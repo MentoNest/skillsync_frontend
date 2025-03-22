@@ -1,0 +1,164 @@
+.container{
+    display: flex;
+    gap: 10rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.login{
+    color: #ccc9c9;
+    margin-left: 6rem;
+
+}
+h2{
+    color: #05283E;
+}
+p{
+    color: #667085;
+}
+.main{
+    margin-top: 3.5rem;
+    width: 380px;
+}
+.note{
+    display: none;
+}
+
+input{
+    width: 87%;
+    border: 1px solid #d1d5db; 
+    padding-left: 36px; 
+    padding-right: 12px; 
+    padding-top: 8px; 
+    padding-bottom: 8px;
+    border-radius: 0.25rem; 
+    outline: none;
+    color: #879196;
+    
+}
+.email-container{
+    position: relative;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+.envelope-icon{
+ position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+}
+
+.eye-icon{
+    width: 20px;
+  height: 20px;
+  color: #9ca3af;
+
+}
+.eye-toggle-btn{
+    background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+}
+.shieldcheck-icon{
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+}
+
+.password-container{
+ position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.forget{
+    color: #0E78B9;
+    text-decoration: none;
+    margin-left: 16rem;
+}
+
+.login-button{
+    background-color: #0E78B9;
+    width: 100%;
+    height: 3rem;
+    color: white;
+    padding-top: 0.5rem;
+    margin-top: 20px;
+    padding-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    
+}
+.account{
+    color: #667085;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 17px;
+}
+
+.register{
+    color: #0E78B9;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.image1{
+    width: 380px;
+    height: 32rem;
+}
+
+  
+  .error-messages p {
+    color: red;
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+  }
+  
+
+
+@media (max-width: 768px) {
+    
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+.login{
+    display: none;
+}
+.image1{
+    display: none;
+}
+.note{
+    display: block;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #667085;
+    margin-bottom: 3rem;
+    font-size: 12px;
+    margin-top: 40px;
+}
+.note a {
+    color: #667085;
+    text-decoration: underline;
+    text-decoration-color: #667085;
+    
+}
+
+}
