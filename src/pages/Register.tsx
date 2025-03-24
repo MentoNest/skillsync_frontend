@@ -1,9 +1,9 @@
 import { useState, ChangeEvent, FormEvent } from "react";
-import image from "../assets/auth-image.png"
-import logo from "../assets/skillsync.png"
-import flag from "../assets/flag.png"
-import password from "../assets/shield.png"
-import referral from "../assets/referral.png"
+import image from "../assets/auth-image.jpg"
+import logo from "../assets/skillsync.jpg"
+import flag from "../assets/flag.jpg"
+import password from "../assets/shield.jpg"
+import referral from "../assets/referral.jpg"
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 interface FirstFormState {
