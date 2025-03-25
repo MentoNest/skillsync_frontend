@@ -5,33 +5,36 @@ import { FiPhoneCall } from "react-icons/fi";
 import { RiSearch2Line } from "react-icons/ri";
 import logoIMG from "../assets/image.png";
 
-
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-md w-full fixed top-0 z-50">
-      <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center py-4">
+    <nav className="fixed top-0 z-50 w-full bg-white shadow-md">
+      <div className="container flex justify-between items-center py-4 px-4 mx-auto lg:px-8">
         {/* Logo */}
         <div className="flex items-center">
           <img src={logoIMG} alt="SkillSync" className="h-8" />
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center space-x-6">
-          <div className="relative flex items-center bg-blue-50 px-4 py-2 rounded-lg">
-            <span className="text-blue-600 font-medium">Mentorship</span>
-            <RiArrowDropDownLine className="ml-1 text-blue-600 text-3xl" />
+        <div className="hidden items-center space-x-6 lg:flex">
+          <div className="flex relative items-center py-2 px-4 bg-blue-50 rounded-lg">
+            <span className="font-medium text-blue-600">Mentorship</span>
+            <RiArrowDropDownLine className="ml-1 text-3xl text-blue-600" />
           </div>
-          <div className="h-8 w-1 bg-gray-500" />
+          <div className="w-1 h-8 bg-gray-500" />
           <div className="flex items-center space-x-4 text-gray-600">
             <FiPhoneCall className="text-2xl" />
             <span>Contact us</span>
             <RiSearch2Line className="ml-4 text-2xl" />
             <span>Find Mentor</span>
           </div>
-          <button className="bg-blue-50 px-6 py-2 rounded-lg text-gray-700">Login</button>
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg">Sign up</button>
+          <button className="py-2 px-6 text-gray-700 bg-blue-50 rounded-lg">
+            Login
+          </button>
+          <button className="py-2 px-6 text-white bg-blue-600 rounded-lg">
+            Sign up
+          </button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -42,13 +45,13 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden bg-white shadow-md p-4">
+        <div className="p-4 bg-white shadow-md lg:hidden">
           <div className="flex flex-col space-y-4">
-            <div className="flex justify-between items-center bg-blue-50 p-2 rounded-lg">
-              <span className="text-blue-600 font-medium">Mentorship</span>
+            <div className="flex justify-between items-center p-2 bg-blue-50 rounded-lg">
+              <span className="font-medium text-blue-600">Mentorship</span>
               <RiArrowDropDownLine className="text-blue-600" />
             </div>
-            <div className="border-t border-gray-300 my-2" />
+            <div className="my-2 border-t border-gray-300" />
             <div className="flex items-center space-x-2 text-gray-600">
               <FiPhoneCall className="text-blue-600" />
               <span>Contact us</span>
@@ -57,8 +60,12 @@ const Navbar = () => {
               <RiSearch2Line className="text-1xl" />
               <span>Find Mentor</span>
             </div>
-            <button className="bg-blue-50 px-4 py-2 rounded-lg text-gray-700">Login</button>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">Sign up</button>
+            <button className="py-2 px-4 text-gray-700 bg-blue-50 rounded-lg">
+              Login
+            </button>
+            <button className="py-2 px-4 text-white bg-blue-600 rounded-lg">
+              Sign up
+            </button>
           </div>
         </div>
       )}

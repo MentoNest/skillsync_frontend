@@ -1,9 +1,9 @@
 import { useState, ChangeEvent, FormEvent } from "react";
-import image from "../assets/auth-image.jpg"
-import logo from "../assets/skillsync.jpg"
-import flag from "../assets/flag.jpg"
-import password from "../assets/shield.jpg"
-import referral from "../assets/referral.jpg"
+import image from "../assets/auth-image.jpg";
+import logo from "../assets/skillsync.jpg";
+import flag from "../assets/flag.jpg";
+import password from "../assets/shield.jpg";
+import referral from "../assets/referral.jpg";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 interface FirstFormState {
@@ -13,13 +13,12 @@ interface FirstFormState {
   email: string;
   department: string;
   year: string;
-
 }
 
 interface SecondFormState {
   phoneNumber: string;
   whatsapp: string;
-   password: string;
+  password: string;
   referralCode: string;
 }
 
@@ -28,26 +27,25 @@ interface FormErrors {
 }
 
 const Register: React.FC = () => {
-  
   const initialState: FirstFormState = {
     firstName: "",
     lastName: "",
-    schoolName:"",
+    schoolName: "",
     email: "",
     department: "",
-     year:"",
-  
+    year: "",
   };
 
   const secondFormState: SecondFormState = {
     phoneNumber: "",
     whatsapp: "",
     password: "",
-    referralCode:"",
+    referralCode: "",
   };
 
   const [formData, setFormData] = useState<FirstFormState>(initialState);
-  const [secondFormData, setSecondFormData] = useState<SecondFormState>(secondFormState);
+  const [secondFormData, setSecondFormData] =
+    useState<SecondFormState>(secondFormState);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showSecondForm, setShowSecondForm] = useState<boolean>(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -84,15 +82,23 @@ const Register: React.FC = () => {
     const newErrors: FormErrors = {};
     if (!secondFormData.phoneNumber) {
       newErrors.phoneNumber = "Phone number is required.";
-    } else if (!/^\+?\d+$/.test(secondFormData.phoneNumber) || secondFormData.phoneNumber.replace(/^\+/, "").length < 11) {
-      newErrors.phoneNumber = "Phone number must be at least 11 digits long and may start with a '+'";
+    } else if (
+      !/^\+?\d+$/.test(secondFormData.phoneNumber) ||
+      secondFormData.phoneNumber.replace(/^\+/, "").length < 11
+    ) {
+      newErrors.phoneNumber =
+        "Phone number must be at least 11 digits long and may start with a '+'";
     }
     if (!secondFormData.whatsapp) {
       newErrors.whatsapp = "Whatsapp number is required.";
-    } else if (!/^\+?\d+$/.test(secondFormData.whatsapp) || secondFormData.whatsapp.replace(/^\+/, "").length < 11) {
-      newErrors.whatsapp = "Whatsapp number must be at least 11 digits long and may start with a '+'";
+    } else if (
+      !/^\+?\d+$/.test(secondFormData.whatsapp) ||
+      secondFormData.whatsapp.replace(/^\+/, "").length < 11
+    ) {
+      newErrors.whatsapp =
+        "Whatsapp number must be at least 11 digits long and may start with a '+'";
     }
- if (!secondFormData.password) {
+    if (!secondFormData.password) {
       newErrors.password = "Password is required.";
     } else if (secondFormData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
@@ -110,10 +116,11 @@ const Register: React.FC = () => {
 
     setFormData(initialState);
     setSecondFormData(secondFormState);
-
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
@@ -129,148 +136,142 @@ const Register: React.FC = () => {
   };
 
   return (
-      <main className="flex h-[100vh] w-[95%] mx-auto">
-          
-          {/* form section */}
+    <main className="flex h-[100vh] w-[95%] mx-auto">
+      {/* form section */}
       <div className="md:w-[50%]">
         <div className="flex flex-col mx-auto w-[90%] md:w-[80%] my-14">
-          <a href="/signup-guardian" className="text-right text-primary mb-5">
+          <a href="/signup-guardian" className="mb-5 text-right text-primary">
             Already have an account? Sign In
           </a>
 
           <img src={logo} alt="skillsync" width={100} className="mb-3" />
-          <h1 className="text-[28px] my-2 font-[600] text-[#05283E]">Get Started,</h1>
-          <p className="text-[#667085] text-[16px]">Join the Student Commerce Revolution!</p>
+          <h1 className="my-2 text-[28px] font-[600] text-[#05283E]">
+            Get Started,
+          </h1>
+          <p className="text-[#667085] text-[16px]">
+            Join the Student Commerce Revolution!
+          </p>
           <form
-              className="text-sm text-gray-800"
-              onSubmit={
-                showSecondForm ? handleSecondFormSubmit : handleFirstFormSubmit
-              }
-            >
-              {!showSecondForm ? (
-                <>
-                  {/* Name */}
-                  <div className="flex gap-3 my-3">
-                    <div className="w-[50%]">
-                      {" "}
-                      <input
-                        type="text"
-                        name="firstName"
-                        placeholder="First Name"
-                        className="border border-gray-300 py-2 px-1 rounded-md outline-none w-full"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                      />
-                      {errors.firstName && (
-                        <p className="text-red-500 text-xs">
-                          {errors.firstName}
-                        </p>
-                      )}
-                    </div>
-                    <div className="w-[50%]">
-                      <input
-                        type="text"
-                        name="lastName"
-                        placeholder="Last Name"
-                        className="border border-gray-300 py-2 px-1 rounded-md outline-none w-full"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                      />
-                      {errors.lastName && (
-                        <p className="text-red-500 text-xs">
-                          {errors.lastName}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  {/* School */}
-                  <div className="flex w-full items-center gap-2 border border-gray-300 py-2 px-1 rounded-md my-3">
+            className="text-sm text-gray-800"
+            onSubmit={
+              showSecondForm ? handleSecondFormSubmit : handleFirstFormSubmit
+            }
+          >
+            {!showSecondForm ? (
+              <>
+                {/* Name */}
+                <div className="flex gap-3 my-3">
+                  <div className="w-[50%]">
+                    {" "}
                     <input
                       type="text"
-                      name="schoolName"
-                      placeholder="School"
-                      className="w-full outline-none"
-                      value={formData.schoolName}
+                      name="firstName"
+                      placeholder="First Name"
+                      className="py-2 px-1 w-full rounded-md border border-gray-300 outline-none"
+                      value={formData.firstName}
                       onChange={handleChange}
                     />
-                </div>
-                    {errors.schoolName && (
-                    <p className="text-red-500 text-xs">{errors.schoolName}</p>
-                )}
-                 
-                
-                 {/* Email */}
-                  <div className="flex items-center gap-1 border border-gray-300 py-2 px-1 rounded-md my-3">
-                    {/* <img src={mail} alt="" /> */}
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email Address"
-                      className="w-full outline-none"
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
+                    {errors.firstName && (
+                      <p className="text-xs text-red-500">{errors.firstName}</p>
+                    )}
                   </div>
-                  {errors.email && (
-                    <p className="text-red-500 text-xs">{errors.email}</p>
+                  <div className="w-[50%]">
+                    <input
+                      type="text"
+                      name="lastName"
+                      placeholder="Last Name"
+                      className="py-2 px-1 w-full rounded-md border border-gray-300 outline-none"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                    />
+                    {errors.lastName && (
+                      <p className="text-xs text-red-500">{errors.lastName}</p>
+                    )}
+                  </div>
+                </div>
+                {/* School */}
+                <div className="flex gap-2 items-center py-2 px-1 my-3 w-full rounded-md border border-gray-300">
+                  <input
+                    type="text"
+                    name="schoolName"
+                    placeholder="School"
+                    className="w-full outline-none"
+                    value={formData.schoolName}
+                    onChange={handleChange}
+                  />
+                </div>
+                {errors.schoolName && (
+                  <p className="text-xs text-red-500">{errors.schoolName}</p>
                 )}
-                 
-                 
-                <div className="flex gap-3 my-3">
-                     <div className="w-[50%]">
-                      <select
-                        name="department"
-                        className="border border-gray-300 py-3 px-2 rounded-md outline-none w-full text-gray-600 bg-white"
-                        value={formData.department}
-                        onChange={handleChange}
-                      >
-                        <option value="" disabled>
-                          Department
-                        </option>
-                       
-                      </select>
-                      {errors.department && (
-                        <p className="text-red-500 text-xs">
-                          {errors.department}
-                        </p>
-                      )}
-                    </div>
-                <div className="w-[50%]">
-                      <select
-                        name="year"
-                        className="border border-gray-300 py-3 px-2 rounded-md outline-none w-full text-gray-600 bg-white"
-                        value={formData.year}
-                        onChange={handleChange}
-                      >
-                        <option value="" disabled>
-                          Year of study
-                        </option>
 
-                      </select>
-                      {errors.department && (
-                        <p className="text-red-500 text-xs">
-                          {errors.department}
-                        </p>
-                      )}
-                    </div>
-                 </div>
-                 
-                
-                  {/* Button */}
-                  <button
-                    type="submit"
-                    className="flex justify-center mx-auto bg-[#0E78B9] text-white py-2 text-sm rounded my-5 w-full"
-                  >
-                    Continue
-                  </button>
-                </>
-              ) : (
+                {/* Email */}
+                <div className="flex gap-1 items-center py-2 px-1 my-3 rounded-md border border-gray-300">
+                  {/* <img src={mail} alt="" /> */}
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email Address"
+                    className="w-full outline-none"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-xs text-red-500">{errors.email}</p>
+                )}
+
+                <div className="flex gap-3 my-3">
+                  <div className="w-[50%]">
+                    <select
+                      name="department"
+                      className="py-3 px-2 w-full text-gray-600 bg-white rounded-md border border-gray-300 outline-none"
+                      value={formData.department}
+                      onChange={handleChange}
+                    >
+                      <option value="" disabled>
+                        Department
+                      </option>
+                    </select>
+                    {errors.department && (
+                      <p className="text-xs text-red-500">
+                        {errors.department}
+                      </p>
+                    )}
+                  </div>
+                  <div className="w-[50%]">
+                    <select
+                      name="year"
+                      className="py-3 px-2 w-full text-gray-600 bg-white rounded-md border border-gray-300 outline-none"
+                      value={formData.year}
+                      onChange={handleChange}
+                    >
+                      <option value="" disabled>
+                        Year of study
+                      </option>
+                    </select>
+                    {errors.department && (
+                      <p className="text-xs text-red-500">
+                        {errors.department}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Button */}
+                <button
+                  type="submit"
+                  className="flex justify-center py-2 my-5 mx-auto w-full text-sm text-white rounded bg-[#0E78B9]"
+                >
+                  Continue
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Second Form Fields with Dropdowns */}
                 <>
-                  {/* Second Form Fields with Dropdowns */}
-                  <>
-                    <div className="flex items-center gap-1 border border-gray-300 py-2 px-1 rounded-md my-3">
-                       <img src={flag} alt="" />
-                   
+                  <div className="flex gap-1 items-center py-2 px-1 my-3 rounded-md border border-gray-300">
+                    <img src={flag} alt="" />
+
                     <input
                       type="text"
                       name="phoneNumber"
@@ -281,12 +282,12 @@ const Register: React.FC = () => {
                     />
                   </div>
                   {errors.phoneNumber && (
-                    <p className="text-red-500 text-xs">{errors.phoneNumber}</p>
-                )}
-                    {/*  */}
-                    <div className="flex items-center gap-1 border border-gray-300 py-2 px-1 rounded-md my-3">
-                       <img src={flag} alt="" />
-                 
+                    <p className="text-xs text-red-500">{errors.phoneNumber}</p>
+                  )}
+                  {/*  */}
+                  <div className="flex gap-1 items-center py-2 px-1 my-3 rounded-md border border-gray-300">
+                    <img src={flag} alt="" />
+
                     <input
                       type="text"
                       name="whatsapp"
@@ -297,13 +298,13 @@ const Register: React.FC = () => {
                     />
                   </div>
                   {errors.whatsapp && (
-                    <p className="text-red-500 text-xs">{errors.whatsapp}</p>
-                    )}
-                    {/*  */}
+                    <p className="text-xs text-red-500">{errors.whatsapp}</p>
+                  )}
+                  {/*  */}
 
-                      {/* Password */}
-                    <div className="flex justify-between items-center border border-gray-300 py-2 px-1 rounded-md my-3">
-                      <div className="flex items-center gap-1">
+                  {/* Password */}
+                  <div className="flex justify-between items-center py-2 px-1 my-3 rounded-md border border-gray-300">
+                    <div className="flex gap-1 items-center">
                       <img src={password} alt="" />
                       <input
                         className="outline-none"
@@ -322,12 +323,12 @@ const Register: React.FC = () => {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-red-500 text-xs">{errors.password}</p>
+                    <p className="text-xs text-red-500">{errors.password}</p>
                   )}
-                    
-                    {/*  */}
-                     {/* Referral code */}
-                  <div className="flex w-full items-center gap-2 border border-gray-300 py-2 px-1 rounded-md my-3">
+
+                  {/*  */}
+                  {/* Referral code */}
+                  <div className="flex gap-2 items-center py-2 px-1 my-3 w-full rounded-md border border-gray-300">
                     <img src={referral} alt="" />
                     <input
                       type="text"
@@ -337,39 +338,42 @@ const Register: React.FC = () => {
                       value={secondFormData.referralCode}
                       onChange={handleChange}
                     />
-                    </div>
-                    
+                  </div>
+
                   {/* Submit Button for Second Form */}
                   <button
                     type="submit"
-                    className="flex justify-center mx-auto bg-[#0E78B9] text-white py-2 text-sm rounded my-5 w-full "
+                    className="flex justify-center py-2 my-5 mx-auto w-full text-sm text-white rounded bg-[#0E78B9]"
                   >
                     Create Account
                   </button>
-                  </>
                 </>
-              )}
-                  </form>
-                    
-            <div className="text-center w-[90%] text-primary flex mx-auto text-sm my-4">
-              <p>
-                By clicking on the &quot;Create Account&quot; button, you
-                indicate that you agree to the{" "}
-                <a href={""} className="underline">Terms of Service</a> and{" "}
-                <a href={""} className="underline">Privacy Policy</a>
-              </p>
-            </div>
-          </div>
-          </div>
-          
+              </>
+            )}
+          </form>
 
-          {/* Image section*/}
-          <div className="hidden md:flex"><img src={image} alt="image"/></div>
+          <div className="text-center w-[90%] text-primary flex mx-auto text-sm my-4">
+            <p>
+              By clicking on the &quot;Create Account&quot; button, you indicate
+              that you agree to the{" "}
+              <a href={""} className="underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href={""} className="underline">
+                Privacy Policy
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Image section*/}
+      <div className="hidden md:flex">
+        <img src={image} alt="image" />
+      </div>
     </main>
   );
 };
 
 export default Register;
-
-
-
