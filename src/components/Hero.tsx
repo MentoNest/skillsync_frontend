@@ -30,7 +30,7 @@ export default function Hero() {
                     }}
                 >
 
-                    <h1 className=" text-[#05283E] font-semibold text-4xl lg:text-5xl lg:leading-[62px] relative  p-1 mb-3  " >
+                    <h1 className=" text-[#05283E] font-semibold text-[32px] lg:text-5xl lg:leading-[62px] relative  p-1 mb-3  " >
                         <span> Give your kids the</span>
                         <span>  academic direction</span>
 
@@ -61,7 +61,7 @@ export default function Hero() {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                             onHoverStart={() => console.log('hover started!')}
-                            className=" cursor-pointer bg-[#09507B] py-[10px] px-4 rounded-[43px] text-[#FFFFFF] text-xs md:text-sm font-normal   "  >Search</motion.button>
+                            className=" cursor-pointer bg-[#09507B] py-[10px] px-4 rounded-[43px] text-[#FFFFFF] text-sm font-normal   "  >Search</motion.button>
                     </div>
                 </motion.div>
 
