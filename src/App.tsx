@@ -1,16 +1,8 @@
-
-import Hero from './components/Hero'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routers";
 
 function App() {
-  return (
-    <>
-    <Navbar />
-    <Hero/>
-    <Footer/>
-    </>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
