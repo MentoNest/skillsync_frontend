@@ -6,6 +6,7 @@ import { LogIn } from "./../pages/LogIn";
 import { AuthLayout } from "../layout/auth/signIn";
 import { DashBoardLayOut } from "../layout/daskboard/dashboard";
 import Home from "../pages/Home";
+import TestimonialSection from "../components/testimonialsection";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+
   {
     path: "/dashboard",
     element: <DashBoardLayOut />,
@@ -30,6 +32,13 @@ export const router = createBrowserRouter([
         path: "/dashboard/home",
         element: <Home />,
       },
+     
     ],
   },
+
+   {
+        path:'/testimonial',
+        element: <TestimonialSection/>
+      }
+
 ]);
