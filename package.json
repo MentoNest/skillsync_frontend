@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "formik": "^2.4.6",
+    "lucide-react": "^0.511.0",
     "motion": "^12.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
