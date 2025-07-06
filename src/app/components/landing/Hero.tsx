@@ -50,7 +50,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="w-full flex flex-col items-center justify-center pt-16 pb-10 px-4 bg-white">
+    <section className="w-full flex flex-col items-center justify-center pt-24 md:pt-32 pb-10 px-4 bg-white">
       <div className="max-w-3xl text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Get Connected to the Best{" "}
