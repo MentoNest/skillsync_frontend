@@ -18,6 +18,17 @@ export function PartnersSection() {
             <div className="w-6 h-6 bg-gray-400 rounded-sm"></div>
             <span className="text-2xl md:text-3xl font-medium">LinkedIn</span>
           </div>
+
+          {/* Microsoft */}
+          <div className="flex items-center gap-2 text-gray-400">
+            <div className="grid grid-cols-2 gap-0.5 w-6 h-6">
+              <div className="bg-gray-400 w-2.5 h-2.5"></div>
+              <div className="bg-gray-400 w-2.5 h-2.5"></div>
+              <div className="bg-gray-400 w-2.5 h-2.5"></div>
+              <div className="bg-gray-400 w-2.5 h-2.5"></div>
+            </div>
+            <span className="text-2xl md:text-3xl font-medium">Microsoft</span>
+          </div>
         </div>
       </div>
     </section>
