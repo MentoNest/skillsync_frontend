@@ -12,6 +12,12 @@ export function PartnersSection() {
           <div className="text-gray-400 text-2xl md:text-3xl font-medium">
             Udemy
           </div>
+
+          {/* LinkedIn */}
+          <div className="flex items-center gap-2 text-gray-400">
+            <div className="w-6 h-6 bg-gray-400 rounded-sm"></div>
+            <span className="text-2xl md:text-3xl font-medium">LinkedIn</span>
+          </div>
         </div>
       </div>
     </section>
