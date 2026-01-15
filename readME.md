@@ -52,6 +52,25 @@ npm run dev
 ```bash
  npm run test
 ```
+## 👥 Contributing
+
+We welcome contributions from the community! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m 'Add some feature'
+   ```
+4. Push to the branch:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+5. Open a pull request
+
 
 ## 🔗 Blockchain Integration
 The frontend interacts with:
@@ -61,6 +80,7 @@ The frontend interacts with:
 All transactions are executed client-side using non-custodial wallets.
 
 ## 📂 Project Structure
+```
   src/
   ├── components/
   ├── pages/
@@ -68,6 +88,7 @@ All transactions are executed client-side using non-custodial wallets.
   ├── services/
   ├── styles/
   └── utils/
+```
 
 ## 📄 License
 MIT License
