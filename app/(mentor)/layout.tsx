@@ -1,3 +1,5 @@
+import FeaturedMentorSection from '../(mentor)/mentor/FeaturedMentorSection';
+
 export default function MentorLayout({
   children,
 }: {
@@ -10,6 +12,10 @@ export default function MentorLayout({
           <h1 className="text-2xl font-bold">Mentor Dashboard</h1>
         </div>
       </header>
+      
+      {/* Featured Mentor Section */}
+      <FeaturedMentorSection />
+      
       <main className="container mx-auto px-4 py-6">{children}</main>
     </div>
   );
