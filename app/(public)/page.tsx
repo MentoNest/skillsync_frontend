@@ -1,3 +1,5 @@
+import Footer from "@/components/Footer";
+
 export default function HomePage() {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -5,6 +7,10 @@ export default function HomePage() {
       <p className="text-lg text-gray-600">
         Landing page placeholder - Content to be implemented
       </p>
+
+
+
+      <Footer />
     </div>
   );
 }
