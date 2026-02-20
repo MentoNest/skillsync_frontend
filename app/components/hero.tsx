@@ -39,7 +39,7 @@ const Hero = () => {
                     {/* Mentor Card 1 */}
                     <div className="group bg-white rounded-[2rem] overflow-hidden shadow-xl hover:shadow-2xl border border-gray-100 transition-all duration-500 hover:-translate-y-2">
                         <div className="h-72 bg-gray-100 relative overflow-hidden">
-                            {/* IMAGE PLACEHOLDER: /mentors/cole.jpg */}
+
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-200">
                                 <Image
                                     src="/Image (Cole Hathans).svg"
@@ -71,7 +71,7 @@ const Hero = () => {
                     {/* Mentor Card 2 */}
                     <div className="group bg-white rounded-[2rem] overflow-hidden shadow-xl hover:shadow-2xl border border-gray-100 transition-all duration-500 hover:-translate-y-2">
                         <div className="h-72 bg-gray-100 relative overflow-hidden">
-                            {/* IMAGE PLACEHOLDER: /mentors/sarah.jpg */}
+
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-200">
                                 <Image
                                     src="/Image (Sarah Johnson).svg"
@@ -103,7 +103,7 @@ const Hero = () => {
                     {/* Mentor Card 3 */}
                     <div className="group bg-white rounded-[2rem] overflow-hidden shadow-xl hover:shadow-2xl border border-gray-100 transition-all duration-500 hover:-translate-y-2">
                         <div className="h-72 bg-gray-100 relative overflow-hidden">
-                            {/* IMAGE PLACEHOLDER: /mentors/marcus.jpg */}
+
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-200">
                                 <Image
                                     src="/Image (Marcus Williams).svg"
