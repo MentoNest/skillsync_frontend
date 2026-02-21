@@ -1,117 +1,218 @@
-import Link from "next/link";
-import React from "react";
+"use client"
+
+import { useState } from "react"
+import { Eye, EyeOff, ChevronLeft, ChevronRight, Star, BookOpen, GraduationCap } from "lucide-react"
+import Link from "next/link"
 
 export default function RegisterPage() {
-    return (
-        <div className="space-y-6">
-            <div className="space-y-2 text-center">
-                <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
-                <p className="text-muted-foreground">
-                    Join SkillSync and start your journey today
-                </p>
+  const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: ""
+  })
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log("Registration attempt:", formData)
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Left Column - Registration Form */}
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-12">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900">SkillSync</h1>
+          </div>
+
+          {/* Welcome Message */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to SkillSync</h2>
+            <p className="text-gray-600">Create your account to get started</p>
+          </div>
+
+          {/* Registration Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Full Name */}
+            <div>
+              <label htmlFor="fullName" className="sr-only">
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                placeholder="Full Name"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200"
+                required
+              />
             </div>
 
-            <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="first-name"
-                            className="text-sm font-medium leading-none"
-                        >
-                            First Name
-                        </label>
-                        <input
-                            id="first-name"
-                            placeholder="John"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="last-name"
-                            className="text-sm font-medium leading-none"
-                        >
-                            Last Name
-                        </label>
-                        <input
-                            id="last-name"
-                            placeholder="Doe"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
-                        />
-                    </div>
-                </div>
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Email address eg. jamie234@gmail.com"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200"
+                required
+              />
+            </div>
 
-                <div className="space-y-2">
-                    <label
-                        htmlFor="email"
-                        className="text-sm font-medium leading-none"
-                    >
-                        Email
-                    </label>
-                    <input
-                        id="email"
-                        type="email"
-                        placeholder="m@example.com"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <label
-                        htmlFor="password"
-                        className="text-sm font-medium leading-none"
-                    >
-                        Password
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
-                    />
-                </div>
-
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200 pr-12"
+                  required
+                />
                 <button
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-lg shadow-primary/20 active:scale-[0.98] transition-all duration-150"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                    Sign Up
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
-
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">
-                            Or continue with
-                        </span>
-                    </div>
-                </div>
-
-                <button
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full active:scale-[0.98] transition-all duration-150"
-                >
-                    Google
-                </button>
+              </div>
             </div>
 
-            <div className="text-center text-sm">
-                Already have an account?{" "}
-                <Link href="/login" className="font-medium text-primary hover:underline">
-                    Sign in
-                </Link>
-            </div>
+            {/* Create Account Button */}
+            <button
+              type="submit"
+              className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+            >
+              Create account
+            </button>
+          </form>
 
-            <p className="px-8 text-center text-xs text-muted-foreground">
-                By clicking continue, you agree to our{" "}
-                <Link href="#" className="underline underline-offset-4 hover:text-primary">
-                    Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="#" className="underline underline-offset-4 hover:text-primary">
-                    Privacy Policy
-                </Link>
-                .
-            </p>
+          {/* Separator */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">or sign up with</span>
+            </div>
+          </div>
+
+          {/* Social Login Buttons */}
+          <div className="space-y-3">
+            <button className="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+              <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <span className="text-gray-700 font-medium">Continue with Google</span>
+            </button>
+
+            <button className="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+              <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              <span className="text-gray-700 font-medium">Continue with Facebook</span>
+            </button>
+          </div>
+
+          <div className="text-center text-sm mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="font-medium text-purple-600 hover:underline">
+              Sign in
+            </Link>
+          </div>
         </div>
-    );
+      </div>
+
+      {/* Right Column - Promotional Section */}
+      <div className="flex-1 bg-purple-600 relative overflow-hidden hidden lg:flex lg:flex-col lg:items-center lg:justify-center p-12">
+        {/* Background Icons */}
+        <div className="absolute top-10 left-10 text-white/20">
+          <BookOpen size={40} />
+        </div>
+        <div className="absolute bottom-10 right-10 text-white/20">
+          <GraduationCap size={40} />
+        </div>
+        <div className="absolute top-1/3 right-20 text-white/10">
+          <BookOpen size={60} />
+        </div>
+        <div className="absolute bottom-1/3 left-20 text-white/10">
+          <GraduationCap size={60} />
+        </div>
+
+        {/* Navigation Arrows */}
+        <div className="absolute top-8 right-8 flex gap-2">
+          <button className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+            <ChevronLeft size={20} />
+          </button>
+          <button className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {/* Mentor Card */}
+        <div className="bg-white rounded-2xl p-6 max-w-sm mx-auto shadow-xl">
+          <div className="flex items-center mb-4">
+            <div className="w-20 h-20 rounded-full bg-gray-300 mr-4 flex items-center justify-center">
+              <span className="text-gray-600 text-lg font-semibold">TA</span>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-gray-900">Tony Adebanjo</h3>
+              <p className="text-gray-600 text-sm">Software Specialist, 10 years</p>
+            </div>
+          </div>
+          
+          {/* Rating */}
+          <div className="flex items-center mb-4">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  size={16}
+                  className={star <= 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
+                />
+              ))}
+            </div>
+            <span className="ml-2 text-sm text-gray-600">4.5</span>
+          </div>
+
+          {/* Price */}
+          <div className="text-2xl font-bold text-gray-900 mb-4">$200.00</div>
+        </div>
+
+        {/* Promotional Text */}
+        <div className="text-center mt-8 max-w-md">
+          <h3 className="text-2xl font-bold text-white mb-4">
+            Grow Confidently with support from skilled mentors who care
+          </h3>
+        </div>
+      </div>
+    </div>
+  )
 }
