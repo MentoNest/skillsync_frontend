@@ -28,6 +28,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <style>{`
+          .skip-link{
+            position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden;
+          }
+          .skip-link:focus{
+            position: static; width: auto; height: auto; left: auto; padding: 8px 12px; background:#111827; color:#fff; border-radius:6px; z-index:9999;
+          }
+        `}</style>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
         {children}
         <Footer />
       </body>

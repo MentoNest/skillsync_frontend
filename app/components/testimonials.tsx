@@ -39,24 +39,25 @@ export default function Testimonials() {
       <div className="testimonials-grid">
         {TESTIMONIALS.map((t, idx) => (
           <article key={idx} className="card" aria-label={`Testimonial from ${t.name}`}>
-            <div className="stars" aria-hidden>
-              {'★ ★ ★ ★ ★'}
-            </div>
-            <p className="quote">{t.quote}</p>
+            <div className="stars" aria-hidden="true">{'★ ★ ★ ★ ★'}</div>
 
-            <div className="meta">
-              <div className="avatar" aria-hidden>
+            <blockquote>
+              <p className="quote">{t.quote}</p>
+            </blockquote>
+
+            <footer className="meta">
+              <div className="avatar" aria-hidden="true">
                 {t.name
-                  .split(' ')
+                  .split(" ")
                   .map((s) => s[0])
                   .slice(0, 2)
-                  .join('')}
+                  .join("")}
               </div>
               <div>
                 <div className="name">{t.name}</div>
                 <div className="role">{t.role}</div>
               </div>
-            </div>
+            </footer>
           </article>
         ))}
       </div>
