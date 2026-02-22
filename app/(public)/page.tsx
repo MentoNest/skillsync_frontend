@@ -5,7 +5,7 @@ import Testimonials from "../components/testimonials";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
+    <main id="main-content" className="min-h-screen">
       <Hero />
       <FeaturedMentor />
       <Testimonials />

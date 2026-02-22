@@ -27,7 +27,7 @@ const Hero = () => {
 
                     {/* CTA Button */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="w-full sm:w-auto bg-[#9333ea] hover:bg-[#7e22ce] text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all duration-300 shadow-[0_10px_20px_-5px_rgba(147,51,234,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(147,51,234,0.5)] transform hover:-translate-y-1 active:scale-95">
+                        <button type="button" aria-label="Find a mentor" className="w-full sm:w-auto bg-[#9333ea] hover:bg-[#7e22ce] text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all duration-300 shadow-[0_10px_20px_-5px_rgba(147,51,234,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(147,51,234,0.5)] transform hover:-translate-y-1 active:scale-95">
                             Find a Mentor
                         </button>
 
@@ -43,7 +43,7 @@ const Hero = () => {
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-200">
                                 <Image
                                     src="/Image (Cole Hathans).svg"
-                                    alt="Sarah - Top Mentor"
+                                    alt="Cole Hathans - Mentor"
                                     fill
                                     className="object-cover"
                                     priority
@@ -75,7 +75,7 @@ const Hero = () => {
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-200">
                                 <Image
                                     src="/Image (Sarah Johnson).svg"
-                                    alt="Sarah - Top Mentor"
+                                    alt="Sarah Johnson - Mentor"
                                     fill
                                     className="object-cover"
                                     priority
@@ -107,7 +107,7 @@ const Hero = () => {
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-200">
                                 <Image
                                     src="/Image (Marcus Williams).svg"
-                                    alt="Sarah - Top Mentor"
+                                    alt="Marcus Williams - Mentor"
                                     fill
                                     className="object-cover"
                                     priority
