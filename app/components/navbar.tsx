@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 
-const NAV_LINKS = ["Home", "Find a Mentor", "Courses", "Contact"];
+const NAV_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Find a Mentor", href: "/find-a-mentor" },
+  { label: "Courses", href: "/courses" },
+  { label: "Contact", href: "/contact" },
+];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -156,16 +161,16 @@ export default function Navbar() {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8 flex-1">
             {NAV_LINKS.map((link) => (
-              <a href="#" key={link} className="nav-link">
-                {link}
+              <a href={link.href} key={link.label} className="nav-link">
+                {link.label}
               </a>
             ))}
           </div>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-5 ml-auto">
-            <button className="btn-login">Log In</button>
-            <button className="btn-get-started">Get started</button>
+            <button type="button" aria-label="Log in" className="btn-login">Log In</button>
+            <button type="button" aria-label="Get started" className="btn-get-started">Get started</button>
           </div>
 
           {/* Mobile hamburger */}
@@ -186,18 +191,22 @@ export default function Navbar() {
         <div className={`mobile-menu md:hidden bg-white border-t border-gray-100 ${menuOpen ? "open" : ""}`}>
           <div className="px-4 py-3 flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
-              <a href="#" key={link} className="mobile-nav-link">
-                {link}
+              <a href={link.href} key={link.label} className="mobile-nav-link">
+                {link.label}
               </a>
             ))}
             <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-2">
               <button
+                type="button"
+                aria-label="Log in"
                 className="mobile-nav-link text-left"
                 style={{ color: "#374151" }}
               >
                 Log In
               </button>
               <button
+                type="button"
+                aria-label="Get started"
                 className="btn-get-started w-full text-center"
                 style={{ borderRadius: "10px" }}
               >
