@@ -68,9 +68,10 @@ export default function AuthLayout({
         <div className="mb-8">
           <MentorCard
             name="Tony Adebanjo"
-            title="Software Specialist"
-            experience="10 years"
+            role="Software Specialist"
+            description="10 years of experience in software development"
             rating={4.5}
+            reviewCount={25}
             price="$200.00"
             initials="TA"
           />

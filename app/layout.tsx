@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import dynamic from 'next/dynamic';
 import "./globals.css";
-import Footer from "./components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +13,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Dynamically import Footer for better performance
+const Footer = dynamic(() => import("./components/footer"), {
+  loading: () => <div className="h-32 bg-gray-100 animate-pulse"></div>
+});
+
 export const metadata: Metadata = {
   title: "SkillSync - Mentorship Platform",
   description: "A blockchain-powered mentorship platform",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  other: {
+    'theme-color': '#9333ea',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'apple-mobile-web-app-title': 'SkillSync',
+  },
 };
 
 export default function RootLayout({

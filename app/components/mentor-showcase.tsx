@@ -1,6 +1,6 @@
 'use client'
 
-import { MentorCard} from './MentorCard'
+import MentorCard from './MentorCard'
 
 const mentors = [
   {
@@ -87,10 +87,9 @@ export function MentorShowcase() {
           </p>
         </div>
 
-        {/* Mentor Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {mentors.map((mentor) => (
-            <MentorCard key={mentor.id} {...mentor} />
+            <MentorCard key={mentor.id} {...mentor} imageSrc={mentor.image} />
           ))}
         </div>
       </div>

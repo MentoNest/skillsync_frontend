@@ -48,7 +48,7 @@ export default function WhyChoose() {
               className="flex flex-col items-center text-center"
             >
               <div
-                className={`mb-6 flex h-20 w-20 items-center justify-center rounded-full shadow-md ${benefit.accentBg}`}
+                className={`mb-6 flex h-20 w-20 items-center justify-center rounded-full shadow-md flex-shrink-0 ${benefit.accentBg}`}
               >
                 <benefit.icon className={`h-9 w-9 ${benefit.accentIcon}`} />
               </div>
