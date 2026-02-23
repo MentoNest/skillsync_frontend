@@ -1,7 +1,7 @@
+/* stylelint-disable at-rule-no-unknown */
+/* css-linguist-disable unknown-at-rules */
 @import "tailwindcss";
 @import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
