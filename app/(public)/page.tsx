@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Hero from "../components/hero";
 import ResourceSearchBar from "../components/resource-search-bar";
+import FeaturedArticles from "../components/featured-articles";
 import QuickAccess from "../components/quick-access";
 
 // Dynamically import below-fold components
@@ -29,6 +30,7 @@ export default function HomePage() {
     <main className="min-h-screen space-y-10 md:space-y-12">
       <Hero />
       <ResourceSearchBar />
+      <FeaturedArticles />
       <WhyChoose />
       <FeaturedMentor />
       <LearningPathSection />
