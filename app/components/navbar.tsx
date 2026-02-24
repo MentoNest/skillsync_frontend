@@ -145,34 +145,29 @@ export default function Navbar() {
         }`}
       >
         {/* Desktop bar */}
-        <div className="max-w-7xl mx-auto px-6 flex items-center h-16">
+        <div className="container-responsive flex items-center h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex-shrink-0 mr-10">
+          <a href="/" className="flex-shrink-0 mr-4 md:mr-10">
             <span
-              style={{
-                fontSize: "1.25rem",
-                fontWeight: 700,
-                color: "#111827",
-                letterSpacing: "-0.5px",
-              }}
+              className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight"
             >
               SkillSync
             </span>
           </a>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-8 flex-1">
+          <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-1">
             {NAV_LINKS.map((link) => (
-              <a href={link.href} key={link.label} className="nav-link">
+              <a href={link.href} key={link.label} className="nav-link text-sm lg:text-base">
                 {link.label}
               </a>
             ))}
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-5 ml-auto">
-            <button type="button" aria-label="Log in" className="btn-login">Log In</button>
-            <button type="button" aria-label="Get started" className="btn-get-started">Get started</button>
+          <div className="hidden md:flex items-center gap-3 lg:gap-5 ml-auto">
+            <button type="button" aria-label="Log in" className="btn-login text-sm lg:text-base">Log In</button>
+            <button type="button" aria-label="Get started" className="btn-get-started text-sm lg:text-base">Get started</button>
           </div>
 
           {/* Mobile hamburger */}
@@ -181,6 +176,7 @@ export default function Navbar() {
               className={`hamburger ${menuOpen ? "open" : ""}`}
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
+              aria-expanded={menuOpen}
             >
               <span />
               <span />
@@ -190,10 +186,18 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu */}
-        <div className={`mobile-menu md:hidden bg-white border-t border-gray-100 ${menuOpen ? "open" : ""}`}>
+        <div 
+          className={`mobile-menu md:hidden bg-white border-t border-gray-100 transition-all duration-300 ease-in-out ${menuOpen ? "open max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+          aria-hidden={!menuOpen}
+        >
           <div className="px-4 py-3 flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
-              <a href={link.href} key={link.label} className="mobile-nav-link">
+              <a 
+                href={link.href} 
+                key={link.label} 
+                className="mobile-nav-link text-base py-3"
+                onClick={() => setMenuOpen(false)}
+              >
                 {link.label}
               </a>
             ))}
@@ -201,16 +205,16 @@ export default function Navbar() {
               <button
                 type="button"
                 aria-label="Log in"
-                className="mobile-nav-link text-left"
-                style={{ color: "#374151" }}
+                className="mobile-nav-link text-left py-3 text-gray-700"
+                onClick={() => setMenuOpen(false)}
               >
                 Log In
               </button>
               <button
                 type="button"
                 aria-label="Get started"
-                className="btn-get-started w-full text-center"
-                style={{ borderRadius: "10px" }}
+                className="btn-get-started w-full text-center py-3 text-base"
+                onClick={() => setMenuOpen(false)}
               >
                 Get started
               </button>
@@ -220,7 +224,7 @@ export default function Navbar() {
       </nav>
 
       {/* Spacer so page content isn't hidden under the fixed nav */}
-      <div style={{ height: 64 }} />
+      <div className="h-16 md:h-20" />
     </>
   );
 }

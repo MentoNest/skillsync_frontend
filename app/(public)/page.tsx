@@ -1,33 +1,46 @@
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import Hero from "../components/hero";
 import Empower from '../components/ui/Empower';
+import ResourceSearchBar from "../components/resource-search-bar";
+import FeaturedArticles from "../components/featured-articles";
 
-// Dynamically import below-fold components to reduce initial payload
+import QuickAccess from "../components/quick-access";
+import PlatformStatistics from "../components/PlatformStatistics";
+
+// Dynamically import below-fold components
+const WhyChoose = dynamic(() => import("../components/why-choose"), {
+  loading: () => (
+    <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
+  ),
+});
+
 const FeaturedMentor = dynamic(() => import("../components/featured-mentor"), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
+  loading: () => (
+    <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
+  ),
 });
 
-const SkillSyncFeatures = dynamic(() => import("../components/why-choose"), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
-});
+const LearningPathSection = dynamic(() =>
+  import("../components/mentor-showcase").then((mod) => ({
+    default: mod.MentorShowcase,
+  }))
+);
 
-const LearningPathSection = dynamic(() => import("../components/mentor-showcase").then(mod => ({ default: mod.MentorShowcase })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
-});
-
-const Testimonials = dynamic(() => import("../components/testimonials"), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
-});
+const Testimonials = dynamic(() => import("../components/testimonials"));
 
 export default function HomePage() {
   return (
-    <main id="main-content" className="min-h-screen">
+    <main className="min-h-screen space-y-10 md:space-y-12">
       <Hero />
+      <ResourceSearchBar />
+      <FeaturedArticles />
+      <WhyChoose />
       <FeaturedMentor />
-      <SkillSyncFeatures />
       <LearningPathSection />
       <Empower/>
+      <PlatformStatistics />
       <Testimonials />
+      <QuickAccess />
     </main>
   );
 }
