@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import Hero from "../components/hero";
+import Empower from '../components/ui/Empower';
 
 // Dynamically import below-fold components to reduce initial payload
 const FeaturedMentor = dynamic(() => import("../components/featured-mentor"), {
@@ -25,6 +26,7 @@ export default function HomePage() {
       <FeaturedMentor />
       <SkillSyncFeatures />
       <LearningPathSection />
+      <Empower/>
       <Testimonials />
     </main>
   );
