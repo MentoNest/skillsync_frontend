@@ -1,5 +1,6 @@
-import dynamic from 'next/dynamic';
 import Hero from "../components/hero";
+import WhyChoose from "../components/why-choose";
+import QuickAccess from "../components/quick-access";
 import ResourceSearchBar from "../components/resource-search-bar";
 import WhyChoose from "../components/why-choose";
 import QuickAccess from "../components/quick-access";
@@ -31,12 +32,10 @@ const Testimonials = dynamic(() => import("../components/testimonials"), {
 
 export default function HomePage() {
   return (
-    <main id="main-content" className="min-h-screen">
+    <main className="min-h-screen">
       <Hero />
-      <FeaturedMentor />
-      <SkillSyncFeatures />
-      <LearningPathSection />
-      <Testimonials />
+      <WhyChoose />
+      <QuickAccess />
     </main>
   );
 }
