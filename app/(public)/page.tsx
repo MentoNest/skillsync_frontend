@@ -2,7 +2,9 @@ import dynamic from "next/dynamic";
 import Hero from "../components/hero";
 import ResourceSearchBar from "../components/resource-search-bar";
 import FeaturedArticles from "../components/featured-articles";
+
 import QuickAccess from "../components/quick-access";
+import PlatformStatistics from "../components/PlatformStatistics";
 
 // Dynamically import below-fold components
 const WhyChoose = dynamic(() => import("../components/why-choose"), {
@@ -34,6 +36,7 @@ export default function HomePage() {
       <WhyChoose />
       <FeaturedMentor />
       <LearningPathSection />
+      <PlatformStatistics />
       <Testimonials />
       <QuickAccess />
     </main>
