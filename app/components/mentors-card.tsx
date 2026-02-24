@@ -1,16 +1,16 @@
-import { Star } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import Image from 'next/image'
+import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface MentorCardProps {
-  id: string
-  name: string
-  role: string
-  description: string
-  image: string
-  rating: number
-  reviewCount: number
-  price: string
+  id: string;
+  name: string;
+  role: string;
+  description: string;
+  image: string;
+  rating: number;
+  reviewCount: number;
+  price: string;
 }
 
 export function MentorCard({
@@ -57,8 +57,8 @@ export function MentorCard({
                 size={16}
                 className={`${
                   i < Math.floor(rating)
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'text-muted-foreground'
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-muted-foreground"
                 }`}
               />
             ))}
@@ -81,5 +81,5 @@ export function MentorCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
