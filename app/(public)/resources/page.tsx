@@ -37,6 +37,8 @@ const articles = [
 
 
 export default function LearningResourcesPage() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -87,6 +89,15 @@ export default function LearningResourcesPage() {
           ))}
         </ul>
       </div>
+
+      {/* Footer */}
+      <footer className="w-full">
+        <div className="bg-gradient-to-r from-[#4c0699] to-[#7a00e0] py-8 px-4 flex justify-center items-center border-t border-white/10">
+          <p className="text-white/80 text-sm font-light tracking-wide">
+            &copy; {currentYear} SkillSync. All rights reserved
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
