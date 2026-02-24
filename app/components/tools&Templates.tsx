@@ -9,7 +9,7 @@ function ToolsTemplates() {
           ToolsTemplates
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-2 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 w-full">
         <TemplateCard
           borderColor="border-[#E2E8F0]"
           bg="bg-[#DBEAFE]"
