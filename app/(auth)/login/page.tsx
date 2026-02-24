@@ -1,27 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import { Eye, EyeOff } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import AuthLayout from "@/app/components/AuthLayout"
+import { Input } from "@/app/components/ui/input"
+import { loginSchema, type LoginFormData } from "@/app/lib/validations"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    email: "",
-    password: ""
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange"
   })
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Login attempt:", formData)
+  const onSubmit = (data: LoginFormData) => {
+    console.log("Login attempt:", data)
   }
 
   return (
@@ -30,22 +30,22 @@ export default function LoginPage() {
       subtitle="Sign in to continue to SkillSync"
     >
       {/* Login Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Email */}
         <div>
           <label htmlFor="email" className="sr-only">
             Email
           </label>
-          <input
-            type="email"
+          <Input
             id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
+            type="email"
             placeholder="Email address"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200"
-            required
+            error={errors.email?.message}
+            {...register("email")}
           />
+          {errors.email && (
+            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+          )}
         </div>
 
         {/* Password */}
@@ -53,25 +53,19 @@ export default function LoginPage() {
           <label htmlFor="password" className="sr-only">
             Password
           </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200 pr-12"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
+          <Input
+            id="password"
+            type="password"
+            placeholder="Password"
+            error={errors.password?.message}
+            showPasswordToggle
+            showPassword={showPassword}
+            onPasswordToggle={() => setShowPassword(!showPassword)}
+            {...register("password")}
+          />
+          {errors.password && (
+            <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+          )}
         </div>
 
         {/* Forgot Password */}
@@ -84,7 +78,8 @@ export default function LoginPage() {
         {/* Sign In Button */}
         <button
           type="submit"
-          className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          disabled={!isValid}
+          className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
         >
           Sign in
         </button>

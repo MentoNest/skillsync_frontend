@@ -1,6 +1,6 @@
 'use client'
 
-import { MentorCard} from './MentorCard'
+import MentorCard from './MentorCard'
 
 const mentors = [
   {
@@ -73,24 +73,25 @@ const mentors = [
 
 export function MentorShowcase() {
   return (
-    <section className="w-full py-12 md:py-16 lg:py-20 px-4 md:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <section className="w-full py-responsive px-4 md:px-6 lg:px-8">
+      <div className="container-responsive max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
+        <div className="text-center mb-10 md:mb-12 lg:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 md:mb-3">
             <span className="text-balance">
               Discover Some of Africa's Best Mentors
             </span>
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
             Connect with experienced professionals who can guide your journey
           </p>
         </div>
 
-        {/* Mentor Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {mentors.map((mentor) => (
-            <MentorCard key={mentor.id} {...mentor} />
+            <div key={mentor.id} className="flex justify-center">
+              <MentorCard {...mentor} imageSrc={mentor.image} />
+            </div>
           ))}
         </div>
       </div>
