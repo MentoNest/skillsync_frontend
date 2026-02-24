@@ -1,9 +1,40 @@
+import ArticleListItem from "@/app/components/ArticleList";
+import { ArrowRight } from "lucide-react";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Learning Resources | SkillSync",
   description: "Explore curated learning resources to boost your skills.",
 };
+
+
+
+const articles = [
+  {
+    id: 1,
+    category: "Career Growth",
+    title: "How to Negotiate Your Salary Like a Pro",
+    author: "Sarah Johnson",
+    readTime: "5 min read",
+  },
+  {
+    id: 2,
+    category: "Personal Branding",
+    title: "Building a Personal Brand on LinkedIn",
+    author: "Marcus Williams",
+    readTime: "7 min read",
+  },
+  {
+    id: 3,
+    category: "Career Change",
+    title: "Transitioning to Tech: A Complete Guide",
+    author: "Emily Chen",
+    readTime: "10 min read",
+  },
+];
+
+
 
 export default function LearningResourcesPage() {
   return (
@@ -22,7 +53,7 @@ export default function LearningResourcesPage() {
       </section>
 
       {/* Placeholder Content */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-6 py-16 space-y-20 ">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
@@ -36,6 +67,25 @@ export default function LearningResourcesPage() {
             </div>
           ))}
         </div>
+
+
+        <ul className="space-y-4">
+
+          <div className="w-full flex items-center justify-between mb-7 " >
+            <h3 className="text-[#101828] font-semibold text-lg md:text-2xl  " >Featured Articles</h3>
+            <Link href={"#"} className=" text-[#9810FA] font-medium text-sm md:text-base flex items-center justify-center " >View All <ArrowRight size={17} /> </Link>
+          </div>
+
+          {articles.map((article) => (
+            <ArticleListItem
+              key={article.id}
+              category={article.category}
+              title={article.title}
+              author={article.author}
+              readTime={article.readTime}
+            />
+          ))}
+        </ul>
       </div>
     </div>
   );

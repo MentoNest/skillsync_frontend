@@ -1,8 +1,29 @@
+import dynamic from "next/dynamic";
 import Hero from "../components/hero";
-import WhyChoose from "../components/why-choose";
-import QuickAccess from "../components/quick-access";
 import ResourceSearchBar from "../components/resource-search-bar";
 import FeaturedArticles from "../components/featured-articles";
+import QuickAccess from "../components/quick-access";
+
+// Dynamically import below-fold components
+const WhyChoose = dynamic(() => import("../components/why-choose"), {
+  loading: () => (
+    <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
+  ),
+});
+
+const FeaturedMentor = dynamic(() => import("../components/featured-mentor"), {
+  loading: () => (
+    <div className="h-96 bg-gray-100 animate-pulse rounded-lg"></div>
+  ),
+});
+
+const LearningPathSection = dynamic(() =>
+  import("../components/mentor-showcase").then((mod) => ({
+    default: mod.MentorShowcase,
+  }))
+);
+
+const Testimonials = dynamic(() => import("../components/testimonials"));
 
 export default function HomePage() {
   return (
@@ -11,6 +32,9 @@ export default function HomePage() {
       <ResourceSearchBar />
       <FeaturedArticles />
       <WhyChoose />
+      <FeaturedMentor />
+      <LearningPathSection />
+      <Testimonials />
       <QuickAccess />
     </main>
   );
