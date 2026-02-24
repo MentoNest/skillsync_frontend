@@ -21,12 +21,6 @@ const Footer = dynamic(() => import("./components/footer"), {
 export const metadata: Metadata = {
   title: "SkillSync - Mentorship Platform",
   description: "A blockchain-powered mentorship platform",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   other: {
     'theme-color': '#9333ea',
     'mobile-web-app-capable': 'yes',
@@ -34,6 +28,13 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-status-bar-style': 'default',
     'apple-mobile-web-app-title': 'SkillSync',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
