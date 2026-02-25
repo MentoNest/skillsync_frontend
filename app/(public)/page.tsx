@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Hero from "../components/hero";
+import Empower from '../components/ui/Empower';
 import ResourceSearchBar from "../components/resource-search-bar";
 import FeaturedArticles from "../components/featured-articles";
 
@@ -36,6 +37,7 @@ export default function HomePage() {
       <WhyChoose />
       <FeaturedMentor />
       <LearningPathSection />
+      <Empower/>
       <PlatformStatistics />
       <Testimonials />
       <QuickAccess />
