@@ -131,7 +131,7 @@ export function FeaturedLearningTracks({
       </div>
 
       {/* Cards grid — stacks on mobile, 3-col on md+ */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {visible.map((track) => (
           <LearningTrackCard key={track.id} track={track} />
         ))}
