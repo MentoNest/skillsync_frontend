@@ -32,6 +32,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "components/FeaturedMentorSection"  ],
   "exclude": ["node_modules"]
 }
