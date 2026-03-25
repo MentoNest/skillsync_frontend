@@ -1,0 +1,428 @@
+'use client';
+
+import Link from 'next/link';
+
+const featuredMentor = {
+  name: 'Dr. Amara Osei',
+  title: 'Senior AI Engineer & Tech Lead',
+  company: 'Google DeepMind',
+  image: '/images/featured-mentor.jpg',
+  badge: 'Mentor of the Month',
+  rating: 4.97,
+  sessions: 312,
+  students: 148,
+  tags: ['Machine Learning', 'Python', 'Career Growth'],
+  bio: `Amara brings 12+ years building production AI systems at Google, Meta, and two YC-backed startups. She specializes in helping engineers break into ML roles, navigate senior promotions, and build impactful side projects that actually ship.`,
+  quote: `"I don't just review your resume — I help you think like the engineer companies are desperate to hire."`,
+};
+
+export default function FeaturedMentorSection() {
+  return (
+    <section className="featured-mentor-section">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+        .featured-mentor-section {
+          font-family: 'DM Sans', sans-serif;
+          background: #0a0a0f;
+          padding: 96px 24px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .featured-mentor-section::before {
+          content: '';
+          position: absolute;
+          top: -120px;
+          left: -120px;
+          width: 480px;
+          height: 480px;
+          background: radial-gradient(circle, rgba(234, 179, 8, 0.12) 0%, transparent 70%);
+          pointer-events: none;
+        }
+
+        .featured-mentor-section::after {
+          content: '';
+          position: absolute;
+          bottom: -80px;
+          right: -80px;
+          width: 360px;
+          height: 360px;
+          background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+          pointer-events: none;
+        }
+
+        .section-label {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(234, 179, 8, 0.1);
+          border: 1px solid rgba(234, 179, 8, 0.25);
+          color: #eab308;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          padding: 6px 14px;
+          border-radius: 100px;
+          margin-bottom: 20px;
+        }
+
+        .section-label span {
+          width: 6px;
+          height: 6px;
+          background: #eab308;
+          border-radius: 50%;
+          display: inline-block;
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .section-heading {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(28px, 4vw, 44px);
+          font-weight: 700;
+          color: #f5f0e8;
+          line-height: 1.2;
+          margin-bottom: 56px;
+          max-width: 420px;
+        }
+
+        .section-heading em {
+          font-style: italic;
+          color: #eab308;
+        }
+
+        .mentor-card {
+          max-width: 1100px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0;
+          background: #13131a;
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,0.07);
+          overflow: hidden;
+          box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+          position: relative;
+          z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+          .mentor-card {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* LEFT: Image panel */
+        .mentor-image-panel {
+          position: relative;
+          min-height: 480px;
+          background: #1a1a24;
+        }
+
+        .mentor-image-panel img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          filter: saturate(0.85);
+        }
+
+        /* Fallback avatar */
+        .mentor-avatar-fallback {
+          width: 100%;
+          height: 100%;
+          min-height: 480px;
+          background: linear-gradient(145deg, #1e1e2e 0%, #2a1f3d 50%, #1a2040 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Playfair Display', serif;
+          font-size: 96px;
+          color: rgba(234,179,8,0.3);
+          letter-spacing: -2px;
+        }
+
+        .mentor-image-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to right,
+            transparent 50%,
+            #13131a 100%
+          ), linear-gradient(
+            to top,
+            rgba(0,0,0,0.6) 0%,
+            transparent 50%
+          );
+        }
+
+        @media (max-width: 768px) {
+          .mentor-image-overlay {
+            background: linear-gradient(to bottom, transparent 50%, #13131a 100%);
+          }
+        }
+
+        .mentor-badge {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          background: rgba(234, 179, 8, 0.15);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(234,179,8,0.4);
+          color: #eab308;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          padding: 6px 12px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .mentor-badge svg {
+          width: 12px;
+          height: 12px;
+          fill: #eab308;
+        }
+
+        /* RIGHT: Content panel */
+        .mentor-content-panel {
+          padding: 48px 44px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+          .mentor-content-panel {
+            padding: 36px 28px;
+          }
+        }
+
+        .mentor-name {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(26px, 3vw, 38px);
+          font-weight: 700;
+          color: #f5f0e8;
+          margin: 0 0 6px;
+          line-height: 1.15;
+        }
+
+        .mentor-title {
+          font-size: 14px;
+          color: rgba(245,240,232,0.5);
+          font-weight: 400;
+          margin: 0 0 4px;
+        }
+
+        .mentor-company {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: #eab308;
+          font-size: 13px;
+          font-weight: 500;
+          margin-bottom: 28px;
+        }
+
+        .mentor-stats {
+          display: flex;
+          gap: 24px;
+          margin-bottom: 28px;
+          padding-bottom: 28px;
+          border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .stat {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .stat-value {
+          font-family: 'Playfair Display', serif;
+          font-size: 22px;
+          font-weight: 700;
+          color: #f5f0e8;
+        }
+
+        .stat-label {
+          font-size: 11px;
+          color: rgba(245,240,232,0.4);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .mentor-quote {
+          font-family: 'Playfair Display', serif;
+          font-style: italic;
+          font-size: 15px;
+          line-height: 1.7;
+          color: rgba(245,240,232,0.65);
+          margin-bottom: 20px;
+          padding-left: 16px;
+          border-left: 2px solid rgba(234,179,8,0.5);
+        }
+
+        .mentor-bio {
+          font-size: 14px;
+          line-height: 1.75;
+          color: rgba(245,240,232,0.55);
+          margin-bottom: 28px;
+        }
+
+        .mentor-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 32px;
+        }
+
+        .mentor-tag {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: rgba(245,240,232,0.65);
+          font-size: 12px;
+          padding: 5px 12px;
+          border-radius: 100px;
+          font-weight: 500;
+        }
+
+        .mentor-cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          background: #eab308;
+          color: #0a0a0f;
+          font-size: 14px;
+          font-weight: 600;
+          padding: 14px 28px;
+          border-radius: 12px;
+          text-decoration: none;
+          transition: all 0.2s ease;
+          align-self: flex-start;
+          letter-spacing: 0.01em;
+        }
+
+        .mentor-cta:hover {
+          background: #f5c842;
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(234,179,8,0.25);
+        }
+
+        .mentor-cta svg {
+          width: 16px;
+          height: 16px;
+          transition: transform 0.2s ease;
+        }
+
+        .mentor-cta:hover svg {
+          transform: translateX(3px);
+        }
+
+        .secondary-cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: rgba(245,240,232,0.5);
+          font-size: 13px;
+          text-decoration: none;
+          margin-left: 20px;
+          transition: color 0.2s;
+        }
+
+        .secondary-cta:hover {
+          color: rgba(245,240,232,0.85);
+        }
+
+        .cta-row {
+          display: flex;
+          align-items: center;
+        }
+      `}</style>
+
+      <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="section-label">
+            <span></span>
+            Featured This Week
+          </div>
+          <h2 className="section-heading">
+            Learn from someone who's <em>been there.</em>
+          </h2>
+        </div>
+      </div>
+
+      <div className="mentor-card">
+        {/* Left: Image */}
+        <div className="mentor-image-panel">
+          <div className="mentor-avatar-fallback">AO</div>
+          <div className="mentor-image-overlay" />
+          <div className="mentor-badge">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            {featuredMentor.badge}
+          </div>
+        </div>
+
+        {/* Right: Content */}
+        <div className="mentor-content-panel">
+          <h3 className="mentor-name">{featuredMentor.name}</h3>
+          <p className="mentor-title">{featuredMentor.title}</p>
+          <div className="mentor-company">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            {featuredMentor.company}
+          </div>
+
+          <div className="mentor-stats">
+            <div className="stat">
+              <span className="stat-value">★ {featuredMentor.rating}</span>
+              <span className="stat-label">Rating</span>
+            </div>
+            <div className="stat">
+              <span className="stat-value">{featuredMentor.sessions}+</span>
+              <span className="stat-label">Sessions</span>
+            </div>
+            <div className="stat">
+              <span className="stat-value">{featuredMentor.students}</span>
+              <span className="stat-label">Mentees</span>
+            </div>
+          </div>
+
+          <blockquote className="mentor-quote">{featuredMentor.quote}</blockquote>
+          <p className="mentor-bio">{featuredMentor.bio}</p>
+
+          <div className="mentor-tags">
+            {featuredMentor.tags.map(tag => (
+              <span key={tag} className="mentor-tag">{tag}</span>
+            ))}
+          </div>
+
+          <div className="cta-row">
+            <Link href="/mentors/amara-osei" className="mentor-cta">
+              Book a Session
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </Link>
+            <Link href="/mentors/amara-osei" className="secondary-cta">
+              View full profile →
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
