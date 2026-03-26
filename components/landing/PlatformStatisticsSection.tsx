@@ -1,4 +1,4 @@
-// components/landing/PlatformStatisticsSection.tsx
+
 
 'use client';
 
