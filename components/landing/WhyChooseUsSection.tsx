@@ -10,6 +10,9 @@ import {
   Clock,
   HeartHandshake
 } from 'lucide-react';
+import { Suspense, lazy } from 'react';
+
+const LazyBenefitCard = lazy(() => import('./BenefitCard'));
 
 const benefits = [
   {
@@ -61,30 +64,25 @@ export default function WhyChooseUsSection() {
 
         {/* Benefits Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {benefits.map((benefit, index) => {
-            const IconComponent = benefit.icon;
-            return (
-              <div
-                key={index}
-                className="flex flex-col items-center text-center p-6 rounded-xl bg-gradient-to-br from-white to-purple-50 border border-purple-100 hover:shadow-lg transition-shadow duration-300"
-              >
-                {/* Icon */}
-                <div className="w-14 h-14 rounded-full bg-purple-600 flex items-center justify-center mb-4">
-                  <IconComponent className="w-7 h-7 text-white" />
+          {benefits.map((benefit, index) => (
+            <Suspense 
+              key={index} 
+              fallback={
+                <div className="flex flex-col items-center text-center p-6 rounded-xl bg-gradient-to-br from-white to-purple-50 border border-purple-100 animate-pulse">
+                  <div className="w-14 h-14 rounded-full bg-purple-200 mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
                 </div>
-
-                {/* Title */}
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {benefit.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {benefit.description}
-                </p>
-              </div>
-            );
-          })}
+              }
+            >
+              <LazyBenefitCard
+                icon={benefit.icon}
+                title={benefit.title}
+                description={benefit.description}
+                index={index}
+              />
+            </Suspense>
+          ))}
         </div>
       </div>
     </section>

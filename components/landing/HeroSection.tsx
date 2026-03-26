@@ -3,6 +3,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function HeroSection() {
   return (
@@ -36,11 +37,18 @@ export default function HeroSection() {
           
           {/* Card 1 */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <img
-              src="/images/mentor1.jpg"
-              alt="Mentor"
-              className="w-full h-40 object-cover"
-            />
+            <div className="relative w-full h-40">
+              <Image
+                src="/Image (Cole Hathans).svg"
+                alt="Colin Brown - Leadership Mentor"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                priority
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2Y3ZjdmNyIvPjwvc3ZnPg=="
+              />
+            </div>
             <div className="p-3 text-left">
               <p className="font-medium text-sm">Colin Brown</p>
               <p className="text-xs text-gray-500">Leadership</p>
@@ -49,11 +57,18 @@ export default function HeroSection() {
 
           {/* Card 2 */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <img
-              src="/images/mentor2.jpg"
-              alt="Mentor"
-              className="w-full h-40 object-cover"
-            />
+            <div className="relative w-full h-40">
+              <Image
+                src="/Image (Sarah Johnson).svg"
+                alt="Sarah Johnson - Product Design Mentor"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                priority
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2Y3ZjdmNyIvPjwvc3ZnPg=="
+              />
+            </div>
             <div className="p-3 text-left">
               <p className="font-medium text-sm">Sarah Johnson</p>
               <p className="text-xs text-gray-500">Product Design</p>
@@ -62,11 +77,18 @@ export default function HeroSection() {
 
           {/* Card 3 */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <img
-              src="/images/mentor3.jpg"
-              alt="Mentor"
-              className="w-full h-40 object-cover"
-            />
+            <div className="relative w-full h-40">
+              <Image
+                src="/Image (Marcus Williams).svg"
+                alt="James Williams - Business Strategy Mentor"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                priority
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2Y3ZjdmNyIvPjwvc3ZnPg=="
+              />
+            </div>
             <div className="p-3 text-left">
               <p className="font-medium text-sm">James Williams</p>
               <p className="text-xs text-gray-500">Business Strategy</p>
