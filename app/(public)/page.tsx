@@ -28,6 +28,7 @@ const WhyChooseUsSection = dynamic(() => import('@/components/landing/WhyChooseU
   ),
   ssr: false
 });
+import CTASection from '@/components/landing/CTASection';
 import WhyChooseUsSection from '@/components/landing/WhyChooseUsSection';
 import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
 
@@ -38,6 +39,7 @@ export default function PublicHomePage() {
       <Suspense fallback={<div>Loading...</div>}>
         <WhyChooseUsSection />
       </Suspense>
+      <CTASection />
       <PlatformStatisticsSection />
       <WhyChooseUsSection />
     </main>
