@@ -5,10 +5,18 @@ export default function PublicLayout({
 }) {
   return (
     <div className="flex flex-col min-h-screen">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-black focus:px-4 focus:py-2 focus:text-white"
+      >
+        Skip to main content
+      </a>
       <header className="p-4 border-b">
-        <h1 className="text-xl font-bold">Public Header Placeholder</h1>
+        <p className="text-xl font-bold">Public Header Placeholder</p>
       </header>
-      <main className="flex-1 p-4">{children}</main>
+      <main id="main-content" className="flex-1 p-4">
+        {children}
+      </main>
     </div>
   );
 }

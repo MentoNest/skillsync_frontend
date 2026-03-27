@@ -5,9 +5,9 @@ import CTASection from '@/components/landing/CTASection';
 
 export default function PublicHomePage() {
   return (
-    <main>
+    <>
       <HeroSection />
       <CTASection />
-    </main>
+    </>
   );
 }
