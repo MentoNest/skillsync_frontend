@@ -34,13 +34,14 @@ import TestimonialsSection from '@/components/landing/TestimonialsSection';
 
 export default function PublicHomePage() {
   return (
-    <main>
+    <>
       <HeroSection />
       <Suspense fallback={<div>Loading...</div>}>
         <WhyChooseUsSection />
       </Suspense>
       <TestimonialsSection />
       <CTASection />
+    </>
       <PlatformStatisticsSection />
     </main>
   );
