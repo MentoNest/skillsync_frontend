@@ -2,9 +2,13 @@
 
 'use client';
 
-import HeroSection from '@/components/landing/HeroSection';
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+
+const HeroSection = dynamic(() => import('@/components/landing/HeroSection'), {
+  loading: () => <div className="w-full bg-gradient-to-r from-white to-purple-50 py-16 md:py-24 animate-pulse"><div className="max-w-7xl mx-auto px-6 text-center"><div className="h-12 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div></div></div>,
+  ssr: false
+});
 
 const WhyChooseUsSection = dynamic(() => import('@/components/landing/WhyChooseUsSection'), {
   loading: () => (
@@ -28,21 +32,40 @@ const WhyChooseUsSection = dynamic(() => import('@/components/landing/WhyChooseU
   ),
   ssr: false
 });
-import CTASection from '@/components/landing/CTASection';
-import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
-import TestimonialsSection from '@/components/landing/TestimonialsSection';
+
+const TestimonialsSection = dynamic(() => import('@/components/landing/TestimonialsSection'), {
+  loading: () => <div className="w-full bg-gray-50 py-16 md:py-24 animate-pulse"><div className="max-w-7xl mx-auto px-6 text-center"><div className="h-12 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div></div></div>,
+  ssr: false
+});
+
+const CTASection = dynamic(() => import('@/components/landing/CTASection'), {
+  loading: () => <div className="w-full bg-purple-600 py-16 md:py-24 animate-pulse"><div className="max-w-7xl mx-auto px-6 text-center"><div className="h-12 bg-white rounded w-1/2 mx-auto"></div></div></div>,
+  ssr: false
+});
+
+const PlatformStatisticsSection = dynamic(() => import('@/components/landing/PlatformStatisticsSection'), {
+  loading: () => <div className="w-full bg-white py-16 md:py-24 animate-pulse"><div className="max-w-7xl mx-auto px-6 text-center"><div className="h-12 bg-gray-200 rounded w-1/2 mx-auto"></div></div></div>,
+  ssr: false
+});
 
 export default function PublicHomePage() {
   return (
-    <>
-      <HeroSection />
+    <main>
+      <Suspense fallback={<div>Loading...</div>}>
+        <HeroSection />
+      </Suspense>
       <Suspense fallback={<div>Loading...</div>}>
         <WhyChooseUsSection />
       </Suspense>
-      <TestimonialsSection />
-      <CTASection />
-    </>
-      <PlatformStatisticsSection />
+      <Suspense fallback={<div>Loading...</div>}>
+        <TestimonialsSection />
+      </Suspense>
+      <Suspense fallback={<div>Loading...</div>}>
+        <CTASection />
+      </Suspense>
+      <Suspense fallback={<div>Loading...</div>}>
+        <PlatformStatisticsSection />
+      </Suspense>
     </main>
   );
 }
