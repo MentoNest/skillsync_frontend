@@ -1,5 +1,6 @@
 import React from 'react';
 import ResourcesHero from '../../components/ResourcesHero';
+import LearningTrackGrid from '../../components/learning/LearningTrackGrid';
 
 export default function ResourcesPage() {
   return (
@@ -14,6 +15,14 @@ export default function ResourcesPage() {
           </p>
         </div>
       </section>
+      
+      {/* Learning Tracks Section */}
+      <LearningTrackGrid
+        onTrackStart={(trackId) => {
+          console.log('Starting track:', trackId);
+          // TODO: Navigate to track detail page or start learning flow
+        }}
+      />
     </main>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { ReportButton } from './moderation';
 
 const filters = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
 
@@ -254,6 +255,7 @@ export default function MentorDiscoverySection() {
           display: flex;
           align-items: flex-start;
           gap: 16px;
+          position: relative;
         }
 
         /* Avatar */
@@ -493,6 +495,18 @@ export default function MentorDiscoverySection() {
                 <div className="md-rating">
                   <span className="md-rating-star">★</span>
                   {mentor.rating}
+                </div>
+
+                {/* Report Button */}
+                <div className="ml-auto">
+                  <ReportButton
+                    reportableType="mentor"
+                    reportableId={mentor.id.toString()}
+                    reportableTitle={mentor.name}
+                    variant="icon"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  />
                 </div>
               </div>
 
