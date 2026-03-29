@@ -41,8 +41,7 @@ export default function PublicHomePage() {
       </Suspense>
       <TestimonialsSection />
       <CTASection />
-    </>
       <PlatformStatisticsSection />
-    </main>
+    </>
   );
 }
