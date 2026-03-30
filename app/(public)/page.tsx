@@ -35,6 +35,10 @@ const WhyChooseUsSection = dynamic(() => import('@/components/landing/WhyChooseU
   ),
   ssr: false
 });
+import CTASection from '@/components/landing/CTASection';
+import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
+import TestimonialsSection from '@/components/landing/TestimonialsSection';
+import ToolsTemplatesSection from '@/components/landing/ToolsTemplatesSection';
 
 const TestimonialsSection = dynamic(() => import('@/components/landing/TestimonialsSection'), {
   loading: () => <div className="w-full bg-gray-50 py-16 md:py-24 animate-pulse"><div className="max-w-7xl mx-auto px-6 text-center"><div className="h-12 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div></div></div>,
@@ -56,6 +60,14 @@ export default function PublicHomePage() {
 
   return (
     <main>
+      <HeroSection />
+      <Suspense fallback={<div>Loading...</div>}>
+        <WhyChooseUsSection />
+      </Suspense>
+      <TestimonialsSection />
+      <ToolsTemplatesSection />
+      <CTASection />
+      <PlatformStatisticsSection />
       <Suspense fallback={<div>Loading...</div>}>
         <HeroSection />
       </Suspense>
