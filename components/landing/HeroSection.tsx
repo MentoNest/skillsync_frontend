@@ -43,12 +43,6 @@ export default function HeroSection() {
           
           {/* Card 1 */}
           <article className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <img
-              src="/images/mentor1.jpg"
-              alt="Portrait of Colin Brown, Leadership mentor"
-              className="w-full h-40 object-cover"
-            />
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="relative w-full h-40">
               <Image
                 src="/Image (Cole Hathans).svg"
@@ -69,12 +63,6 @@ export default function HeroSection() {
 
           {/* Card 2 */}
           <article className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <img
-              src="/images/mentor2.jpg"
-              alt="Portrait of Sarah Johnson, Product Design mentor"
-              className="w-full h-40 object-cover"
-            />
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="relative w-full h-40">
               <Image
                 src="/Image (Sarah Johnson).svg"
@@ -95,12 +83,6 @@ export default function HeroSection() {
 
           {/* Card 3 */}
           <article className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <img
-              src="/images/mentor3.jpg"
-              alt="Portrait of James Williams, Business Strategy mentor"
-              className="w-full h-40 object-cover"
-            />
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="relative w-full h-40">
               <Image
                 src="/Image (Marcus Williams).svg"
