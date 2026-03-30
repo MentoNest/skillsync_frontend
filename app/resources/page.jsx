@@ -1,17 +1,23 @@
 "use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import ResourcesHero from '../../components/ResourcesHero';
 
-export default function ResourcesPage() {
-  const [query, setQuery] = useState('');
+function ResourcesPageContent() {
+  const searchParams = useSearchParams();
+  const incomingQuery = searchParams.get('query') ?? '';
+  const [query, setQuery] = useState(incomingQuery);
+
+  useEffect(() => {
+    setQuery(incomingQuery);
+  }, [incomingQuery]);
 
   const trimmedQuery = useMemo(() => query.trim(), [query]);
 
   return (
-    <main className="bg-gray-100">
-      <ResourcesHero />
+    <>
       <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 -mt-10 sm:-mt-12 lg:-mt-14">
         <div className="relative w-full max-w-3xl mx-auto">
           <Search
@@ -227,6 +233,17 @@ export default function ResourcesPage() {
           </div>
         </div>
       </section>
+    </>
+  );
+}
+
+export default function ResourcesPage() {
+  return (
+    <main className="bg-gray-100">
+      <ResourcesHero />
+      <Suspense fallback={<section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12 text-gray-500">Loading resources...</section>}>
+        <ResourcesPageContent />
+      </Suspense>
     </main>
   );
 }
