@@ -1,22 +1,14 @@
-import FeaturedMentorSection from '../(mentor)/mentor/FeaturedMentorSection';
-
 export default function MentorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
-      <header className="bg-blue-600 text-white">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">Mentor Dashboard</h1>
-        </div>
-      </header>
-      
-      {/* Featured Mentor Section */}
-      <FeaturedMentorSection />
-      
-      <main className="container mx-auto px-4 py-6">{children}</main>
+    <div className="flex min-h-screen bg-gray-50">
+      <aside className="w-64 bg-white border-r p-4">
+        <h2 className="text-lg font-bold">Mentor Sidebar Placeholder</h2>
+      </aside>
+      <main className="flex-1 p-8">{children}</main>
     </div>
   );
 }

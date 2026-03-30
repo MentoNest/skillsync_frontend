@@ -1,109 +1,46 @@
-## SkillSync Frontend 🌐
+# Mentorship Platform
 
-*Frontend for the SkillSync decentralized mentorship marketplace*
+## Overview
+This is a modern mentorship platform built using **Next.js (App Router)** and **Tailwind CSS**. It provides an interface for distinct user roles to interact within the mentorship ecosystem.
 
-## 📌 About
+## Features & Dashboards
+The application structure is built with specific route groups dedicated to various roles:
+- **Public**: The landing page and general public-facing information.
+- **Mentor**: Dashboard and management tools for Mentors.
+- **Mentee**: Dashboard and platform interaction for Mentees.
+- **Admin**: System management and administrative overview.
 
-**SkillSync web** is the user-facing frontend for the SkillSync platform.  
-It allows mentors and mentees to connect, manage profiles, initiate mentorship agreements, and interact with the Stellar blockchain through non-custodial wallets.
+## Tech Stack
+- **Framework**: Next.js 16+ (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Linting & Formatting**: ESLint
+- **Architecture**: Role-based layouts utilizing Next.js structural Route Groups.
 
-This application is designed to provide a seamless Web3 experience while abstracting blockchain complexity for end users.
+## Getting Started
 
-## 🚀 Key Features
-
-- Mentor & mentee onboarding
-- Wallet connection (Freighter / Albedo)
-- Mentorship discovery & matching
-- Escrow initiation on Stellar
-- Transaction status tracking
-- Responsive UI
-
-## 🧠 How It Works
-
-1. Mentors create profiles showcasing skills, experience, and pricing
-2. Mentees browse and select mentors based on their needs
-3. A smart contract (Stellar Soroban) locks funds in escrow
-4. Mentorship sessions are conducted off-chain (video, chat, etc.)
-5. Upon completion, funds are released automatically
-6. Both parties leave verifiable feedback
-
-## 🛠 Tech Stack
-
-- Next.js / React
-- TypeScript
-- Tailwind CSS
-- Stellar SDK
-- Wallet connectors
-
-## ⚙️ Setup & Installation
-
-### Prerequisites
-
-- Node.js ≥ 18
-- npm or yarn
-- Freighter Wallet
-
-### Install
-
+First, install the dependencies:
 ```bash
-git clone https://github.com/MentoNest/skillsync_frontend.git
-cd skillsync_frontend
 npm install
+# or
+yarn install
+# or
+pnpm install
 ```
 
-### Run Locally
-
+Then, run the development server:
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
 ```
 
-### 🧪 Testing
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-```bash
-npm run test
-```
-
-## 👥 Contributing
-
-We welcome contributions from the community! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m 'Add some feature'
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Open a pull request
-
-## 🔗 Blockchain Integration
-
-The frontend interacts with:
-
-- Stellar Network
-- Soroban smart contracts
-- Wallet providers for transaction signing.
-
-All transactions are executed client-side using non-custodial wallets.
-
-## 📂 Project Structure
-
-```
-src/
-├── components/
-├── pages/
-├── hooks/
-├── services/
-├── styles/
-└── utils/
-```
-
-## 📄 License
-
-MIT License
+## Project Structure
+- `app/` - The Next.js App Router root containing all role-based dashboards and global configurations.
+- `components/` - Shared UI components used across the application.
+- `lib/` - Utility functions, configurations, and core application logging/logic.
+- `styles/` - Additional styling extensions or base styles if needed beyond standard Tailwind utilities.
