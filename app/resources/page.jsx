@@ -123,7 +123,11 @@ function ResourcesPageContent() {
   return (
     <>
       {/* Search Bar Section */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 -mt-10 sm:-mt-12 lg:-mt-14 relative z-20">
+      <section
+        className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 -mt-10 sm:-mt-12 lg:-mt-14 relative z-20"
+        aria-labelledby="search-section-heading"
+      >
+        <h2 id="search-section-heading" className="sr-only">Search Resources</h2>
         <div className="relative w-full max-w-3xl mx-auto group">
           <Search
             className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${isSearching ? 'text-purple-600' : 'text-slate-400'}`}
@@ -136,10 +140,14 @@ function ResourcesPageContent() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search for resources, courses, guides..."
             aria-label="Search learning resources"
+            aria-describedby="search-status"
             className="w-full rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-md py-4 pl-12 pr-5 text-base text-slate-700 shadow-xl outline-none transition-all duration-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
           />
+          <div id="search-status" className="sr-only">
+            {isSearching ? 'Searching...' : 'Search completed'}
+          </div>
           {isSearching && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2" aria-hidden="true">
               <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent" />
             </div>
           )}
@@ -147,70 +155,97 @@ function ResourcesPageContent() {
       </section>
 
       {/* Quick Access Section */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+      <section
+        className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16"
+        aria-labelledby="quick-access-heading"
+      >
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Quick Access</h2>
+          <h2 id="quick-access-heading" className="text-3xl font-bold text-gray-900 tracking-tight">Quick Access</h2>
           {trimmedQuery && filteredQuickAccess.length === 0 && (
-            <span className="text-sm text-gray-500">No results found for "{query}"</span>
+            <span className="text-sm text-gray-500" role="status" aria-live="polite">
+              No results found for "{query}"
+            </span>
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="list">
           {filteredQuickAccess.map((item, idx) => (
-            <div key={idx} className="group bg-white border border-slate-100 rounded-2xl p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+            <article
+              key={idx}
+              className="group bg-white border border-slate-100 rounded-2xl p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+              role="listitem"
+            >
               <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-100 transition-colors">
-                <item.icon className="w-6 h-6 text-purple-600" />
+                <item.icon
+                  className="w-6 h-6 text-purple-600"
+                  aria-hidden="true"
+                />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-700 transition-colors">{item.title}</h3>
               <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
-            </div>
+            </article>
           ))}
         </div>
       </section>
       
       {/* Featured Tools Section */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Featured Tools</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <section
+        className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8"
+        aria-labelledby="featured-tools-heading"
+      >
+        <h2 id="featured-tools-heading" className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Featured Tools</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" role="list">
           {FEATURED_TOOLS.map((tool, idx) => (
-            <LargeToolCard
-              key={idx}
-              icon={tool.icon}
-              title={tool.title}
-              description={tool.description}
-              buttonText={tool.buttonText}
-              gradient={tool.gradient}
-            />
+            <article key={idx} role="listitem">
+              <LargeToolCard
+                icon={tool.icon}
+                title={tool.title}
+                description={tool.description}
+                buttonText={tool.buttonText}
+                gradient={tool.gradient}
+              />
+            </article>
           ))}
         </div>
       </section>
       
       {/* Learning Tracks Section */}
-      <section className="bg-slate-50 border-y border-slate-100 py-16">
+      <section
+        className="bg-slate-50 border-y border-slate-100 py-16"
+        aria-labelledby="learning-tracks-heading"
+      >
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Learning Tracks</h2>
-            <Link 
-              href="/resources/tracks" 
-              className="group flex items-center text-purple-600 font-semibold hover:text-purple-800 transition-colors"
+            <h2 id="learning-tracks-heading" className="text-3xl font-bold text-gray-900 tracking-tight">Learning Tracks</h2>
+            <Link
+              href="/resources/tracks"
+              className="group flex items-center text-purple-600 font-semibold hover:text-purple-800 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-md px-2 py-1"
+              aria-label="View all learning tracks"
             >
               View All Tracks
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </Link>
           </div>
-          
+
           {filteredTracks.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" role="list">
               {filteredTracks.map((track, idx) => (
-                <div key={idx} className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 flex flex-col hover:border-purple-200 transition-colors">
-                  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-8">
+                <article
+                  key={idx}
+                  className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 flex flex-col hover:border-purple-200 transition-colors"
+                  role="listitem"
+                >
+                  <header className="bg-gradient-to-r from-purple-600 to-indigo-600 p-8">
                     <h3 className="text-2xl font-bold text-white">{track.title}</h3>
                     <p className="text-purple-100 mt-2 font-light">{track.subtitle}</p>
-                  </div>
+                  </header>
                   <div className="p-8 flex-grow">
-                    <ul className="space-y-4">
+                    <ul className="space-y-4" role="list">
                       {track.items.map((item, i) => (
-                        <li key={i} className="flex items-start group/item">
-                          <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xs mr-3 font-bold group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors">
+                        <li key={i} className="flex items-start group/item" role="listitem">
+                          <span
+                            className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xs mr-3 font-bold group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors"
+                            aria-hidden="true"
+                          >
                             {i + 1}
                           </span>
                           <span className="text-gray-700">{item}</span>
@@ -218,16 +253,23 @@ function ResourcesPageContent() {
                       ))}
                     </ul>
                   </div>
-                  <div className="p-8 pt-0 mt-auto">
-                    <button className="w-full py-3 rounded-xl border-2 border-slate-100 text-slate-600 font-semibold hover:border-purple-600 hover:text-purple-600 transition-all">
+                  <footer className="p-8 pt-0 mt-auto">
+                    <button
+                      className="w-full py-3 rounded-xl border-2 border-slate-100 text-slate-600 font-semibold hover:border-purple-600 hover:text-purple-600 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      aria-label={`Continue ${track.title} learning path`}
+                    >
                       Continue Path
                     </button>
-                  </div>
-                </div>
+                  </footer>
+                </article>
               ))}
             </div>
           ) : (
-             <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+             <div
+               className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300"
+               role="status"
+               aria-live="polite"
+             >
                <p className="text-gray-500">No tracks match your search query.</p>
              </div>
           )}
@@ -235,53 +277,88 @@ function ResourcesPageContent() {
       </section>
       
       {/* Articles & Resources Section */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+      <section
+        className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16"
+        aria-labelledby="articles-guides-heading"
+      >
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Articles & Guides</h2>
-          <Link 
-            href="/resources/articles" 
-            className="group flex items-center text-purple-600 font-semibold hover:text-purple-800 transition-colors"
+          <h2 id="articles-guides-heading" className="text-3xl font-bold text-gray-900 tracking-tight">Articles & Guides</h2>
+          <Link
+            href="/resources/articles"
+            className="group flex items-center text-purple-600 font-semibold hover:text-purple-800 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-md px-2 py-1"
+            aria-label="View all articles and guides"
           >
             View All Articles
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </Link>
         </div>
 
         {filteredResources.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
             {filteredResources.map((res, idx) => (
-              <div key={idx} className="flex flex-col bg-white border border-slate-100 rounded-2xl p-8 hover:shadow-2xl hover:border-purple-200 transition-all group">
-                <div className="flex items-center mb-6">
+              <article
+                key={idx}
+                className="flex flex-col bg-white border border-slate-100 rounded-2xl p-8 hover:shadow-2xl hover:border-purple-200 transition-all group"
+                role="listitem"
+              >
+                <header className="flex items-center mb-6">
                   <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mr-4 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                    <res.icon className="w-6 h-6 text-indigo-600 group-hover:text-white" />
+                    <res.icon
+                      className="w-6 h-6 text-indigo-600 group-hover:text-white"
+                      aria-hidden="true"
+                    />
                   </div>
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-500">{res.type}</span>
+                    <span
+                      className="text-xs font-bold uppercase tracking-wider text-indigo-500"
+                      aria-label={`Content type: ${res.type}`}
+                    >
+                      {res.type}
+                    </span>
                     <h3 className="text-lg font-bold text-gray-900">{res.title}</h3>
                   </div>
-                </div>
+                </header>
                 <p className="text-gray-600 flex-grow leading-relaxed mb-6">{res.description}</p>
-                <Link href="#" className="inline-flex items-center text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors">
-                  Read Article <ArrowRight className="ml-1 h-3 w-3" />
-                </Link>
-              </div>
+                <footer>
+                  <Link
+                    href="#"
+                    className="inline-flex items-center text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-md px-2 py-1"
+                    aria-label={`Read article: ${res.title}`}
+                  >
+                    Read Article
+                    <ArrowRight className="ml-1 h-3 w-3" aria-hidden="true" />
+                  </Link>
+                </footer>
+              </article>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 rounded-3xl border border-dashed border-slate-200">
+          <div
+            className="text-center py-20 rounded-3xl border border-dashed border-slate-200"
+            role="status"
+            aria-live="polite"
+          >
              <p className="text-gray-500">No articles found.</p>
           </div>
         )}
       </section>
       
       {/* Footer CTA */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
+      <section
+        className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12"
+        aria-labelledby="suggest-resource-heading"
+      >
         <div className="bg-purple-900 rounded-[3rem] p-12 text-center text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-purple-600 rounded-full blur-[100px] opacity-20" />
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-purple-600 rounded-full blur-[100px] opacity-20" aria-hidden="true" />
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-4">Can't find what you're looking for?</h2>
-            <p className="text-purple-200 mb-8 max-w-xl mx-auto">Suggest a resource or topic you'd like to learn more about, and we'll work with our mentors to create content for it.</p>
-            <button className="bg-white text-purple-900 font-bold px-8 py-4 rounded-2xl hover:bg-purple-50 transition-colors shadow-lg">
+            <h2 id="suggest-resource-heading" className="text-3xl font-bold mb-4">Can't find what you're looking for?</h2>
+            <p className="text-purple-200 mb-8 max-w-xl mx-auto">
+              Suggest a resource or topic you'd like to learn more about, and we'll work with our mentors to create content for it.
+            </p>
+            <button
+              className="bg-white text-purple-900 font-bold px-8 py-4 rounded-2xl hover:bg-purple-50 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-900"
+              aria-label="Suggest a new learning resource"
+            >
               Suggest Resource
             </button>
           </div>
