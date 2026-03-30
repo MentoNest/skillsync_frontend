@@ -6,6 +6,7 @@ import { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Search } from 'lucide-react';
 import QuickAccessSection from '../../components/landing/QuickAccessSection';
+import FeaturedArticlesSection from '../../components/landing/FeaturedArticlesSection';
 
 const HeroSection = dynamic(() => import('@/components/landing/HeroSection'), {
   loading: () => <div className="w-full bg-linear-to-r from-white to-purple-50 py-16 md:py-24 animate-pulse"><div className="max-w-7xl mx-auto px-6 text-center"><div className="h-12 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div></div></div>,
@@ -76,6 +77,7 @@ export default function PublicHomePage() {
           </div>
         </div>
       </section>
+      <FeaturedArticlesSection />
       <QuickAccessSection />
       <Suspense fallback={<div>Loading...</div>}>
         <WhyChooseUsSection />
