@@ -29,6 +29,7 @@ const WhyChooseUsSection = dynamic(() => import('@/components/landing/WhyChooseU
   ssr: false
 });
 import CTASection from '@/components/landing/CTASection';
+import FeaturedArticlesSection from '@/components/landing/FeaturedArticlesSection';
 import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
 
@@ -36,13 +37,13 @@ export default function PublicHomePage() {
   return (
     <>
       <HeroSection />
+      <FeaturedArticlesSection />
       <Suspense fallback={<div>Loading...</div>}>
         <WhyChooseUsSection />
       </Suspense>
       <TestimonialsSection />
+      <PlatformStatisticsSection />
       <CTASection />
     </>
-      <PlatformStatisticsSection />
-    </main>
   );
 }
