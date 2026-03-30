@@ -2,26 +2,131 @@
 
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, BookOpen, Video, FileText, Users, Star, ArrowRight, Zap, Target, BookMarked, Layers } from 'lucide-react';
+import Link from 'next/link';
 import ResourcesHero from '../../components/ResourcesHero';
+import LargeToolCard from '../../components/LargeToolCard';
+import { ResourceSkleteonContainer } from '../../components/ResourceSkeletons';
+
+// Mock Data
+const QUICK_ACCESS = [
+  { icon: FileText, title: "Documentation", description: "Official guides and API references", color: "purple" },
+  { icon: Video, title: "Video Tutorials", description: "Step-by-step video guides", color: "purple" },
+  { icon: BookOpen, title: "Books & Articles", description: "Recommended reading list", color: "purple" },
+  { icon: Users, title: "Community", description: "Join discussions and forums", color: "purple" },
+];
+
+const LEARNING_TRACKS = [
+  {
+    title: "Beginner Track",
+    subtitle: "Start your journey here",
+    items: ["Introduction to Mentorship", "Setting Goals", "Building Communication Skills"]
+  },
+  {
+    title: "Intermediate Track",
+    subtitle: "Level up your skills",
+    items: ["Advanced Strategies", "Peer Mentoring", "Feedback Techniques"]
+  },
+  {
+    title: "Advanced Track",
+    subtitle: "Master the craft",
+    items: ["Leadership Development", "Program Management", "Scaling Mentorship"]
+  }
+];
+
+const FEATURED_TOOLS = [
+  {
+    icon: Zap,
+    title: "Progress Tracker",
+    description: "Monitor your learning progress and milestones across all your active courses and mentorship tracks.",
+    buttonText: "Launch Tracker",
+    gradient: "from-blue-600 to-indigo-700"
+  },
+  {
+    icon: Target,
+    title: "Goal Setter",
+    description: "Define and track your mentorship goals with our smart goal-setting framework tailored for career growth.",
+    buttonText: "Set New Goals",
+    gradient: "from-purple-600 to-pink-600"
+  }
+];
+
+const RESOURCES = [
+  { icon: Layers, title: "Session Planner", description: "Plan and schedule your mentorship sessions efficiently.", type: "Article" },
+  { icon: BookMarked, title: "Resource Library", description: "Access a curated collection of ebooks and case studies.", type: "Article" },
+  { icon: Star, title: "Expert Guides", description: "Deep dives into specialized industry topics by verified mentors.", type: "Article" }
+];
 
 function ResourcesPageContent() {
   const searchParams = useSearchParams();
   const incomingQuery = searchParams.get('query') ?? '';
   const [query, setQuery] = useState(incomingQuery);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initial loading simulation
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     setQuery(incomingQuery);
   }, [incomingQuery]);
 
-  const trimmedQuery = useMemo(() => query.trim(), [query]);
+  // Debounced search logic simulation
+  useEffect(() => {
+    if (query) {
+      setIsSearching(true);
+      const timer = setTimeout(() => setIsSearching(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [query]);
+
+  const trimmedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
+
+  // Filter Logic
+  const filteredTracks = useMemo(() => 
+    LEARNING_TRACKS.filter(track => 
+      track.title.toLowerCase().includes(trimmedQuery) || 
+      track.subtitle.toLowerCase().includes(trimmedQuery) ||
+      track.items.some(item => item.toLowerCase().includes(trimmedQuery))
+    ), [trimmedQuery]);
+
+  const filteredResources = useMemo(() => 
+    RESOURCES.filter(res => 
+      res.title.toLowerCase().includes(trimmedQuery) || 
+      res.description.toLowerCase().includes(trimmedQuery)
+    ), [trimmedQuery]);
+
+  const filteredQuickAccess = useMemo(() => 
+    QUICK_ACCESS.filter(item => 
+      item.title.toLowerCase().includes(trimmedQuery) ||
+      item.description.toLowerCase().includes(trimmedQuery)
+    ), [trimmedQuery]);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12 space-y-16">
+        <div>
+          <div className="h-10 bg-gray-200 rounded-full w-48 mb-8" />
+          <ResourceSkleteonContainer type="quick" count={4} />
+        </div>
+        <div>
+          <div className="h-10 bg-gray-200 rounded-full w-48 mb-8" />
+          <ResourceSkleteonContainer type="track" count={3} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 -mt-10 sm:-mt-12 lg:-mt-14">
-        <div className="relative w-full max-w-3xl mx-auto">
+      {/* Search Bar Section */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 -mt-10 sm:-mt-12 lg:-mt-14 relative z-20">
+        <div className="relative w-full max-w-3xl mx-auto group">
           <Search
-            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${isSearching ? 'text-purple-600' : 'text-slate-400'}`}
             size={22}
             aria-hidden="true"
           />
@@ -31,205 +136,154 @@ function ResourcesPageContent() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search for resources, courses, guides..."
             aria-label="Search learning resources"
-            className="w-full rounded-2xl border border-slate-200 bg-white py-4 pl-12 pr-5 text-base text-slate-700 shadow-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+            className="w-full rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-md py-4 pl-12 pr-5 text-base text-slate-700 shadow-xl outline-none transition-all duration-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
           />
+          {isSearching && (
+            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent" />
+            </div>
+          )}
         </div>
       </section>
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
-        <div className="text-gray-700">
-          <h2 className="text-2xl font-semibold mb-4">Coming Soon</h2>
-          <p>This page will host curated learning resources, guides, and tutorials.</p>
-          {trimmedQuery ? (
-            <p className="mt-3 text-sm text-gray-500">
-              Searching for: <span className="font-medium text-gray-700">{trimmedQuery}</span>
-            </p>
-          ) : null}
-      
+
       {/* Quick Access Section */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Quick Access</h2>
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Quick Access</h2>
+          {trimmedQuery && filteredQuickAccess.length === 0 && (
+            <span className="text-sm text-gray-500">No results found for "{query}"</span>
+          )}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1 */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+          {filteredQuickAccess.map((item, idx) => (
+            <div key={idx} className="group bg-white border border-slate-100 rounded-2xl p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-100 transition-colors">
+                <item.icon className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-700 transition-colors">{item.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Documentation</h3>
-            <p className="text-gray-600">Official guides and API references</p>
-          </div>
-          
-          {/* Card 2 */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Video Tutorials</h3>
-            <p className="text-gray-600">Step-by-step video guides</p>
-          </div>
-          
-          {/* Card 3 */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Books & Articles</h3>
-            <p className="text-gray-600">Recommended reading list</p>
-          </div>
-          
-          {/* Card 4 */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Community</h3>
-            <p className="text-gray-600">Join discussions and forums</p>
-          </div>
+          ))}
+        </div>
+      </section>
+      
+      {/* Featured Tools Section */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Featured Tools</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {FEATURED_TOOLS.map((tool, idx) => (
+            <LargeToolCard
+              key={idx}
+              icon={tool.icon}
+              title={tool.title}
+              description={tool.description}
+              buttonText={tool.buttonText}
+              gradient={tool.gradient}
+            />
+          ))}
         </div>
       </section>
       
       {/* Learning Tracks Section */}
-      <section className="bg-gray-50 py-12">
+      <section className="bg-slate-50 border-y border-slate-100 py-16">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Learning Tracks</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Track 1 */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-600 to-purple-500 p-6">
-                <h3 className="text-2xl font-bold text-white">Beginner Track</h3>
-                <p className="text-purple-100 mt-2">Start your journey here</p>
-              </div>
-              <div className="p-6">
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Introduction to Mentorship</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Setting Goals</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Building Communication Skills</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            
-            {/* Track 2 */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-600 to-purple-500 p-6">
-                <h3 className="text-2xl font-bold text-white">Intermediate Track</h3>
-                <p className="text-purple-100 mt-2">Level up your skills</p>
-              </div>
-              <div className="p-6">
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Advanced Strategies</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Peer Mentoring</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Feedback Techniques</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            
-            {/* Track 3 */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-600 to-purple-500 p-6">
-                <h3 className="text-2xl font-bold text-white">Advanced Track</h3>
-                <p className="text-purple-100 mt-2">Master the craft</p>
-              </div>
-              <div className="p-6">
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Leadership Development</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Program Management</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
-                    <span className="text-gray-700">Scaling Mentorship</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Learning Tracks</h2>
+            <Link 
+              href="/resources/tracks" 
+              className="group flex items-center text-purple-600 font-semibold hover:text-purple-800 transition-colors"
+            >
+              View All Tracks
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
+          
+          {filteredTracks.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {filteredTracks.map((track, idx) => (
+                <div key={idx} className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 flex flex-col hover:border-purple-200 transition-colors">
+                  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-8">
+                    <h3 className="text-2xl font-bold text-white">{track.title}</h3>
+                    <p className="text-purple-100 mt-2 font-light">{track.subtitle}</p>
+                  </div>
+                  <div className="p-8 flex-grow">
+                    <ul className="space-y-4">
+                      {track.items.map((item, i) => (
+                        <li key={i} className="flex items-start group/item">
+                          <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xs mr-3 font-bold group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors">
+                            {i + 1}
+                          </span>
+                          <span className="text-gray-700">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="p-8 pt-0 mt-auto">
+                    <button className="w-full py-3 rounded-xl border-2 border-slate-100 text-slate-600 font-semibold hover:border-purple-600 hover:text-purple-600 transition-all">
+                      Continue Path
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+             <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+               <p className="text-gray-500">No tracks match your search query.</p>
+             </div>
+          )}
         </div>
       </section>
       
-      {/* Tools Section */}
+      {/* Articles & Resources Section */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Articles & Guides</h2>
+          <Link 
+            href="/resources/articles" 
+            className="group flex items-center text-purple-600 font-semibold hover:text-purple-800 transition-colors"
+          >
+            View All Articles
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {filteredResources.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredResources.map((res, idx) => (
+              <div key={idx} className="flex flex-col bg-white border border-slate-100 rounded-2xl p-8 hover:shadow-2xl hover:border-purple-200 transition-all group">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mr-4 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                    <res.icon className="w-6 h-6 text-indigo-600 group-hover:text-white" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-500">{res.type}</span>
+                    <h3 className="text-lg font-bold text-gray-900">{res.title}</h3>
+                  </div>
+                </div>
+                <p className="text-gray-600 flex-grow leading-relaxed mb-6">{res.description}</p>
+                <Link href="#" className="inline-flex items-center text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors">
+                  Read Article <ArrowRight className="ml-1 h-3 w-3" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 rounded-3xl border border-dashed border-slate-200">
+             <p className="text-gray-500">No articles found.</p>
+          </div>
+        )}
+      </section>
+      
+      {/* Footer CTA */}
       <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Tools & Resources</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Tool 1 */}
-          <div className="flex flex-col bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Progress Tracker</h3>
-            </div>
-            <p className="text-gray-600 flex-grow">Monitor your learning progress and milestones</p>
-          </div>
-          
-          {/* Tool 2 */}
-          <div className="flex flex-col bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Session Planner</h3>
-            </div>
-            <p className="text-gray-600 flex-grow">Plan and schedule your mentorship sessions</p>
-          </div>
-          
-          {/* Tool 3 */}
-          <div className="flex flex-col bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 01.806-1.946 3.42 3.42 0 003.138-3.138z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Goal Setter</h3>
-            </div>
-            <p className="text-gray-600 flex-grow">Define and track your mentorship goals</p>
-          </div>
-        </div>
-      </section>
-      
-      {/* Coming Soon Section */}
-      <section className="bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="text-center text-gray-700">
-            <h2 className="text-2xl font-semibold mb-4">More Coming Soon</h2>
-            <p className="max-w-2xl mx-auto">
-              This page will host additional curated learning resources, guides, and tutorials.
-              Stay tuned for updates!
-            </p>
+        <div className="bg-purple-900 rounded-[3rem] p-12 text-center text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-purple-600 rounded-full blur-[100px] opacity-20" />
+          <div className="relative z-10">
+            <h2 className="text-3xl font-bold mb-4">Can't find what you're looking for?</h2>
+            <p className="text-purple-200 mb-8 max-w-xl mx-auto">Suggest a resource or topic you'd like to learn more about, and we'll work with our mentors to create content for it.</p>
+            <button className="bg-white text-purple-900 font-bold px-8 py-4 rounded-2xl hover:bg-purple-50 transition-colors shadow-lg">
+              Suggest Resource
+            </button>
           </div>
         </div>
       </section>
@@ -239,9 +293,14 @@ function ResourcesPageContent() {
 
 export default function ResourcesPage() {
   return (
-    <main className="bg-gray-100">
+    <main className="bg-white min-h-screen">
       <ResourcesHero />
-      <Suspense fallback={<section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12 text-gray-500">Loading resources...</section>}>
+      <Suspense fallback={
+        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto mb-4" />
+          <p className="text-slate-500">Wait a moment, we're preparing your resources...</p>
+        </div>
+      }>
         <ResourcesPageContent />
       </Suspense>
     </main>
