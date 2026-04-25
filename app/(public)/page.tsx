@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import LearningPath from '@/components/LearningPath';
 import MentorDiscovery from '@/components/MentorDiscovery';
+import WhyChooseUs from '@/components/WhyChooseUs';
 
 export default function PublicPage() {
   return (
@@ -36,6 +37,9 @@ export default function PublicPage() {
 
       {/* Mentor Discovery Section */}
       <MentorDiscovery />
+
+      {/* Why Choose Us Section */}
+      <WhyChooseUs />
     </div>
   );
 }
