@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function PublicPage() {
   return (
     <div className="text-center py-12">
@@ -8,13 +10,19 @@ export default function PublicPage() {
         Connecting mentors and mentees for meaningful growth
       </p>
       <div className="space-x-4">
-        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-          Find a Mentor
-        </button>
-        <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
-          Become a Mentor
-        </button>
+        <Link
+          href="/login"
+          className="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors duration-200"
+        >
+          Login
+        </Link>
+        <Link
+          href="/register"
+          className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200"
+        >
+          Register
+        </Link>
       </div>
     </div>
-  )
+  );
 }
