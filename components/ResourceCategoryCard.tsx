@@ -1,37 +1,31 @@
 'use client';
 
 import Link from 'next/link';
+import React from 'react';
 
-interface ResourceCategoryCardProps {
-  id: string;
+export interface ResourceCategoryCardProps {
+  icon: React.ReactNode;
   title: string;
   description: string;
-  icon: string;
-  count: number;
+  link: string;
 }
 
 export default function ResourceCategoryCard({
-  id,
+  icon,
   title,
   description,
-  icon,
-  count,
+  link,
 }: ResourceCategoryCardProps) {
   return (
     <Link
-      href={`/learning-resources/${id}`}
-      className="block bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-indigo-200 transition-all group"
+      href={link}
+      className="flex flex-col items-center text-center bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-indigo-200 transition-all group"
     >
-      <div className="flex items-center gap-3 mb-3">
-        <span className="text-3xl">{icon}</span>
-        <h3 className="text-base font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
-          {title}
-        </h3>
-      </div>
-      <p className="text-sm text-gray-500 mb-4 leading-relaxed">{description}</p>
-      <span className="inline-block text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-        {count} resources
+      <span className="text-3xl mb-3">{icon}</span>
+      <span className="text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition-colors">
+        {title}
       </span>
+      <span className="text-xs text-gray-400 mt-1">{description}</span>
     </Link>
   );
 }
