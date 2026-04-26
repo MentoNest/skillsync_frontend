@@ -36,9 +36,18 @@ const FeaturedMentor = () => {
                             your current role, or learn new skills, our mentors are here to guide you.
                         </p>
 
-                        <button type="button" aria-label="Get started with SkillSync" className="bg-[#9333ea] hover:bg-[#7e22ce] text-white px-10 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-[0_10px_20px_-5px_rgba(147,51,234,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(147,51,234,0.5)] transform hover:-translate-y-1 active:scale-95 flex items-center gap-2">
-                            Get Started
-                        </button>
+                        <button
+  type="button"
+  aria-label="Get started with SkillSync"
+  className="bg-[#9333ea] hover:bg-[#7e22ce] text-white px-10 py-4 rounded-xl font-bold text-lg 
+  w-full md:w-auto 
+  flex items-center justify-center gap-2
+  transition-all duration-300 shadow-[0_10px_20px_-5px_rgba(147,51,234,0.4)] 
+  hover:shadow-[0_15px_30px_-5px_rgba(147,51,234,0.5)] 
+  transform hover:-translate-y-1 active:scale-95"
+>
+  Get Started
+</button>
                     </div>
                 </div>
             </div>
