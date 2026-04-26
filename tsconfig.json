@@ -30,12 +30,26 @@
         "./components/*"
       ],
       "@/lib/*": [
-        "./lib/*"
+        "./src/lib/*"
       ],
       "@/styles/*": [
         "./styles/*"
+      ],
+      "@/entities/*": [
+        "./src/entities/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
+      ],
+      "@/auth/*": [
+        "./src/auth/*"
+      ],
+      "@/guards/*": [
+        "./src/guards/*"
       ]
-    }
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "next-env.d.ts",
@@ -43,7 +57,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "tests/**/*.ts"
   ],
   "exclude": [
     "node_modules"
