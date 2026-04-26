@@ -1,7 +1,7 @@
 import { User } from '@/entities/User.entity';
 import { AppDataSource } from '@/lib/database';
 import { JwtService } from '@/auth/jwt';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 export class AuthUtils {
   static async getUserFromToken(token: string): Promise<User | null> {
@@ -17,7 +17,7 @@ export class AuthUtils {
       });
 
       return user || null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }

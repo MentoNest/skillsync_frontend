@@ -17,11 +17,11 @@ export class JwtService {
     };
 
     const accessToken = jwt.sign(payload as jwt.JwtPayload, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN as any,
+      expiresIn: JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     } as jwt.SignOptions);
 
     const refreshToken = jwt.sign(payload as jwt.JwtPayload, JWT_REFRESH_SECRET, {
-      expiresIn: JWT_REFRESH_EXPIRES_IN as any,
+      expiresIn: JWT_REFRESH_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     } as jwt.SignOptions);
 
     return { accessToken, refreshToken };
@@ -31,7 +31,7 @@ export class JwtService {
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
       return decoded;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -40,7 +40,7 @@ export class JwtService {
     try {
       const decoded = jwt.verify(token, JWT_REFRESH_SECRET) as JwtPayload;
       return decoded;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
