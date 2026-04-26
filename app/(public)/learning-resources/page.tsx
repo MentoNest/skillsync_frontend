@@ -1,12 +1,12 @@
 import ResourceCategoryCard from '@/components/ResourceCategoryCard';
 
 const categories = [
-  { id: '1', title: 'Frontend Development', description: 'React, Next.js, CSS, and modern UI tooling.', icon: '💻', count: 24 },
-  { id: '2', title: 'Backend Engineering', description: 'Node.js, databases, APIs, and server architecture.', icon: '🛠️', count: 18 },
-  { id: '3', title: 'Data Science', description: 'Python, statistics, and machine learning fundamentals.', icon: '📊', count: 15 },
-  { id: '4', title: 'DevOps & Cloud', description: 'CI/CD, Docker, Kubernetes, and cloud platforms.', icon: '☁️', count: 12 },
-  { id: '5', title: 'Design & UX', description: 'Figma, user research, and design systems.', icon: '🎨', count: 10 },
-  { id: '6', title: 'Soft Skills', description: 'Communication, leadership, and career growth.', icon: '🤝', count: 8 },
+  { title: 'Frontend Development', description: 'React, Next.js, CSS, and modern UI tooling.', icon: '💻', link: '/learning-resources/frontend' },
+  { title: 'Backend Engineering', description: 'Node.js, databases, APIs, and server architecture.', icon: '🛠️', link: '/learning-resources/backend' },
+  { title: 'Data Science', description: 'Python, statistics, and machine learning fundamentals.', icon: '📊', link: '/learning-resources/data-science' },
+  { title: 'DevOps & Cloud', description: 'CI/CD, Docker, Kubernetes, and cloud platforms.', icon: '☁️', link: '/learning-resources/devops' },
+  { title: 'Design & UX', description: 'Figma, user research, and design systems.', icon: '🎨', link: '/learning-resources/design' },
+  { title: 'Soft Skills', description: 'Communication, leadership, and career growth.', icon: '🤝', link: '/learning-resources/soft-skills' },
 ];
 
 export const metadata = {
@@ -26,7 +26,7 @@ export default function LearningResourcesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((cat) => (
-          <ResourceCategoryCard key={cat.id} {...cat} />
+          <ResourceCategoryCard key={cat.link} {...cat} />
         ))}
       </div>
     </main>

@@ -32,7 +32,7 @@ const FeaturedMentor = () => {
 
                         <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl mb-10">
                             Join thousands of professionals who have accelerated their careers through
-                            personalized mentorship. Whether you're looking to switch careers, advance in
+                            personalized mentorship. Whether you&apos;re looking to switch careers, advance in
                             your current role, or learn new skills, our mentors are here to guide you.
                         </p>
 

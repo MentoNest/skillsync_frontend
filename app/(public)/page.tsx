@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import LearningPath from '@/components/LearningPath';
 import PlatformStats from '@/components/PlatformStats';
+import FeaturedLearningTracks from '@/components/FeaturedLearningTracks';
 import MentorDiscovery from '@/components/MentorDiscovery';
 import WhyChooseUs from '@/components/WhyChooseUs';
 
@@ -35,6 +36,9 @@ export default function PublicPage() {
 
       {/* Platform Statistics Section */}
       <PlatformStats />
+
+      {/* Featured Learning Tracks Section */}
+      <FeaturedLearningTracks />
 
       {/* Learning Path / Resources Section */}
       <LearningPath />
