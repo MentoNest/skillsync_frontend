@@ -125,23 +125,44 @@ export default function LoginForm() {
             </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
-            >
-              Login
-            </button>
-          </div>
+           <div>
+             <button
+               type="submit"
+               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+             >
+               Login
+             </button>
+           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link href="/register" className="font-medium text-purple-600 hover:text-purple-500">
-                Create Account
-              </Link>
-            </p>
-          </div>
+           <div className="flex items-center my-6">
+             <div className="w-1/2 border-t border-gray-300"></div>
+             <div className="px-3 text-sm text-gray-500">or</div>
+             <div className="w-1/2 border-t border-gray-300"></div>
+           </div>
+           
+           <div className="space-y-3">
+             <button
+               type="button"
+               className="group relative w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+             >
+               Continue with Google
+             </button>
+             <button
+               type="button"
+               className="group relative w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+             >
+               Continue with Facebook
+             </button>
+           </div>
+
+           <div className="text-center">
+             <p className="text-sm text-gray-600">
+               Don't have an account?{' '}
+               <Link href="/register" className="font-medium text-purple-600 hover:text-purple-500">
+                 Create Account
+               </Link>
+             </p>
+           </div>
         </form>
       </div>
     </div>
