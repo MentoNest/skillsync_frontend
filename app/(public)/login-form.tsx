@@ -155,8 +155,8 @@ export default function LoginForm() {
            </div>
 
            <div className="text-center">
-             <p className="text-sm text-gray-600">
-               Don't have an account?{' '}
+                <p className="text-sm text-gray-600">
+                  Don&apos;t have an account?{' '}
                <Link href="/register" className="font-medium text-purple-600 hover:text-purple-500">
                  Create Account
                </Link>
