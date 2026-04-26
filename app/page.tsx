@@ -1,10 +1,8 @@
-import Link from 'next/link';
 import LearningPath from '@/components/LearningPath';
-import PlatformStats from '@/components/PlatformStats';
 import MentorDiscovery from '@/components/MentorDiscovery';
 import WhyChooseUs from '@/components/WhyChooseUs';
 
-export default function PublicPage() {
+export default function HomePage() {
   return (
     <div>
       {/* Hero Section */}
@@ -32,9 +30,6 @@ export default function PublicPage() {
           </div>
         </div>
       </section>
-
-      {/* Platform Statistics Section */}
-      <PlatformStats />
 
       {/* Learning Path / Resources Section */}
       <LearningPath />
