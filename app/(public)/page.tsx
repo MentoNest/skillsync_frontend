@@ -1,29 +1,6 @@
 import Link from 'next/link';
-
-export default function PublicPage() {
-  return (
-    <div className="text-center py-12">
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        Welcome to SkillSync
-      </h1>
-      <p className="text-xl text-gray-600 mb-8">
-        Connecting mentors and mentees for meaningful growth
-      </p>
-      <div className="space-x-4">
-        <Link
-          href="/login"
-          className="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors duration-200"
-        >
-          Login
-        </Link>
-        <Link
-          href="/register"
-          className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200"
-        >
-          Register
-        </Link>
-      </div>
 import LearningPath from '@/components/LearningPath';
+import FeaturedMentor from '@/components/FeaturedMentor';
 
 export default function PublicPage() {
   return (
@@ -43,16 +20,25 @@ export default function PublicPage() {
               share your expertise, or discover personalized learning paths tailored to your goals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
+              <Link
+                href="/register"
+                className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl text-center"
+              >
                 Find a Mentor
-              </button>
-              <button className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-200 shadow-md hover:shadow-lg">
+              </Link>
+              <Link
+                href="/register"
+                className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-200 shadow-md hover:shadow-lg text-center"
+              >
                 Become a Mentor
-              </button>
+              </Link>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Featured Mentor Section */}
+      <FeaturedMentor />
 
       {/* Learning Path / Resources Section */}
       <LearningPath />
