@@ -1,7 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Search } from "lucide-react";
+import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+
+// Lazy load the Search icon
+const SearchIcon = dynamic(
+  () => import("lucide-react").then(mod => ({ default: mod.Search })),
+  { ssr: true }
+);
 
 interface Props {
   onSearch?: (query: string) => void;
@@ -14,15 +20,16 @@ export default function ResourceSearchBar({
 }: Props) {
   const [query, setQuery] = useState("");
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setQuery(e.target.value);
-    onSearch?.(e.target.value);
-  }
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    onSearch?.(value);
+  }, [onSearch]);
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4">
       <div className="relative flex items-center">
-        <Search className="absolute left-4 w-5 h-5 text-gray-400 pointer-events-none" />
+        <SearchIcon className="absolute left-4 w-5 h-5 text-gray-400 pointer-events-none" />
         <input
           type="text"
           value={query}

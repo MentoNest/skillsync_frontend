@@ -87,6 +87,7 @@ export default function MentorDiscovery() {
                 {/* Avatar & Info */}
                 <div className="flex items-center mb-4">
                   <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-100">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-100 flex-shrink-0">
                     <Image
                       src={mentor.avatar}
                       alt={`${mentor.name}'s avatar`}

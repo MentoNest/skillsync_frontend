@@ -1,7 +1,45 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Enable SWR and optimizations
+  swcMinify: true,
+  
+  // Enable production source maps (disable in production for smaller bundles)
+  productionBrowserSourceMaps: false,
+
+  // Optimize images
+  images: {
+    optimization: 'auto',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        pathname: '/**',
+      },
+    ],
+  },
+
+  // Webpack optimization
+  webpack: (config, { isServer }) => {
+    // Tree shaking optimizations
+    config.optimization = {
+      ...config.optimization,
+      usedExports: true,
+      sideEffects: true,
+    };
+
+    return config;
+  },
+
+  // Enable Middleware caching
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
 };
 
 export default nextConfig;
