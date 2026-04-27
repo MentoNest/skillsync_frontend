@@ -17,18 +17,21 @@ export const metadata = {
 export default function LearningResourcesPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-10">
+      <header className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900">Learning Resources</h1>
         <p className="mt-2 text-gray-500 text-base">
           Explore hand-picked resources to grow your skills across all disciplines.
         </p>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((cat) => (
-          <ResourceCategoryCard key={cat.link} {...cat} />
-        ))}
-      </div>
+      <section aria-labelledby="resource-categories">
+        <h2 id="resource-categories" className="sr-only">Resource Categories</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="grid" aria-label="Learning resource categories">
+          {categories.map((cat) => (
+            <ResourceCategoryCard key={cat.link} {...cat} />
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
