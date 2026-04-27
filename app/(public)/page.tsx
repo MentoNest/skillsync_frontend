@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import LearningPath from '@/components/LearningPath';
 import PlatformStats from '@/components/PlatformStats';
 import FeaturedLearningTracks from '@/components/FeaturedLearningTracks';

@@ -1,64 +1,69 @@
-'use client';
-
 import Link from 'next/link';
+import LearningTrackCard from '@/components/LearningTrackCard';
 
 interface LearningTrack {
   id: string;
+  imageSrc: string;
   title: string;
   description: string;
-  icon: string;
+  category: string;
+  lessonCount: number;
   duration: string;
-  level: string;
 }
 
 const tracks: LearningTrack[] = [
   {
     id: '1',
+    imageSrc: '/learning-tracks/full-stack.svg',
     title: 'Full-Stack Development',
     description: 'Master frontend and backend technologies to build complete web applications.',
-    icon: '💻',
+    category: 'Development',
+    lessonCount: 24,
     duration: '12 weeks',
-    level: 'Beginner',
   },
   {
     id: '2',
+    imageSrc: '/learning-tracks/data-science.svg',
     title: 'Data Science & AI',
     description: 'Learn Python, machine learning, and data visualization techniques.',
-    icon: '📊',
+    category: 'Data Science',
+    lessonCount: 30,
     duration: '16 weeks',
-    level: 'Intermediate',
   },
   {
     id: '3',
+    imageSrc: '/learning-tracks/design.svg',
     title: 'UI/UX Design Masterclass',
     description: 'Create stunning user interfaces and seamless user experiences.',
-    icon: '🎨',
+    category: 'Design',
+    lessonCount: 18,
     duration: '10 weeks',
-    level: 'Beginner',
   },
 ];
 
 export default function FeaturedLearningTracks() {
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+    <section className="bg-gradient-to-b from-white to-slate-50 px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
+              Featured Tracks
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
               Featured Learning Tracks
             </h2>
-            <p className="mt-2 text-gray-500 text-base">
-              Hand-picked paths to accelerate your career.
+            <p className="mt-2 text-base leading-7 text-gray-500">
+              Hand-picked paths designed to keep the layout clean, readable, and easy to scan.
             </p>
           </div>
           <Link
             href="/learning-resources"
-            className="hidden sm:inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            className="inline-flex items-center font-medium text-blue-600 transition-colors hover:text-blue-800"
           >
             View All
             <svg
-              className="ml-1 w-4 h-4"
+              className="ml-1 h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -74,64 +79,20 @@ export default function FeaturedLearningTracks() {
           </Link>
         </div>
 
-        {/* Track Cards - Horizontal Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="-mx-4 flex gap-6 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
           {tracks.map((track) => (
-            <div
-              key={track.id}
-              className="bg-gray-50 rounded-xl p-6 border border-gray-100 hover:shadow-md hover:border-indigo-200 transition-all group"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <span className="text-4xl">{track.icon}</span>
-                <span className="px-3 py-1 text-xs font-medium text-indigo-700 bg-indigo-100 rounded-full">
-                  {track.level}
-                </span>
-              </div>
-
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
-                {track.title}
-              </h3>
-              <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-                {track.description}
-              </p>
-
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400 font-medium">
-                  {track.duration}
-                </span>
-                <Link
-                  href={`/learning/${track.id}`}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  Explore
-                </Link>
-              </div>
+            <div key={track.id} className="min-w-[280px] flex-none md:min-w-0 md:flex-auto">
+              <LearningTrackCard
+                category={track.category}
+                title={track.title}
+                description={track.description}
+                lessonCount={track.lessonCount}
+                duration={track.duration}
+                href={`/learning/${track.id}`}
+                imageSrc={track.imageSrc}
+              />
             </div>
           ))}
-        </div>
-
-        {/* Mobile View All Link */}
-        <div className="mt-8 text-center sm:hidden">
-          <Link
-            href="/learning-resources"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors"
-          >
-            View All
-            <svg
-              className="ml-1 w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
         </div>
       </div>
     </section>
