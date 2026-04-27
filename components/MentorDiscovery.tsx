@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 interface MentorCard {
   id: string;
   name: string;
@@ -84,11 +86,15 @@ export default function MentorDiscovery() {
               <div className="p-6">
                 {/* Avatar & Info */}
                 <div className="flex items-center mb-4">
-                  <img
-                    src={mentor.avatar}
-                    alt={`${mentor.name}'s avatar`}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-blue-100"
-                  />
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-100 flex-shrink-0">
+                    <Image
+                      src={mentor.avatar}
+                      alt={`${mentor.name}'s avatar`}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-semibold text-gray-900">
                       {mentor.name}
