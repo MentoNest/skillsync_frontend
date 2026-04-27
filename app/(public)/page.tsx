@@ -1,6 +1,43 @@
 import Link from 'next/link';
 import LearningPath from '@/components/LearningPath';
 import FeaturedMentor from '@/components/FeaturedMentor';
+import dynamic from 'next/dynamic';
+
+// Static imports for above-the-fold content
+import PlatformStats from '@/components/PlatformStats';
+
+// Dynamic imports for below-the-fold sections with loading state
+const LearningPath = dynamic(() => import('@/components/LearningPath'), {
+  loading: () => <SectionSkeleton />,
+});
+
+const FeaturedLearningTracks = dynamic(
+  () => import('@/components/FeaturedLearningTracks'),
+  { loading: () => <SectionSkeleton /> }
+);
+
+const MentorDiscovery = dynamic(
+  () => import('@/components/MentorDiscovery'),
+  { loading: () => <SectionSkeleton /> }
+);
+
+const WhyChooseUs = dynamic(() => import('@/components/WhyChooseUs'), {
+  loading: () => <SectionSkeleton />,
+});
+
+function SectionSkeleton() {
+  return (
+    <section className="py-16 sm:py-24 lg:py-32 bg-gray-50 animate-pulse">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="h-12 bg-gray-200 rounded w-1/3 mb-8" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="h-64 bg-gray-200 rounded" />
+          <div className="h-64 bg-gray-200 rounded" />
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function PublicPage() {
   return (
@@ -41,7 +78,20 @@ export default function PublicPage() {
       <FeaturedMentor />
 
       {/* Learning Path / Resources Section */}
+      {/* Platform Statistics Section - Loaded immediately */}
+      <PlatformStats />
+
+      {/* Featured Learning Tracks Section - Lazy loaded */}
+      <FeaturedLearningTracks />
+
+      {/* Learning Path / Resources Section - Lazy loaded */}
       <LearningPath />
+
+      {/* Mentor Discovery Section - Lazy loaded */}
+      <MentorDiscovery />
+
+      {/* Why Choose Us Section - Lazy loaded */}
+      <WhyChooseUs />
     </div>
   );
 }
