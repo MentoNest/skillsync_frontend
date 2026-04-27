@@ -93,6 +93,7 @@ export default function MentorDiscovery() {
                       fill
                       sizes="64px"
                       className="object-cover"
+                      priority={mentor.id === '1'}
                     />
                   </div>
                   <div className="ml-4">
