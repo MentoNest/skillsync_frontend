@@ -86,6 +86,7 @@ export default function MentorDiscovery() {
               <div className="p-6">
                 {/* Avatar & Info */}
                 <div className="flex items-center mb-4">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-100">
                   <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-100 flex-shrink-0">
                     <Image
                       src={mentor.avatar}
@@ -93,6 +94,7 @@ export default function MentorDiscovery() {
                       fill
                       sizes="64px"
                       className="object-cover"
+                      priority={mentor.id === '1'}
                     />
                   </div>
                   <div className="ml-4">

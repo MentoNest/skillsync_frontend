@@ -43,14 +43,14 @@ const tracks: LearningTrack[] = [
 
 export default function FeaturedLearningTracks() {
   return (
-    <section className="bg-gradient-to-b from-white to-slate-50 px-4 py-16 sm:px-6 lg:px-8">
+    <section className="bg-gradient-to-b from-white to-slate-50 px-4 py-16 sm:px-6 lg:px-8" aria-labelledby="featured-tracks-heading">
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
               Featured Tracks
             </p>
-            <h2 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
+            <h2 id="featured-tracks-heading" className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
               Featured Learning Tracks
             </h2>
             <p className="mt-2 text-base leading-7 text-gray-500">
@@ -59,7 +59,8 @@ export default function FeaturedLearningTracks() {
           </div>
           <Link
             href="/learning-resources"
-            className="inline-flex items-center font-medium text-blue-600 transition-colors hover:text-blue-800"
+            className="inline-flex items-center font-medium text-blue-600 transition-colors hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1"
+            aria-label="View all learning tracks"
           >
             View All
             <svg
@@ -68,6 +69,7 @@ export default function FeaturedLearningTracks() {
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -79,9 +81,9 @@ export default function FeaturedLearningTracks() {
           </Link>
         </div>
 
-        <div className="-mx-4 flex gap-6 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
+        <div className="-mx-4 flex gap-6 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0" role="list" aria-label="Featured learning tracks">
           {tracks.map((track) => (
-            <div key={track.id} className="min-w-[280px] flex-none md:min-w-0 md:flex-auto">
+            <div key={track.id} className="min-w-[280px] flex-none md:min-w-0 md:flex-auto" role="listitem">
               <LearningTrackCard
                 category={track.category}
                 title={track.title}
