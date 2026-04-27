@@ -33,6 +33,15 @@ export class User {
   @Column({ name: 'is_admin', default: false })
   isAdmin!: boolean;
 
+  @Column({ unique: true, nullable: true, length: 30 })
+  username?: string;
+
+  @Column({ name: 'display_name', nullable: true, length: 50 })
+  displayName?: string;
+
+  @Column({ name: 'username_changed_at', nullable: true })
+  usernameChangedAt?: Date;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
@@ -42,5 +51,15 @@ export class User {
   @BeforeInsert()
   setDefaults() {
     this.id = uuidv4();
+    if (!this.displayName) {
+      this.displayName = this.generateDefaultDisplayName();
+    }
+  }
+
+  private generateDefaultDisplayName(): string {
+    if (this.email) {
+      return this.email.split('@')[0];
+    }
+    return 'User';
   }
 }
