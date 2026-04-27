@@ -1,4 +1,5 @@
 import ResourceCategoryCard from '@/components/ResourceCategoryCard';
+import ResourcesHero from '@/components/ResourcesHero';
 
 const categories = [
   { title: 'Frontend Development', description: 'React, Next.js, CSS, and modern UI tooling.', icon: '💻', link: '/learning-resources/frontend' },
