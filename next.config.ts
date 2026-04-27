@@ -10,7 +10,18 @@ const nextConfig: NextConfig = {
   // Optimize images
   images: {
     optimization: 'auto',
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        pathname: '/**',
+      },
+    ],
   },
 
   // Webpack optimization
