@@ -28,14 +28,14 @@ export default function LearningTrackCard({
       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
         <Image
           src={imageSrc}
-          alt={imageAlt ?? title}
+          alt={imageAlt ?? `${title} course thumbnail`}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" />
         <div className="absolute left-4 top-4">
-          <span className="inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900 shadow-sm backdrop-blur">
+          <span className="inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900 shadow-sm backdrop-blur" aria-label={`Category: ${category}`}>
             {category}
           </span>
         </div>
@@ -43,12 +43,12 @@ export default function LearningTrackCard({
 
       <div className="flex h-full flex-col p-6">
         <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-slate-500">
-          <span className="inline-flex items-center gap-1.5">
-            <BookOpen className="h-4 w-4" />
+          <span className="inline-flex items-center gap-1.5" aria-label={`${lessonCount} lessons available`}>
+            <BookOpen className="h-4 w-4" aria-hidden="true" />
             {lessonCount} lessons
           </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Clock3 className="h-4 w-4" />
+          <span className="inline-flex items-center gap-1.5" aria-label={`Course duration: ${duration}`}>
+            <Clock3 className="h-4 w-4" aria-hidden="true" />
             {duration}
           </span>
         </div>
@@ -60,6 +60,7 @@ export default function LearningTrackCard({
           <Link
             href={href}
             className="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label={`Start learning ${title}`}
           >
             Start Learning
           </Link>
