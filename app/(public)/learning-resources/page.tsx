@@ -1,18 +1,35 @@
-import ResourceCategoryCard from '@/components/ResourceCategoryCard';
+import dynamic from 'next/dynamic';
+import { Laptop, Wrench, BarChart3, Cloud, Palette, Users } from 'lucide-react';
+
+// Dynamically import the card component for code splitting
+const ResourceCategoryCard = dynamic(
+  () => import('@/components/ResourceCategoryCard'),
+  { loading: () => <CardSkeleton /> }
+);
 
 const categories = [
-  { title: 'Frontend Development', description: 'React, Next.js, CSS, and modern UI tooling.', icon: '💻', link: '/learning-resources/frontend' },
-  { title: 'Backend Engineering', description: 'Node.js, databases, APIs, and server architecture.', icon: '🛠️', link: '/learning-resources/backend' },
-  { title: 'Data Science', description: 'Python, statistics, and machine learning fundamentals.', icon: '📊', link: '/learning-resources/data-science' },
-  { title: 'DevOps & Cloud', description: 'CI/CD, Docker, Kubernetes, and cloud platforms.', icon: '☁️', link: '/learning-resources/devops' },
-  { title: 'Design & UX', description: 'Figma, user research, and design systems.', icon: '🎨', link: '/learning-resources/design' },
-  { title: 'Soft Skills', description: 'Communication, leadership, and career growth.', icon: '🤝', link: '/learning-resources/soft-skills' },
+  { title: 'Frontend Development', description: 'React, Next.js, CSS, and modern UI tooling.', icon: Laptop, link: '/learning-resources/frontend' },
+  { title: 'Backend Engineering', description: 'Node.js, databases, APIs, and server architecture.', icon: Wrench, link: '/learning-resources/backend' },
+  { title: 'Data Science', description: 'Python, statistics, and machine learning fundamentals.', icon: BarChart3, link: '/learning-resources/data-science' },
+  { title: 'DevOps & Cloud', description: 'CI/CD, Docker, Kubernetes, and cloud platforms.', icon: Cloud, link: '/learning-resources/devops' },
+  { title: 'Design & UX', description: 'Figma, user research, and design systems.', icon: Palette, link: '/learning-resources/design' },
+  { title: 'Soft Skills', description: 'Communication, leadership, and career growth.', icon: Users, link: '/learning-resources/soft-skills' },
 ];
 
 export const metadata = {
   title: 'Learning Resources | SkillSync',
   description: 'Browse curated learning resources by category.',
 };
+
+function CardSkeleton() {
+  return (
+    <div className="flex flex-col items-center text-center bg-white rounded-xl p-5 shadow-sm border border-gray-100 animate-pulse">
+      <div className="w-8 h-8 bg-gray-200 rounded-full mb-3" />
+      <div className="w-24 h-4 bg-gray-200 rounded mb-2" />
+      <div className="w-32 h-3 bg-gray-100 rounded" />
+    </div>
+  );
+}
 
 export default function LearningResourcesPage() {
   return (
