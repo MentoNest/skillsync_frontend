@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-keys": "node scripts/generate-keys.js",
+    "test:encryption": "npx tsx __tests__/encryption-manual-test.ts"
   },
   "dependencies": {
     "next": "14.2.5",
