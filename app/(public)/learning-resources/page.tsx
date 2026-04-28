@@ -1,4 +1,4 @@
-import ResourceCategoryCard from '@/components/ResourceCategoryCard';
+import ResourcesFooter from '@/components/ResourcesFooter';
 import ResourcesHero from '@/components/ResourcesHero';
 import dynamic from 'next/dynamic';
 import { Laptop, Wrench, BarChart3, Cloud, Palette, Users } from 'lucide-react';
@@ -54,6 +54,7 @@ export default function LearningResourcesPage() {
           </div>
         </section>
       </main>
+      <ResourcesFooter />
     </>
   );
 }
