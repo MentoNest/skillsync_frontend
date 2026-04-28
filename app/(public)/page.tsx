@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import LearningPath from '@/components/LearningPath';
+import FeaturedMentor from '@/components/FeaturedMentor';
 import dynamic from 'next/dynamic';
 
 // Static imports for above-the-fold content
@@ -54,17 +57,27 @@ export default function PublicPage() {
               share your expertise, or discover personalized learning paths tailored to your goals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
+              <Link
+                href="/register"
+                className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl text-center"
+              >
                 Find a Mentor
-              </button>
-              <button className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-200 shadow-md hover:shadow-lg">
+              </Link>
+              <Link
+                href="/register"
+                className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-200 shadow-md hover:shadow-lg text-center"
+              >
                 Become a Mentor
-              </button>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Featured Mentor Section */}
+      <FeaturedMentor />
+
+      {/* Learning Path / Resources Section */}
       {/* Platform Statistics Section - Loaded immediately */}
       <PlatformStats />
 
