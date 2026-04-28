@@ -1,5 +1,10 @@
 import LoginForm from '../login-form';
+import SplitAuthLayout from '@/components/auth/SplitAuthLayout';
 
 export default function LoginPage() {
-  return <LoginForm />;
+  return (
+    <SplitAuthLayout>
+      <LoginForm />
+    </SplitAuthLayout>
+  );
 }
