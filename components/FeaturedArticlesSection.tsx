@@ -10,7 +10,7 @@ export interface FeaturedArticlesSectionProps {
 
 export default function FeaturedArticlesSection({
   articles,
-  viewAllHref = '/articles',
+  viewAllHref = '/resources/articles',
 }: FeaturedArticlesSectionProps) {
   return (
     <section className="w-full">

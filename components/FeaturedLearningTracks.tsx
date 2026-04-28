@@ -58,7 +58,7 @@ export default function FeaturedLearningTracks() {
             </p>
           </div>
           <Link
-            href="/learning-resources"
+            href="/resources/tracks"
             className="inline-flex items-center font-medium text-blue-600 transition-colors hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1"
             aria-label="View all learning tracks"
           >
@@ -81,9 +81,9 @@ export default function FeaturedLearningTracks() {
           </Link>
         </div>
 
-        <div className="-mx-4 flex gap-6 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0" role="list" aria-label="Featured learning tracks">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" role="list" aria-label="Featured learning tracks">
           {tracks.map((track) => (
-            <div key={track.id} className="min-w-[280px] flex-none md:min-w-0 md:flex-auto" role="listitem">
+            <div key={track.id} role="listitem">
               <LearningTrackCard
                 category={track.category}
                 title={track.title}
