@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate-keys": "node scripts/generate-keys.js",
+    "test:encryption": "npx tsx __tests__/encryption-manual-test.ts",
+    "test:sessions": "npx tsx __tests__/sessionBooking.test.ts"
     "test:encryption": "npx tsx __tests__/encryption-manual-test.ts"
     "test": "jest",
     "test:watch": "jest --watch",
