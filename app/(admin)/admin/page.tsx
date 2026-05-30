@@ -1,10 +1,10 @@
+import React from 'react'
+
 export default function AdminPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard Placeholder</h1>
-      <div className="p-6 bg-white rounded-lg shadow-sm border">
-        <p>Admin management tools go here.</p>
-      </div>
+    <div className="p-4">
+      <h2 className="text-xl">Admin Home</h2>
+      <p className="text-sm text-slate-600">Placeholder for admin dashboard content.</p>
     </div>
-  );
+  )
 }

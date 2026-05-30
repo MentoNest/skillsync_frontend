@@ -1,21 +1,16 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import '@/styles/globals.css'
+import React from 'react'
 
-export const metadata: Metadata = {
-  title: "Mentorship Platform",
-  description: "Role-Based Dashboards for Mentorship",
-};
+export const metadata = {
+  title: 'Skillsync'
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className="min-h-screen bg-gray-50 text-slate-800">
         {children}
       </body>
     </html>
-  );
+  )
 }
