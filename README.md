@@ -1,3 +1,15 @@
+# Skillsync Frontend (Scaffold)
+
+This repository is a minimal scaffold for a mentorship platform using Next.js (App Router), TypeScript and Tailwind CSS.
+
+Structure highlights:
+
+- `app/` — Next.js App Router routes and layouts with role-based route groups: `(public)`, `(mentor)`, `(mentee)`, `(admin)`.
+- `components/` — shared UI components (placeholder).
+- `lib/` — helper libraries (placeholder).
+- `styles/` — global Tailwind CSS entry.
+
+This scaffold intentionally includes placeholders only; UI content and features are out of scope.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -1,34 +1,12 @@
-'use client';
+import React from 'react'
 
-import { usePathname } from 'next/navigation';
-
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const pathname = usePathname();
-  const isAuthPage = pathname === '/login' || pathname === '/register';
-
-  if (isAuthPage) {
-    return <>{children}</>;
-  }
-
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-semibold text-gray-900">SkillSync</h1>
-            <nav className="flex space-x-8">
-              <a href="#" className="text-gray-700 hover:text-gray-900">Home</a>
-              <a href="#" className="text-gray-700 hover:text-gray-900">About</a>
-              <a href="#" className="text-gray-700 hover:text-gray-900">Contact</a>
-            </nav>
-          </div>
-        </div>
+    <section className="p-6">
+      <header className="mb-6">
+        <h1 className="text-2xl font-semibold">Public Area</h1>
       </header>
       <main>{children}</main>
-    </div>
+    </section>
   )
 }
