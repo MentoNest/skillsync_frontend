@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 
 const filters = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
@@ -15,6 +16,7 @@ const mentors = [
     initials: 'KA',
     accent: '#3b82f6',
     bg: '#0f1f3d',
+    image: '/tony-adebanjo.jpg',
     available: true,
     rating: 4.95,
     sessions: 204,
@@ -30,6 +32,7 @@ const mentors = [
     initials: 'PM',
     accent: '#a855f7',
     bg: '#1e0f3d',
+    image: '/Image (Sarah Johnson).svg',
     available: true,
     rating: 4.98,
     sessions: 187,
@@ -45,6 +48,7 @@ const mentors = [
     initials: 'TR',
     accent: '#10b981',
     bg: '#0a2318',
+    image: '/Image (Marcus Williams).svg',
     available: false,
     rating: 4.91,
     sessions: 139,
@@ -60,6 +64,7 @@ const mentors = [
     initials: 'AN',
     accent: '#f59e0b',
     bg: '#2a1800',
+    image: '/Image (Cole Hathans).svg',
     available: true,
     rating: 4.93,
     sessions: 256,
@@ -75,6 +80,7 @@ const mentors = [
     initials: 'LF',
     accent: '#ef4444',
     bg: '#2a0a0a',
+    image: '/tony-adebanjo.jpg',
     available: true,
     rating: 4.89,
     sessions: 98,
@@ -90,6 +96,7 @@ const mentors = [
     initials: 'SL',
     accent: '#06b6d4',
     bg: '#011f26',
+    image: '/Image (Sarah Johnson).svg',
     available: false,
     rating: 4.96,
     sessions: 321,
@@ -480,7 +487,17 @@ export default function MentorDiscoverySection() {
                   className="md-avatar"
                   style={{ background: mentor.bg, color: mentor.accent }}
                 >
-                  {mentor.initials}
+                  {mentor.image ? (
+                    <Image 
+                      src={mentor.image} 
+                      alt={mentor.name}
+                      width={56}
+                      height={56}
+                      className="rounded-[14px] object-cover"
+                    />
+                  ) : (
+                    mentor.initials
+                  )}
                   <span className={`md-availability ${mentor.available ? 'available' : 'busy'}`} />
                 </div>
 

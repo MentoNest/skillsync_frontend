@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 const featuredMentor = {
   name: 'Dr. Amara Osei',
   title: 'Senior AI Engineer & Tech Lead',
   company: 'Google DeepMind',
-  image: '/images/featured-mentor.jpg',
+  image: '/tony-adebanjo.jpg', // Using existing image
   badge: 'Mentor of the Month',
   rating: 4.97,
   sessions: 312,
@@ -364,7 +365,16 @@ export default function FeaturedMentorSection() {
       <div className="mentor-card">
         {/* Left: Image */}
         <div className="mentor-image-panel">
-          <div className="mentor-avatar-fallback">AO</div>
+          {featuredMentor.image ? (
+            <Image 
+              src={featuredMentor.image} 
+              alt={featuredMentor.name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="mentor-avatar-fallback">AO</div>
+          )}
           <div className="mentor-image-overlay" />
           <div className="mentor-badge">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
