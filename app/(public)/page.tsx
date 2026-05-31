@@ -33,6 +33,7 @@ import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSe
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import MentorDiscoverySection from '@/components/landing/MentorDiscoverySection';
 import FeaturedMentorSection from '@/components/landing/FeaturedMentorSection';
+import LearningPathResourcesSection from '@/components/landing/LearningPathResourcesSection';
 
 export default function PublicPage() {
   return (
@@ -43,6 +44,7 @@ export default function PublicPage() {
       </Suspense>
       <FeaturedMentorSection />
       <MentorDiscoverySection />
+      <LearningPathResourcesSection />
       <TestimonialsSection />
       <PlatformStatisticsSection />
       <CTASection />
