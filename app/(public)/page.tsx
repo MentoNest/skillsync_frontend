@@ -1,6 +1,6 @@
-import React from 'react'
-
 'use client';
+
+import React from 'react'
 
 import HeroSection from '@/components/landing/HeroSection';
 import { Suspense } from 'react';
