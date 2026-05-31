@@ -1,12 +1,17 @@
-import React from 'react'
+import React from "react";
+import Navbar from "../../components/navigation/Navbar";
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <section className="p-6">
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold">Public Area</h1>
-      </header>
-      <main>{children}</main>
-    </section>
-  )
+    <>
+      <Navbar />
+      <section className="pt-16 p-6">
+        <main>{children}</main>
+      </section>
+    </>
+  );
 }
