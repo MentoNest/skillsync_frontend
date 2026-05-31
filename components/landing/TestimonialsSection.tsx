@@ -1,4 +1,12 @@
+'use client'
+
+import Image from 'next/image'
+import { useState } from 'react'
+
 export default function TestimonialsSection() {
+  const [aminaImageError, setAminaImageError] = useState(false)
+  const [danielImageError, setDanielImageError] = useState(false)
+
   return (
     <section className="testimonials bg-white py-20 text-slate-950">
       <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
@@ -8,23 +16,29 @@ export default function TestimonialsSection() {
         </div>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <div className="rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center">
-            <div className="mb-6">
-              <img src="/Image (Sarah Johnson).svg" alt="Amina" className="w-16 h-16 rounded-full border-4 border-cyan-500" onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = '/tony-adebanjo.jpg'; // fallback image
-              }} />
+            <div className="mb-6 relative w-16 h-16">
+              <Image
+                src={aminaImageError ? '/tony-adebanjo.jpg' : '/Image (Sarah Johnson).svg'}
+                alt="Amina"
+                fill
+                className="rounded-full border-4 border-cyan-500 object-cover"
+                onError={() => setAminaImageError(true)}
+              />
             </div>
-            <p className="text-lg leading-8 text-slate-700 text-center">“My mentor helped me define the skills I needed to land a senior position, and the weekly check-ins kept me accountable. I got the offer in three months.”</p>
+            <p className="text-lg leading-8 text-slate-700 text-center">&quot;My mentor helped me define the skills I needed to land a senior position, and the weekly check-ins kept me accountable. I got the offer in three months.&quot;</p>
             <p className="mt-6 font-semibold text-slate-950 text-center">Amina, Product Manager</p>
           </div>
           <div className="rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center">
-            <div className="mb-6">
-              <img src="/Image (Marcus Williams).svg" alt="Daniel" className="w-16 h-16 rounded-full border-4 border-cyan-500" onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = '/tony-adebanjo.jpg'; // fallback image
-              }} />
+            <div className="mb-6 relative w-16 h-16">
+              <Image
+                src={danielImageError ? '/tony-adebanjo.jpg' : '/Image (Marcus Williams).svg'}
+                alt="Daniel"
+                fill
+                className="rounded-full border-4 border-cyan-500 object-cover"
+                onError={() => setDanielImageError(true)}
+              />
             </div>
-            <p className="text-lg leading-8 text-slate-700 text-center">“The feedback on my interview strategy was clear, practical, and immediately useful. The coaching gave me the edge I needed.”</p>
+            <p className="text-lg leading-8 text-slate-700 text-center">&quot;The feedback on my interview strategy was clear, practical, and immediately useful. The coaching gave me the edge I needed.&quot;</p>
             <p className="mt-6 font-semibold text-slate-950 text-center">Daniel, Software Engineer</p>
           </div>
         </div>
