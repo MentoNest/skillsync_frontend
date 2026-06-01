@@ -7,7 +7,7 @@ const featuredMentor = {
   name: 'Dr. Amara Osei',
   title: 'Senior AI Engineer & Tech Lead',
   company: 'Google DeepMind',
-  image: '', // Using fallback avatar
+  image: null, // Using fallback avatar
   badge: 'Mentor of the Month',
   rating: 4.97,
   sessions: 312,
