@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import CategoryBadge from '../CategoryBadge';
 
 const filters = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
 
@@ -505,6 +506,7 @@ export default function MentorDiscoverySection() {
                   <p className="md-name">{mentor.name}</p>
                   <p className="md-role">{mentor.role}</p>
                   <p className="md-company" style={{ color: mentor.accent }}>{mentor.company}</p>
+                  <CategoryBadge category={mentor.category} backgroundColor={mentor.accent} />
                 </div>
 
                 <div className="md-rating">
