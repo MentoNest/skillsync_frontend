@@ -34,6 +34,7 @@ import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import MentorDiscoverySection from '@/components/landing/MentorDiscoverySection';
 import FeaturedMentorSection from '@/components/landing/FeaturedMentorSection';
 import LearningPathResourcesSection from '@/components/landing/LearningPathResourcesSection';
+import FeaturedArticlesSection from '@/components/landing/FeaturedArticlesSection';
 
 export default function PublicPage() {
   return (
@@ -45,6 +46,7 @@ export default function PublicPage() {
       <FeaturedMentorSection />
       <MentorDiscoverySection />
       <LearningPathResourcesSection />
+      <FeaturedArticlesSection />
       <TestimonialsSection />
       <PlatformStatisticsSection />
       <CTASection />
