@@ -1,18 +1,28 @@
 import Link from 'next/link'
 import React from 'react'
+import ArticleListItem from '@/components/ArticleListItem'
 
-const resourceCards = [
+const resourceArticles = [
   {
-    title: 'Mentorship Launchpad',
-    description: 'Scaffolded learning pathways to help mentees find the right mentors and resources quickly.',
+    category: 'Productivity',
+    title: 'How to build meaningful mentorship goals',
+    author: 'Amina Patel',
+    readTime: '6 min read',
+    href: '/resources/article-mentorship-goals',
   },
   {
-    title: 'Skill Growth Library',
-    description: 'Curated topic collections for leadership, product, engineering, and career development.',
+    category: 'Career Growth',
+    title: 'Design your first structured learning path',
+    author: 'Noah Kim',
+    readTime: '8 min read',
+    href: '/resources/article-learning-path',
   },
   {
-    title: 'Community Playbooks',
-    description: 'Starter guides and sample workflows for building strong mentor-mentee relationships.',
+    category: 'Leadership',
+    title: 'Best practices for growing trust with mentees',
+    author: 'Lena Torres',
+    readTime: '5 min read',
+    href: '/resources/article-mentee-trust',
   },
 ]
 
@@ -51,11 +61,15 @@ export default function ResourcesPage() {
       </section>
 
       <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {resourceCards.map(item => (
-          <article key={item.title} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-            <h3 className="text-xl font-semibold text-slate-900">{item.title}</h3>
-            <p className="mt-3 text-slate-600">{item.description}</p>
-          </article>
+        {resourceArticles.map(item => (
+          <ArticleListItem
+            key={item.title}
+            category={item.category}
+            title={item.title}
+            author={item.author}
+            readTime={item.readTime}
+            href={item.href}
+          />
         ))}
       </section>
     </div>
