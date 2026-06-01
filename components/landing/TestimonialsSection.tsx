@@ -16,14 +16,8 @@ export default function TestimonialsSection() {
         </div>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <div className="rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center">
-            <div className="mb-6 relative w-16 h-16">
-              <Image
-                src={aminaImageError ? '/tony-adebanjo.jpg' : '/Image (Sarah Johnson).svg'}
-                alt="Amina"
-                fill
-                className="rounded-full border-4 border-cyan-500 object-cover"
-                onError={() => setAminaImageError(true)}
-              />
+            <div className="mb-6 w-16 h-16 rounded-full border-4 border-cyan-500 bg-cyan-100 flex items-center justify-center text-cyan-600 font-semibold text-xl">
+              AM
             </div>
             <p className="text-lg leading-8 text-slate-700 text-center">&quot;My mentor helped me define the skills I needed to land a senior position, and the weekly check-ins kept me accountable. I got the offer in three months.&quot;</p>
             <p className="mt-6 font-semibold text-slate-950 text-center">Amina, Product Manager</p>

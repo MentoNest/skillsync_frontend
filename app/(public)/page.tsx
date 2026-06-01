@@ -1,6 +1,7 @@
-'use client'
+'use client';
 
 import React from 'react'
+
 import HeroSection from '@/components/landing/HeroSection';
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
