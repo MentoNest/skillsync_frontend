@@ -1,6 +1,7 @@
 import ResourceSearchBar from '@/components/resources/ResourceSearchBar'
 import QuickAccessSection from '@/components/resources/QuickAccessSection'
 import FeaturedLearningTracksSection from '@/components/resources/FeaturedLearningTracksSection'
+import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection'
 import Link from 'next/link'
 import React from 'react'
 import ArticleListItem from '@/components/ArticleListItem'
@@ -52,6 +53,7 @@ export default function ResourcesPage() {
           />
         ))}
       </section>
+      <ToolsTemplatesSection />
     </div>
   )
 }
