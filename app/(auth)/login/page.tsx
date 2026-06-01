@@ -22,9 +22,8 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      // TODO: wire up to your auth service
       console.log("Login data:", data);
-      await new Promise((r) => setTimeout(r, 1200)); // simulate API call
+      await new Promise((r) => setTimeout(r, 1200)); 
     } finally {
       setIsLoading(false);
     }
