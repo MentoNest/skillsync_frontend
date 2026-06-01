@@ -25,8 +25,7 @@ const WhyChooseUsSection = dynamic(() => import('@/components/landing/WhyChooseU
         </div>
       </div>
     </div>
-  ),
-  ssr: false
+  )
 });
 import CTASection from '@/components/landing/CTASection';
 import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
