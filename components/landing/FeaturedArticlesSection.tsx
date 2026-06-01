@@ -36,7 +36,7 @@ export default function FeaturedArticlesSection() {
             <p className="text-sm font-semibold uppercase tracking-wider text-slate-500">Insights</p>
             <h2 className="mt-2 text-3xl font-semibold text-slate-900">Featured Articles</h2>
           </div>
-          <Link href="/articles" className="text-sm font-medium text-cyan-600 hover:underline">
+          <Link href="/resources/articles" className="text-sm font-medium text-cyan-600 hover:underline">
             View all →
           </Link>
         </div>
