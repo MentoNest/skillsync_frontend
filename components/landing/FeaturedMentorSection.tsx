@@ -357,7 +357,7 @@ export default function FeaturedMentorSection() {
             Featured This Week
           </div>
           <h2 className="section-heading">
-            Learn from someone who's <em>been there.</em>
+            Learn from someone who&apos;s <em>been there.</em>
           </h2>
         </div>
       </div>
