@@ -26,7 +26,6 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      // TODO: wire up to your auth service
       console.log("Register data:", data);
       await new Promise((r) => setTimeout(r, 1200));
     } finally {

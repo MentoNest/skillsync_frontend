@@ -39,7 +39,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
       {/* Right Side – Mentor Highlight Panel (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-[48%] relative overflow-hidden flex-col justify-between p-12 bg-gradient-to-br from-violet-700 via-purple-600 to-indigo-800">
-        {/* Decorative circles */}
+        {/* Decorative circles for good ui */}
         <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-white/5 blur-3xl" />
         <div className="absolute bottom-0 -left-20 w-72 h-72 rounded-full bg-indigo-400/10 blur-2xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full border border-white/5" />
