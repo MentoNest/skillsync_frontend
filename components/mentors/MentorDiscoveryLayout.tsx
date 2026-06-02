@@ -325,6 +325,8 @@ function FilterPanel({
 export default function MentorDiscoveryLayout() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeAvailability, setActiveAvailability] = useState('All');
+  const [minRate, setMinRate] = useState('');
+  const [maxRate, setMaxRate] = useState('');
 
   const filtered = mentors.filter(m => {
     const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
@@ -332,7 +334,11 @@ export default function MentorDiscoveryLayout() {
       activeAvailability === 'All' ||
       (activeAvailability === 'Available' && m.available) ||
       (activeAvailability === 'Fully Booked' && !m.available);
-    return matchesCategory && matchesAvailability;
+    const parsedMin = minRate === '' ? 0 : parseFloat(minRate);
+    const parsedMax = maxRate === '' ? Number.POSITIVE_INFINITY : parseFloat(maxRate);
+    const matchesRate = m.rate >= parsedMin && m.rate <= parsedMax;
+
+    return matchesCategory && matchesAvailability && matchesRate;
   });
 
   return (
@@ -397,6 +403,10 @@ export default function MentorDiscoveryLayout() {
               setActiveCategory={setActiveCategory}
               activeAvailability={activeAvailability}
               setActiveAvailability={setActiveAvailability}
+              minRate={minRate}
+              maxRate={maxRate}
+              setMinRate={setMinRate}
+              setMaxRate={setMaxRate}
             />
           </aside>
 
