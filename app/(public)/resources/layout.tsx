@@ -1,4 +1,5 @@
 import React from 'react'
+import ResourcesFooter from '@/components/resources/ResourcesFooter'
 
 export default function ResourcesLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export default function ResourcesLayout({ children }: { children: React.ReactNod
           </p>
         </header>
         {children}
+        <ResourcesFooter />
       </div>
     </section>
   )
