@@ -1,13 +1,15 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 export default function TestimonialsSection() {
-  const [imgErrors, setImgErrors] = useState({});
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
-  const handleImgError = (name) => {
+  const handleImgError = (name: string) => {
     setImgErrors(prev => ({ ...prev, [name]: true }));
   };
+
   return (
     <section className="testimonials bg-white py-20 text-slate-950">
       <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
@@ -17,11 +19,12 @@ export default function TestimonialsSection() {
         </div>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <div className="rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center">
-            <div className="mb-6">
-              <img
+            <div className="mb-6 relative w-16 h-16">
+              <Image
                 src={imgErrors['amina'] ? '/tony-adebanjo.jpg' : '/Image (Sarah Johnson).svg'}
                 alt="Amina"
-                className="w-16 h-16 rounded-full border-4 border-cyan-500"
+                fill
+                className="rounded-full border-4 border-cyan-500 object-cover"
                 onError={() => handleImgError('amina')}
               />
             </div>
@@ -29,11 +32,12 @@ export default function TestimonialsSection() {
             <p className="mt-6 font-semibold text-slate-950 text-center">Amina, Product Manager</p>
           </div>
           <div className="rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center">
-            <div className="mb-6">
-              <img
+            <div className="mb-6 relative w-16 h-16">
+              <Image
                 src={imgErrors['daniel'] ? '/tony-adebanjo.jpg' : '/Image (Marcus Williams).svg'}
                 alt="Daniel"
-                className="w-16 h-16 rounded-full border-4 border-cyan-500"
+                fill
+                className="rounded-full border-4 border-cyan-500 object-cover"
                 onError={() => handleImgError('daniel')}
               />
             </div>

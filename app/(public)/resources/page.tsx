@@ -5,6 +5,13 @@ import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection'
 import Link from 'next/link'
 import React from 'react'
 import ArticleListItem from '@/components/ArticleListItem'
+'use client';
+
+import React, { useState } from 'react';
+import ResourceSearchBar from '@/components/resources/ResourceSearchBar';
+import QuickAccessSection from '@/components/resources/QuickAccessSection';
+import FeaturedLearningTracksSection from '@/components/resources/FeaturedLearningTracksSection';
+import ArticleListItem from '@/components/ArticleListItem';
 
 const resourceArticles = [
   {
@@ -28,32 +35,46 @@ const resourceArticles = [
     readTime: '5 min read',
     href: '/resources/article-mentee-trust',
   },
-]
+];
 
 export default function ResourcesPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const q = searchQuery.toLowerCase();
+  const filteredArticles = q
+    ? resourceArticles.filter(
+        (a) =>
+          a.title.toLowerCase().includes(q) ||
+          a.category.toLowerCase().includes(q) ||
+          a.author.toLowerCase().includes(q)
+      )
+    : resourceArticles;
+
   return (
     <div className="space-y-10">
-      {/* #317 - Search Bar */}
-      <ResourceSearchBar />
-
-      {/* #318 & #319 - Quick Access Section with Reusable Cards */}
+      <ResourceSearchBar onSearch={setSearchQuery} />
       <QuickAccessSection />
-
-      {/* #320 - Featured Learning Tracks */}
-      <FeaturedLearningTracksSection />
-      <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {resourceArticles.map(item => (
-          <ArticleListItem
-            key={item.title}
-            category={item.category}
-            title={item.title}
-            author={item.author}
-            readTime={item.readTime}
-            href={item.href}
-          />
-        ))}
+      <FeaturedLearningTracksSection searchQuery={searchQuery} />
+      <section>
+        <h2 className="text-2xl font-semibold text-slate-900 mb-6">Articles</h2>
+        {filteredArticles.length > 0 ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredArticles.map((item) => (
+              <ArticleListItem
+                key={item.title}
+                category={item.category}
+                title={item.title}
+                author={item.author}
+                readTime={item.readTime}
+                href={item.href}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">No articles match your search.</p>
+        )}
       </section>
       <ToolsTemplatesSection />
     </div>
-  )
+  );
 }

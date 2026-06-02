@@ -1,9 +1,26 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-export default function ResourceSearchBar() {
+interface ResourceSearchBarProps {
+  onSearch?: (query: string) => void;
+  debounceMs?: number;
+}
+
+export default function ResourceSearchBar({ onSearch, debounceMs = 300 }: ResourceSearchBarProps) {
   const [query, setQuery] = useState('');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!onSearch) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      onSearch(query.trim());
+    }, debounceMs);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [query, onSearch, debounceMs]);
 
   return (
     <div className="mx-auto w-full max-w-2xl">
