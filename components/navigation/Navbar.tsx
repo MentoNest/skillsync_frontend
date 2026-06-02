@@ -6,7 +6,7 @@ import { MenuIcon, XIcon } from "@/components/Icons";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Discover Mentors", href: "/discover" },
+  { label: "Find Mentors", href: "/mentors" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
 ];
