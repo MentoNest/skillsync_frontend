@@ -323,7 +323,16 @@ function FilterPanel({
   maxRate,
   setMinRate,
   setMaxRate,
-}: FilterPanelProps) {
+}: {
+  activeCategory: string;
+  setActiveCategory: (v: string) => void;
+  activeAvailability: string;
+  setActiveAvailability: (v: string) => void;
+  minRate: string;
+  maxRate: string;
+  setMinRate: (v: string) => void;
+  setMaxRate: (v: string) => void;
+}) {
   return (
     <>
       {/* Category */}
@@ -514,13 +523,10 @@ export default function MentorDiscoveryLayout() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [displayedCount, setDisplayedCount] = useState(9);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const observerTarget = useRef<HTMLDivElement>(null);
   const ITEMS_PER_PAGE = 6;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [activeAvailability, setActiveAvailability] = useState("All");
-  const [minRate, setMinRate] = useState("");
-  const [maxRate, setMaxRate] = useState("");
+  const { selectedMentors, toggleMentor, isSelected } = useMentorSelection();
 
   const filtered = mentorList.filter(m => {
     const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
@@ -539,18 +545,16 @@ export default function MentorDiscoveryLayout() {
     return matchesCategory && matchesAvailability && matchesRate;
   });
 
-  // Reset displayed count when filters change
   useEffect(() => {
     setDisplayedCount(9);
+    setCurrentPage(1);
   }, [activeCategory, activeAvailability, minRate, maxRate]);
 
-  // Load more mentors when observer target becomes visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && !isLoading && displayedCount < filtered.length) {
           setIsLoading(true);
-          // Simulate network delay for smooth loading experience
           setTimeout(() => {
             setDisplayedCount(prev => Math.min(prev + 6, filtered.length));
             setIsLoading(false);
@@ -573,14 +577,6 @@ export default function MentorDiscoveryLayout() {
   }, [displayedCount, filtered.length, isLoading]);
 
   const displayedMentors = filtered.slice(0, displayedCount);
-  // Reset to page 1 when filters change
-  const [prevFiltered, setPrevFiltered] = useState(filtered.length);
-  if (filtered.length !== prevFiltered) {
-    setCurrentPage(1);
-    setPrevFiltered(filtered.length);
-  }
-
-  // Calculate pagination
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -604,8 +600,6 @@ export default function MentorDiscoveryLayout() {
             ? 'Loading mentors from backend...'
             : `Browse ${mentorList.length} experienced professionals ready to guide your journey.`}
           Browse {filtered.length} experienced professionals ready to guide your journey.
-          Browse {mentors.length} experienced professionals ready to guide your
-          journey.
         </p>
       </div>
 
@@ -676,13 +670,9 @@ export default function MentorDiscoveryLayout() {
           {/* Mentor listing area */}
           <main className="flex-1 min-w-0">
             <p className="text-[13px] text-[#94928d] mb-5">
-              <span className="font-semibold text-[#141210]">{displayedCount}</span> of{' '}
+              <span className="font-semibold text-[#141210]">{displayedMentors.length}</span> of{' '}
               <span className="font-semibold text-[#141210]">{filtered.length}</span>{' '}
               mentor{filtered.length !== 1 ? 's' : ''} found
-              <span className="font-semibold text-[#141210]">
-                {filtered.length}
-              </span>{" "}
-              mentor{filtered.length !== 1 ? "s" : ""} found
             </p>
 
             {loading ? (
@@ -704,7 +694,12 @@ export default function MentorDiscoveryLayout() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                   {displayedMentors.map(mentor => (
-                    <MentorCard key={mentor.id} mentor={mentor} />
+                    <MentorCard
+                      key={mentor.id}
+                      mentor={mentor}
+                      isSelected={isSelected(mentor.id)}
+                      onToggle={() => toggleMentor(mentor)}
+                    />
                   ))}
                 </div>
 
@@ -715,7 +710,6 @@ export default function MentorDiscoveryLayout() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
                         {[...Array(3)].map((_, i) => (
                           <div key={i} className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col">
-                            {/* Skeleton top */}
                             <div className="p-6 flex items-start gap-4">
                               <div className="w-14 h-14 rounded-[14px] flex-shrink-0 bg-[#e8e5e0] animate-pulse" />
                               <div className="flex-1 space-y-2">
@@ -725,7 +719,6 @@ export default function MentorDiscoveryLayout() {
                               <div className="w-12 h-8 bg-[#e8e5e0] rounded-lg animate-pulse flex-shrink-0" />
                             </div>
                             <div className="h-px bg-[rgba(20,18,16,0.07)] mx-6" />
-                            {/* Skeleton body */}
                             <div className="p-6 flex-1 flex flex-col gap-4">
                               <div className="space-y-2">
                                 <div className="h-3 bg-[#e8e5e0] rounded animate-pulse" />
@@ -737,7 +730,6 @@ export default function MentorDiscoveryLayout() {
                                 ))}
                               </div>
                             </div>
-                            {/* Skeleton footer */}
                             <div className="px-6 pb-6 flex items-center justify-between gap-3">
                               <div className="h-4 bg-[#e8e5e0] rounded animate-pulse w-20" />
                               <div className="h-8 bg-[#e8e5e0] rounded-xl animate-pulse w-24" />
@@ -752,10 +744,7 @@ export default function MentorDiscoveryLayout() {
                     )}
                   </div>
                 )}
-                  {paginatedMentors.map((mentor) => (
-                    <MentorCard key={mentor.id} mentor={mentor} />
-                  ))}
-                </div>
+
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -766,6 +755,8 @@ export default function MentorDiscoveryLayout() {
           </main>
         </div>
       </div>
+
+      <ComparisonBar />
     </div>
   );
 }
