@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -28,6 +30,24 @@ type FilterPanelProps = {
   setMaxRate: (v: string) => void;
 };
 
+function parseCategoryParam(value: string | null) {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  return CATEGORIES.find(category => category.toLowerCase() === normalized) || null;
+}
+
+function parseAvailabilityParam(value: string | null) {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'available') return 'Available';
+  if (normalized === 'fully-booked' || normalized === 'fullybooked' || normalized === 'fully booked') return 'Fully Booked';
+  return null;
+}
+
+function normalizeRateParam(value: string | null) {
+  if (!value) return '';
+  const parsed = parseFloat(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? String(parsed) : '';
 const mentors: Mentor[] = [
   {
     id: 1,
@@ -354,6 +374,73 @@ function FilterPanel({
 }
 
 export default function MentorDiscoveryLayout() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const hasLoadedUrlParams = useRef(false);
+
+  const initialCategory = useMemo(
+    () => parseCategoryParam(searchParams.get('expertise')) ?? 'All',
+    [searchParams],
+  );
+  const initialAvailability = useMemo(
+    () => parseAvailabilityParam(searchParams.get('availability')) ?? 'All',
+    [searchParams],
+  );
+  const initialMinRate = useMemo(() => normalizeRateParam(searchParams.get('minRate')), [searchParams]);
+  const initialMaxRate = useMemo(() => normalizeRateParam(searchParams.get('maxRate')), [searchParams]);
+
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const [activeAvailability, setActiveAvailability] = useState(initialAvailability);
+  const [minRate, setMinRate] = useState(initialMinRate);
+  const [maxRate, setMaxRate] = useState(initialMaxRate);
+
+  useEffect(() => {
+    const category = parseCategoryParam(searchParams.get('expertise')) ?? 'All';
+    const availability = parseAvailabilityParam(searchParams.get('availability')) ?? 'All';
+    const min = normalizeRateParam(searchParams.get('minRate'));
+    const max = normalizeRateParam(searchParams.get('maxRate'));
+
+    setActiveCategory(category);
+    setActiveAvailability(availability);
+    setMinRate(min);
+    setMaxRate(max);
+    hasLoadedUrlParams.current = true;
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!hasLoadedUrlParams.current) {
+      return;
+    }
+
+    const params = new URLSearchParams();
+
+    if (activeCategory !== 'All') {
+      params.set('expertise', activeCategory.toLowerCase());
+    }
+
+    if (activeAvailability !== 'All') {
+      params.set(
+        'availability',
+        activeAvailability === 'Fully Booked' ? 'fully-booked' : 'available',
+      );
+    }
+
+    if (minRate) {
+      params.set('minRate', minRate);
+    }
+
+    if (maxRate) {
+      params.set('maxRate', maxRate);
+    }
+
+    const expectedQuery = params.toString();
+    const currentQuery = searchParams.toString();
+    if (currentQuery !== expectedQuery) {
+      const url = `${pathname}${expectedQuery ? `?${expectedQuery}` : ''}`;
+      router.replace(url);
+    }
+  }, [activeCategory, activeAvailability, minRate, maxRate, pathname, router, searchParams]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeAvailability, setActiveAvailability] = useState('All');
   const [minRate, setMinRate] = useState('');
