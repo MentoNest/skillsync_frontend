@@ -4,24 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
-
-type Mentor = {
-  id: number;
-  name: string;
-  role: string;
-  company: string;
-  category: string;
-  initials: string;
-  accent: string;
-  bg: string;
-  image?: string;
-  available: boolean;
-  rating: number;
-  rate: number;
-  sessions: number;
-  description: string;
-  tags: string[];
-};
+import type { Mentor } from '@/lib/types/mentor';
 
 const mentors: Mentor[] = [
   {
