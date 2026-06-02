@@ -48,7 +48,7 @@ export default function MentorCard({ mentor, onBookmarkChange }: MentorCardProps
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
+    <article className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]" aria-labelledby={`mentor-${mentor.id}-name`}>
       <div className="p-6 flex items-start gap-4">
         <div
           className="w-14 h-14 rounded-[14px] flex-shrink-0 flex items-center justify-center text-lg font-bold relative overflow-hidden"
@@ -69,13 +69,19 @@ export default function MentorCard({ mentor, onBookmarkChange }: MentorCardProps
             className={`absolute bottom-[-2px] right-[-2px] w-3 h-3 rounded-full border-2 border-white ${
               mentor.available ? 'bg-emerald-500' : 'bg-gray-300'
             }`}
+            aria-hidden="true"
           />
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-[#141210] text-[15px] truncate" style={{ fontFamily: "'Syne', sans-serif" }}>
+          <p
+            id={`mentor-${mentor.id}-name`}
+            className="font-bold text-[#141210] text-[15px] truncate"
+            style={{ fontFamily: "'Syne', sans-serif" }}
+          >
             {mentor.name}
           </p>
+          <p className="sr-only">{mentor.available ? 'Available for booking' : 'Fully booked'}</p>
           <p className="text-[13px] text-[#94928d] truncate">{mentor.role}</p>
           <p className="text-[12px] font-medium mt-0.5" style={{ color: mentor.accent }}>
             {mentor.company}
@@ -85,11 +91,12 @@ export default function MentorCard({ mentor, onBookmarkChange }: MentorCardProps
 
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="flex items-center gap-1 bg-[#f7f5f2] rounded-lg px-2 py-1">
-            <span className="text-amber-400 text-[11px]">★</span>
+            <span className="text-amber-400 text-[11px]" aria-hidden="true">★</span>
             <span className="text-[12px] font-semibold text-[#141210]">{mentor.rating}</span>
           </div>
 
           <button
+            type="button"
             onClick={toggleBookmark}
             aria-pressed={bookmarked}
             aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark mentor'}
@@ -130,18 +137,26 @@ export default function MentorCard({ mentor, onBookmarkChange }: MentorCardProps
         <span className="text-[12px] text-[#94928d]">
           <strong className="text-[#141210] font-semibold">{mentor.sessions}</strong> sessions
         </span>
-        <Link
-          href={mentor.available ? `/mentors/${mentor.id}` : '#'}
-          className={`text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 ${
-            mentor.available
-              ? 'bg-[#141210] text-[#f7f5f2] hover:bg-[#2d2a27]'
-              : 'bg-[#f0efed] text-[#94928d] cursor-default pointer-events-none'
-          }`}
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          {mentor.available ? 'Book session' : 'Fully booked'}
-        </Link>
+        {mentor.available ? (
+          <Link
+            href={`/mentors/${mentor.id}`}
+            className="text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 bg-[#141210] text-[#f7f5f2] hover:bg-[#2d2a27]"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Book session
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 bg-[#f0efed] text-[#94928d] cursor-not-allowed"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Fully booked
+          </button>
+        )}
       </div>
-    </div>
+    </article>
   );
 }
