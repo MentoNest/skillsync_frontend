@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
+import MentorSkillTag from '@/components/mentors/MentorSkillTag';
 
 type Mentor = {
   id: number;
@@ -185,12 +186,7 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
         <p className="text-[13.5px] leading-[1.7] text-[#6b6860] flex-1">{mentor.description}</p>
         <div className="flex flex-wrap gap-1.5">
           {mentor.tags.map(tag => (
-            <span
-              key={tag}
-              className="text-[11.5px] font-medium px-2.5 py-1 rounded-md bg-[#f7f5f2] text-[#6b6860] border border-[rgba(20,18,16,0.08)]"
-            >
-              {tag}
-            </span>
+            <MentorSkillTag key={tag} skill={tag} />
           ))}
         </div>
       </div>
