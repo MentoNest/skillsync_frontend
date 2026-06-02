@@ -6,6 +6,25 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
+import AvailabilityBadge, { AvailabilityStatus } from '@/components/mentors/AvailabilityBadge';
+
+type Mentor = {
+  id: number;
+  name: string;
+  role: string;
+  company: string;
+  category: string;
+  initials: string;
+  accent: string;
+  bg: string;
+  image?: string;
+  available: boolean;
+  status?: AvailabilityStatus;
+  rating: number;
+  rate: number;
+  sessions: number;
+  description: string;
+  tags: string[];
 import type { Mentor } from '@/lib/types/mentor';
 import { useState } from 'react';
 import MentorCard from '@/components/mentors/MentorCard';
@@ -61,6 +80,7 @@ const mentors: Mentor[] = [
     bg: "#0f1f3d",
     image: "/tony-adebanjo.jpg",
     available: true,
+    status: 'available' as AvailabilityStatus,
     rating: 4.95,
     rate: 180,
     sessions: 204,
@@ -79,6 +99,7 @@ const mentors: Mentor[] = [
     bg: "#1e0f3d",
     image: "/Image (Sarah Johnson).svg",
     available: true,
+    status: 'busy' as AvailabilityStatus,
     rating: 4.98,
     rate: 145,
     sessions: 187,
@@ -97,6 +118,7 @@ const mentors: Mentor[] = [
     bg: "#0a2318",
     image: "/Image (Marcus Williams).svg",
     available: false,
+    status: 'fully_booked' as AvailabilityStatus,
     rating: 4.91,
     rate: 160,
     sessions: 139,
@@ -115,6 +137,7 @@ const mentors: Mentor[] = [
     bg: "#2a1800",
     image: "/Image (Cole Hathans).svg",
     available: true,
+    status: 'available' as AvailabilityStatus,
     rating: 4.93,
     rate: 155,
     sessions: 256,
@@ -133,6 +156,7 @@ const mentors: Mentor[] = [
     bg: "#2a0a0a",
     image: "/tony-adebanjo.jpg",
     available: true,
+    status: 'busy' as AvailabilityStatus,
     rating: 4.89,
     rate: 135,
     sessions: 98,
@@ -151,6 +175,7 @@ const mentors: Mentor[] = [
     bg: "#011f26",
     image: "/Image (Sarah Johnson).svg",
     available: false,
+    status: 'fully_booked' as AvailabilityStatus,
     rating: 4.96,
     rate: 170,
     sessions: 321,
@@ -161,6 +186,7 @@ const mentors: Mentor[] = [
 ];
 
 function MentorCard({ mentor }: { mentor: Mentor }) {
+  const status = mentor.status ?? (mentor.available ? 'available' : 'fully_booked');
   return (
     <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
       {/* Top */}
@@ -184,6 +210,15 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
           ) : (
             <span>{mentor.initials}</span>
           )}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <p className="font-bold text-[#141210] text-[15px] truncate" style={{ fontFamily: "'Syne', sans-serif" }}>
+              {mentor.name}
+            </p>
+            <AvailabilityBadge status={status} />
+          </div>
           <span
             className={`absolute bottom-[-2px] right-[-2px] w-3 h-3 rounded-full border-2 border-white ${
               mentor.available ? "bg-emerald-500" : "bg-gray-300"
