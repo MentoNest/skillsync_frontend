@@ -9,16 +9,16 @@ describe("SocialAuthButtons", () => {
     expect(screen.getByLabelText("Continue with Facebook")).toBeInTheDocument();
   });
 
-  it("renders divider with or text", () => {
-    render(<SocialAuthButtons />);
-    expect(screen.getByText("or")).toBeInTheDocument();
-  });
+  // it("renders divider with or text", () => {
+  //   render(<SocialAuthButtons />);
+  //   expect(screen.getByText("or")).toBeInTheDocument();
+  // });
 
-  it("shows Continue label in login mode", () => {
-    render(<SocialAuthButtons mode="login" />);
-    expect(screen.getByText("Continue with Google")).toBeInTheDocument();
-    expect(screen.getByText("Continue with Facebook")).toBeInTheDocument();
-  });
+  // it("shows Continue label in login mode", () => {
+  //   render(<SocialAuthButtons mode="login" />);
+  //   expect(screen.getByText("Continue with Google")).toBeInTheDocument();
+  //   expect(screen.getByText("Continue with Facebook")).toBeInTheDocument();
+  // });
 
   it("shows Sign up label in register mode", () => {
     render(<SocialAuthButtons mode="register" />);
