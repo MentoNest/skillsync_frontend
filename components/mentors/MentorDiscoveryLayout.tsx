@@ -325,6 +325,7 @@ export default function MentorDiscoveryLayout() {
   const [activeAvailability, setActiveAvailability] = useState('All');
   const [minRate, setMinRate] = useState('');
   const [maxRate, setMaxRate] = useState('');
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const filtered = mentors.filter(m => {
     const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
@@ -358,16 +359,52 @@ export default function MentorDiscoveryLayout() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Mobile filters (horizontal pills) */}
-        <div className="lg:hidden mb-6 space-y-3">
-          <FilterSidebar
-            mode="pill"
-            activeCategory={activeCategory}
-            setActiveCategory={setActiveCategory}
-            activeAvailability={activeAvailability}
-            setActiveAvailability={setActiveAvailability}
-          />
+        <div className="lg:hidden mb-6 flex items-center justify-between gap-4">
+          <button
+            type="button"
+            onClick={() => setIsMobileFiltersOpen(true)}
+            className="inline-flex items-center justify-center rounded-full border border-[rgba(20,18,16,0.12)] bg-white px-4 py-2 text-[13px] font-semibold text-[#141210] shadow-sm transition hover:border-[rgba(20,18,16,0.2)]"
+          >
+            Filters
+          </button>
+          <p className="text-[13px] text-[#94928d]">{filtered.length} mentor{filtered.length !== 1 ? 's' : ''}</p>
         </div>
+
+        {isMobileFiltersOpen ? (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setIsMobileFiltersOpen(false)}
+            />
+            <div className="absolute inset-y-0 left-0 w-full max-w-sm bg-white shadow-2xl border-r border-[rgba(20,18,16,0.08)] overflow-y-auto">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(20,18,16,0.07)]">
+                <div>
+                  <p className="text-[15px] font-semibold text-[#141210]">Filters</p>
+                  <p className="text-[12px] text-[#6b6860]">Refine your mentor search</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFiltersOpen(false)}
+                  className="text-[13px] font-semibold text-[#141210]"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="p-5">
+                <FilterSidebar
+                  activeCategory={activeCategory}
+                  setActiveCategory={setActiveCategory}
+                  activeAvailability={activeAvailability}
+                  setActiveAvailability={setActiveAvailability}
+                  minRate={minRate}
+                  maxRate={maxRate}
+                  setMinRate={setMinRate}
+                  setMaxRate={setMaxRate}
+                />
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {/* Two-column layout */}
         <div className="flex gap-8 items-start">
