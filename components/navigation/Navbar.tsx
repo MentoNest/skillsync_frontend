@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { MenuIcon, XIcon } from "@/components/Icons";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -78,36 +79,11 @@ export default function Navbar() {
               aria-label="Toggle menu"
               className="p-2 inline-flex items-center justify-center rounded-md text-gray-700 hover:bg-gray-100"
             >
-              <svg
-                className={`${open ? "hidden" : "block"} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-              <svg
-                className={`${open ? "block" : "hidden"} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              {open ? (
+                <XIcon className="h-6 w-6" strokeWidth={2} />
+              ) : (
+                <MenuIcon className="h-6 w-6" strokeWidth={2} />
+              )}
             </button>
           </div>
         </div>

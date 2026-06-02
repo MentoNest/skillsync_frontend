@@ -1,54 +1,108 @@
 'use client';
 
 import React from 'react'
-
 import HeroSection from '@/components/landing/HeroSection';
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import { SectionLoadingSkeleton, MentorCardSkeleton, ArticleCardSkeleton } from '@/components/loadingSkeletons';
 
+// Lazy load sections to improve initial page load
 const WhyChooseUsSection = dynamic(() => import('@/components/landing/WhyChooseUsSection'), {
+  loading: () => <SectionLoadingSkeleton />
+});
+
+const FeaturedMentorSection = dynamic(() => import('@/components/landing/FeaturedMentorSection'), {
   loading: () => (
-    <div className="w-full bg-white py-16 md:py-24">
+    <div className="w-full bg-gradient-to-b from-white to-slate-50 py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <div className="h-12 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
-          <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
-        </div>
+        <div className="h-12 bg-gray-200 rounded w-1/3 mb-12 animate-pulse"></div>
+        <div className="h-80 bg-gray-200 rounded-xl animate-pulse"></div>
+      </div>
+    </div>
+  )
+});
+
+const MentorDiscoverySection = dynamic(() => import('@/components/landing/MentorDiscoverySection'), {
+  loading: () => (
+    <div className="w-full bg-gray-50 py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="h-12 bg-gray-200 rounded w-1/3 mb-12 animate-pulse"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex flex-col items-center text-center p-6 rounded-xl bg-gray-100 animate-pulse">
-              <div className="w-14 h-14 rounded-full bg-gray-200 mb-4"></div>
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-            </div>
+            <MentorCardSkeleton key={i} />
           ))}
         </div>
       </div>
     </div>
   )
 });
-import CTASection from '@/components/landing/CTASection';
-import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
-import TestimonialsSection from '@/components/landing/TestimonialsSection';
-import MentorDiscoverySection from '@/components/landing/MentorDiscoverySection';
-import FeaturedMentorSection from '@/components/landing/FeaturedMentorSection';
-import LearningPathResourcesSection from '@/components/landing/LearningPathResourcesSection';
-import FeaturedArticlesSection from '@/components/landing/FeaturedArticlesSection';
+
+const LearningPathResourcesSection = dynamic(() => import('@/components/landing/LearningPathResourcesSection'), {
+  loading: () => <SectionLoadingSkeleton />
+});
+
+const FeaturedArticlesSection = dynamic(() => import('@/components/landing/FeaturedArticlesSection'), {
+  loading: () => (
+    <div className="w-full bg-white py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="h-12 bg-gray-200 rounded w-1/3 mb-12 animate-pulse"></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[...Array(3)].map((_, i) => (
+            <ArticleCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+});
+
+const TestimonialsSection = dynamic(() => import('@/components/landing/TestimonialsSection'), {
+  loading: () => <SectionLoadingSkeleton />
+});
+
+const PlatformStatisticsSection = dynamic(() => import('@/components/landing/PlatformStatisticsSection'), {
+  loading: () => <SectionLoadingSkeleton />
+});
+
+const CTASection = dynamic(() => import('@/components/landing/CTASection'), {
+  loading: () => (
+    <div className="w-full bg-gradient-to-r from-blue-600 to-purple-600 py-16 md:py-24">
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="h-12 bg-white/20 rounded w-2/3 mx-auto mb-8 animate-pulse"></div>
+        <div className="h-6 bg-white/20 rounded w-1/2 mx-auto animate-pulse"></div>
+      </div>
+    </div>
+  )
+});
 
 export default function PublicPage() {
   return (
     <main>
       <HeroSection />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={null}>
         <WhyChooseUsSection />
       </Suspense>
-      <FeaturedMentorSection />
-      <MentorDiscoverySection />
-      <LearningPathResourcesSection />
-      <FeaturedArticlesSection />
-      <TestimonialsSection />
-      <PlatformStatisticsSection />
-      <CTASection />
+      <Suspense fallback={null}>
+        <FeaturedMentorSection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <MentorDiscoverySection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <LearningPathResourcesSection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <FeaturedArticlesSection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <TestimonialsSection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <PlatformStatisticsSection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <CTASection />
+      </Suspense>
     </main>
   );
 }
