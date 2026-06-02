@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import MentorCard from '@/components/mentors/MentorCard';
@@ -6,6 +6,11 @@ import { mentors } from '@/lib/mentors';
 
 const CATEGORIES = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
 const AVAILABILITY = ['All', 'Available', 'Fully Booked'];
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import FilterSidebar from "@/components/mentors/FilterSidebar";
+import Pagination from "@/components/mentors/Pagination";
 
 type FilterPanelProps = {
   activeCategory: string;
@@ -17,6 +22,216 @@ type FilterPanelProps = {
   setMinRate: (v: string) => void;
   setMaxRate: (v: string) => void;
 };
+
+const mentors: Mentor[] = [
+  {
+    id: 1,
+    name: "Kwame Asante",
+    role: "Staff Engineer",
+    company: "Stripe",
+    category: "Engineering",
+    initials: "KA",
+    accent: "#3b82f6",
+    bg: "#0f1f3d",
+    image: "/tony-adebanjo.jpg",
+    available: true,
+    rating: 4.95,
+    rate: 180,
+    sessions: 204,
+    description:
+      "Helps engineers level up to Staff and beyond. Specialises in distributed systems, technical leadership, and promo packets.",
+    tags: ["System Design", "Leadership", "Go"],
+  },
+  {
+    id: 2,
+    name: "Priya Menon",
+    role: "Head of Product Design",
+    company: "Figma",
+    category: "Design",
+    initials: "PM",
+    accent: "#a855f7",
+    bg: "#1e0f3d",
+    image: "/Image (Sarah Johnson).svg",
+    available: true,
+    rating: 4.98,
+    rate: 145,
+    sessions: 187,
+    description:
+      "Portfolio reviews, design system strategy, and breaking into senior IC or management tracks at top-tier product companies.",
+    tags: ["Figma", "Design Systems", "Portfolio"],
+  },
+  {
+    id: 3,
+    name: "Tomás Reyes",
+    role: "Senior PM",
+    company: "Notion",
+    category: "Product",
+    initials: "TR",
+    accent: "#10b981",
+    bg: "#0a2318",
+    image: "/Image (Marcus Williams).svg",
+    available: false,
+    rating: 4.91,
+    rate: 160,
+    sessions: 139,
+    description:
+      "From APM to PM to Group PM — Tomás has made every jump and guides others through the same transitions with precision.",
+    tags: ["Roadmapping", "Stakeholders", "APM"],
+  },
+  {
+    id: 4,
+    name: "Aisha Nwosu",
+    role: "Data Science Lead",
+    company: "Spotify",
+    category: "Data",
+    initials: "AN",
+    accent: "#f59e0b",
+    bg: "#2a1800",
+    image: "/Image (Cole Hathans).svg",
+    available: true,
+    rating: 4.93,
+    rate: 155,
+    sessions: 256,
+    description:
+      "ML pipelines, A/B testing at scale, and transitioning from academia to industry. Obsessed with making data teams actually functional.",
+    tags: ["Python", "ML", "Analytics"],
+  },
+  {
+    id: 5,
+    name: "Leon Fischer",
+    role: "Founding Engineer",
+    company: "3× YC Startups",
+    category: "Engineering",
+    initials: "LF",
+    accent: "#ef4444",
+    bg: "#2a0a0a",
+    image: "/tony-adebanjo.jpg",
+    available: true,
+    rating: 4.89,
+    rate: 135,
+    sessions: 98,
+    description:
+      "Zero to one builder. Helps early-career devs ship fast, make technical decisions under uncertainty, and navigate startup chaos.",
+    tags: ["React", "Node", "Startup"],
+  },
+  {
+    id: 6,
+    name: "Sara Lindqvist",
+    role: "VP of Growth",
+    company: "Duolingo",
+    category: "Business",
+    initials: "SL",
+    accent: "#06b6d4",
+    bg: "#011f26",
+    image: "/Image (Sarah Johnson).svg",
+    available: false,
+    rating: 4.96,
+    rate: 170,
+    sessions: 321,
+    description:
+      "Growth loops, retention mechanics, and go-to-market for consumer apps. Former founder. Brutally practical and candid.",
+    tags: ["Growth", "GTM", "Retention"],
+  },
+];
+
+function MentorCard({ mentor }: { mentor: Mentor }) {
+  return (
+    <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
+      {/* Top */}
+      <div className="p-6 flex items-start gap-4">
+        <div
+          className="w-14 h-14 rounded-[14px] flex-shrink-0 flex items-center justify-center text-lg font-bold relative overflow-hidden"
+          style={{
+            background: mentor.bg,
+            color: mentor.accent,
+            fontFamily: "'Syne', sans-serif",
+          }}
+        >
+          {mentor.image ? (
+            <Image
+              src={mentor.image}
+              alt={`${mentor.name} profile`}
+              width={56}
+              height={56}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span>{mentor.initials}</span>
+          )}
+          <span
+            className={`absolute bottom-[-2px] right-[-2px] w-3 h-3 rounded-full border-2 border-white ${
+              mentor.available ? "bg-emerald-500" : "bg-gray-300"
+            }`}
+          />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p
+            className="font-bold text-[#141210] text-[15px] truncate"
+            style={{ fontFamily: "'Syne', sans-serif" }}
+          >
+            {mentor.name}
+          </p>
+          <p className="text-[13px] text-[#94928d] truncate">{mentor.role}</p>
+          <p
+            className="text-[12px] font-medium mt-0.5"
+            style={{ color: mentor.accent }}
+          >
+            {mentor.company}
+          </p>
+          <p className="text-[12px] mt-1 text-[#141210]">${mentor.rate}/hr</p>
+        </div>
+
+        <div className="flex items-center gap-1 bg-[#f7f5f2] rounded-lg px-2 py-1 flex-shrink-0">
+          <span className="text-amber-400 text-[11px]">★</span>
+          <span className="text-[12px] font-semibold text-[#141210]">
+            {mentor.rating}
+          </span>
+        </div>
+      </div>
+
+      <div className="h-px bg-[rgba(20,18,16,0.07)] mx-6" />
+
+      {/* Body */}
+      <div className="p-6 flex-1 flex flex-col gap-4">
+        <p className="text-[13.5px] leading-[1.7] text-[#6b6860] flex-1">
+          {mentor.description}
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {mentor.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-[11.5px] font-medium px-2.5 py-1 rounded-md bg-[#f7f5f2] text-[#6b6860] border border-[rgba(20,18,16,0.08)]"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 pb-6 flex items-center justify-between gap-3">
+        <span className="text-[12px] text-[#94928d]">
+          <strong className="text-[#141210] font-semibold">
+            {mentor.sessions}
+          </strong>{" "}
+          sessions
+        </span>
+        <Link
+          href={mentor.available ? `/mentors/${mentor.id}` : "#"}
+          className={`text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 ${
+            mentor.available
+              ? "bg-[#141210] text-[#f7f5f2] hover:bg-[#2d2a27]"
+              : "bg-[#f0efed] text-[#94928d] cursor-default pointer-events-none"
+          }`}
+          style={{ fontFamily: "'DM Sans', sans-serif" }}
+        >
+          {mentor.available ? "Book session" : "Fully booked"}
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 function FilterPanel({
   activeCategory,
@@ -36,14 +251,14 @@ function FilterPanel({
           Category
         </h3>
         <ul className="space-y-0.5">
-          {CATEGORIES.map(cat => (
+          {CATEGORIES.map((cat) => (
             <li key={cat}>
               <button
                 onClick={() => setActiveCategory(cat)}
                 className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
                   activeCategory === cat
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
+                    ? "bg-[#141210] text-[#f7f5f2] font-medium"
+                    : "text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]"
                 }`}
               >
                 {cat}
@@ -59,14 +274,14 @@ function FilterPanel({
           Availability
         </h3>
         <ul className="space-y-0.5">
-          {AVAILABILITY.map(opt => (
+          {AVAILABILITY.map((opt) => (
             <li key={opt}>
               <button
                 onClick={() => setActiveAvailability(opt)}
                 className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
                   activeAvailability === opt
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
+                    ? "bg-[#141210] text-[#f7f5f2] font-medium"
+                    : "text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]"
                 }`}
               >
                 {opt}
@@ -91,7 +306,7 @@ function FilterPanel({
               type="number"
               min={0}
               value={minRate}
-              onChange={e => setMinRate(e.target.value)}
+              onChange={(e) => setMinRate(e.target.value)}
               placeholder="Any"
               className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
             />
@@ -102,7 +317,7 @@ function FilterPanel({
               type="number"
               min={0}
               value={maxRate}
-              onChange={e => setMaxRate(e.target.value)}
+              onChange={(e) => setMaxRate(e.target.value)}
               placeholder="Any"
               className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
             />
@@ -114,23 +329,40 @@ function FilterPanel({
 }
 
 export default function MentorDiscoveryLayout() {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [activeAvailability, setActiveAvailability] = useState('All');
-  const [minRate, setMinRate] = useState('');
-  const [maxRate, setMaxRate] = useState('');
+  const ITEMS_PER_PAGE = 6;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeAvailability, setActiveAvailability] = useState("All");
+  const [minRate, setMinRate] = useState("");
+  const [maxRate, setMaxRate] = useState("");
 
-  const filtered = mentors.filter(m => {
-    const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
+  const filtered = mentors.filter((m) => {
+    const matchesCategory =
+      activeCategory === "All" || m.category === activeCategory;
     const matchesAvailability =
-      activeAvailability === 'All' ||
-      (activeAvailability === 'Available' && m.available) ||
-      (activeAvailability === 'Fully Booked' && !m.available);
-    const parsedMin = minRate === '' ? 0 : parseFloat(minRate);
-    const parsedMax = maxRate === '' ? Number.POSITIVE_INFINITY : parseFloat(maxRate);
+      activeAvailability === "All" ||
+      (activeAvailability === "Available" && m.available) ||
+      (activeAvailability === "Fully Booked" && !m.available);
+    const parsedMin = minRate === "" ? 0 : parseFloat(minRate);
+    const parsedMax =
+      maxRate === "" ? Number.POSITIVE_INFINITY : parseFloat(maxRate);
     const matchesRate = m.rate >= parsedMin && m.rate <= parsedMax;
 
     return matchesCategory && matchesAvailability && matchesRate;
   });
+
+  // Reset to page 1 when filters change
+  const [prevFiltered, setPrevFiltered] = useState(filtered.length);
+  if (filtered.length !== prevFiltered) {
+    setCurrentPage(1);
+    setPrevFiltered(filtered.length);
+  }
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedMentors = filtered.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen bg-[#f7f5f2]">
@@ -146,50 +378,28 @@ export default function MentorDiscoveryLayout() {
           Find your mentor
         </h1>
         <p className="mt-2 text-[15px] text-[#6b6860]">
-          Browse {mentors.length} experienced professionals ready to guide your journey.
+          Browse {mentors.length} experienced professionals ready to guide your
+          journey.
         </p>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mobile filters (horizontal pills) */}
         <div className="lg:hidden mb-6 space-y-3">
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 text-[12.5px] font-medium px-4 py-2 rounded-full border transition-all ${
-                  activeCategory === cat
-                    ? 'bg-[#141210] text-[#f7f5f2] border-[#141210]'
-                    : 'text-[#6b6860] border-[rgba(20,18,16,0.15)] hover:border-[rgba(20,18,16,0.4)] hover:text-[#141210]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {AVAILABILITY.map(opt => (
-              <button
-                key={opt}
-                onClick={() => setActiveAvailability(opt)}
-                className={`flex-shrink-0 text-[12.5px] font-medium px-4 py-2 rounded-full border transition-all ${
-                  activeAvailability === opt
-                    ? 'bg-[#141210] text-[#f7f5f2] border-[#141210]'
-                    : 'text-[#6b6860] border-[rgba(20,18,16,0.15)] hover:border-[rgba(20,18,16,0.4)] hover:text-[#141210]'
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
+          <FilterSidebar
+            mode="pill"
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+            activeAvailability={activeAvailability}
+            setActiveAvailability={setActiveAvailability}
+          />
         </div>
 
         {/* Two-column layout */}
         <div className="flex gap-8 items-start">
           {/* Sidebar — hidden on mobile, sticky on desktop */}
           <aside className="hidden lg:block w-56 flex-shrink-0 sticky top-20">
-            <FilterPanel
+            <FilterSidebar
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               activeAvailability={activeAvailability}
@@ -204,8 +414,10 @@ export default function MentorDiscoveryLayout() {
           {/* Mentor listing area */}
           <main className="flex-1 min-w-0">
             <p className="text-[13px] text-[#94928d] mb-5">
-              <span className="font-semibold text-[#141210]">{filtered.length}</span>{' '}
-              mentor{filtered.length !== 1 ? 's' : ''} found
+              <span className="font-semibold text-[#141210]">
+                {filtered.length}
+              </span>{" "}
+              mentor{filtered.length !== 1 ? "s" : ""} found
             </p>
 
             {filtered.length === 0 ? (
@@ -213,11 +425,18 @@ export default function MentorDiscoveryLayout() {
                 No mentors match the selected filters.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map(mentor => (
-                  <MentorCard key={mentor.id} mentor={mentor} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {paginatedMentors.map((mentor) => (
+                    <MentorCard key={mentor.id} mentor={mentor} />
+                  ))}
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             )}
           </main>
         </div>
