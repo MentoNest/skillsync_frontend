@@ -1,27 +1,26 @@
 "use client";
 
+import { useState } from 'react';
+import MentorCard from '@/components/mentors/MentorCard';
+import { mentors } from '@/lib/mentors';
+
+const CATEGORIES = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
+const AVAILABILITY = ['All', 'Available', 'Fully Booked'];
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import FilterSidebar from "@/components/mentors/FilterSidebar";
 import Pagination from "@/components/mentors/Pagination";
 
-type Mentor = {
-  id: number;
-  name: string;
-  role: string;
-  company: string;
-  category: string;
-  initials: string;
-  accent: string;
-  bg: string;
-  image?: string;
-  available: boolean;
-  rating: number;
-  rate: number;
-  sessions: number;
-  description: string;
-  tags: string[];
+type FilterPanelProps = {
+  activeCategory: string;
+  setActiveCategory: (v: string) => void;
+  activeAvailability: string;
+  setActiveAvailability: (v: string) => void;
+  minRate: string;
+  maxRate: string;
+  setMinRate: (v: string) => void;
+  setMaxRate: (v: string) => void;
 };
 
 const mentors: Mentor[] = [
@@ -243,16 +242,7 @@ function FilterPanel({
   maxRate,
   setMinRate,
   setMaxRate,
-}: {
-  activeCategory: string;
-  setActiveCategory: (v: string) => void;
-  activeAvailability: string;
-  setActiveAvailability: (v: string) => void;
-  minRate: string;
-  maxRate: string;
-  setMinRate: (v: string) => void;
-  setMaxRate: (v: string) => void;
-}) {
+}: FilterPanelProps) {
   return (
     <>
       {/* Category */}
