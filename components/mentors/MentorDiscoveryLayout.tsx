@@ -9,7 +9,8 @@ import FilterSidebar from '@/components/mentors/FilterSidebar';
 import type { Mentor } from '@/lib/types/mentor';
 import { useState } from 'react';
 import MentorCard from '@/components/mentors/MentorCard';
-import { mentors } from '@/lib/mentors';
+import { MentorCardSkeleton } from '@/components/loadingSkeletons';
+import type { Mentor } from '@/lib/mentors';
 
 const CATEGORIES = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
 const AVAILABILITY = ['All', 'Available', 'Fully Booked'];
@@ -390,10 +391,40 @@ export default function MentorDiscoveryLayout() {
   const initialMinRate = useMemo(() => normalizeRateParam(searchParams.get('minRate')), [searchParams]);
   const initialMaxRate = useMemo(() => normalizeRateParam(searchParams.get('maxRate')), [searchParams]);
 
+  const [mentorList, setMentorList] = useState<Mentor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [activeAvailability, setActiveAvailability] = useState(initialAvailability);
   const [minRate, setMinRate] = useState(initialMinRate);
   const [maxRate, setMaxRate] = useState(initialMaxRate);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchMentors = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch('/api/mentors', { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error('Failed to load mentors');
+        }
+
+        const data = (await response.json()) as Mentor[];
+        setMentorList(data);
+      } catch (err) {
+        if ((err as any).name === 'AbortError') return;
+        setError('Unable to load mentors at this time.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMentors();
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     const category = parseCategoryParam(searchParams.get('expertise')) ?? 'All';
@@ -456,6 +487,8 @@ export default function MentorDiscoveryLayout() {
   const [minRate, setMinRate] = useState("");
   const [maxRate, setMaxRate] = useState("");
 
+  const filtered = mentorList.filter(m => {
+    const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
   const filtered = mentors.filter((m) => {
     const matchesCategory =
       activeCategory === "All" || m.category === activeCategory;
@@ -532,6 +565,9 @@ export default function MentorDiscoveryLayout() {
           Find your mentor
         </h1>
         <p className="mt-2 text-[15px] text-[#6b6860]">
+          {loading
+            ? 'Loading mentors from backend...'
+            : `Browse ${mentorList.length} experienced professionals ready to guide your journey.`}
           Browse {filtered.length} experienced professionals ready to guide your journey.
           Browse {mentors.length} experienced professionals ready to guide your
           journey.
@@ -614,7 +650,18 @@ export default function MentorDiscoveryLayout() {
               mentor{filtered.length !== 1 ? "s" : ""} found
             </p>
 
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                {[...Array(6)].map((_, index) => (
+                  <MentorCardSkeleton key={index} />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="rounded-3xl bg-white border border-[rgba(20,18,16,0.07)] p-12 text-center">
+                <p className="text-[15px] text-[#141210] font-semibold mb-3">Unable to load mentors</p>
+                <p className="text-[14px] text-[#6b6860]">{error}</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-[#94928d] text-[15px]">
                 No mentors match the selected filters.
               </div>
