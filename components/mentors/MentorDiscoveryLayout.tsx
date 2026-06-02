@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const CATEGORIES = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
@@ -15,8 +16,10 @@ type Mentor = {
   initials: string;
   accent: string;
   bg: string;
+  image?: string;
   available: boolean;
   rating: number;
+  rate: number;
   sessions: number;
   description: string;
   tags: string[];
