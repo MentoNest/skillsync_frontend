@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
+import type { Mentor } from '@/lib/types/mentor';
 import { useState } from 'react';
 import MentorCard from '@/components/mentors/MentorCard';
 import { mentors } from '@/lib/mentors';
