@@ -14,4 +14,4 @@ export type Mentor = {
   sessions: number;
   description: string;
   tags: string[];
-};
+}

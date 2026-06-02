@@ -1,5 +1,3 @@
-'use client';
-
 export type Mentor = {
   id: number;
   name: string;

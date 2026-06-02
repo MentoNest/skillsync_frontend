@@ -9,6 +9,10 @@ type FilterSidebarProps = {
   activeAvailability: string;
   setActiveAvailability: Dispatch<SetStateAction<string>>;
   mode?: 'sidebar' | 'pill';
+  minRate?: string;
+  maxRate?: string;
+  setMinRate?: Dispatch<SetStateAction<string>>;
+  setMaxRate?: Dispatch<SetStateAction<string>>;
 };
 
 export default function FilterSidebar({
@@ -17,9 +21,14 @@ export default function FilterSidebar({
   activeAvailability,
   setActiveAvailability,
   mode = 'sidebar',
+  minRate,
+  maxRate,
+  setMinRate,
+  setMaxRate,
 }: FilterSidebarProps) {
   const buttonBase =
     'text-[13px] px-3 py-2 rounded-lg transition-colors w-full text-left';
+  const hasRateControls = Boolean(setMinRate && setMaxRate);
 
   if (mode === 'pill') {
     return (
@@ -103,6 +112,41 @@ export default function FilterSidebar({
           ))}
         </ul>
       </div>
+
+      {hasRateControls ? (
+        <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)]">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[13px] font-semibold text-[#141210] uppercase tracking-wider">
+              Hourly rate
+            </h3>
+            <span className="text-[11px] text-[#6b6860]">USD</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block text-[12px] text-[#6b6860]">
+              Min
+              <input
+                type="number"
+                min={0}
+                value={minRate}
+                onChange={e => setMinRate?.(e.target.value)}
+                placeholder="Any"
+                className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
+              />
+            </label>
+            <label className="block text-[12px] text-[#6b6860]">
+              Max
+              <input
+                type="number"
+                min={0}
+                value={maxRate}
+                onChange={e => setMaxRate?.(e.target.value)}
+                placeholder="Any"
+                className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
+              />
+            </label>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
