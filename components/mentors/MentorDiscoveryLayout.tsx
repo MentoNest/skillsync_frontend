@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
@@ -334,6 +334,9 @@ export default function MentorDiscoveryLayout() {
   const [activeAvailability, setActiveAvailability] = useState('All');
   const [minRate, setMinRate] = useState('');
   const [maxRate, setMaxRate] = useState('');
+  const [displayedCount, setDisplayedCount] = useState(9);
+  const [isLoading, setIsLoading] = useState(false);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   const filtered = mentors.filter(m => {
     const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
@@ -347,6 +350,41 @@ export default function MentorDiscoveryLayout() {
 
     return matchesCategory && matchesAvailability && matchesRate;
   });
+
+  // Reset displayed count when filters change
+  useEffect(() => {
+    setDisplayedCount(9);
+  }, [activeCategory, activeAvailability, minRate, maxRate]);
+
+  // Load more mentors when observer target becomes visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !isLoading && displayedCount < filtered.length) {
+          setIsLoading(true);
+          // Simulate network delay for smooth loading experience
+          setTimeout(() => {
+            setDisplayedCount(prev => Math.min(prev + 6, filtered.length));
+            setIsLoading(false);
+          }, 300);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [displayedCount, filtered.length, isLoading]);
+
+  const displayedMentors = filtered.slice(0, displayedCount);
 
   return (
     <div className="min-h-screen bg-[#f7f5f2]">
@@ -362,7 +400,7 @@ export default function MentorDiscoveryLayout() {
           Find your mentor
         </h1>
         <p className="mt-2 text-[15px] text-[#6b6860]">
-          Browse {mentors.length} experienced professionals ready to guide your journey.
+          Browse {filtered.length} experienced professionals ready to guide your journey.
         </p>
       </div>
 
@@ -397,6 +435,7 @@ export default function MentorDiscoveryLayout() {
           {/* Mentor listing area */}
           <main className="flex-1 min-w-0">
             <p className="text-[13px] text-[#94928d] mb-5">
+              <span className="font-semibold text-[#141210]">{displayedCount}</span> of{' '}
               <span className="font-semibold text-[#141210]">{filtered.length}</span>{' '}
               mentor{filtered.length !== 1 ? 's' : ''} found
             </p>
@@ -406,11 +445,58 @@ export default function MentorDiscoveryLayout() {
                 No mentors match the selected filters.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map(mentor => (
-                  <MentorCard key={mentor.id} mentor={mentor} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {displayedMentors.map(mentor => (
+                    <MentorCard key={mentor.id} mentor={mentor} />
+                  ))}
+                </div>
+
+                {/* Loading indicator and intersection observer target */}
+                {displayedCount < filtered.length && (
+                  <div ref={observerTarget} className="mt-8 flex justify-center">
+                    {isLoading ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
+                        {[...Array(3)].map((_, i) => (
+                          <div key={i} className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col">
+                            {/* Skeleton top */}
+                            <div className="p-6 flex items-start gap-4">
+                              <div className="w-14 h-14 rounded-[14px] flex-shrink-0 bg-[#e8e5e0] animate-pulse" />
+                              <div className="flex-1 space-y-2">
+                                <div className="h-4 bg-[#e8e5e0] rounded animate-pulse w-3/4" />
+                                <div className="h-3 bg-[#e8e5e0] rounded animate-pulse w-1/2" />
+                              </div>
+                              <div className="w-12 h-8 bg-[#e8e5e0] rounded-lg animate-pulse flex-shrink-0" />
+                            </div>
+                            <div className="h-px bg-[rgba(20,18,16,0.07)] mx-6" />
+                            {/* Skeleton body */}
+                            <div className="p-6 flex-1 flex flex-col gap-4">
+                              <div className="space-y-2">
+                                <div className="h-3 bg-[#e8e5e0] rounded animate-pulse" />
+                                <div className="h-3 bg-[#e8e5e0] rounded animate-pulse w-5/6" />
+                              </div>
+                              <div className="flex gap-1.5">
+                                {[...Array(3)].map((_, j) => (
+                                  <div key={j} className="h-6 bg-[#e8e5e0] rounded-md animate-pulse w-14" />
+                                ))}
+                              </div>
+                            </div>
+                            {/* Skeleton footer */}
+                            <div className="px-6 pb-6 flex items-center justify-between gap-3">
+                              <div className="h-4 bg-[#e8e5e0] rounded animate-pulse w-20" />
+                              <div className="h-8 bg-[#e8e5e0] rounded-xl animate-pulse w-24" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center text-[#94928d] text-sm">
+                        Scroll to load more mentors
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </main>
         </div>
