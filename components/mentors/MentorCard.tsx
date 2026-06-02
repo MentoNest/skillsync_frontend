@@ -8,9 +8,11 @@ import type { Mentor } from '@/lib/mentors';
 interface MentorCardProps {
   mentor: Mentor;
   onBookmarkChange?: (nextIds: number[]) => void;
+  isSelected?: boolean;
+  onToggle?: () => void;
 }
 
-export default function MentorCard({ mentor, onBookmarkChange }: MentorCardProps) {
+export default function MentorCard({ mentor, onBookmarkChange, isSelected, onToggle }: MentorCardProps) {
   const [bookmarked, setBookmarked] = useState(false);
 
   useEffect(() => {
@@ -50,6 +52,19 @@ export default function MentorCard({ mentor, onBookmarkChange }: MentorCardProps
   return (
     <article className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]" aria-labelledby={`mentor-${mentor.id}-name`}>
       <div className="p-6 flex items-start gap-4">
+        {onToggle && (
+          <button
+            onClick={onToggle}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-1 transition-colors ${
+              isSelected
+                ? 'bg-[#141210] border-[#141210]'
+                : 'border-[rgba(20,18,16,0.2)] hover:border-[#141210]'
+            }`}
+            aria-label={isSelected ? `Deselect ${mentor.name}` : `Select ${mentor.name} for comparison`}
+          >
+            {isSelected && <span className="text-[#f7f5f2] text-[10px]">✓</span>}
+          </button>
+        )}
         <div
           className="w-14 h-14 rounded-[14px] flex-shrink-0 flex items-center justify-center text-lg font-bold relative overflow-hidden"
           style={{ background: mentor.bg, color: mentor.accent, fontFamily: "'Syne', sans-serif" }}
