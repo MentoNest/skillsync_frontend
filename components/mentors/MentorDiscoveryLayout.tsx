@@ -6,6 +6,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
+import MentorSkillTag from '@/components/mentors/MentorSkillTag';
 import AvailabilityBadge, { AvailabilityStatus } from '@/components/mentors/AvailabilityBadge';
 
 type Mentor = {
@@ -259,6 +260,8 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
           {mentor.description}
         </p>
         <div className="flex flex-wrap gap-1.5">
+          {mentor.tags.map(tag => (
+            <MentorSkillTag key={tag} skill={tag} />
           {mentor.tags.map((tag) => (
             <span
               key={tag}
