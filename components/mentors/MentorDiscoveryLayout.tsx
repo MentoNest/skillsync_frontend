@@ -224,43 +224,20 @@ export default function MentorDiscoveryLayout() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mobile filters (horizontal pills) */}
         <div className="lg:hidden mb-6 space-y-3">
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 text-[12.5px] font-medium px-4 py-2 rounded-full border transition-all ${
-                  activeCategory === cat
-                    ? 'bg-[#141210] text-[#f7f5f2] border-[#141210]'
-                    : 'text-[#6b6860] border-[rgba(20,18,16,0.15)] hover:border-[rgba(20,18,16,0.4)] hover:text-[#141210]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {AVAILABILITY.map(opt => (
-              <button
-                key={opt}
-                onClick={() => setActiveAvailability(opt)}
-                className={`flex-shrink-0 text-[12.5px] font-medium px-4 py-2 rounded-full border transition-all ${
-                  activeAvailability === opt
-                    ? 'bg-[#141210] text-[#f7f5f2] border-[#141210]'
-                    : 'text-[#6b6860] border-[rgba(20,18,16,0.15)] hover:border-[rgba(20,18,16,0.4)] hover:text-[#141210]'
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
+          <FilterSidebar
+            mode="pill"
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+            activeAvailability={activeAvailability}
+            setActiveAvailability={setActiveAvailability}
+          />
         </div>
 
         {/* Two-column layout */}
         <div className="flex gap-8 items-start">
           {/* Sidebar — hidden on mobile, sticky on desktop */}
           <aside className="hidden lg:block w-56 flex-shrink-0 sticky top-20">
-            <FilterPanel
+            <FilterSidebar
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               activeAvailability={activeAvailability}
