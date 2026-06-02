@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import CategoryBadge from '../CategoryBadge';
+import MentorSearchBar from '../mentors/MentorSearchBar';
 
 const filters = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
 
@@ -108,10 +109,19 @@ const mentors = [
 
 export default function MentorDiscoverySection() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filtered = activeFilter === 'All'
-    ? mentors
-    : mentors.filter(m => m.category === activeFilter);
+  const filtered = mentors.filter(m => {
+    const matchesFilter = activeFilter === 'All' || m.category === activeFilter;
+    const q = searchQuery.toLowerCase();
+    const matchesSearch =
+      !q ||
+      m.name.toLowerCase().includes(q) ||
+      m.role.toLowerCase().includes(q) ||
+      m.description.toLowerCase().includes(q) ||
+      m.tags.some(tag => tag.toLowerCase().includes(q));
+    return matchesFilter && matchesSearch;
+  });
 
   return (
     <section className="mentor-discovery">
@@ -461,6 +471,11 @@ export default function MentorDiscoverySection() {
           </Link>
         </div>
 
+        {/* Search */}
+        <div style={{ marginBottom: '24px' }}>
+          <MentorSearchBar onSearch={setSearchQuery} />
+        </div>
+
         {/* Filters */}
         <div className="md-filters">
           {filters.map(f => (
@@ -477,7 +492,11 @@ export default function MentorDiscoverySection() {
         {/* Grid */}
         <div className="md-grid">
           {filtered.length === 0 && (
-            <div className="md-empty">No mentors found in this category yet.</div>
+            <div className="md-empty">
+              {searchQuery
+                ? `No mentors match "${searchQuery}".`
+                : 'No mentors found in this category yet.'}
+            </div>
           )}
 
           {filtered.map(mentor => (
