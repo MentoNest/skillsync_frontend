@@ -200,17 +200,26 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
         <span className="text-[12px] text-[#94928d]">
           <strong className="text-[#141210] font-semibold">{mentor.sessions}</strong> sessions
         </span>
-        <Link
-          href={mentor.available ? `/mentors/${mentor.id}` : '#'}
-          className={`text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 ${
-            mentor.available
-              ? 'bg-[#141210] text-[#f7f5f2] hover:bg-[#2d2a27]'
-              : 'bg-[#f0efed] text-[#94928d] cursor-default pointer-events-none'
-          }`}
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          {mentor.available ? 'Book session' : 'Fully booked'}
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/mentors/${mentor.id}`}
+            className="text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 bg-[#f7f5f2] text-[#141210] hover:bg-[#ede8e2] border border-[rgba(20,18,16,0.1)]"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            View profile
+          </Link>
+          <Link
+            href={mentor.available ? `/mentors/${mentor.id}` : '#'}
+            className={`text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 ${
+              mentor.available
+                ? 'bg-[#141210] text-[#f7f5f2] hover:bg-[#2d2a27]'
+                : 'bg-[#f0efed] text-[#94928d] cursor-default pointer-events-none'
+            }`}
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {mentor.available ? 'Book session' : 'Fully booked'}
+          </Link>
+        </div>
       </div>
     </div>
   );
