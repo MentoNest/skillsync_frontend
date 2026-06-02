@@ -194,10 +194,12 @@ const mentors: Mentor[] = [
   },
 ];
 
+const MENTOR_CARD_SKELETON_COUNT = 6;
+
 function MentorCard({ mentor }: { mentor: Mentor }) {
   const status = mentor.status ?? (mentor.available ? 'available' : 'fully_booked');
   return (
-    <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
+    <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex h-full min-h-[338px] flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
       {/* Top */}
       <div className="p-6 flex items-start gap-4">
         <div
@@ -325,26 +327,23 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
   );
 }
 
-function FilterPanel({
-  activeCategory,
-  setActiveCategory,
-  activeAvailability,
-  setActiveAvailability,
-  minRate,
-  maxRate,
-  setMinRate,
-  setMaxRate,
-}: {
-  activeCategory: string;
-  setActiveCategory: (v: string) => void;
-  activeAvailability: string;
-  setActiveAvailability: (v: string) => void;
-  minRate: string;
-  maxRate: string;
-  setMinRate: (v: string) => void;
-  setMaxRate: (v: string) => void;
-}) {
+function MentorCardSkeleton() {
   return (
+    <div
+      className="h-full min-h-[338px] overflow-hidden rounded-2xl border border-[rgba(20,18,16,0.07)] bg-white animate-pulse"
+      aria-hidden="true"
+    >
+      <div className="p-6 flex items-start gap-4">
+        <div className="h-14 w-14 flex-shrink-0 rounded-[14px] bg-[#e6e1d8]" />
+
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="h-4 w-3/4 rounded bg-[#e6e1d8]" />
+          <div className="h-3 w-2/3 rounded bg-[#ece8df]" />
+          <div className="h-3 w-1/2 rounded bg-[#ece8df]" />
+          <div className="h-3 w-1/3 rounded bg-[#ece8df]" />
+        </div>
+
+        <div className="h-7 w-14 flex-shrink-0 rounded-lg bg-[#f0ede7]" />
     <>
       {/* Category */}
       <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)]">
@@ -392,14 +391,19 @@ function FilterPanel({
         </ul>
       </div>
 
-      {/* Hourly rate */}
-      <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)] mt-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[13px] font-semibold text-[#141210] uppercase tracking-wider">
-            Hourly rate
-          </h3>
-          <span className="text-[11px] text-[#6b6860]">USD</span>
+      <div className="h-px bg-[rgba(20,18,16,0.07)] mx-6" />
+
+      <div className="p-6 flex flex-col gap-4">
+        <div className="space-y-3">
+          <div className="h-3.5 w-full rounded bg-[#ece8df]" />
+          <div className="h-3.5 w-11/12 rounded bg-[#ece8df]" />
+          <div className="h-3.5 w-4/5 rounded bg-[#ece8df]" />
         </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          <div className="h-7 w-20 rounded-md bg-[#f0ede7]" />
+          <div className="h-7 w-24 rounded-md bg-[#f0ede7]" />
+          <div className="h-7 w-16 rounded-md bg-[#f0ede7]" />
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-[12px] text-[#6b6860]">
             Min
@@ -425,7 +429,12 @@ function FilterPanel({
           </label>
         </div>
       </div>
-    </>
+
+      <div className="px-6 pb-6 flex items-center justify-between gap-3">
+        <div className="h-3.5 w-24 rounded bg-[#ece8df]" />
+        <div className="h-9 w-24 rounded-xl bg-[#e6e1d8]" />
+      </div>
+    </div>
   );
 }
 
@@ -531,6 +540,15 @@ export default function MentorDiscoveryLayout() {
   const [activeAvailability, setActiveAvailability] = useState('All');
   const [minRate, setMinRate] = useState('');
   const [maxRate, setMaxRate] = useState('');
+  const [isLoadingMentors, setIsLoadingMentors] = useState(true);
+
+  useEffect(() => {
+    const loadFrame = window.requestAnimationFrame(() => {
+      setIsLoadingMentors(false);
+    });
+
+    return () => window.cancelAnimationFrame(loadFrame);
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -585,6 +603,7 @@ export default function MentorDiscoveryLayout() {
 
     return matchesCategory && matchesAvailability && matchesRate && matchesSearch;
   });
+  const displayedMentorCount = isLoadingMentors ? mentors.length : filtered.length;
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -685,6 +704,26 @@ export default function MentorDiscoveryLayout() {
             </div>
           </aside>
 
+          {/* Mentor listing area */}
+          <main className="flex-1 min-w-0" aria-busy={isLoadingMentors}>
+            <p className="text-[13px] text-[#94928d] mb-5">
+              <span className="font-semibold text-[#141210]">
+                {displayedMentorCount}
+              </span>{' '}
+              mentor{displayedMentorCount !== 1 ? 's' : ''} found
+            </p>
+
+            {isLoadingMentors ? (
+              <>
+                <span className="sr-only" role="status">
+                  Loading mentors
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {Array.from({ length: MENTOR_CARD_SKELETON_COUNT }).map((_, index) => (
+                    <MentorCardSkeleton key={index} />
+                  ))}
+                </div>
+              </>
           <main className="flex-1 min-w-0">
             <section aria-labelledby="mentor-search-heading" className="mb-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

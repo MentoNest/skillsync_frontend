@@ -1,17 +1,11 @@
-import ResourceSearchBar from '@/components/resources/ResourceSearchBar'
-import QuickAccessSection from '@/components/resources/QuickAccessSection'
-import FeaturedLearningTracksSection from '@/components/resources/FeaturedLearningTracksSection'
-import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection'
-import Link from 'next/link'
-import React from 'react'
-import ArticleListItem from '@/components/ArticleListItem'
 'use client';
 
-import React, { useState } from 'react';
-import ResourceSearchBar from '@/components/resources/ResourceSearchBar';
-import QuickAccessSection from '@/components/resources/QuickAccessSection';
-import FeaturedLearningTracksSection from '@/components/resources/FeaturedLearningTracksSection';
+import { useState } from 'react';
 import ArticleListItem from '@/components/ArticleListItem';
+import FeaturedLearningTracksSection from '@/components/resources/FeaturedLearningTracksSection';
+import QuickAccessSection from '@/components/resources/QuickAccessSection';
+import ResourceSearchBar from '@/components/resources/ResourceSearchBar';
+import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection';
 
 const resourceArticles = [
   {
