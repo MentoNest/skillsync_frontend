@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
@@ -134,9 +134,11 @@ const mentors: Mentor[] = [
   },
 ];
 
+const MENTOR_CARD_SKELETON_COUNT = 6;
+
 function MentorCard({ mentor }: { mentor: Mentor }) {
   return (
-    <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
+    <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex h-full min-h-[338px] flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
       {/* Top */}
       <div className="p-6 flex items-start gap-4">
         <div
@@ -216,107 +218,46 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
   );
 }
 
-function FilterPanel({
-  activeCategory,
-  setActiveCategory,
-  activeAvailability,
-  setActiveAvailability,
-  minRate,
-  maxRate,
-  setMinRate,
-  setMaxRate,
-}: {
-  activeCategory: string;
-  setActiveCategory: (v: string) => void;
-  activeAvailability: string;
-  setActiveAvailability: (v: string) => void;
-  minRate: string;
-  maxRate: string;
-  setMinRate: (v: string) => void;
-  setMaxRate: (v: string) => void;
-}) {
+function MentorCardSkeleton() {
   return (
-    <>
-      {/* Category */}
-      <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)]">
-        <h3 className="text-[13px] font-semibold text-[#141210] mb-3 uppercase tracking-wider">
-          Category
-        </h3>
-        <ul className="space-y-0.5">
-          {CATEGORIES.map(cat => (
-            <li key={cat}>
-              <button
-                onClick={() => setActiveCategory(cat)}
-                className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
-                  activeCategory === cat
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
-                }`}
-              >
-                {cat}
-              </button>
-            </li>
-          ))}
-        </ul>
+    <div
+      className="h-full min-h-[338px] overflow-hidden rounded-2xl border border-[rgba(20,18,16,0.07)] bg-white animate-pulse"
+      aria-hidden="true"
+    >
+      <div className="p-6 flex items-start gap-4">
+        <div className="h-14 w-14 flex-shrink-0 rounded-[14px] bg-[#e6e1d8]" />
+
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="h-4 w-3/4 rounded bg-[#e6e1d8]" />
+          <div className="h-3 w-2/3 rounded bg-[#ece8df]" />
+          <div className="h-3 w-1/2 rounded bg-[#ece8df]" />
+          <div className="h-3 w-1/3 rounded bg-[#ece8df]" />
+        </div>
+
+        <div className="h-7 w-14 flex-shrink-0 rounded-lg bg-[#f0ede7]" />
       </div>
 
-      {/* Availability */}
-      <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)] mt-4">
-        <h3 className="text-[13px] font-semibold text-[#141210] mb-3 uppercase tracking-wider">
-          Availability
-        </h3>
-        <ul className="space-y-0.5">
-          {AVAILABILITY.map(opt => (
-            <li key={opt}>
-              <button
-                onClick={() => setActiveAvailability(opt)}
-                className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
-                  activeAvailability === opt
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
-                }`}
-              >
-                {opt}
-              </button>
-            </li>
-          ))}
-        </ul>
+      <div className="h-px bg-[rgba(20,18,16,0.07)] mx-6" />
+
+      <div className="p-6 flex flex-col gap-4">
+        <div className="space-y-3">
+          <div className="h-3.5 w-full rounded bg-[#ece8df]" />
+          <div className="h-3.5 w-11/12 rounded bg-[#ece8df]" />
+          <div className="h-3.5 w-4/5 rounded bg-[#ece8df]" />
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          <div className="h-7 w-20 rounded-md bg-[#f0ede7]" />
+          <div className="h-7 w-24 rounded-md bg-[#f0ede7]" />
+          <div className="h-7 w-16 rounded-md bg-[#f0ede7]" />
+        </div>
       </div>
 
-      {/* Hourly rate */}
-      <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)] mt-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[13px] font-semibold text-[#141210] uppercase tracking-wider">
-            Hourly rate
-          </h3>
-          <span className="text-[11px] text-[#6b6860]">USD</span>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block text-[12px] text-[#6b6860]">
-            Min
-            <input
-              type="number"
-              min={0}
-              value={minRate}
-              onChange={e => setMinRate(e.target.value)}
-              placeholder="Any"
-              className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
-            />
-          </label>
-          <label className="block text-[12px] text-[#6b6860]">
-            Max
-            <input
-              type="number"
-              min={0}
-              value={maxRate}
-              onChange={e => setMaxRate(e.target.value)}
-              placeholder="Any"
-              className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
-            />
-          </label>
-        </div>
+      <div className="px-6 pb-6 flex items-center justify-between gap-3">
+        <div className="h-3.5 w-24 rounded bg-[#ece8df]" />
+        <div className="h-9 w-24 rounded-xl bg-[#e6e1d8]" />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -325,6 +266,15 @@ export default function MentorDiscoveryLayout() {
   const [activeAvailability, setActiveAvailability] = useState('All');
   const [minRate, setMinRate] = useState('');
   const [maxRate, setMaxRate] = useState('');
+  const [isLoadingMentors, setIsLoadingMentors] = useState(true);
+
+  useEffect(() => {
+    const loadFrame = window.requestAnimationFrame(() => {
+      setIsLoadingMentors(false);
+    });
+
+    return () => window.cancelAnimationFrame(loadFrame);
+  }, []);
 
   const filtered = mentors.filter(m => {
     const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
@@ -338,6 +288,7 @@ export default function MentorDiscoveryLayout() {
 
     return matchesCategory && matchesAvailability && matchesRate;
   });
+  const displayedMentorCount = isLoadingMentors ? mentors.length : filtered.length;
 
   return (
     <div className="min-h-screen bg-[#f7f5f2]">
@@ -386,13 +337,26 @@ export default function MentorDiscoveryLayout() {
           </aside>
 
           {/* Mentor listing area */}
-          <main className="flex-1 min-w-0">
+          <main className="flex-1 min-w-0" aria-busy={isLoadingMentors}>
             <p className="text-[13px] text-[#94928d] mb-5">
-              <span className="font-semibold text-[#141210]">{filtered.length}</span>{' '}
-              mentor{filtered.length !== 1 ? 's' : ''} found
+              <span className="font-semibold text-[#141210]">
+                {displayedMentorCount}
+              </span>{' '}
+              mentor{displayedMentorCount !== 1 ? 's' : ''} found
             </p>
 
-            {filtered.length === 0 ? (
+            {isLoadingMentors ? (
+              <>
+                <span className="sr-only" role="status">
+                  Loading mentors
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {Array.from({ length: MENTOR_CARD_SKELETON_COUNT }).map((_, index) => (
+                    <MentorCardSkeleton key={index} />
+                  ))}
+                </div>
+              </>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-[#94928d] text-[15px]">
                 No mentors match the selected filters.
               </div>

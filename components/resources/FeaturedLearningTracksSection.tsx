@@ -60,10 +60,6 @@ export default function FeaturedLearningTracksSection({ searchQuery = '' }: Feat
           View All &rarr;
         </Link>
       </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {featuredTracks.map((track) => (
-          <LearningTrackCard key={track.title} {...track} />
-        ))}
       <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filtered.length > 0 ? (
           filtered.map((track) => (
