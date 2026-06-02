@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-
-const CATEGORIES = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
-const AVAILABILITY = ['All', 'Available', 'Fully Booked'];
+import FilterSidebar from '@/components/mentors/FilterSidebar';
 
 type Mentor = {
   id: number;
@@ -189,68 +187,6 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
         </Link>
       </div>
     </div>
-  );
-}
-
-function FilterPanel({
-  activeCategory,
-  setActiveCategory,
-  activeAvailability,
-  setActiveAvailability,
-}: {
-  activeCategory: string;
-  setActiveCategory: (v: string) => void;
-  activeAvailability: string;
-  setActiveAvailability: (v: string) => void;
-}) {
-  return (
-    <>
-      {/* Category */}
-      <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)]">
-        <h3 className="text-[13px] font-semibold text-[#141210] mb-3 uppercase tracking-wider">
-          Category
-        </h3>
-        <ul className="space-y-0.5">
-          {CATEGORIES.map(cat => (
-            <li key={cat}>
-              <button
-                onClick={() => setActiveCategory(cat)}
-                className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
-                  activeCategory === cat
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
-                }`}
-              >
-                {cat}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Availability */}
-      <div className="bg-white rounded-2xl p-5 border border-[rgba(20,18,16,0.07)] mt-4">
-        <h3 className="text-[13px] font-semibold text-[#141210] mb-3 uppercase tracking-wider">
-          Availability
-        </h3>
-        <ul className="space-y-0.5">
-          {AVAILABILITY.map(opt => (
-            <li key={opt}>
-              <button
-                onClick={() => setActiveAvailability(opt)}
-                className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
-                  activeAvailability === opt
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
-                }`}
-              >
-                {opt}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
   );
 }
 
