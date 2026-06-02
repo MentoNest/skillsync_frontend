@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -137,6 +137,38 @@ const mentors: Mentor[] = [
 ];
 
 function MentorCard({ mentor }: { mentor: Mentor }) {
+  const [bookmarked, setBookmarked] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('bookmarkedMentors');
+      const arr = raw ? JSON.parse(raw) : [];
+      setBookmarked(arr.includes(mentor.id));
+    } catch (e) {
+      setBookmarked(false);
+    }
+  }, [mentor.id]);
+
+  function toggleBookmark(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const raw = localStorage.getItem('bookmarkedMentors');
+      const arr: number[] = raw ? JSON.parse(raw) : [];
+      let next: number[];
+      if (arr.includes(mentor.id)) {
+        next = arr.filter(id => id !== mentor.id);
+        setBookmarked(false);
+      } else {
+        next = [...arr, mentor.id];
+        setBookmarked(true);
+      }
+      localStorage.setItem('bookmarkedMentors', JSON.stringify(next));
+    } catch (e) {
+      // ignore localStorage errors silently
+    }
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
       {/* Top */}
@@ -174,9 +206,30 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
           <p className="text-[12px] mt-1 text-[#141210]">${mentor.rate}/hr</p>
         </div>
 
-        <div className="flex items-center gap-1 bg-[#f7f5f2] rounded-lg px-2 py-1 flex-shrink-0">
-          <span className="text-amber-400 text-[11px]">★</span>
-          <span className="text-[12px] font-semibold text-[#141210]">{mentor.rating}</span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 bg-[#f7f5f2] rounded-lg px-2 py-1">
+            <span className="text-amber-400 text-[11px]">★</span>
+            <span className="text-[12px] font-semibold text-[#141210]">{mentor.rating}</span>
+          </div>
+
+          <button
+            onClick={toggleBookmark}
+            aria-pressed={bookmarked}
+            aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark mentor'}
+            className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors border ${
+              bookmarked ? 'bg-amber-400 text-white border-amber-400' : 'bg-white text-[#6b6860] border-[rgba(20,18,16,0.08)]'
+            }`}
+          >
+            {bookmarked ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 2C5.44772 2 5 2.44772 5 3V21L12 18L19 21V3C19 2.44772 18.5523 2 18 2H6Z" fill="currentColor" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 2C5.44772 2 5 2.44772 5 3V21L12 18L19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 
