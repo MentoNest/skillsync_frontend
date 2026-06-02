@@ -35,8 +35,10 @@ const mentors: Mentor[] = [
     initials: 'KA',
     accent: '#3b82f6',
     bg: '#0f1f3d',
+    image: '/tony-adebanjo.jpg',
     available: true,
     rating: 4.95,
+    rate: 180,
     sessions: 204,
     description:
       'Helps engineers level up to Staff and beyond. Specialises in distributed systems, technical leadership, and promo packets.',
@@ -51,8 +53,10 @@ const mentors: Mentor[] = [
     initials: 'PM',
     accent: '#a855f7',
     bg: '#1e0f3d',
+    image: '/Image (Sarah Johnson).svg',
     available: true,
     rating: 4.98,
+    rate: 145,
     sessions: 187,
     description:
       'Portfolio reviews, design system strategy, and breaking into senior IC or management tracks at top-tier product companies.',
@@ -67,8 +71,10 @@ const mentors: Mentor[] = [
     initials: 'TR',
     accent: '#10b981',
     bg: '#0a2318',
+    image: '/Image (Marcus Williams).svg',
     available: false,
     rating: 4.91,
+    rate: 160,
     sessions: 139,
     description:
       'From APM to PM to Group PM — Tomás has made every jump and guides others through the same transitions with precision.',
@@ -83,8 +89,10 @@ const mentors: Mentor[] = [
     initials: 'AN',
     accent: '#f59e0b',
     bg: '#2a1800',
+    image: '/Image (Cole Hathans).svg',
     available: true,
     rating: 4.93,
+    rate: 155,
     sessions: 256,
     description:
       'ML pipelines, A/B testing at scale, and transitioning from academia to industry. Obsessed with making data teams actually functional.',
@@ -99,8 +107,10 @@ const mentors: Mentor[] = [
     initials: 'LF',
     accent: '#ef4444',
     bg: '#2a0a0a',
+    image: '/tony-adebanjo.jpg',
     available: true,
     rating: 4.89,
+    rate: 135,
     sessions: 98,
     description:
       'Zero to one builder. Helps early-career devs ship fast, make technical decisions under uncertainty, and navigate startup chaos.',
@@ -115,8 +125,10 @@ const mentors: Mentor[] = [
     initials: 'SL',
     accent: '#06b6d4',
     bg: '#011f26',
+    image: '/Image (Sarah Johnson).svg',
     available: false,
     rating: 4.96,
+    rate: 170,
     sessions: 321,
     description:
       'Growth loops, retention mechanics, and go-to-market for consumer apps. Former founder. Brutally practical and candid.',
@@ -130,10 +142,20 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
       {/* Top */}
       <div className="p-6 flex items-start gap-4">
         <div
-          className="w-14 h-14 rounded-[14px] flex-shrink-0 flex items-center justify-center text-lg font-bold relative"
+          className="w-14 h-14 rounded-[14px] flex-shrink-0 flex items-center justify-center text-lg font-bold relative overflow-hidden"
           style={{ background: mentor.bg, color: mentor.accent, fontFamily: "'Syne', sans-serif" }}
         >
-          {mentor.initials}
+          {mentor.image ? (
+            <Image
+              src={mentor.image}
+              alt={`${mentor.name} profile`}
+              width={56}
+              height={56}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span>{mentor.initials}</span>
+          )}
           <span
             className={`absolute bottom-[-2px] right-[-2px] w-3 h-3 rounded-full border-2 border-white ${
               mentor.available ? 'bg-emerald-500' : 'bg-gray-300'
@@ -149,6 +171,7 @@ function MentorCard({ mentor }: { mentor: Mentor }) {
           <p className="text-[12px] font-medium mt-0.5" style={{ color: mentor.accent }}>
             {mentor.company}
           </p>
+          <p className="text-[12px] mt-1 text-[#141210]">${mentor.rate}/hr</p>
         </div>
 
         <div className="flex items-center gap-1 bg-[#f7f5f2] rounded-lg px-2 py-1 flex-shrink-0">
@@ -200,11 +223,19 @@ function FilterPanel({
   setActiveCategory,
   activeAvailability,
   setActiveAvailability,
+  minRate,
+  maxRate,
+  setMinRate,
+  setMaxRate,
 }: {
   activeCategory: string;
   setActiveCategory: (v: string) => void;
   activeAvailability: string;
   setActiveAvailability: (v: string) => void;
+  minRate: string;
+  maxRate: string;
+  setMinRate: (v: string) => void;
+  setMaxRate: (v: string) => void;
 }) {
   return (
     <>
