@@ -1,3 +1,10 @@
+import ResourceSearchBar from '@/components/resources/ResourceSearchBar'
+import QuickAccessSection from '@/components/resources/QuickAccessSection'
+import FeaturedLearningTracksSection from '@/components/resources/FeaturedLearningTracksSection'
+import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection'
+import Link from 'next/link'
+import React from 'react'
+import ArticleListItem from '@/components/ArticleListItem'
 'use client';
 
 import React, { useState } from 'react';
@@ -67,6 +74,7 @@ export default function ResourcesPage() {
           <p className="text-sm text-slate-500">No articles match your search.</p>
         )}
       </section>
+      <ToolsTemplatesSection />
     </div>
   );
 }
