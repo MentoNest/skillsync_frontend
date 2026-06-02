@@ -1,117 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/mentors/FilterSidebar';
-import type { Mentor } from '@/lib/types/mentor';
-import { mentors } from '@/lib/data/mentors';
+import MentorCard from '@/components/mentors/MentorCard';
+import Pagination from '@/components/mentors/Pagination';
+import { mentors } from '@/lib/mentors';
 import { useMentorSelection } from '@/lib/context/MentorSelectionContext';
 import ComparisonBar from '@/components/mentors/ComparisonBar';
 
-const CATEGORIES = ['All', 'Engineering', 'Design', 'Product', 'Data', 'Business'];
+const CATEGORIES = ['All', 'Engineering', 'Design', 'Product', 'Business', 'Data'];
 const AVAILABILITY = ['All', 'Available', 'Fully Booked'];
-
-function MentorCard({
-  mentor,
-  isSelected,
-  onToggle,
-}: {
-  mentor: Mentor;
-  isSelected: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <div className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(20,18,16,0.1)]">
-      {/* Top */}
-      <div className="p-6 flex items-start gap-4">
-        <button
-          onClick={onToggle}
-          className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-1 transition-colors ${
-            isSelected
-              ? 'bg-[#141210] border-[#141210]'
-              : 'border-[rgba(20,18,16,0.2)] hover:border-[#141210]'
-          }`}
-          aria-label={isSelected ? `Deselect ${mentor.name}` : `Select ${mentor.name} for comparison`}
-        >
-          {isSelected && <span className="text-[#f7f5f2] text-[10px]">✓</span>}
-        </button>
-        <div
-          className="w-14 h-14 rounded-[14px] flex-shrink-0 flex items-center justify-center text-lg font-bold relative overflow-hidden"
-          style={{ background: mentor.bg, color: mentor.accent, fontFamily: "'Syne', sans-serif" }}
-        >
-          {mentor.image ? (
-            <Image
-              src={mentor.image}
-              alt={`${mentor.name} profile`}
-              width={56}
-              height={56}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span>{mentor.initials}</span>
-          )}
-          <span
-            className={`absolute bottom-[-2px] right-[-2px] w-3 h-3 rounded-full border-2 border-white ${
-              mentor.available ? 'bg-emerald-500' : 'bg-gray-300'
-            }`}
-          />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[#141210] text-[15px] truncate" style={{ fontFamily: "'Syne', sans-serif" }}>
-            {mentor.name}
-          </p>
-          <p className="text-[13px] text-[#94928d] truncate">{mentor.role}</p>
-          <p className="text-[12px] font-medium mt-0.5" style={{ color: mentor.accent }}>
-            {mentor.company}
-          </p>
-          <p className="text-[12px] mt-1 text-[#141210]">${mentor.rate}/hr</p>
-        </div>
-
-        <div className="flex items-center gap-1 bg-[#f7f5f2] rounded-lg px-2 py-1 flex-shrink-0">
-          <span className="text-amber-400 text-[11px]">★</span>
-          <span className="text-[12px] font-semibold text-[#141210]">{mentor.rating}</span>
-        </div>
-      </div>
-
-      <div className="h-px bg-[rgba(20,18,16,0.07)] mx-6" />
-
-      {/* Body */}
-      <div className="p-6 flex-1 flex flex-col gap-4">
-        <p className="text-[13.5px] leading-[1.7] text-[#6b6860] flex-1">{mentor.description}</p>
-        <div className="flex flex-wrap gap-1.5">
-          {mentor.tags.map(tag => (
-            <span
-              key={tag}
-              className="text-[11.5px] font-medium px-2.5 py-1 rounded-md bg-[#f7f5f2] text-[#6b6860] border border-[rgba(20,18,16,0.08)]"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="px-6 pb-6 flex items-center justify-between gap-3">
-        <span className="text-[12px] text-[#94928d]">
-          <strong className="text-[#141210] font-semibold">{mentor.sessions}</strong> sessions
-        </span>
-        <Link
-          href={mentor.available ? `/mentors/${mentor.id}` : '#'}
-          className={`text-[12.5px] font-semibold px-4 py-2 rounded-xl transition-all duration-200 ${
-            mentor.available
-              ? 'bg-[#141210] text-[#f7f5f2] hover:bg-[#2d2a27]'
-              : 'bg-[#f0efed] text-[#94928d] cursor-default pointer-events-none'
-          }`}
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          {mentor.available ? 'Book session' : 'Fully booked'}
-        </Link>
-      </div>
-    </div>
-  );
-}
 
 function FilterPanel({
   activeCategory,
@@ -140,14 +40,14 @@ function FilterPanel({
           Category
         </h3>
         <ul className="space-y-0.5">
-          {CATEGORIES.map(cat => (
+          {CATEGORIES.map((cat) => (
             <li key={cat}>
               <button
                 onClick={() => setActiveCategory(cat)}
                 className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
                   activeCategory === cat
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
+                    ? "bg-[#141210] text-[#f7f5f2] font-medium"
+                    : "text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]"
                 }`}
               >
                 {cat}
@@ -163,14 +63,14 @@ function FilterPanel({
           Availability
         </h3>
         <ul className="space-y-0.5">
-          {AVAILABILITY.map(opt => (
+          {AVAILABILITY.map((opt) => (
             <li key={opt}>
               <button
                 onClick={() => setActiveAvailability(opt)}
                 className={`w-full text-left text-[13px] px-3 py-2 rounded-lg transition-colors ${
                   activeAvailability === opt
-                    ? 'bg-[#141210] text-[#f7f5f2] font-medium'
-                    : 'text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]'
+                    ? "bg-[#141210] text-[#f7f5f2] font-medium"
+                    : "text-[#6b6860] hover:bg-[#f7f5f2] hover:text-[#141210]"
                 }`}
               >
                 {opt}
@@ -195,7 +95,7 @@ function FilterPanel({
               type="number"
               min={0}
               value={minRate}
-              onChange={e => setMinRate(e.target.value)}
+              onChange={(e) => setMinRate(e.target.value)}
               placeholder="Any"
               className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
             />
@@ -206,7 +106,7 @@ function FilterPanel({
               type="number"
               min={0}
               value={maxRate}
-              onChange={e => setMaxRate(e.target.value)}
+              onChange={(e) => setMaxRate(e.target.value)}
               placeholder="Any"
               className="mt-2 w-full rounded-xl border border-[rgba(20,18,16,0.12)] bg-[#f7f5f2] px-3 py-2 text-sm text-[#141210] focus:border-[#141210] focus:outline-none"
             />
@@ -222,20 +122,64 @@ export default function MentorDiscoveryLayout() {
   const [activeAvailability, setActiveAvailability] = useState('All');
   const [minRate, setMinRate] = useState('');
   const [maxRate, setMaxRate] = useState('');
+  const [displayedCount, setDisplayedCount] = useState(9);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const observerTarget = useRef<HTMLDivElement>(null);
+  const ITEMS_PER_PAGE = 6;
   const { selectedMentors, toggleMentor, isSelected } = useMentorSelection();
 
-  const filtered = mentors.filter(m => {
-    const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
+  const filtered = mentors.filter((m) => {
+    const matchesCategory =
+      activeCategory === "All" || m.category === activeCategory;
     const matchesAvailability =
-      activeAvailability === 'All' ||
-      (activeAvailability === 'Available' && m.available) ||
-      (activeAvailability === 'Fully Booked' && !m.available);
-    const parsedMin = minRate === '' ? 0 : parseFloat(minRate);
-    const parsedMax = maxRate === '' ? Number.POSITIVE_INFINITY : parseFloat(maxRate);
+      activeAvailability === "All" ||
+      (activeAvailability === "Available" && m.available) ||
+      (activeAvailability === "Fully Booked" && !m.available);
+    const parsedMin = minRate === "" ? 0 : parseFloat(minRate);
+    const parsedMax =
+      maxRate === "" ? Number.POSITIVE_INFINITY : parseFloat(maxRate);
     const matchesRate = m.rate >= parsedMin && m.rate <= parsedMax;
 
     return matchesCategory && matchesAvailability && matchesRate;
   });
+
+  useEffect(() => {
+    setDisplayedCount(9);
+    setCurrentPage(1);
+  }, [activeCategory, activeAvailability, minRate, maxRate]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !isLoading && displayedCount < filtered.length) {
+          setIsLoading(true);
+          setTimeout(() => {
+            setDisplayedCount(prev => Math.min(prev + 6, filtered.length));
+            setIsLoading(false);
+          }, 300);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [displayedCount, filtered.length, isLoading]);
+
+  const displayedMentors = filtered.slice(0, displayedCount);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedMentors = filtered.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen bg-[#f7f5f2]">
@@ -251,7 +195,7 @@ export default function MentorDiscoveryLayout() {
           Find your mentor
         </h1>
         <p className="mt-2 text-[15px] text-[#6b6860]">
-          Browse {mentors.length} experienced professionals ready to guide your journey.
+          Browse {filtered.length} experienced professionals ready to guide your journey.
         </p>
       </div>
 
@@ -286,6 +230,7 @@ export default function MentorDiscoveryLayout() {
           {/* Mentor listing area */}
           <main className="flex-1 min-w-0">
             <p className="text-[13px] text-[#94928d] mb-5">
+              <span className="font-semibold text-[#141210]">{displayedMentors.length}</span> of{' '}
               <span className="font-semibold text-[#141210]">{filtered.length}</span>{' '}
               mentor{filtered.length !== 1 ? 's' : ''} found
             </p>
@@ -295,16 +240,66 @@ export default function MentorDiscoveryLayout() {
                 No mentors match the selected filters.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map(mentor => (
-                  <MentorCard
-                    key={mentor.id}
-                    mentor={mentor}
-                    isSelected={isSelected(mentor.id)}
-                    onToggle={() => toggleMentor(mentor)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {displayedMentors.map(mentor => (
+                    <MentorCard
+                      key={mentor.id}
+                      mentor={mentor}
+                      isSelected={isSelected(mentor.id)}
+                      onToggle={() => toggleMentor(mentor)}
+                    />
+                  ))}
+                </div>
+
+                {/* Loading indicator and intersection observer target */}
+                {displayedCount < filtered.length && (
+                  <div ref={observerTarget} className="mt-8 flex justify-center">
+                    {isLoading ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
+                        {[...Array(3)].map((_, i) => (
+                          <div key={i} className="bg-white rounded-2xl border border-[rgba(20,18,16,0.07)] overflow-hidden flex flex-col">
+                            <div className="p-6 flex items-start gap-4">
+                              <div className="w-14 h-14 rounded-[14px] flex-shrink-0 bg-[#e8e5e0] animate-pulse" />
+                              <div className="flex-1 space-y-2">
+                                <div className="h-4 bg-[#e8e5e0] rounded animate-pulse w-3/4" />
+                                <div className="h-3 bg-[#e8e5e0] rounded animate-pulse w-1/2" />
+                              </div>
+                              <div className="w-12 h-8 bg-[#e8e5e0] rounded-lg animate-pulse flex-shrink-0" />
+                            </div>
+                            <div className="h-px bg-[rgba(20,18,16,0.07)] mx-6" />
+                            <div className="p-6 flex-1 flex flex-col gap-4">
+                              <div className="space-y-2">
+                                <div className="h-3 bg-[#e8e5e0] rounded animate-pulse" />
+                                <div className="h-3 bg-[#e8e5e0] rounded animate-pulse w-5/6" />
+                              </div>
+                              <div className="flex gap-1.5">
+                                {[...Array(3)].map((_, j) => (
+                                  <div key={j} className="h-6 bg-[#e8e5e0] rounded-md animate-pulse w-14" />
+                                ))}
+                              </div>
+                            </div>
+                            <div className="px-6 pb-6 flex items-center justify-between gap-3">
+                              <div className="h-4 bg-[#e8e5e0] rounded animate-pulse w-20" />
+                              <div className="h-8 bg-[#e8e5e0] rounded-xl animate-pulse w-24" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center text-[#94928d] text-sm">
+                        Scroll to load more mentors
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             )}
           </main>
         </div>
