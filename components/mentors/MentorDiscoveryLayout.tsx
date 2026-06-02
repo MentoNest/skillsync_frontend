@@ -195,10 +195,13 @@ export default function MentorDiscoveryLayout() {
       params.set('maxRate', maxRate);
     }
 
-    const query = params.toString();
-    const url = `${pathname}${query ? `?${query}` : ''}`;
-    router.replace(url, { scroll: false });
-  }, [activeCategory, activeAvailability, minRate, maxRate, pathname, router]);
+    const expectedQuery = params.toString();
+    const currentQuery = searchParams.toString();
+    if (currentQuery !== expectedQuery) {
+      const url = `${pathname}${expectedQuery ? `?${expectedQuery}` : ''}`;
+      router.replace(url);
+    }
+  }, [activeCategory, activeAvailability, minRate, maxRate, pathname, router, searchParams]);
 
   const filtered = mentors.filter(m => {
     const matchesCategory = activeCategory === 'All' || m.category === activeCategory;
