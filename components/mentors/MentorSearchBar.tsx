@@ -28,8 +28,11 @@ export default function MentorSearchBar({
   }, [query, onSearch, debounceMs]);
 
   return (
-    <div className="w-full">
+    <form role="search" aria-label="Search mentors" className="w-full" onSubmit={(e) => e.preventDefault()}>
       <div className="relative">
+        <label htmlFor="mentor-search" className="sr-only">
+          Search mentors
+        </label>
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
           <svg
             className="h-5 w-5"
@@ -48,33 +51,16 @@ export default function MentorSearchBar({
           </svg>
         </div>
         <input
+          id="mentor-search"
+          name="mentorSearch"
           type="text"
           value={query}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
           placeholder={placeholder}
-          aria-label="Search mentors"
-          style={{
-            width: '100%',
-            borderRadius: '100px',
-            border: '1.5px solid rgba(20,18,16,0.15)',
-            background: '#fff',
-            padding: '11px 16px 11px 44px',
-            fontSize: '14px',
-            color: '#141210',
-            fontFamily: "'DM Sans', sans-serif",
-            outline: 'none',
-            transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(20,18,16,0.5)';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20,18,16,0.06)';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(20,18,16,0.15)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
+          className="w-full rounded-full border border-[rgba(20,18,16,0.15)] bg-white px-4 py-3 pl-11 text-[14px] text-[#141210] font-[DM Sans] outline-none transition duration-200 focus:border-[#141210] focus:ring-2 focus:ring-[#d6d3d1]"
+          autoComplete="off"
         />
       </div>
-    </div>
+    </form>
   );
 }
