@@ -1,6 +1,4 @@
-import React from "react";
-import Navbar from "../../components/navigation/Navbar";
-import { MentorSelectionProvider } from "@/lib/context/MentorSelectionContext";
+import React from 'react';
 
 export default function PublicLayout({
   children,
@@ -8,11 +6,9 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <MentorSelectionProvider>
-      <Navbar />
-      <section className="pt-16 p-6">
-        <main>{children}</main>
-      </section>
-    </MentorSelectionProvider>
+    <div>
+      <h1>Public Layout</h1>
+      {children}
+    </div>
   );
 }
