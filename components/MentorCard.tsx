@@ -12,7 +12,7 @@ export default function MentorCard({ name, role, description, avatarUrl }: Mento
   return (
     <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
       <a href="#">
-        <Image className="rounded-t-lg" src={avatarUrl} alt={`Avatar of ${name}`} width={400} height={300} objectFit="cover" />
+        <Image className="rounded-t-lg object-cover" src={avatarUrl} alt={`Avatar of ${name}`} width={400} height={300} />
       </a>
       <div className="p-5">
         <a href="#">
