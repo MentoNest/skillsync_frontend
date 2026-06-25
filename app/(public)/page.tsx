@@ -1,5 +1,8 @@
 import { Button } from "@/components/ui/button";
 import MentorCard from "@/components/MentorCard";
+import FeaturedLearningTracks from "@/components/FeaturedLearningTracks";
+import FeaturedArticles from "@/components/FeaturedArticles";
+import ToolsAndTemplates from "@/components/ToolsAndTemplates";
 
 export default function Home() {
   const mentors = [
@@ -73,6 +76,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <FeaturedLearningTracks />
+      <FeaturedArticles />
+      <ToolsAndTemplates />
     </>
   );
 }
