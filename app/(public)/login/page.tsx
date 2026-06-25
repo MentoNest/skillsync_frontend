@@ -1,4 +1,5 @@
 import AuthLayout from '@/components/auth/AuthLayout';
+import PasswordInput from '@/components/auth/PasswordInput';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -30,12 +31,7 @@ export default function LoginPage() {
             <label htmlFor="password" className="text-sm font-medium text-gray-700">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
-            />
+            <PasswordInput id="password" placeholder="••••••••" />
           </div>
 
           <button

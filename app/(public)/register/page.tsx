@@ -1,4 +1,5 @@
 import AuthLayout from '@/components/auth/AuthLayout';
+import PasswordInput from '@/components/auth/PasswordInput';
 import Link from 'next/link';
 
 export default function RegisterPage() {
@@ -42,24 +43,14 @@ export default function RegisterPage() {
             <label htmlFor="password" className="text-sm font-medium text-gray-700">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
-            />
+            <PasswordInput id="password" placeholder="••••••••" />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
               Confirm Password
             </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
-            />
+            <PasswordInput id="confirmPassword" placeholder="••••••••" />
           </div>
 
           <button
