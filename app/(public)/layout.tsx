@@ -1,5 +1,5 @@
-import React from "react";
-import Navbar from "../../components/navigation/Navbar";
+import React from 'react';
+import Navbar from '@/components/navigation/Navbar';
 
 export default function PublicLayout({
   children,
@@ -7,11 +7,9 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <section className="pt-16 p-6">
-        <main>{children}</main>
-      </section>
-    </>
+      <main className="flex-1">{children}</main>
+    </div>
   );
 }
