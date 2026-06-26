@@ -3,6 +3,7 @@ import MentorCard from "@/components/MentorCard";
 import FeaturedLearningTracks from "@/components/FeaturedLearningTracks";
 import FeaturedArticles from "@/components/FeaturedArticles";
 import ToolsAndTemplates from "@/components/ToolsAndTemplates";
+import Image from "next/image";
 
 export default function Home() {
   const mentors = [
@@ -47,8 +48,8 @@ export default function Home() {
       </section>
       <section className="bg-white dark:bg-gray-900">
         <div className="gap-8 items-center py-8 px-4 mx-auto max-w-screen-xl xl:gap-16 md:grid md:grid-cols-2 sm:py-16 lg:px-6">
-          <img className="w-full dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup.svg" alt="dashboard image" />
-          <img className="w-full hidden dark:block" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup-dark.svg" alt="dashboard image" />
+          <Image width={1200} height={800} loading="lazy" className="w-full dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup.svg" alt="dashboard image" />
+          <Image width={1200} height={800} loading="lazy" className="w-full hidden dark:block" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup-dark.svg" alt="dashboard image" />
           <div className="mt-4 md:mt-0">
             <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Let's create more tools and ideas that brings us together.</h2>
             <p className="mb-6 font-light text-gray-500 md:text-lg dark:text-gray-400">Flowbite helps you connect with friends and communities of people who share your interests. Connecting with your friends and family as well as discovering new ones is easy with features like Groups.</p>
@@ -79,6 +80,15 @@ export default function Home() {
       <FeaturedLearningTracks />
       <FeaturedArticles />
       <ToolsAndTemplates />
+      <section className="bg-cyan-600 dark:bg-cyan-800">
+        <div className="py-12 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6 text-center">
+          <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-white">Ready to elevate your career?</h2>
+          <p className="mb-8 font-light text-cyan-100 md:text-lg">Join SkillSync today and connect with mentors who can help you achieve your goals.</p>
+          <Button variant="secondary" size="lg" className="bg-white text-cyan-700 hover:bg-gray-100 font-bold">
+            Sign Up Now
+          </Button>
+        </div>
+      </section>
     </>
   );
 }
