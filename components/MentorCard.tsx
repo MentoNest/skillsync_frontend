@@ -2,13 +2,14 @@ import React from 'react';
 import Link from 'next/link';
 
 interface MentorCardProps {
+  mentorId: string;
   name: string;
   role: string;
   description: string;
   avatarUrl: string;
 }
 
-export default function MentorCard({ name, role, description }: MentorCardProps) {
+export default function MentorCard({ mentorId, name, role, description }: MentorCardProps) {
   // Get initials for avatar fallback
   const initials = name
     .split(' ')
@@ -60,7 +61,7 @@ export default function MentorCard({ name, role, description }: MentorCardProps)
       {/* Action Footer */}
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 dark:bg-gray-800/50 dark:border-gray-750 flex items-center justify-between">
         <Link 
-          href={`/mentors/${name.toLowerCase().replace(/ /g, '-')}`}
+          href={`/mentors/${mentorId}`}
           className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 flex items-center gap-1 group/link focus:outline-none focus:underline"
           aria-label={`View profile of mentor ${name}`}
         >
