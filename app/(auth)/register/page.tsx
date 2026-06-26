@@ -1,224 +1,125 @@
-"use client";
-import { useState } from "react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, RegisterFormValues } from "@/lib/validations/auth";
-import FormField from "@/components/auth/FormField";
-
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isValid, isDirty },
-  } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-    mode: "onChange",
-  });
-
-  const password = watch("password", "");
-
-  const onSubmit = async (data: RegisterFormValues) => {
-    setIsLoading(true);
-    try {
-      console.log("Register data:", data);
-      await new Promise((r) => setTimeout(r, 1200));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Password strength indicator
-  const getPasswordStrength = (pw: string) => {
-    if (!pw) return 0;
-    let score = 0;
-    if (pw.length >= 8) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    return score;
-  };
-
-  const strength = getPasswordStrength(password);
-  const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"][strength];
-  const strengthColor = ["", "bg-red-400", "bg-amber-400", "bg-yellow-400", "bg-emerald-500"][strength];
-
-  const EyeToggle = ({
-    visible,
-    onToggle,
-  }: {
-    visible: boolean;
-    onToggle: () => void;
-  }) => (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="focus:outline-none hover:text-violet-600 transition-colors"
-      aria-label={visible ? "Hide" : "Show"}
-    >
-      {visible ? (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-      )}
-    </button>
-  );
-
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Create your account
-        </h1>
-        <p className="text-gray-500 text-sm mt-1.5">
-          Join thousands of learners and mentors on SkillSync
-        </p>
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Create an account</h1>
+      <p className="text-sm text-gray-500 mb-6">
+        Already have an account?{" "}
+        <a href="/login" className="text-purple-600 font-medium hover:underline">
+          Sign in
+        </a>
+      </p>
+
+      <div className="space-y-3">
+        <button
+          type="button"
+          className="w-full flex items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+            <path
+              d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z"
+              fill="#4285F4"
+            />
+            <path
+              d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z"
+              fill="#34A853"
+            />
+            <path
+              d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332Z"
+              fill="#FBBC05"
+            />
+            <path
+              d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58Z"
+              fill="#EA4335"
+            />
+          </svg>
+          Continue with Google
+        </button>
+
+        <button
+          type="button"
+          className="w-full flex items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="#1877F2">
+            <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.971h-1.513c-1.491 0-1.956.93-1.956 1.883v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073Z" />
+          </svg>
+          Continue with Facebook
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
-        <FormField
-          id="fullName"
-          label="Full name"
-          placeholder="Jane Doe"
-          error={errors.fullName}
-          registration={register("fullName")}
-        />
+      <div className="flex items-center my-6">
+        <div className="flex-1 border-t border-gray-200" />
+        <span className="mx-4 text-xs text-gray-400 uppercase tracking-wide">or</span>
+        <div className="flex-1 border-t border-gray-200" />
+      </div>
 
-        <FormField
-          id="email"
-          label="Email address"
-          type="email"
-          placeholder="you@example.com"
-          error={errors.email}
-          registration={register("email")}
-        />
-
-        {/* Role selector */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">I want to join as</label>
-          <div className="grid grid-cols-2 gap-3">
-            {(["mentee", "mentor"] as const).map((role) => (
-              <label
-                key={role}
-                className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer
-                  border-gray-200 hover:border-violet-400 hover:bg-violet-50/50
-                  has-[:checked]:border-violet-500 has-[:checked]:bg-violet-50
-                  transition-all duration-150"
-              >
-                <input
-                  type="radio"
-                  value={role}
-                  className="accent-violet-600"
-                  {...register("role")}
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-800 capitalize">{role}</p>
-                  <p className="text-xs text-gray-400">
-                    {role === "mentee" ? "Find & learn from mentors" : "Share your expertise"}
-                  </p>
-                </div>
-              </label>
-            ))}
-          </div>
-          {errors.role && (
-            <p role="alert" className="text-xs text-red-500 flex items-center gap-1 mt-0.5">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              {errors.role.message}
-            </p>
-          )}
+      <form className="space-y-4">
+        <div>
+          <label
+            htmlFor="fullName"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Full Name
+          </label>
+          <input
+            id="fullName"
+            type="text"
+            placeholder="John Doe"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+          />
         </div>
 
         <div>
-          <FormField
-            id="password"
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Min. 8 characters"
-            error={errors.password}
-            registration={register("password")}
-            rightElement={
-              <EyeToggle visible={showPassword} onToggle={() => setShowPassword((v) => !v)} />
-            }
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
           />
-          {/* Strength meter */}
-          {password && (
-            <div className="mt-2 flex items-center gap-2">
-              <div className="flex gap-1 flex-1">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                      i <= strength ? strengthColor : "bg-gray-200"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className={`text-xs font-medium ${
-                strength <= 1 ? "text-red-500" :
-                strength === 2 ? "text-amber-500" :
-                strength === 3 ? "text-yellow-600" : "text-emerald-600"
-              }`}>
-                {strengthLabel}
-              </span>
-            </div>
-          )}
         </div>
 
-        <FormField
-          id="confirmPassword"
-          label="Confirm password"
-          type={showConfirm ? "text" : "password"}
-          placeholder="Repeat your password"
-          error={errors.confirmPassword}
-          registration={register("confirmPassword")}
-          rightElement={
-            <EyeToggle visible={showConfirm} onToggle={() => setShowConfirm((v) => !v)} />
-          }
-        />
+        <div>
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            placeholder="••••••••"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+          />
+        </div>
 
         <button
           type="submit"
-          disabled={!isDirty || !isValid || isLoading}
-          className="w-full py-3 px-4 rounded-xl text-sm font-semibold text-white
-            bg-violet-600 hover:bg-violet-700 active:scale-[0.98]
-            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-violet-600
-            transition-all duration-150 flex items-center justify-center gap-2 shadow-sm shadow-violet-200"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
         >
-          {isLoading ? (
-            <>
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              Creating account…
-            </>
-          ) : (
-            "Create account"
-          )}
+          Create Account
         </button>
       </form>
-
-      <p className="text-center text-sm text-gray-500 mt-8">
-        Already have an account?{" "}
-        <Link
-          href="/login"
-          className="text-violet-600 font-semibold hover:text-violet-700 transition-colors"
-        >
-          Sign in
-        </Link>
-      </p>
     </div>
   );
 }
