@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import MentorCard from "@/components/MentorCard";
 import FeaturedLearningTracks from "@/components/FeaturedLearningTracks";
 import FeaturedArticles from "@/components/FeaturedArticles";
@@ -27,7 +28,13 @@ export default function Home() {
       description: "Passionate about creating beautiful and intuitive user experiences.",
       avatarUrl: "/avatars/jane.jpg",
     },
+    // Add more mentor objects as needed
   ];
+
+  const pageSize = 6;
+  const [page, setPage] = useState(1);
+  const totalPages = Math.ceil(mentors.length / pageSize);
+  const displayedMentors = mentors.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <>
@@ -113,9 +120,25 @@ export default function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {mentors.map((mentor) => (
+            {displayedMentors.map((mentor) => (
               <MentorCard key={mentor.name} {...mentor} />
             ))}
+          </div>
+          {/* Pagination Controls */}
+          <div className="flex justify-center mt-6 space-x-2">
+            <Button
+              disabled={page <= 1}
+              onClick={() => setPage(page - 1)}
+            >
+              Previous
+            </Button>
+            <span className="self-center px-2">Page {page} of {totalPages}</span>
+            <Button
+              disabled={page >= totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </section>
