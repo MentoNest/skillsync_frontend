@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 interface ArticleListItemProps {
   category: string;
@@ -8,32 +9,38 @@ interface ArticleListItemProps {
   href?: string;
 }
 
-export default function ArticleListItem({ category, title, author, readTime, href = '#' }: ArticleListItemProps) {
+export default function ArticleListItem({ category, title, author, readTime, href }: ArticleListItemProps) {
+  const articleSlug = title.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-p\-]/g, '');
+  const targetHref = href || `/resources/articles/${articleSlug}`;
+
   return (
-    <a
-      href={href}
-      className="flex items-center justify-between gap-4 py-3 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition group"
+    <Link
+      href={targetHref}
+      className="flex items-center justify-between gap-4 py-4 px-2 hover:bg-slate-50 dark:hover:bg-gray-800/60 rounded-xl transition-all group focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
     >
       <div>
-        <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+        <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide">
           {category}
         </span>
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+        <h3 className="text-base font-bold text-gray-900 dark:text-white mt-1 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
           {title}
-        </h4>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          {author} · {readTime}
+        </h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          By {author} &middot; {readTime}
         </p>
       </div>
-      <svg
-        className="w-4 h-4 text-green-500 flex-shrink-0"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-      </svg>
-    </a>
+      <div className="flex-shrink-0 p-2 bg-slate-50 rounded-full group-hover:bg-cyan-50 group-hover:text-cyan-600 dark:bg-gray-800 dark:group-hover:bg-cyan-900/30 dark:group-hover:text-cyan-400 transition-colors">
+        <svg
+          className="w-4 h-4 text-cyan-600 dark:text-cyan-400 transform group-hover:translate-x-0.5 transition-transform"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </Link>
   );
 }
