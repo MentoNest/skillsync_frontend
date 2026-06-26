@@ -1,10 +1,13 @@
-import AuthLayout from "@/components/auth/AuthLayout";
+import React from "react";
 
-
-export default function AuthRouteLayout({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthLayout>{children}</AuthLayout>;
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      {children}
+    </div>
+  );
 }
