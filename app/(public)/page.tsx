@@ -16,19 +16,19 @@ export default function Home() {
       name: "Sarah Doe",
       role: "Software Engineer @ Google",
       description: "Expert in React, Node.js, and cloud infrastructure.",
-      avatarUrl: "/avatars/sarah.jpg",
+      avatarUrl: "/avatars/sarah.svg",
     },
     {
       name: "John Smith",
       role: "Product Manager @ Microsoft",
       description: "Specializes in product strategy and user-centric design.",
-      avatarUrl: "/avatars/john.jpg",
+      avatarUrl: "/avatars/john.svg",
     },
     {
       name: "Jane Roe",
       role: "UX Designer @ Apple",
       description: "Passionate about creating beautiful and intuitive user experiences.",
-      avatarUrl: "/avatars/jane.jpg",
+      avatarUrl: "/avatars/jane.svg",
     },
     // Add more mentor objects as needed
   ];
