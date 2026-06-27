@@ -1,14 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
+import MentorAvailabilityBadge, { AvailabilityStatus } from './MentorAvailabilityBadge';
 
 interface MentorCardProps {
   name: string;
   role: string;
   description: string;
   avatarUrl: string;
+  availability?: AvailabilityStatus;
 }
 
-export default function MentorCard({ name, role, description }: MentorCardProps) {
+export default function MentorCard({ name, role, description, availability = 'available' }: MentorCardProps) {
   // Get initials for avatar fallback
   const initials = name
     .split(' ')
@@ -38,9 +40,12 @@ export default function MentorCard({ name, role, description }: MentorCardProps)
           >
             {initials}
           </div>
-          <span className="bg-cyan-50 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
-            Verified
-          </span>
+          <div className="flex flex-col items-end gap-2">
+            <span className="bg-cyan-50 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
+              Verified
+            </span>
+            <MentorAvailabilityBadge status={availability} />
+          </div>
         </div>
 
         {/* Content */}
@@ -79,10 +84,16 @@ export default function MentorCard({ name, role, description }: MentorCardProps)
         </Link>
         <Link 
           href={`/book/${name.toLowerCase().replace(/ /g, '-')}`}
-          className="text-xs font-semibold bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+          className={`text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            availability === 'fully-booked'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none dark:bg-gray-700 dark:text-gray-500'
+              : 'bg-cyan-600 hover:bg-cyan-700 text-white focus:ring-cyan-500'
+          }`}
           aria-label={`Book a session with ${name}`}
+          aria-disabled={availability === 'fully-booked'}
+          tabIndex={availability === 'fully-booked' ? -1 : undefined}
         >
-          Book Session
+          {availability === 'fully-booked' ? 'Unavailable' : 'Book Session'}
         </Link>
       </div>
     </article>
