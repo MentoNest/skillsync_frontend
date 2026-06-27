@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import LearningPath from '@/components/LearningPath';
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import MentorCard from "@/components/MentorCard";
@@ -37,6 +39,33 @@ export default function Home() {
   const displayedMentors = mentors.slice((page - 1) * pageSize, page * pageSize);
 
   return (
+    <div>
+      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-16 sm:py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6">
+              Connect, Learn & Grow with{' '}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                SkillSync
+              </span>
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-600 mb-10 leading-relaxed">
+              Bridge the gap between knowledge and experience. Find expert mentors,
+              share your expertise, or discover personalized learning paths tailored to your goals.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/login"
+                className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
+              >
+                Find a Mentor
+              </Link>
+              <Link
+                href="/register"
+                className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-200 shadow-md hover:shadow-lg"
+              >
+                Become a Mentor
+              </Link>
     <>
       {/* Hero Section */}
       <section className="bg-white dark:bg-gray-900 transition-colors" aria-label="Hero Section">
@@ -62,6 +91,8 @@ export default function Home() {
         </div>
       </section>
 
+      <LearningPath />
+    </div>
       {/* Resource Search Section (Below Hero Section) */}
       <section className="bg-slate-50 dark:bg-gray-800/40 border-y border-slate-100 dark:border-gray-800 transition-colors" aria-label="Resource Search">
         <ResourceSearchBar />
