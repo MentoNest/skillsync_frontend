@@ -1,7 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
+import MentorAvailabilityBadge, { AvailabilityStatus } from './MentorAvailabilityBadge';
 
 interface MentorCardProps {
+  mentorId: string;
   name: string;
   title: string;
   bio: string;
@@ -27,6 +29,15 @@ export default function MentorCard({
   onBook,
 }: MentorCardProps) {
   // Initials fallback when no avatar photo is provided
+  role: string;
+  description: string;
+  avatarUrl: string;
+  availability?: AvailabilityStatus;
+}
+
+export default function MentorCard({ mentorId, name, role, description }: MentorCardProps) {
+export default function MentorCard({ name, role, description, availability = 'available' }: MentorCardProps) {
+  // Get initials for avatar fallback
   const initials = name
     .split(' ')
     .map((n) => n[0])
@@ -79,6 +90,12 @@ export default function MentorCard({
           <span className="bg-cyan-50 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
             Verified
           </span>
+          <div className="flex flex-col items-end gap-2">
+            <span className="bg-cyan-50 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
+              Verified
+            </span>
+            <MentorAvailabilityBadge status={availability} />
+          </div>
         </div>
 
         {/* Name + title */}
@@ -178,6 +195,39 @@ export default function MentorCard({
             Book Session
           </button>
         </div>
+      {/* Action Footer */}
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 dark:bg-gray-800/50 dark:border-gray-750 flex items-center justify-between">
+        <Link 
+          href={`/mentors/${mentorId}`}
+          className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 flex items-center gap-1 group/link focus:outline-none focus:underline"
+          aria-label={`View profile of mentor ${name}`}
+        >
+          View Profile
+          <svg 
+            className="w-4 h-4 transform group-hover/link:translate-x-0.5 transition-transform" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2.5" 
+            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+        <Link 
+          href={`/book/${name.toLowerCase().replace(/ /g, '-')}`}
+          className={`text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            availability === 'fully-booked'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none dark:bg-gray-700 dark:text-gray-500'
+              : 'bg-cyan-600 hover:bg-cyan-700 text-white focus:ring-cyan-500'
+          }`}
+          aria-label={`Book a session with ${name}`}
+          aria-disabled={availability === 'fully-booked'}
+          tabIndex={availability === 'fully-booked' ? -1 : undefined}
+        >
+          {availability === 'fully-booked' ? 'Unavailable' : 'Book Session'}
+        </Link>
       </div>
     </article>
   );
