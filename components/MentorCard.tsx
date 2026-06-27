@@ -1,17 +1,21 @@
 import React from 'react';
 import Link from 'next/link';
+import Avatar from './Avatar';
 import MentorAvailabilityBadge, { AvailabilityStatus } from './MentorAvailabilityBadge';
 
 export interface MentorCardProps {
   mentorId: string;
+interface MentorCardProps {
+  mentorId?: string;
   name: string;
-  title: string;
-  bio: string;
-  avatarUrl?: string;
-  rating: number;
+  role: string;
+  description: string;
+  avatarUrl?: string | null;
+  rating?: number;
   reviewCount?: number;
-  pricePerSession: number;
-  skills: string[];
+  pricePerSession?: number;
+  skills?: string[];
+  availability?: AvailabilityStatus;
   profileHref?: string;
   onBook?: () => void;
   availability?: AvailabilityStatus;
@@ -20,13 +24,14 @@ export interface MentorCardProps {
 export default function MentorCard({
   mentorId,
   name,
-  title,
-  bio,
+  role,
+  description,
   avatarUrl,
   rating,
   reviewCount,
   pricePerSession,
   skills,
+  availability = 'available',
   profileHref,
   onBook,
   availability = 'available',
@@ -55,79 +60,57 @@ export default function MentorCard({
   const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
 
   const resolvedProfileHref = profileHref ?? `/mentors/${mentorId}`;
+  const resolvedProfileHref = profileHref ?? (mentorId ? `/mentors/${mentorId}` : '#');
 
   return (
     <article className="w-full max-w-sm mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 dark:bg-gray-800 dark:border-gray-700/80 flex flex-col justify-between overflow-hidden group">
-      {/* ── Card body ── */}
       <div className="p-6 flex flex-col gap-4">
         {/* Profile photo + verified badge + availability */}
         <div className="flex items-start justify-between">
-          <div className="relative">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={`Photo of ${name}`}
-                className="w-16 h-16 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
-              />
-            ) : (
-              <div
-                className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-xl font-bold shadow-md shadow-cyan-500/10 group-hover:scale-105 transition-transform duration-300`}
-                aria-hidden="true"
-              >
-                {initials}
-              </div>
-            )}
-          </div>
+          <Avatar
+            src={avatarUrl}
+            alt={`Photo of ${name}`}
+            name={name}
+            size="md"
+            variant="rounded"
+            className="group-hover:scale-105 transition-transform duration-300"
+          />
 
           <div className="flex flex-col items-end gap-2">
-            <span className="bg-cyan-50 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
-              Verified
-            </span>
             <MentorAvailabilityBadge status={availability} />
           </div>
         </div>
 
-        {/* Name + title */}
         <div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors leading-tight">
             {name}
           </h3>
           <p className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 mt-0.5">
-            {title}
+            {role}
           </p>
         </div>
 
-        {/* Rating */}
-        <div className="flex items-center gap-2" aria-label={`Rating: ${clampedRating} out of 5`}>
-          <div className="flex items-center gap-0.5" aria-hidden="true">
-            {/* Full stars */}
-            {Array.from({ length: fullStars }).map((_, i) => (
-              <StarIcon key={`full-${i}`} type="full" />
-            ))}
-            {/* Half star */}
-            {hasHalf && <StarIcon type="half" />}
-            {/* Empty stars */}
-            {Array.from({ length: emptyStars }).map((_, i) => (
-              <StarIcon key={`empty-${i}`} type="empty" />
-            ))}
-          </div>
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-            {clampedRating.toFixed(1)}
-          </span>
-          {reviewCount !== undefined && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              ({reviewCount.toLocaleString()} reviews)
+        {rating !== undefined && (
+          <div className="flex items-center gap-2" aria-label={`Rating: ${rating.toFixed(1)} out of 5`}>
+            <div className="flex items-center gap-0.5" aria-hidden="true">
+              {renderStars(rating)}
+            </div>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+              {rating.toFixed(1)}
             </span>
-          )}
-        </div>
+            {reviewCount !== undefined && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                ({reviewCount.toLocaleString()} reviews)
+              </span>
+            )}
+          </div>
+        )}
 
-        {/* Bio */}
         <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">
-          {bio}
+          {description}
         </p>
 
-        {/* Skills */}
-        {skills.length > 0 && (
+        {skills && skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5" aria-label="Skills">
             {skills.slice(0, 5).map((skill) => (
               <span
@@ -146,18 +129,17 @@ export default function MentorCard({
         )}
       </div>
 
-      {/* ── Card footer: price + CTAs ── */}
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 dark:bg-gray-800/50 dark:border-gray-700/60 flex items-center justify-between gap-3">
-        {/* Price */}
-        <div className="flex flex-col">
-          <span className="text-xs text-gray-500 dark:text-gray-400 leading-none">per session</span>
-          <span className="text-lg font-bold text-gray-900 dark:text-white leading-snug">
-            ${pricePerSession}
-          </span>
-        </div>
+        {pricePerSession !== undefined && (
+          <div className="flex flex-col">
+            <span className="text-xs text-gray-500 dark:text-gray-400 leading-none">per session</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-white leading-snug">
+              ${pricePerSession}
+            </span>
+          </div>
+        )}
 
-        {/* CTAs */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
           <Link
             href={resolvedProfileHref}
             className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 flex items-center gap-1 group/link focus:outline-none focus:underline"
@@ -177,6 +159,7 @@ export default function MentorCard({
           </Link>
 
           {availability !== 'fully-booked' && (
+          {onBook && (
             <button
               onClick={onBook}
               className="text-xs font-semibold bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
@@ -227,11 +210,38 @@ function StarIcon({ type }: StarIconProps) {
       </svg>
     );
   }
+function renderStars(rating: number) {
+  const clamped = Math.min(5, Math.max(0, rating));
+  const full = Math.floor(clamped);
+  const hasHalf = clamped - full >= 0.5;
+  const empty = 5 - full - (hasHalf ? 1 : 0);
 
-  // empty
   return (
-    <svg className="w-4 h-4 text-gray-300 dark:text-gray-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-    </svg>
+    <>
+      {Array.from({ length: full }).map((_, i) => (
+        <svg key={`full-${i}`} className="w-4 h-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ))}
+      {hasHalf && (
+        <svg key="half" className="w-4 h-4" viewBox="0 0 20 20" aria-hidden="true">
+          <defs>
+            <linearGradient id="half-fill">
+              <stop offset="50%" stopColor="#fbbf24" />
+              <stop offset="50%" stopColor="#d1d5db" />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#half-fill)"
+            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+          />
+        </svg>
+      )}
+      {Array.from({ length: empty }).map((_, i) => (
+        <svg key={`empty-${i}`} className="w-4 h-4 text-gray-300 dark:text-gray-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ))}
+    </>
   );
 }
