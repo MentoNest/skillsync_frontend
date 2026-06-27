@@ -10,9 +10,12 @@ interface ResourceCategoryCardProps {
 
 export default function ResourceCategoryCard({ icon, title, description, link }: ResourceCategoryCardProps) {
   return (
-    <Link href={link} className="group block">
+    <Link href={link} className="group block" aria-label={`Explore ${title}`}>
       <article className="flex h-full flex-col items-start gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 transition duration-300 group-hover:bg-cyan-100">
+        <div
+          className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 transition duration-300 group-hover:bg-cyan-100"
+          aria-hidden="true"
+        >
           {icon}
         </div>
         <div className="space-y-2">
