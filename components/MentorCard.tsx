@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Avatar from './Avatar';
 import MentorAvailabilityBadge, { AvailabilityStatus } from './MentorAvailabilityBadge';
 
+export interface MentorCardProps {
+  mentorId: string;
 interface MentorCardProps {
   mentorId?: string;
   name: string;
@@ -16,6 +18,7 @@ interface MentorCardProps {
   availability?: AvailabilityStatus;
   profileHref?: string;
   onBook?: () => void;
+  availability?: AvailabilityStatus;
 }
 
 export default function MentorCard({
@@ -31,12 +34,38 @@ export default function MentorCard({
   availability = 'available',
   profileHref,
   onBook,
+  availability = 'available',
 }: MentorCardProps) {
+  // Get initials for avatar fallback
+  const initials = name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  // Deterministic gradient derived from name length so it never flickers
+  const bgGradients = [
+    'from-cyan-500 to-blue-600',
+    'from-purple-500 to-indigo-600',
+    'from-emerald-500 to-teal-600',
+    'from-pink-500 to-rose-600',
+  ];
+  const gradient = bgGradients[name.length % bgGradients.length];
+
+  // Clamp rating to [0, 5] and build filled/empty star counts
+  const clampedRating = Math.min(5, Math.max(0, rating));
+  const fullStars = Math.floor(clampedRating);
+  const hasHalf = clampedRating - fullStars >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+
+  const resolvedProfileHref = profileHref ?? `/mentors/${mentorId}`;
   const resolvedProfileHref = profileHref ?? (mentorId ? `/mentors/${mentorId}` : '#');
 
   return (
     <article className="w-full max-w-sm mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 dark:bg-gray-800 dark:border-gray-700/80 flex flex-col justify-between overflow-hidden group">
       <div className="p-6 flex flex-col gap-4">
+        {/* Profile photo + verified badge + availability */}
         <div className="flex items-start justify-between">
           <Avatar
             src={avatarUrl}
@@ -129,6 +158,7 @@ export default function MentorCard({
             </svg>
           </Link>
 
+          {availability !== 'fully-booked' && (
           {onBook && (
             <button
               onClick={onBook}
@@ -138,12 +168,48 @@ export default function MentorCard({
               Book Session
             </button>
           )}
+          {availability === 'fully-booked' && (
+            <span className="text-xs font-semibold bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500 px-3.5 py-1.5 rounded-lg cursor-not-allowed">
+              Unavailable
+            </span>
+          )}
         </div>
       </div>
     </article>
   );
 }
 
+// ── Inline SVG star icons (no external icon lib dependency) ──────────────────
+
+interface StarIconProps {
+  type: 'full' | 'half' | 'empty';
+}
+
+function StarIcon({ type }: StarIconProps) {
+  if (type === 'full') {
+    return (
+      <svg className="w-4 h-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+      </svg>
+    );
+  }
+
+  if (type === 'half') {
+    return (
+      <svg className="w-4 h-4" viewBox="0 0 20 20" aria-hidden="true">
+        <defs>
+          <linearGradient id="half-fill">
+            <stop offset="50%" stopColor="#fbbf24" />
+            <stop offset="50%" stopColor="#d1d5db" />
+          </linearGradient>
+        </defs>
+        <path
+          fill="url(#half-fill)"
+          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+        />
+      </svg>
+    );
+  }
 function renderStars(rating: number) {
   const clamped = Math.min(5, Math.max(0, rating));
   const full = Math.floor(clamped);
