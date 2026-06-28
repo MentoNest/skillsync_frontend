@@ -24,12 +24,20 @@ interface MentorDiscoveryViewProps {
 
 export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProps) {
   const [selectedExpertise, setSelectedExpertise] = useState<Expertise[]>([]);
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
   const [sort, setSort] = useState<SortOption>('rating-desc');
 
   const toggleExpertise = (expertise: Expertise) => {
     setSelectedExpertise((prev) =>
       prev.includes(expertise) ? prev.filter((e) => e !== expertise) : [...prev, expertise],
     );
+  };
+
+  const clearFilters = () => {
+    setSelectedExpertise([]);
+    setMinPrice('');
+    setMaxPrice('');
   };
 
   const clearExpertise = () => setSelectedExpertise([]);
@@ -47,12 +55,27 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
   }, [mentors]);
 
   const filteredMentors = useMemo<Mentor[]>(() => {
-    const matched =
-      selectedExpertise.length === 0
-        ? mentors
-        : mentors.filter((mentor) =>
-            mentor.expertise.some((e) => selectedExpertise.includes(e)),
-          );
+    const matched = mentors.filter((mentor) => {
+      // 1. Expertise filter
+      if (
+        selectedExpertise.length > 0 &&
+        !mentor.expertise.some((e) => selectedExpertise.includes(e))
+      ) {
+        return false;
+      }
+
+      // 2. Minimum price filter
+      if (minPrice !== '' && mentor.pricePerSession < parseFloat(minPrice)) {
+        return false;
+      }
+
+      // 3. Maximum price filter
+      if (maxPrice !== '' && mentor.pricePerSession > parseFloat(maxPrice)) {
+        return false;
+      }
+
+      return true;
+    });
 
     const sorted = [...matched];
     sorted.sort((a, b) => {
@@ -70,9 +93,9 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
       }
     });
     return sorted;
-  }, [mentors, selectedExpertise, sort]);
+  }, [mentors, selectedExpertise, minPrice, maxPrice, sort]);
 
-  const hasFilters = selectedExpertise.length > 0;
+  const hasFilters = selectedExpertise.length > 0 || minPrice !== '' || maxPrice !== '';
   const resultNoun = filteredMentors.length === 1 ? 'mentor' : 'mentors';
 
   return (
@@ -92,7 +115,7 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
                 {hasFilters && (
                   <button
                     type="button"
-                    onClick={clearExpertise}
+                    onClick={clearFilters}
                     className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 focus:outline-none focus:underline"
                     aria-label="Clear all mentor filters"
                   >
