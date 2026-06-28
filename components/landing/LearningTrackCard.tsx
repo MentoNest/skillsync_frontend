@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface LearningTrackCardProps {
   title: string;
@@ -24,11 +25,13 @@ export default function LearningTrackCard({
       <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg group-hover:border-cyan-300 overflow-hidden">
         {/* Image header */}
         <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-          <div
-            className="h-full w-full bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
-            style={{ backgroundImage: `url("${imageSrc}")` }}
-            role="img"
-            aria-label={`Illustration for ${title}`}
+          <Image
+            src={imageSrc}
+            alt={`Illustration for ${title}`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
           />
           <span className="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-700 shadow-sm backdrop-blur-sm">
             {category}
