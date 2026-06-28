@@ -135,11 +135,12 @@ const initialEvents: Event[] = [
 ];
 
 const initialCategories: Category[] = [
-  { id: 'career-advice', name: 'Career Advice', count: 156 },
-  { id: 'technical', name: 'Technical', count: 203 },
-  { id: 'personal-branding', name: 'Personal Branding', count: 89 },
+  { id: 'career-growth', name: 'Career Growth', count: 156 },
+  { id: 'leadership', name: 'Leadership', count: 89 },
+  { id: 'interview-prep', name: 'Interview Prep', count: 124 },
+  { id: 'salary-compensation', name: 'Salary & Compensation', count: 98 },
+  { id: 'work-life-balance', name: 'Work-Life Balance', count: 76 },
   { id: 'networking', name: 'Networking', count: 67 },
-  { id: 'leadership', name: 'Leadership', count: 45 }
 ];
 
 const initialState: CommunityState = {

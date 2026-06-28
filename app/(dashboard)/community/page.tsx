@@ -5,6 +5,7 @@ import { SortOption } from '@/components/ui/discussion-sort';
 import { StatisticCard } from '@/components/ui/statistic-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { UpcomingEventsWidget } from '@/components/ui/upcoming-events-widget';
+import { CategoriesWidget } from '@/components/ui/categories-widget';
 import { Button } from '@/components/ui/button';
 import { useCommunity } from './community-context';
 
@@ -147,41 +148,13 @@ export default function CommunityPage() {
 
         {/* Sidebar */}
         <div className="flex flex-col gap-6 order-2 lg:order-2">
-          {/* Categories */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Categories</h2>
-            <div className="space-y-2">
-              <button
-                onClick={() => setCategoryFilter(null)}
-                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                  filters.category === null 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                <span className="flex justify-between">
-                  <span>All Discussions</span>
-                  <span className="text-gray-500">{statistics.totalDiscussions}</span>
-                </span>
-              </button>
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setCategoryFilter(category.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                    filters.category === category.id 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'hover:bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  <span className="flex justify-between">
-                    <span>{category.name}</span>
-                    <span className="text-gray-500">{category.count}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Categories Widget */}
+          <CategoriesWidget
+            categories={categories}
+            selectedCategory={filters.category}
+            onCategorySelect={setCategoryFilter}
+            totalDiscussions={statistics.totalDiscussions}
+          />
 
           {/* Upcoming Events Widget */}
           <UpcomingEventsWidget 
