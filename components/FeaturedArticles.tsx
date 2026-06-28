@@ -17,7 +17,7 @@ export default function FeaturedArticles() {
             Featured Articles
           </h2>
           <Link 
-            href="/resources" 
+            href="/resources/articles" 
             className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 transition-colors focus:outline-none focus:underline"
           >
             View All Articles &rarr;

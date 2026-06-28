@@ -142,7 +142,7 @@ export default function LearningPathResourcesSection() {
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold text-slate-900">Learning tracks</h3>
             <Link
-              href="/resources#tracks"
+              href="/resources/tracks"
               className="text-sm font-medium text-cyan-600 transition hover:text-cyan-500"
             >
               View all &rarr;

@@ -24,12 +24,20 @@ interface MentorDiscoveryViewProps {
 
 export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProps) {
   const [selectedExpertise, setSelectedExpertise] = useState<Expertise[]>([]);
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
   const [sort, setSort] = useState<SortOption>('rating-desc');
 
   const toggleExpertise = (expertise: Expertise) => {
     setSelectedExpertise((prev) =>
       prev.includes(expertise) ? prev.filter((e) => e !== expertise) : [...prev, expertise],
     );
+  };
+
+  const clearFilters = () => {
+    setSelectedExpertise([]);
+    setMinPrice('');
+    setMaxPrice('');
   };
 
   const clearExpertise = () => setSelectedExpertise([]);
@@ -47,12 +55,27 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
   }, [mentors]);
 
   const filteredMentors = useMemo<Mentor[]>(() => {
-    const matched =
-      selectedExpertise.length === 0
-        ? mentors
-        : mentors.filter((mentor) =>
-            mentor.expertise.some((e) => selectedExpertise.includes(e)),
-          );
+    const matched = mentors.filter((mentor) => {
+      // 1. Expertise filter
+      if (
+        selectedExpertise.length > 0 &&
+        !mentor.expertise.some((e) => selectedExpertise.includes(e))
+      ) {
+        return false;
+      }
+
+      // 2. Minimum price filter
+      if (minPrice !== '' && mentor.pricePerSession < parseFloat(minPrice)) {
+        return false;
+      }
+
+      // 3. Maximum price filter
+      if (maxPrice !== '' && mentor.pricePerSession > parseFloat(maxPrice)) {
+        return false;
+      }
+
+      return true;
+    });
 
     const sorted = [...matched];
     sorted.sort((a, b) => {
@@ -70,9 +93,9 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
       }
     });
     return sorted;
-  }, [mentors, selectedExpertise, sort]);
+  }, [mentors, selectedExpertise, minPrice, maxPrice, sort]);
 
-  const hasFilters = selectedExpertise.length > 0;
+  const hasFilters = selectedExpertise.length > 0 || minPrice !== '' || maxPrice !== '';
   const resultNoun = filteredMentors.length === 1 ? 'mentor' : 'mentors';
 
   return (
@@ -92,7 +115,7 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
                 {hasFilters && (
                   <button
                     type="button"
-                    onClick={clearExpertise}
+                    onClick={clearFilters}
                     className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 focus:outline-none focus:underline"
                     aria-label="Clear all mentor filters"
                   >
@@ -106,6 +129,42 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
                 onToggle={toggleExpertise}
                 onClear={clearExpertise}
               />
+              <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-6">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                  Hourly Rate ($)
+                </h3>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <label htmlFor="min-price" className="sr-only">
+                      Minimum price
+                    </label>
+                    <input
+                      id="min-price"
+                      type="number"
+                      min="0"
+                      placeholder="Min"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      className="block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+                    />
+                  </div>
+                  <span className="text-gray-400 text-sm">to</span>
+                  <div className="flex-1">
+                    <label htmlFor="max-price" className="sr-only">
+                      Maximum price
+                    </label>
+                    <input
+                      id="max-price"
+                      type="number"
+                      min="0"
+                      placeholder="Max"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      className="block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </aside>

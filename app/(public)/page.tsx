@@ -44,34 +44,6 @@ const mentors = [
   },
 ];
 export default function Home() {
-  const mentors = [
-    {
-      name: "Sarah Doe",
-      role: "Software Engineer @ Google",
-      description: "Expert in React, Node.js, and cloud infrastructure.",
-      avatarUrl: "/avatars/sarah.svg",
-    },
-    {
-      name: "John Smith",
-      role: "Product Manager @ Microsoft",
-      description: "Specializes in product strategy and user-centric design.",
-      avatarUrl: "/avatars/john.svg",
-    },
-    {
-      name: "Jane Roe",
-      role: "UX Designer @ Apple",
-      description: "Passionate about creating beautiful and intuitive user experiences.",
-      avatarUrl: "/avatars/jane.svg",
-    },
-    // Add more mentor objects as needed
-  ];
-
-  const pageSize = 6;
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(mentors.length / pageSize);
-  const displayedMentors = mentors.slice((page - 1) * pageSize, page * pageSize);
-
-export default function Home() {
   return (
     <>
       {/* Hero Section */}
@@ -127,6 +99,7 @@ export default function Home() {
               width={1200}
               height={800}
               loading="lazy"
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="w-full h-auto max-w-md md:max-w-full rounded-2xl shadow-md border border-gray-100 dark:hidden"
               src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup.svg"
               alt="SkillSync web platform interface preview showing mentors list and schedule builder"
@@ -135,6 +108,7 @@ export default function Home() {
               width={1200}
               height={800}
               loading="lazy"
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="w-full h-auto max-w-md md:max-w-full rounded-2xl shadow-md border border-gray-800 hidden dark:block"
               src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup-dark.svg"
               alt="SkillSync dark mode platform interface preview showcasing career progress dashboard"
