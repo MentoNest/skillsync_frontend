@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import StarRating from '@/components/ui/StarRating';
 import MentorAvailabilityBadge from '@/components/MentorAvailabilityBadge';
 import type { Mentor } from './data';
@@ -54,11 +55,13 @@ export default function DiscoveryMentorCard({ mentor }: DiscoveryMentorCardProps
         <div className="flex items-start justify-between gap-3">
           <div className="relative shrink-0">
             {mentor.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- dynamic avatar URLs may come from external CDNs without remotePatterns configured.
-              <img
+              <Image
                 src={mentor.avatarUrl}
                 alt={`Photo of ${mentor.name}`}
-                className="w-14 h-14 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
+                width={56}
+                height={56}
+                loading="lazy"
+                className="rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
               <div
