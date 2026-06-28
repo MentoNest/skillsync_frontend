@@ -5,19 +5,7 @@ import MentorCard from '@/components/MentorCard';
 import MentorSearchBar from '@/components/MentorSearchBar';
 import { Button } from '@/components/ui/button';
 
-interface Mentor {
-  mentorId: string;
-  name: string;
-  title: string;
-  bio: string;
-  avatarUrl?: string;
-  rating: number;
-  reviewCount?: number;
-  pricePerSession: number;
-  skills: string[];
-  availability?: 'available' | 'busy' | 'fully-booked';
-  isFeatured?: boolean;
-}
+import { Mentor } from '@/lib/types';
 
 const mentors: Mentor[] = [
   {

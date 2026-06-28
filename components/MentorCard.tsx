@@ -1,25 +1,4 @@
-import React from 'react';
-import Link from 'next/link';
-import Avatar from './Avatar';
-import MentorAvailabilityBadge, { AvailabilityStatus } from './MentorAvailabilityBadge';
-
-export interface MentorCardProps {
-  mentorId?: string;
-  name: string;
-  role?: string;
-  title?: string;
-  description?: string;
-  bio?: string;
-  avatarUrl?: string | null;
-  rating?: number;
-  reviewCount?: number;
-  pricePerSession?: number;
-  skills?: string[];
-  availability?: AvailabilityStatus;
-  isFeatured?: boolean;
-  profileHref?: string;
-  onBook?: () => void;
-}
+import { Mentor } from '@/lib/types';
 
 export default function MentorCard({
   mentorId,
@@ -37,7 +16,7 @@ export default function MentorCard({
   isFeatured,
   profileHref,
   onBook,
-}: MentorCardProps) {
+}: Mentor) {
   const resolvedRole = role ?? title ?? '';
   const resolvedDescription = description ?? bio ?? '';
 

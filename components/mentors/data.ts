@@ -34,23 +34,7 @@ export const EXPERTISE_OPTIONS = [
   'Engineering Leadership',
 ] as const satisfies readonly Expertise[];
 
-export interface Mentor {
-  id: string;
-  name: string;
-  title: string;
-  company: string;
-  bio: string;
-  avatarUrl?: string;
-  rating: number;
-  reviewCount: number;
-  /** Price in USD per one mentoring session. */
-  pricePerSession: number;
-  skills: string[];
-  expertise: Expertise[];
-  experienceYears: number;
-  availability: AvailabilityStatus;
-  isFeatured?: boolean;
-}
+import { Mentor } from '@/lib/types';
 
 export const MOCK_MENTORS: Mentor[] = [
   {

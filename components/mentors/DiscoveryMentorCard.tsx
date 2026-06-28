@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import StarRating from '@/components/ui/StarRating';
 import MentorAvailabilityBadge from '@/components/MentorAvailabilityBadge';
-import type { Mentor } from './data';
+import type { Mentor } from '@/lib/types';
 
 interface DiscoveryMentorCardProps {
   mentor: Mentor;
