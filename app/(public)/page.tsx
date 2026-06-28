@@ -99,6 +99,7 @@ export default function Home() {
               width={1200}
               height={800}
               loading="lazy"
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="w-full h-auto max-w-md md:max-w-full rounded-2xl shadow-md border border-gray-100 dark:hidden"
               src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup.svg"
               alt="SkillSync web platform interface preview showing mentors list and schedule builder"
@@ -107,6 +108,7 @@ export default function Home() {
               width={1200}
               height={800}
               loading="lazy"
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="w-full h-auto max-w-md md:max-w-full rounded-2xl shadow-md border border-gray-800 hidden dark:block"
               src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup-dark.svg"
               alt="SkillSync dark mode platform interface preview showcasing career progress dashboard"
