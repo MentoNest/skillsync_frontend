@@ -2,75 +2,128 @@
 
 import React, { useState, useMemo } from 'react';
 import { DiscussionSort, SortOption } from '@/components/ui/discussion-sort';
+import DiscussionCard from '@/components/community/DiscussionCard';
+import Toast from '@/components/ui/toast';
+import type { DiscussionMetadata } from '@/lib/community-types';
 
-interface Discussion {
-  id: string;
-  title: string;
-  author: string;
-  createdAt: Date;
-  replies: number;
-  likes: number;
-  trending: number;
-}
-
-const mockDiscussions: Discussion[] = [
+const mockDiscussions: DiscussionMetadata[] = [
   {
     id: '1',
     title: 'How to transition into a career in UX design?',
-    author: 'Sarah Johnson',
-    createdAt: new Date('2025-06-25'),
-    replies: 12,
-    likes: 24,
-    trending: 85
+    author: {
+      id: 'user-1',
+      name: 'Sarah Johnson',
+      avatarUrl: null,
+      role: 'UX Designer'
+    },
+    category: 'Career Advice',
+    createdAt: '2025-06-25T10:00:00Z',
+    likeCount: 24,
+    commentCount: 12,
+    viewCount: 156,
+    isLiked: false,
+    isBookmarked: false,
+    tags: ['career', 'ux', 'transition']
   },
   {
     id: '2',
     title: 'Best resources for learning cloud computing',
-    author: 'Mike Chen',
-    createdAt: new Date('2025-06-27'),
-    replies: 8,
-    likes: 18,
-    trending: 72
+    author: {
+      id: 'user-2',
+      name: 'Mike Chen',
+      avatarUrl: null,
+      role: 'Cloud Architect'
+    },
+    category: 'Learning Resources',
+    createdAt: '2025-06-27T14:30:00Z',
+    likeCount: 18,
+    commentCount: 8,
+    viewCount: 89,
+    isLiked: false,
+    isBookmarked: false,
+    tags: ['cloud', 'aws', 'learning']
   },
   {
     id: '3',
     title: 'Tips for negotiating a salary raise',
-    author: 'Emily Rodriguez',
-    createdAt: new Date('2025-06-28'),
-    replies: 23,
-    likes: 31,
-    trending: 95
+    author: {
+      id: 'current-user',
+      name: 'Emily Rodriguez',
+      avatarUrl: null,
+      role: 'Product Manager'
+    },
+    category: 'Career Advice',
+    createdAt: '2025-06-28T09:15:00Z',
+    likeCount: 31,
+    commentCount: 23,
+    viewCount: 234,
+    isLiked: false,
+    isBookmarked: false,
+    tags: ['salary', 'negotiation', 'career']
   },
   {
     id: '4',
     title: 'How to build a personal brand as a developer',
-    author: 'James Wilson',
-    createdAt: new Date('2025-06-26'),
-    replies: 15,
-    likes: 42,
-    trending: 78
+    author: {
+      id: 'user-4',
+      name: 'James Wilson',
+      avatarUrl: null,
+      role: 'Senior Developer'
+    },
+    category: 'Personal Development',
+    createdAt: '2025-06-26T16:45:00Z',
+    likeCount: 42,
+    commentCount: 15,
+    viewCount: 312,
+    isLiked: false,
+    isBookmarked: false,
+    tags: ['branding', 'developer', 'growth']
   }
 ];
 
 export default function CommunityPage() {
   const [currentSort, setCurrentSort] = useState<SortOption>('trending');
+  const [discussions, setDiscussions] = useState<DiscussionMetadata[]>(mockDiscussions);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const currentUserId = 'current-user';
 
   const sortedDiscussions = useMemo(() => {
-    const discussions = [...mockDiscussions];
+    const discussionsList = [...discussions];
     
     switch (currentSort) {
       case 'trending':
-        return discussions.sort((a, b) => b.trending - a.trending);
+        return discussionsList.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
       case 'latest':
-        return discussions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return discussionsList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       case 'most-replies':
-        return discussions.sort((a, b) => b.replies - a.replies);
+        return discussionsList.sort((a, b) => b.commentCount - a.commentCount);
       case 'most-liked':
-        return discussions.sort((a, b) => b.likes - a.likes);
+        return discussionsList.sort((a, b) => b.likeCount - a.likeCount);
       default:
-        return discussions;
+        return discussionsList;
     }
-  }, [currentSort]);
+  }, [currentSort, discussions]);
+
+  const handleDelete = (id: string) => {
+    setDiscussions(prev => prev.filter(d => d.id !== id));
+    setToast({ message: 'Discussion deleted successfully', type: 'success' });
+  };
+
+  const handleLike = (id: string) => {
+    setDiscussions(prev => prev.map(d => 
+      d.id === id 
+        ? { ...d, isLiked: !d.isLiked, likeCount: d.isLiked ? d.likeCount - 1 : d.likeCount + 1 }
+        : d
+    ));
+  };
+
+  const handleBookmark = (id: string) => {
+    setDiscussions(prev => prev.map(d => 
+      d.id === id 
+        ? { ...d, isBookmarked: !d.isBookmarked }
+        : d
+    ));
+  };
 
   return (
     <div>
@@ -90,26 +143,22 @@ export default function CommunityPage() {
           </div>
           
           <div className="space-y-4">
-            {sortedDiscussions.map((discussion) => (
-              <div key={discussion.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <h3 className="font-medium text-gray-900 mb-2">{discussion.title}</h3>
-                <p className="text-sm text-gray-600 mb-3">Started by {discussion.author}</p>
-                <div className="flex gap-4 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    {discussion.replies} replies
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    {discussion.likes} likes
-                  </span>
-                </div>
+            {sortedDiscussions.length > 0 ? (
+              sortedDiscussions.map((discussion) => (
+                <DiscussionCard
+                  key={discussion.id}
+                  discussion={discussion}
+                  onLike={handleLike}
+                  onBookmark={handleBookmark}
+                  onDelete={handleDelete}
+                  currentUserId={currentUserId}
+                />
+              ))
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <p>No discussions yet.</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -132,6 +181,14 @@ export default function CommunityPage() {
           </div>
         </div>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }
