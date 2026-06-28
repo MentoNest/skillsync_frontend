@@ -44,34 +44,6 @@ const mentors = [
   },
 ];
 export default function Home() {
-  const mentors = [
-    {
-      name: "Sarah Doe",
-      role: "Software Engineer @ Google",
-      description: "Expert in React, Node.js, and cloud infrastructure.",
-      avatarUrl: "/avatars/sarah.svg",
-    },
-    {
-      name: "John Smith",
-      role: "Product Manager @ Microsoft",
-      description: "Specializes in product strategy and user-centric design.",
-      avatarUrl: "/avatars/john.svg",
-    },
-    {
-      name: "Jane Roe",
-      role: "UX Designer @ Apple",
-      description: "Passionate about creating beautiful and intuitive user experiences.",
-      avatarUrl: "/avatars/jane.svg",
-    },
-    // Add more mentor objects as needed
-  ];
-
-  const pageSize = 6;
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(mentors.length / pageSize);
-  const displayedMentors = mentors.slice((page - 1) * pageSize, page * pageSize);
-
-export default function Home() {
   return (
     <>
       {/* Hero Section */}
