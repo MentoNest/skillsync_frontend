@@ -113,7 +113,7 @@ export default function CommunityPage() {
           </div>
         </div>
 
-        {/* Sidebar placeholders */}
+        {/* Sidebar */}
         <div className="flex flex-col gap-6">
           {/* Events */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -128,6 +128,29 @@ export default function CommunityPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Members</h2>
             <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500">
               <p className="text-sm">Member activity coming soon.</p>
+            </div>
+          </div>
+
+          {/* Community Statistics Widget */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Community Statistics</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">1,247</p>
+                <p className="text-xs text-gray-600 mt-1">Total Members</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">89</p>
+                <p className="text-xs text-gray-600 mt-1">Active Discussions</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">542</p>
+                <p className="text-xs text-gray-600 mt-1">Total Discussions</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">12</p>
+                <p className="text-xs text-gray-600 mt-1">Events This Month</p>
+              </div>
             </div>
           </div>
         </div>
