@@ -5,18 +5,7 @@ import MentorCard from '@/components/MentorCard';
 import MentorSearchBar from '@/components/MentorSearchBar';
 import { Button } from '@/components/ui/button';
 
-interface Mentor {
-  mentorId: string;
-  name: string;
-  title: string;
-  bio: string;
-  avatarUrl?: string;
-  rating: number;
-  reviewCount?: number;
-  pricePerSession: number;
-  skills: string[];
-  availability?: 'available' | 'busy' | 'fully-booked';
-}
+import { Mentor } from '@/lib/types';
 
 const mentors: Mentor[] = [
   {
@@ -29,6 +18,7 @@ const mentors: Mentor[] = [
     reviewCount: 124,
     pricePerSession: 85,
     skills: ['React', 'Node.js', 'Cloud', 'System Design'],
+    isFeatured: true,
   },
   {
     mentorId: 'john-smith',
@@ -99,15 +89,28 @@ const PAGE_SIZE = 6;
 export default function MentorsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+
+  const toggleBookmark = (mentorId: string) => {
+    setBookmarkedMentors((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(mentorId)) {
+        newSet.delete(mentorId);
+      } else {
+        newSet.add(mentorId);
+      }
+      return newSet;
+    });
+  };
 
   const filteredMentors = mentors.filter((mentor) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return (
       mentor.name.toLowerCase().includes(q) ||
-      mentor.title.toLowerCase().includes(q) ||
-      mentor.bio.toLowerCase().includes(q) ||
-      mentor.skills.some((skill) => skill.toLowerCase().includes(q))
+      (mentor.title && mentor.title.toLowerCase().includes(q)) ||
+      (mentor.bio && mentor.bio.toLowerCase().includes(q)) ||
+      (mentor.skills && mentor.skills.some((skill) => skill.toLowerCase().includes(q)))
     );
   });
 
@@ -139,7 +142,12 @@ export default function MentorsPage() {
         {displayedMentors.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {displayedMentors.map((mentor) => (
-              <MentorCard key={mentor.mentorId} {...mentor} />
+              <MentorCard
+                key={mentor.mentorId}
+                {...mentor}
+                isBookmarked={bookmarkedMentors.has(mentor.mentorId as string)}
+                onToggleBookmark={() => toggleBookmark(mentor.mentorId as string)}
+              />
             ))}
           </div>
         ) : (

@@ -27,6 +27,19 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sort, setSort] = useState<SortOption>('rating-desc');
+  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+
+  const toggleBookmark = (mentorId: string) => {
+    setBookmarkedMentors((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(mentorId)) {
+        newSet.delete(mentorId);
+      } else {
+        newSet.add(mentorId);
+      }
+      return newSet;
+    });
+  };
 
   const toggleExpertise = (expertise: Expertise) => {
     setSelectedExpertise((prev) =>
@@ -262,7 +275,13 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
             >
               {filteredMentors.map((mentor) => (
                 <li key={mentor.id} className="h-full">
-                  <DiscoveryMentorCard mentor={mentor} />
+                  <DiscoveryMentorCard
+                    mentor={{
+                      ...mentor,
+                      isBookmarked: bookmarkedMentors.has(mentor.id as string),
+                      onToggleBookmark: () => toggleBookmark(mentor.id as string),
+                    }}
+                  />
                 </li>
               ))}
             </ul>
@@ -272,4 +291,3 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
     </div>
   );
 }
-
