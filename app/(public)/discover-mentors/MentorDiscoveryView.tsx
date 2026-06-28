@@ -129,6 +129,42 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
                 onToggle={toggleExpertise}
                 onClear={clearExpertise}
               />
+              <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-6">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                  Hourly Rate ($)
+                </h3>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <label htmlFor="min-price" className="sr-only">
+                      Minimum price
+                    </label>
+                    <input
+                      id="min-price"
+                      type="number"
+                      min="0"
+                      placeholder="Min"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      className="block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+                    />
+                  </div>
+                  <span className="text-gray-400 text-sm">to</span>
+                  <div className="flex-1">
+                    <label htmlFor="max-price" className="sr-only">
+                      Maximum price
+                    </label>
+                    <input
+                      id="max-price"
+                      type="number"
+                      min="0"
+                      placeholder="Max"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      className="block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </aside>
