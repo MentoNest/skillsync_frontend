@@ -21,9 +21,19 @@ interface Category {
   count: number;
 }
 
+interface Event {
+  id: string;
+  title: string;
+  host: string;
+  date: string;
+  time: string;
+  registrationCount?: number;
+}
+
 interface CommunityState {
   discussions: Discussion[];
   categories: Category[];
+  events: Event[];
   filters: {
     sortBy: DiscussionSort;
     category: string | null;
@@ -97,6 +107,33 @@ const initialDiscussions: Discussion[] = [
   }
 ];
 
+const initialEvents: Event[] = [
+  {
+    id: '1',
+    title: 'UX Design Career Workshop',
+    host: 'Sarah Johnson',
+    date: '2025-07-05',
+    time: '2:00 PM EST',
+    registrationCount: 42
+  },
+  {
+    id: '2',
+    title: 'Cloud Computing AMA',
+    host: 'Mike Chen',
+    date: '2025-07-08',
+    time: '1:00 PM EST',
+    registrationCount: 28
+  },
+  {
+    id: '3',
+    title: 'Salary Negotiation Strategies',
+    host: 'Emily Rodriguez',
+    date: '2025-07-12',
+    time: '3:00 PM EST',
+    registrationCount: 56
+  }
+];
+
 const initialCategories: Category[] = [
   { id: 'career-advice', name: 'Career Advice', count: 156 },
   { id: 'technical', name: 'Technical', count: 203 },
@@ -108,6 +145,7 @@ const initialCategories: Category[] = [
 const initialState: CommunityState = {
   discussions: initialDiscussions,
   categories: initialCategories,
+  events: initialEvents,
   filters: {
     sortBy: 'trending',
     category: null,
@@ -196,6 +234,7 @@ interface CommunityContextType extends CommunityState {
   updateDiscussionLikes: (id: string, likes: number) => void;
   updateDiscussionReplies: (id: string, replies: number) => void;
   getFilteredDiscussions: () => Discussion[];
+  handleEventRegistration: (eventId: string) => void;
 }
 
 const CommunityContext = createContext<CommunityContextType | undefined>(undefined);
@@ -268,6 +307,12 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleEventRegistration = (eventId: string) => {
+    // Increment registration count for the event
+    // This is a placeholder for future API integration
+    console.log(`Registered for event: ${eventId}`);
+  };
+
   return (
     <CommunityContext.Provider
       value={{
@@ -280,7 +325,8 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
         addDiscussion,
         updateDiscussionLikes,
         updateDiscussionReplies,
-        getFilteredDiscussions
+        getFilteredDiscussions,
+        handleEventRegistration
       }}
     >
       {children}

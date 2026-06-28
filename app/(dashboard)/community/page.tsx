@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { SortOption } from '@/components/ui/discussion-sort';
 import { StatisticCard } from '@/components/ui/statistic-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { UpcomingEventsWidget } from '@/components/ui/upcoming-events-widget';
 import { Button } from '@/components/ui/button';
 import { useCommunity } from './community-context';
 
@@ -46,8 +47,10 @@ export default function CommunityPage() {
     setSortBy,
     setCategoryFilter,
     addDiscussion,
+    handleEventRegistration,
     statistics,
     categories,
+    events,
     loading,
     error
   } = useCommunity();
@@ -179,6 +182,12 @@ export default function CommunityPage() {
               ))}
             </div>
           </div>
+
+          {/* Upcoming Events Widget */}
+          <UpcomingEventsWidget 
+            events={events}
+            onRegister={handleEventRegistration}
+          />
           
           {/* Events */}
           <div className="bg-white rounded-lg shadow p-6">
