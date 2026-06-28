@@ -1,76 +1,21 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { DiscussionSort, SortOption } from '@/components/ui/discussion-sort';
-
-interface Discussion {
-  id: string;
-  title: string;
-  author: string;
-  createdAt: Date;
-  replies: number;
-  likes: number;
-  trending: number;
-}
-
-const mockDiscussions: Discussion[] = [
-  {
-    id: '1',
-    title: 'How to transition into a career in UX design?',
-    author: 'Sarah Johnson',
-    createdAt: new Date('2025-06-25'),
-    replies: 12,
-    likes: 24,
-    trending: 85
-  },
-  {
-    id: '2',
-    title: 'Best resources for learning cloud computing',
-    author: 'Mike Chen',
-    createdAt: new Date('2025-06-27'),
-    replies: 8,
-    likes: 18,
-    trending: 72
-  },
-  {
-    id: '3',
-    title: 'Tips for negotiating a salary raise',
-    author: 'Emily Rodriguez',
-    createdAt: new Date('2025-06-28'),
-    replies: 23,
-    likes: 31,
-    trending: 95
-  },
-  {
-    id: '4',
-    title: 'How to build a personal brand as a developer',
-    author: 'James Wilson',
-    createdAt: new Date('2025-06-26'),
-    replies: 15,
-    likes: 42,
-    trending: 78
-  }
-];
+import React from 'react';
+import { SortOption } from '@/components/ui/discussion-sort';
+import { useCommunity } from './community-context';
 
 export default function CommunityPage() {
-  const [currentSort, setCurrentSort] = useState<SortOption>('trending');
+  const {
+    getFilteredDiscussions,
+    filters,
+    setSortBy,
+    statistics,
+    categories,
+    loading,
+    error
+  } = useCommunity();
 
-  const sortedDiscussions = useMemo(() => {
-    const discussions = [...mockDiscussions];
-    
-    switch (currentSort) {
-      case 'trending':
-        return discussions.sort((a, b) => b.trending - a.trending);
-      case 'latest':
-        return discussions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-      case 'most-replies':
-        return discussions.sort((a, b) => b.replies - a.replies);
-      case 'most-liked':
-        return discussions.sort((a, b) => b.likes - a.likes);
-      default:
-        return discussions;
-    }
-  }, [currentSort]);
+  const sortedDiscussions = getFilteredDiscussions();
 
   return (
     <div>
@@ -86,7 +31,10 @@ export default function CommunityPage() {
         <div className="lg:col-span-2 bg-white rounded-lg shadow p-6 order-1 lg:order-1">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Discussions</h2>
-            <DiscussionSort currentSort={currentSort} onSortChange={setCurrentSort} />
+            <DiscussionSort 
+              currentSort={filters.sortBy as SortOption} 
+              onSortChange={(sort) => setSortBy(sort)} 
+            />
           </div>
           
           <div className="space-y-4">
@@ -115,6 +63,42 @@ export default function CommunityPage() {
 
         {/* Sidebar */}
         <div className="flex flex-col gap-6 order-2 lg:order-2">
+          {/* Categories */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Categories</h2>
+            <div className="space-y-2">
+              <button
+                onClick={() => setCategoryFilter(null)}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                  filters.category === null 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                <span className="flex justify-between">
+                  <span>All Discussions</span>
+                  <span className="text-gray-500">{statistics.totalDiscussions}</span>
+                </span>
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setCategoryFilter(category.id)}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                    filters.category === category.id 
+                      ? 'bg-blue-100 text-blue-700' 
+                      : 'hover:bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <span className="flex justify-between">
+                    <span>{category.name}</span>
+                    <span className="text-gray-500">{category.count}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
           {/* Events */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h2>
@@ -136,19 +120,19 @@ export default function CommunityPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Community Statistics</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-gray-900">1,247</p>
+                <p className="text-2xl font-bold text-gray-900">{statistics.totalMembers.toLocaleString()}</p>
                 <p className="text-xs text-gray-600 mt-1">Total Members</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-gray-900">89</p>
+                <p className="text-2xl font-bold text-gray-900">{statistics.activeDiscussions}</p>
                 <p className="text-xs text-gray-600 mt-1">Active Discussions</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-gray-900">542</p>
+                <p className="text-2xl font-bold text-gray-900">{statistics.totalDiscussions}</p>
                 <p className="text-xs text-gray-600 mt-1">Total Discussions</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-gray-900">12</p>
+                <p className="text-2xl font-bold text-gray-900">{statistics.eventsThisMonth}</p>
                 <p className="text-xs text-gray-600 mt-1">Events This Month</p>
               </div>
             </div>
