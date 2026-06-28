@@ -11,10 +11,16 @@ import {
   type Mentor,
 } from '@/components/mentors/data';
 
-type SortOption = 'rating-desc' | 'price-asc' | 'price-desc' | 'experience-desc';
+type SortOption =
+  | 'rating-desc'
+  | 'price-asc'
+  | 'price-desc'
+  | 'experience-desc'
+  | 'popularity-desc';
 
 const SORT_OPTIONS: ReadonlyArray<{ value: SortOption; label: string }> = [
   { value: 'rating-desc', label: 'Highest rated' },
+  { value: 'popularity-desc', label: 'Most popular' },
   { value: 'price-asc', label: 'Price: low to high' },
   { value: 'price-desc', label: 'Price: high to low' },
   { value: 'experience-desc', label: 'Most experienced' },
@@ -120,6 +126,8 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
           return b.pricePerSession - a.pricePerSession;
         case 'experience-desc':
           return b.experienceYears - a.experienceYears;
+        case 'popularity-desc':
+          return b.reviewCount - a.reviewCount;
         default:
           return 0;
       }
