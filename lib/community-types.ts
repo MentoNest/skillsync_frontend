@@ -26,3 +26,18 @@ export interface DiscussionCardProps {
   onBookmark?: (id: string) => void;
   onClick?: (id: string) => void;
 }
+
+export interface Comment {
+  id: string;
+  author: Author;
+  content: string;
+  createdAt: string;
+  likeCount: number;
+  isLiked?: boolean;
+  replies?: Comment[];
+}
+
+export interface Discussion extends DiscussionMetadata {
+  content: string;
+  comments: Comment[];
+}
