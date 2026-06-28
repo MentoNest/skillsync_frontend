@@ -81,9 +81,9 @@ export default function CommunityPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Discussions */}
-        <div className="md:col-span-2 bg-white rounded-lg shadow p-6">
+        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6 order-1 lg:order-1">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Discussions</h2>
             <DiscussionSort currentSort={currentSort} onSortChange={setCurrentSort} />
@@ -114,7 +114,7 @@ export default function CommunityPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 order-2 lg:order-2">
           {/* Events */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h2>
@@ -134,7 +134,7 @@ export default function CommunityPage() {
           {/* Community Statistics Widget */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Community Statistics</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 text-center">
                 <p className="text-2xl font-bold text-gray-900">1,247</p>
                 <p className="text-xs text-gray-600 mt-1">Total Members</p>
