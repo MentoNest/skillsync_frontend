@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import ExpertiseFilter from '@/components/mentors/ExpertiseFilter';
 import DiscoveryMentorCard from '@/components/mentors/DiscoveryMentorCard';
 import {
@@ -22,12 +23,29 @@ interface MentorDiscoveryViewProps {
   mentors: Mentor[];
 }
 
-export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProps) {
+export default function MentorDiscoveryView({ mentors: initialMentors }: MentorDiscoveryViewProps) {
   const [selectedExpertise, setSelectedExpertise] = useState<Expertise[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sort, setSort] = useState<SortOption>('rating-desc');
   const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+  const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchMoreMentors = () => {
+    // In a real app, you'd fetch data from an API.
+    // Here, we'll just simulate it by duplicating the initial mentors.
+    if (mentors.length >= 50) { // Cap at 50 mentors for this demo
+      setHasMore(false);
+      return;
+    }
+    setTimeout(() => {
+      setMentors(prevMentors => [
+        ...prevMentors,
+        ...initialMentors.map(m => ({ ...m, id: `${m.id}-${mentors.length}` })),
+      ]);
+    }, 1500);
+  };
 
   const toggleBookmark = (mentorId: string) => {
     setBookmarkedMentors((prev) => {
@@ -269,22 +287,34 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
               </button>
             </div>
           ) : (
-            <ul
-              role="list"
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+            <InfiniteScroll
+              dataLength={filteredMentors.length}
+              next={fetchMoreMentors}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+              endMessage={
+                <p style={{ textAlign: 'center' }}>
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }
             >
-              {filteredMentors.map((mentor) => (
-                <li key={mentor.id} className="h-full">
-                  <DiscoveryMentorCard
-                    mentor={{
-                      ...mentor,
-                      isBookmarked: bookmarkedMentors.has(mentor.id as string),
-                      onToggleBookmark: () => toggleBookmark(mentor.id as string),
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
+              <ul
+                role="list"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+              >
+                {filteredMentors.map((mentor) => (
+                  <li key={mentor.id} className="h-full">
+                    <DiscoveryMentorCard
+                      mentor={{
+                        ...mentor,
+                        isBookmarked: bookmarkedMentors.has(mentor.id as string),
+                        onToggleBookmark: () => toggleBookmark(mentor.id as string),
+                      }}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </InfiniteScroll>
           )}
         </section>
       </div>
