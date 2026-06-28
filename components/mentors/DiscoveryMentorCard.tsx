@@ -42,7 +42,7 @@ function slugFor(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-');
 }
 
-export default function DiscoveryMentorCard({ mentor }: DiscoveryMentorCardProps) {
+export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
   const initials = initialsFor(mentor.name);
   const gradient = gradientFor(mentor.name);
   const profileHref = `/mentors/${slugFor(mentor.name)}`;
@@ -53,31 +53,53 @@ export default function DiscoveryMentorCard({ mentor }: DiscoveryMentorCardProps
       <div className="p-6 flex flex-col gap-4 grow">
         {/* Avatar + availability badge */}
         <div className="flex items-start justify-between gap-3">
-          <div className="relative shrink-0">
-            {mentor.isFeatured && (
-              <div className="absolute -top-2 -right-2 z-10">
-                <span className="inline-flex items-center rounded-full bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 border border-purple-200/80 dark:border-purple-800">
-                  Featured
-                </span>
-              </div>
-            )}
-            {mentor.avatarUrl ? (
-              <Image
-                src={mentor.avatarUrl}
-                alt={`Photo of ${mentor.name}`}
-                width={56}
-                height={56}
-                loading="lazy"
-                className="rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
-              />
-            ) : (
-              <div
-                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-lg font-bold shadow-md group-hover:scale-105 transition-transform duration-300`}
-                aria-hidden="true"
+          <div className="flex items-start gap-4">
+            <div className="relative shrink-0">
+              {mentor.isFeatured && (
+                <div className="absolute -top-2 -right-2 z-10">
+                  <span className="inline-flex items-center rounded-full bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 border border-purple-200/80 dark:border-purple-800">
+                    Featured
+                  </span>
+                </div>
+              )}
+              {mentor.avatarUrl ? (
+                <Image
+                  src={mentor.avatarUrl}
+                  alt={`Photo of ${mentor.name}`}
+                  width={56}
+                  height={56}
+                  loading="lazy"
+                  className="rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div
+                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-lg font-bold shadow-md group-hover:scale-105 transition-transform duration-300`}
+                  aria-hidden="true"
+                >
+                  {initials}
+                </div>
+              )}
+            </div>
+            <button
+              onClick={mentor.onToggleBookmark}
+              className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              aria-label={mentor.isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill={mentor.isBookmarked ? 'currentColor' : 'none'}
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                {initials}
-              </div>
-            )}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+            </button>
           </div>
           <MentorAvailabilityBadge status={mentor.availability} />
         </div>

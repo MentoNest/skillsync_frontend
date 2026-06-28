@@ -29,4 +29,6 @@ export interface Mentor {
   isFeatured?: boolean;
   profileHref?: string;
   onBook?: () => void;
+  isBookmarked?: boolean;
+  onToggleBookmark?: ()_=> void;
 }
