@@ -54,6 +54,13 @@ export default function DiscoveryMentorCard({ mentor }: DiscoveryMentorCardProps
         {/* Avatar + availability badge */}
         <div className="flex items-start justify-between gap-3">
           <div className="relative shrink-0">
+            {mentor.isFeatured && (
+              <div className="absolute -top-2 -right-2 z-10">
+                <span className="inline-flex items-center rounded-full bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 border border-purple-200/80 dark:border-purple-800">
+                  Featured
+                </span>
+              </div>
+            )}
             {mentor.avatarUrl ? (
               <Image
                 src={mentor.avatarUrl}

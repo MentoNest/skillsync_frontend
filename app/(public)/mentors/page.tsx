@@ -16,6 +16,7 @@ interface Mentor {
   pricePerSession: number;
   skills: string[];
   availability?: 'available' | 'busy' | 'fully-booked';
+  isFeatured?: boolean;
 }
 
 const mentors: Mentor[] = [
@@ -29,6 +30,7 @@ const mentors: Mentor[] = [
     reviewCount: 124,
     pricePerSession: 85,
     skills: ['React', 'Node.js', 'Cloud', 'System Design'],
+    isFeatured: true,
   },
   {
     mentorId: 'john-smith',

@@ -49,6 +49,7 @@ export interface Mentor {
   expertise: Expertise[];
   experienceYears: number;
   availability: AvailabilityStatus;
+  isFeatured?: boolean;
 }
 
 export const MOCK_MENTORS: Mentor[] = [
@@ -65,6 +66,7 @@ export const MOCK_MENTORS: Mentor[] = [
     expertise: ['Frontend Development', 'Full-Stack Engineering'],
     experienceYears: 6,
     availability: 'available',
+    isFeatured: true,
   },
   {
     id: 'john-smith',

@@ -16,6 +16,7 @@ export interface MentorCardProps {
   pricePerSession?: number;
   skills?: string[];
   availability?: AvailabilityStatus;
+  isFeatured?: boolean;
   profileHref?: string;
   onBook?: () => void;
 }
@@ -33,6 +34,7 @@ export default function MentorCard({
   pricePerSession,
   skills,
   availability = 'available',
+  isFeatured,
   profileHref,
   onBook,
 }: MentorCardProps) {
@@ -65,6 +67,11 @@ export default function MentorCard({
           />
 
           <div className="flex flex-col items-end gap-2">
+            {isFeatured && (
+              <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 border border-purple-200/80 dark:border-purple-800">
+                Featured
+              </span>
+            )}
             <MentorAvailabilityBadge status={availability} />
           </div>
         </div>

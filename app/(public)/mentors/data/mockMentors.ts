@@ -34,6 +34,8 @@ export interface Mentor {
   pricePerSession: number;
   /** Years of professional experience driving the headline credibility. */
   yearsExperience: number;
+  /** Whether the mentor is featured and should be highlighted. */
+  isFeatured?: boolean;
 }
 
 export const INDUSTRIES = [
@@ -97,6 +99,7 @@ export const MENTORS: Mentor[] = [
     reviewCount: 248,
     pricePerSession: 120,
     yearsExperience: 12,
+    isFeatured: true,
   },
   {
     id: 'jordan-park',
@@ -111,6 +114,7 @@ export const MENTORS: Mentor[] = [
     reviewCount: 192,
     pricePerSession: 95,
     yearsExperience: 9,
+    isFeatured: true,
   },
   {
     id: 'priya-shankar',
