@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { communityService } from '@/lib/community-service';
 import { useParams, useRouter } from 'next/navigation';
 import Avatar from '@/components/Avatar';
 import CategoryBadge from '@/components/CategoryBadge';
@@ -172,6 +173,7 @@ export default function DiscussionDetailsPage() {
   const [newComment, setNewComment] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   if (!discussion) {
     return (
@@ -201,6 +203,53 @@ export default function DiscussionDetailsPage() {
       ...prev,
       isBookmarked: !prev.isBookmarked
     } : null);
+  };
+
+  const handleFollow = async () => {
+    if (!discussion?.author.id) return;
+    const next = !discussion.isFollowing;
+    setDiscussion(prev => prev ? { ...prev, isFollowing: next } : null);
+    try {
+      if (next) {
+        await communityService.followUser(discussion.author.id);
+      } else {
+        await communityService.unfollowUser(discussion.author.id);
+      }
+      setFeedback(next ? 'You are now following this user.' : 'You unfollowed this user.');
+    } catch {
+      setDiscussion(prev => prev ? { ...prev, isFollowing: !next } : null);
+      setFeedback('Unable to update follow state right now.');
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/community/${discussion?.id}` : '';
+    if (typeof navigator !== 'undefined' && 'share' in navigator && shareUrl) {
+      try {
+        await navigator.share({ title: discussion?.title, url: shareUrl });
+        setFeedback('Discussion shared.');
+        return;
+      } catch {
+        // fall back to clipboard
+      }
+    }
+    if (shareUrl && typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(shareUrl);
+      setFeedback('Discussion link copied to clipboard.');
+      return;
+    }
+    setFeedback('Sharing is unavailable in this browser.');
+  };
+
+  const handleReport = async () => {
+    if (!discussion) return;
+    try {
+      await communityService.reportDiscussion(discussion.id);
+      setDiscussion(prev => prev ? { ...prev, isReported: true } : null);
+      setFeedback('Discussion reported for moderator review.');
+    } catch {
+      setFeedback('Unable to report this discussion right now.');
+    }
   };
 
   const handleAddComment = () => {
@@ -436,10 +485,15 @@ export default function DiscussionDetailsPage() {
           <p className="text-gray-700 leading-relaxed whitespace-pre-line">{discussion.content}</p>
         </div>
 
+        {feedback ? <p className="mb-4 text-sm text-cyan-700">{feedback}</p> : null}
+
         <DiscussionMetadata
           metadata={discussion}
           onLike={handleLike}
           onBookmark={handleBookmark}
+          onFollow={handleFollow}
+          onShare={handleShare}
+          onReport={handleReport}
         />
       </div>
 
