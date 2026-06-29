@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { DiscussionSort, SortOption } from '@/components/ui/discussion-sort';
+import StartDiscussionModal from '@/components/community/StartDiscussionModal';
 
 interface Discussion {
   id: string;
@@ -54,6 +55,7 @@ const mockDiscussions: Discussion[] = [
 
 export default function CommunityPage() {
   const [currentSort, setCurrentSort] = useState<SortOption>('trending');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sortedDiscussions = useMemo(() => {
     const discussions = [...mockDiscussions];
@@ -74,11 +76,19 @@ export default function CommunityPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Community</h1>
-        <p className="mt-2 text-gray-600">
-          Connect with mentors and mentees — ask questions, share experiences, and join community events.
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Community</h1>
+          <p className="mt-2 text-gray-600">
+            Connect with mentors and mentees — ask questions, share experiences, and join community events.
+          </p>
+        </div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors"
+        >
+          Start Discussion
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -132,6 +142,11 @@ export default function CommunityPage() {
           </div>
         </div>
       </div>
+
+      <StartDiscussionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
