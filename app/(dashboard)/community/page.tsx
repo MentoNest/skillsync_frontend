@@ -28,6 +28,60 @@ export default function CommunityPage() {
       setIsLoading(false);
     }
   };
+import StartDiscussionModal from '@/components/community/StartDiscussionModal';
+
+interface Discussion {
+  id: string;
+  title: string;
+  author: string;
+  createdAt: Date;
+  replies: number;
+  likes: number;
+  trending: number;
+}
+
+const mockDiscussions: Discussion[] = [
+  {
+    id: '1',
+    title: 'How to transition into a career in UX design?',
+    author: 'Sarah Johnson',
+    createdAt: new Date('2025-06-25'),
+    replies: 12,
+    likes: 24,
+    trending: 85
+  },
+  {
+    id: '2',
+    title: 'Best resources for learning cloud computing',
+    author: 'Mike Chen',
+    createdAt: new Date('2025-06-27'),
+    replies: 8,
+    likes: 18,
+    trending: 72
+  },
+  {
+    id: '3',
+    title: 'Tips for negotiating a salary raise',
+    author: 'Emily Rodriguez',
+    createdAt: new Date('2025-06-28'),
+    replies: 23,
+    likes: 31,
+    trending: 95
+  },
+  {
+    id: '4',
+    title: 'How to build a personal brand as a developer',
+    author: 'James Wilson',
+    createdAt: new Date('2025-06-26'),
+    replies: 15,
+    likes: 42,
+    trending: 78
+  }
+];
+
+export default function CommunityPage() {
+  const [currentSort, setCurrentSort] = useState<SortOption>('trending');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sortedDiscussions = useMemo(() => {
     const discussionsList = [...discussions];
@@ -60,6 +114,10 @@ export default function CommunityPage() {
           className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors"
         >
           {showCreateForm ? 'Cancel' : 'New Discussion'}
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors"
+        >
+          Start Discussion
         </button>
       </div>
 
@@ -124,6 +182,11 @@ export default function CommunityPage() {
           </div>
         </div>
       </div>
+
+      <StartDiscussionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
