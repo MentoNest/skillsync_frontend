@@ -1,5 +1,21 @@
 'use client';
 
+import React from 'react';
+import { SortOption } from '@/components/ui/discussion-sort';
+import { useCommunity } from './community-context';
+
+export default function CommunityPage() {
+  const {
+    getFilteredDiscussions,
+    filters,
+    setSortBy,
+    statistics,
+    categories,
+    loading,
+    error
+  } = useCommunity();
+
+  const sortedDiscussions = getFilteredDiscussions();
 import React, { useState, useMemo, useEffect } from 'react';
 import { DiscussionSort, SortOption } from '@/components/ui/discussion-sort';
 import CreateDiscussionForm from '@/components/community/CreateDiscussionForm';
@@ -121,6 +137,7 @@ export default function CommunityPage() {
         </button>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {showCreateForm && (
         <div className="mb-6">
           <CreateDiscussionForm onSuccess={() => { setShowCreateForm(false); fetchDiscussions(); }} />
@@ -129,10 +146,13 @@ export default function CommunityPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Discussions */}
-        <div className="md:col-span-2 bg-white rounded-lg shadow p-6">
+        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6 order-1 lg:order-1">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Discussions</h2>
-            <DiscussionSort currentSort={currentSort} onSortChange={setCurrentSort} />
+            <DiscussionSort 
+              currentSort={filters.sortBy as SortOption} 
+              onSortChange={(sort) => setSortBy(sort)} 
+            />
           </div>
           
           {isLoading ? (
@@ -163,8 +183,44 @@ export default function CommunityPage() {
           )}
         </div>
 
-        {/* Sidebar placeholders */}
-        <div className="flex flex-col gap-6">
+        {/* Sidebar */}
+        <div className="flex flex-col gap-6 order-2 lg:order-2">
+          {/* Categories */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Categories</h2>
+            <div className="space-y-2">
+              <button
+                onClick={() => setCategoryFilter(null)}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                  filters.category === null 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                <span className="flex justify-between">
+                  <span>All Discussions</span>
+                  <span className="text-gray-500">{statistics.totalDiscussions}</span>
+                </span>
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setCategoryFilter(category.id)}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                    filters.category === category.id 
+                      ? 'bg-blue-100 text-blue-700' 
+                      : 'hover:bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <span className="flex justify-between">
+                    <span>{category.name}</span>
+                    <span className="text-gray-500">{category.count}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
           {/* Events */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h2>
@@ -178,6 +234,29 @@ export default function CommunityPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Members</h2>
             <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500">
               <p className="text-sm">Member activity coming soon.</p>
+            </div>
+          </div>
+
+          {/* Community Statistics Widget */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Community Statistics</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">{statistics.totalMembers.toLocaleString()}</p>
+                <p className="text-xs text-gray-600 mt-1">Total Members</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">{statistics.activeDiscussions}</p>
+                <p className="text-xs text-gray-600 mt-1">Active Discussions</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">{statistics.totalDiscussions}</p>
+                <p className="text-xs text-gray-600 mt-1">Total Discussions</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-gray-900">{statistics.eventsThisMonth}</p>
+                <p className="text-xs text-gray-600 mt-1">Events This Month</p>
+              </div>
             </div>
           </div>
         </div>
