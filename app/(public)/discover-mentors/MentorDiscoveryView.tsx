@@ -1,15 +1,24 @@
 'use client';
 
+import { useMemo, useState, useEffect } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import ExpertiseFilter from '@/components/mentors/ExpertiseFilter';
 import DiscoveryMentorCard from '@/components/mentors/DiscoveryMentorCard';
+import EmptyState from '@/components/mentors/EmptyState';
 import {
   EXPERTISE_OPTIONS,
   type Expertise,
   type Mentor,
 } from '@/components/mentors/data';
 
+type SortOption =
+  | 'rating-desc'
+  | 'price-asc'
+  | 'price-desc'
+  | 'experience-desc'
+  | 'popularity-desc';
 // Issue 481 – lazy-load the comparison drawer (only needed when user selects mentors)
 const MentorComparisonDrawer = dynamic(
   () => import('@/components/mentors/MentorComparisonDrawer'),
@@ -20,6 +29,7 @@ type SortOption = 'rating-desc' | 'price-asc' | 'price-desc' | 'experience-desc'
 
 const SORT_OPTIONS: ReadonlyArray<{ value: SortOption; label: string }> = [
   { value: 'rating-desc', label: 'Highest rated' },
+  { value: 'popularity-desc', label: 'Most popular' },
   { value: 'price-asc', label: 'Price: low to high' },
   { value: 'price-desc', label: 'Price: high to low' },
   { value: 'experience-desc', label: 'Most experienced' },
@@ -31,7 +41,7 @@ interface MentorDiscoveryViewProps {
   mentors: Mentor[];
 }
 
-export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProps) {
+export default function MentorDiscoveryView({ mentors: initialMentors }: MentorDiscoveryViewProps) {
   const [selectedExpertise, setSelectedExpertise] = useState<Expertise[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
@@ -44,6 +54,23 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
   // Issue 482 – ref to announce live region messages
   const announceRef = useRef<HTMLParagraphElement>(null);
   const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+  const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchMoreMentors = () => {
+    // In a real app, you'd fetch data from an API.
+    // Here, we'll just simulate it by duplicating the initial mentors.
+    if (mentors.length >= 50) { // Cap at 50 mentors for this demo
+      setHasMore(false);
+      return;
+    }
+    setTimeout(() => {
+      setMentors(prevMentors => [
+        ...prevMentors,
+        ...initialMentors.map(m => ({ ...m, id: `${m.id}-${mentors.length}` })),
+      ]);
+    }, 1500);
+  };
 
   const toggleBookmark = (mentorId: string) => {
     setBookmarkedMentors((prev) => {
@@ -124,6 +151,18 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
 
     return [...matched].sort((a, b) => {
       switch (sort) {
+        case 'rating-desc':
+          return b.rating - a.rating;
+        case 'price-asc':
+          return a.pricePerSession - b.pricePerSession;
+        case 'price-desc':
+          return b.pricePerSession - a.pricePerSession;
+        case 'experience-desc':
+          return b.experienceYears - a.experienceYears;
+        case 'popularity-desc':
+          return b.reviewCount - a.reviewCount;
+        default:
+          return 0;
         case 'rating-desc': return b.rating - a.rating;
         case 'price-asc': return a.pricePerSession - b.pricePerSession;
         case 'price-desc': return b.pricePerSession - a.pricePerSession;
@@ -397,6 +436,8 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
               </div>
             </div>
 
+          {filteredMentors.length === 0 ? (
+            <EmptyState onClearFilters={hasFilters ? clearFilters : undefined} />
             {/* Issue 479 – compare CTA bar when ≥2 mentors selected */}
             {compareIds.length >= 2 && (
               <div
@@ -490,22 +531,34 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
               </button>
             </div>
           ) : (
-            <ul
-              role="list"
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+            <InfiniteScroll
+              dataLength={filteredMentors.length}
+              next={fetchMoreMentors}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+              endMessage={
+                <p style={{ textAlign: 'center' }}>
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }
             >
-              {filteredMentors.map((mentor) => (
-                <li key={mentor.id} className="h-full">
-                  <DiscoveryMentorCard
-                    mentor={{
-                      ...mentor,
-                      isBookmarked: bookmarkedMentors.has(mentor.id as string),
-                      onToggleBookmark: () => toggleBookmark(mentor.id as string),
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
+              <ul
+                role="list"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+              >
+                {filteredMentors.map((mentor) => (
+                  <li key={mentor.id} className="h-full">
+                    <DiscoveryMentorCard
+                      mentor={{
+                        ...mentor,
+                        isBookmarked: bookmarkedMentors.has(mentor.id as string),
+                        onToggleBookmark: () => toggleBookmark(mentor.id as string),
+                      }}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </InfiniteScroll>
           )}
         </section>
       </div>
