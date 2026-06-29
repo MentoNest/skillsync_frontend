@@ -1,7 +1,33 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { DiscussionSort, SortOption } from '@/components/ui/discussion-sort';
+import CreateDiscussionForm from '@/components/community/CreateDiscussionForm';
+import type { DiscussionMetadata } from '@/lib/community-types';
+
+export default function CommunityPage() {
+  const [currentSort, setCurrentSort] = useState<SortOption>('trending');
+  const [discussions, setDiscussions] = useState<DiscussionMetadata[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  useEffect(() => {
+    fetchDiscussions();
+  }, []);
+
+  const fetchDiscussions = async () => {
+    try {
+      const response = await fetch('/api/discussions');
+      if (response.ok) {
+        const data = await response.json();
+        setDiscussions(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch discussions:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 import StartDiscussionModal from '@/components/community/StartDiscussionModal';
 
 interface Discussion {
@@ -58,21 +84,21 @@ export default function CommunityPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sortedDiscussions = useMemo(() => {
-    const discussions = [...mockDiscussions];
+    const discussionsList = [...discussions];
     
     switch (currentSort) {
       case 'trending':
-        return discussions.sort((a, b) => b.trending - a.trending);
+        return discussionsList.sort((a, b) => (b.isTrending ? 1 : 0) - (a.isTrending ? 1 : 0));
       case 'latest':
-        return discussions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return discussionsList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       case 'most-replies':
-        return discussions.sort((a, b) => b.replies - a.replies);
+        return discussionsList.sort((a, b) => b.commentCount - a.commentCount);
       case 'most-liked':
-        return discussions.sort((a, b) => b.likes - a.likes);
+        return discussionsList.sort((a, b) => b.likeCount - a.likeCount);
       default:
-        return discussions;
+        return discussionsList;
     }
-  }, [currentSort]);
+  }, [currentSort, discussions]);
 
   return (
     <div>
@@ -84,12 +110,22 @@ export default function CommunityPage() {
           </p>
         </div>
         <button
+          onClick={() => setShowCreateForm(!showCreateForm)}
+          className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors"
+        >
+          {showCreateForm ? 'Cancel' : 'New Discussion'}
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors"
         >
           Start Discussion
         </button>
       </div>
+
+      {showCreateForm && (
+        <div className="mb-6">
+          <CreateDiscussionForm onSuccess={() => { setShowCreateForm(false); fetchDiscussions(); }} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Discussions */}
@@ -99,28 +135,32 @@ export default function CommunityPage() {
             <DiscussionSort currentSort={currentSort} onSortChange={setCurrentSort} />
           </div>
           
-          <div className="space-y-4">
-            {sortedDiscussions.map((discussion) => (
-              <div key={discussion.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <h3 className="font-medium text-gray-900 mb-2">{discussion.title}</h3>
-                <p className="text-sm text-gray-600 mb-3">Started by {discussion.author}</p>
-                <div className="flex gap-4 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    {discussion.replies} replies
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    {discussion.likes} likes
-                  </span>
+          {isLoading ? (
+            <div className="text-center py-8 text-gray-500">Loading discussions...</div>
+          ) : (
+            <div className="space-y-4">
+              {sortedDiscussions.map((discussion) => (
+                <div key={discussion.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <h3 className="font-medium text-gray-900 mb-2">{discussion.title}</h3>
+                  <p className="text-sm text-gray-600 mb-3">Started by {discussion.author.name}</p>
+                  <div className="flex gap-4 text-sm text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      {discussion.commentCount} replies
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      {discussion.likeCount} likes
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Sidebar placeholders */}
