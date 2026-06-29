@@ -43,6 +43,19 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   // Issue 482 – ref to announce live region messages
   const announceRef = useRef<HTMLParagraphElement>(null);
+  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+
+  const toggleBookmark = (mentorId: string) => {
+    setBookmarkedMentors((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(mentorId)) {
+        newSet.delete(mentorId);
+      } else {
+        newSet.add(mentorId);
+      }
+      return newSet;
+    });
+  };
 
   // Issue 482 – keyboard-navigable focus skip link target
   const mainRef = useRef<HTMLElement>(null);
@@ -473,6 +486,28 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
             )}
           </main>
         </div>
+                Clear expertise filters
+              </button>
+            </div>
+          ) : (
+            <ul
+              role="list"
+              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+            >
+              {filteredMentors.map((mentor) => (
+                <li key={mentor.id} className="h-full">
+                  <DiscoveryMentorCard
+                    mentor={{
+                      ...mentor,
+                      isBookmarked: bookmarkedMentors.has(mentor.id as string),
+                      onToggleBookmark: () => toggleBookmark(mentor.id as string),
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
 
       {/* Issue 479 – Comparison drawer */}
@@ -485,4 +520,5 @@ export default function MentorDiscoveryView({ mentors }: MentorDiscoveryViewProp
       )}
     </>
   );
+}
 }

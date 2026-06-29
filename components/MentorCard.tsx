@@ -1,24 +1,4 @@
-import React from 'react';
-import Link from 'next/link';
-import Avatar from './Avatar';
-import MentorAvailabilityBadge, { AvailabilityStatus } from './MentorAvailabilityBadge';
-
-export interface MentorCardProps {
-  mentorId?: string;
-  name: string;
-  role?: string;
-  title?: string;
-  description?: string;
-  bio?: string;
-  avatarUrl?: string | null;
-  rating?: number;
-  reviewCount?: number;
-  pricePerSession?: number;
-  skills?: string[];
-  availability?: AvailabilityStatus;
-  profileHref?: string;
-  onBook?: () => void;
-}
+import { Mentor } from '@/lib/types';
 
 export default function MentorCard({
   mentorId,
@@ -33,9 +13,12 @@ export default function MentorCard({
   pricePerSession,
   skills,
   availability = 'available',
+  isFeatured,
   profileHref,
   onBook,
-}: MentorCardProps) {
+  isBookmarked,
+  onToggleBookmark,
+}: Mentor) {
   const resolvedRole = role ?? title ?? '';
   const resolvedDescription = description ?? bio ?? '';
 
@@ -55,16 +38,43 @@ export default function MentorCard({
       <div className="p-6 flex flex-col gap-4">
         {/* Profile photo + verified badge + availability */}
         <div className="flex items-start justify-between">
-          <Avatar
-            src={avatarUrl}
-            alt={`Photo of ${name}`}
-            name={name}
-            size="md"
-            variant="rounded"
-            className="group-hover:scale-105 transition-transform duration-300"
-          />
+          <div className="flex items-start gap-4">
+            <Avatar
+              src={avatarUrl}
+              alt={`Photo of ${name}`}
+              name={name}
+              size="md"
+              variant="rounded"
+              className="group-hover:scale-105 transition-transform duration-300"
+            />
+            <button
+              onClick={onToggleBookmark}
+              className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill={isBookmarked ? 'currentColor' : 'none'}
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+            </button>
+          </div>
 
           <div className="flex flex-col items-end gap-2">
+            {isFeatured && (
+              <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 border border-purple-200/80 dark:border-purple-800">
+                Featured
+              </span>
+            )}
             <MentorAvailabilityBadge status={availability} />
           </div>
         </div>
