@@ -17,6 +17,8 @@ export interface DiscussionMetadata {
   isLiked?: boolean;
   isBookmarked?: boolean;
   isTrending?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
   tags?: string[];
 }
 
