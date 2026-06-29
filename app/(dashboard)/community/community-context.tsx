@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { DiscussionSort } from '@/components/ui/discussion-sort';
+import type { SortOption } from '@/components/ui/discussion-sort';
 
 // Types
 interface Discussion {
@@ -25,7 +25,7 @@ interface CommunityState {
   discussions: Discussion[];
   categories: Category[];
   filters: {
-    sortBy: DiscussionSort;
+    sortBy: SortOption;
     category: string | null;
     searchQuery: string;
   };
@@ -45,7 +45,7 @@ type Action =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_DISCUSSIONS'; payload: Discussion[] }
   | { type: 'SET_CATEGORIES'; payload: Category[] }
-  | { type: 'SET_SORT_BY'; payload: DiscussionSort }
+  | { type: 'SET_SORT_BY'; payload: SortOption }
   | { type: 'SET_CATEGORY_FILTER'; payload: string | null }
   | { type: 'SET_SEARCH_QUERY'; payload: string }
   | { type: 'SET_RECOMMENDED'; payload: Discussion[] }
@@ -189,7 +189,7 @@ function communityReducer(state: CommunityState, action: Action): CommunityState
 interface CommunityContextType extends CommunityState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setSortBy: (sortBy: DiscussionSort) => void;
+  setSortBy: (sortBy: SortOption) => void;
   setCategoryFilter: (category: string | null) => void;
   setSearchQuery: (query: string) => void;
   addDiscussion: (discussion: Discussion) => void;
@@ -212,7 +212,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_ERROR', payload: error });
   };
 
-  const setSortBy = (sortBy: DiscussionSort) => {
+  const setSortBy = (sortBy: SortOption) => {
     dispatch({ type: 'SET_SORT_BY', payload: sortBy });
   };
 
