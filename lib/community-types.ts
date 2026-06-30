@@ -28,3 +28,18 @@ export interface DiscussionCardProps {
   onDelete?: (id: string) => void;
   currentUserId?: string;
 }
+
+export interface Comment {
+  id: string;
+  author: Author;
+  content: string;
+  createdAt: string;
+  likeCount: number;
+  isLiked?: boolean;
+  replies?: Comment[];
+}
+
+export interface Discussion extends DiscussionMetadata {
+  content: string;
+  comments: Comment[];
+}
