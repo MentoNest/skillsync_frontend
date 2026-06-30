@@ -24,6 +24,35 @@ export const communityService = {
   removeBookmark: (id: string) =>
     request<{ bookmarked: boolean }>(`/api/community/discussions/${id}/bookmark`, { method: 'DELETE' }),
 
+  followUser: (userId: string) =>
+    request<{ following: boolean }>(`/api/community/users/${userId}/follow`, { method: 'POST' }),
+
+  unfollowUser: (userId: string) =>
+    request<{ following: boolean }>(`/api/community/users/${userId}/follow`, { method: 'DELETE' }),
+
+  reportDiscussion: (id: string, reason = 'Inappropriate content') =>
+    request<{ reported: boolean }>(`/api/community/discussions/${id}/report`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    }),
+
+  getReportedDiscussions: async () => {
+    const reports = await request<{ id: string; title: string; reason: string; reportedAt: string; status: string }[]>(
+      '/api/community/moderation/reports',
+    );
+    return reports.map((item) => ({ ...item, status: item.status as 'Pending' | 'Approved' | 'Removed' }));
+  },
+
+  reviewReport: async (id: string, action: 'approve' | 'remove') => {
+    const reports = await request<{ id: string; title: string; reason: string; reportedAt: string; status: string }[]>(
+      `/api/community/moderation/reports/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ action }),
+      },
+    );
+    return reports.map((item) => ({ ...item, status: item.status as 'Pending' | 'Approved' | 'Removed' }));
+  },
   followCategory: (categoryId: string) =>
     request<{ followed: boolean }>(`/api/community/categories/${categoryId}/follow`, { method: 'POST' }),
 
