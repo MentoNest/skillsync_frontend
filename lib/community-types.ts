@@ -17,6 +17,10 @@ export interface DiscussionMetadata {
   isLiked?: boolean;
   isBookmarked?: boolean;
   isTrending?: boolean;
+  isFollowing?: boolean;
+  isReported?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
   tags?: string[];
 }
 
@@ -25,6 +29,8 @@ export interface DiscussionCardProps {
   onLike?: (id: string) => void;
   onBookmark?: (id: string) => void;
   onClick?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  currentUserId?: string;
 }
 
 export interface Comment {
