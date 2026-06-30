@@ -19,6 +19,8 @@ export interface DiscussionMetadata {
   isTrending?: boolean;
   isFollowing?: boolean;
   isReported?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
   tags?: string[];
 }
 

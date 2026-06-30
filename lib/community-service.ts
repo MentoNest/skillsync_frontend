@@ -53,6 +53,11 @@ export const communityService = {
     );
     return reports.map((item) => ({ ...item, status: item.status as 'Pending' | 'Approved' | 'Removed' }));
   },
+  followCategory: (categoryId: string) =>
+    request<{ followed: boolean }>(`/api/community/categories/${categoryId}/follow`, { method: 'POST' }),
+
+  unfollowCategory: (categoryId: string) =>
+    request<{ followed: boolean }>(`/api/community/categories/${categoryId}/follow`, { method: 'DELETE' }),
 
   fetchDiscussions: (params?: { page?: number; limit?: number; category?: string; sort?: string }) => {
     const query = new URLSearchParams();

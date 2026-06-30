@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { DiscussionSort } from '@/components/ui/discussion-sort';
+import type { SortOption } from '@/components/ui/discussion-sort';
 
 // Types
 interface Discussion {
@@ -13,6 +13,8 @@ interface Discussion {
   likes: number;
   trending: number;
   category: string;
+  isPinned?: boolean;
+  isLocked?: boolean;
 }
 
 interface Category {
@@ -25,7 +27,7 @@ interface CommunityState {
   discussions: Discussion[];
   categories: Category[];
   filters: {
-    sortBy: DiscussionSort;
+    sortBy: SortOption;
     category: string | null;
     searchQuery: string;
   };
@@ -45,13 +47,15 @@ type Action =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_DISCUSSIONS'; payload: Discussion[] }
   | { type: 'SET_CATEGORIES'; payload: Category[] }
-  | { type: 'SET_SORT_BY'; payload: DiscussionSort }
+  | { type: 'SET_SORT_BY'; payload: SortOption }
   | { type: 'SET_CATEGORY_FILTER'; payload: string | null }
   | { type: 'SET_SEARCH_QUERY'; payload: string }
   | { type: 'SET_RECOMMENDED'; payload: Discussion[] }
   | { type: 'ADD_DISCUSSION'; payload: Discussion }
   | { type: 'UPDATE_DISCUSSION_LIKES'; payload: { id: string; likes: number } }
-  | { type: 'UPDATE_DISCUSSION_REPLIES'; payload: { id: string; replies: number } };
+  | { type: 'UPDATE_DISCUSSION_REPLIES'; payload: { id: string; replies: number } }
+  | { type: 'TOGGLE_PIN'; payload: string }
+  | { type: 'TOGGLE_LOCK'; payload: string };
 
 // Initial state
 const initialDiscussions: Discussion[] = [
@@ -180,6 +184,20 @@ function communityReducer(state: CommunityState, action: Action): CommunityState
             : d
         )
       };
+    case 'TOGGLE_PIN':
+      return {
+        ...state,
+        discussions: state.discussions.map(d =>
+          d.id === action.payload ? { ...d, isPinned: !d.isPinned } : d
+        )
+      };
+    case 'TOGGLE_LOCK':
+      return {
+        ...state,
+        discussions: state.discussions.map(d =>
+          d.id === action.payload ? { ...d, isLocked: !d.isLocked } : d
+        )
+      };
     default:
       return state;
   }
@@ -189,12 +207,14 @@ function communityReducer(state: CommunityState, action: Action): CommunityState
 interface CommunityContextType extends CommunityState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setSortBy: (sortBy: DiscussionSort) => void;
+  setSortBy: (sortBy: SortOption) => void;
   setCategoryFilter: (category: string | null) => void;
   setSearchQuery: (query: string) => void;
   addDiscussion: (discussion: Discussion) => void;
   updateDiscussionLikes: (id: string, likes: number) => void;
   updateDiscussionReplies: (id: string, replies: number) => void;
+  togglePin: (id: string) => void;
+  toggleLock: (id: string) => void;
   getFilteredDiscussions: () => Discussion[];
 }
 
@@ -212,7 +232,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_ERROR', payload: error });
   };
 
-  const setSortBy = (sortBy: DiscussionSort) => {
+  const setSortBy = (sortBy: SortOption) => {
     dispatch({ type: 'SET_SORT_BY', payload: sortBy });
   };
 
@@ -236,6 +256,14 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_DISCUSSION_REPLIES', payload: { id, replies } });
   };
 
+  const togglePin = (id: string) => {
+    dispatch({ type: 'TOGGLE_PIN', payload: id });
+  };
+
+  const toggleLock = (id: string) => {
+    dispatch({ type: 'TOGGLE_LOCK', payload: id });
+  };
+
   const getFilteredDiscussions = () => {
     let filtered = [...state.discussions];
 
@@ -256,16 +284,21 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     // Apply sorting
     switch (state.filters.sortBy) {
       case 'trending':
-        return filtered.sort((a, b) => b.trending - a.trending);
+        filtered = filtered.sort((a, b) => b.trending - a.trending);
+        break;
       case 'latest':
-        return filtered.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        filtered = filtered.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        break;
       case 'most-replies':
-        return filtered.sort((a, b) => b.replies - a.replies);
+        filtered = filtered.sort((a, b) => b.replies - a.replies);
+        break;
       case 'most-liked':
-        return filtered.sort((a, b) => b.likes - a.likes);
-      default:
-        return filtered;
+        filtered = filtered.sort((a, b) => b.likes - a.likes);
+        break;
     }
+
+    // Pinned discussions always float to the top
+    return filtered.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
   };
 
   return (
@@ -280,6 +313,8 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
         addDiscussion,
         updateDiscussionLikes,
         updateDiscussionReplies,
+        togglePin,
+        toggleLock,
         getFilteredDiscussions
       }}
     >
