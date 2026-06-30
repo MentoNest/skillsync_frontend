@@ -163,11 +163,6 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
           return b.reviewCount - a.reviewCount;
         default:
           return 0;
-        case 'rating-desc': return b.rating - a.rating;
-        case 'price-asc': return a.pricePerSession - b.pricePerSession;
-        case 'price-desc': return b.pricePerSession - a.pricePerSession;
-        case 'experience-desc': return b.experienceYears - a.experienceYears;
-        default: return 0;
       }
     });
   }, [mentors, selectedExpertise, minPrice, maxPrice, sort]);
@@ -573,5 +568,4 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
       )}
     </>
   );
-}
 }
