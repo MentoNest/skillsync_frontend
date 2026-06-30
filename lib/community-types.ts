@@ -29,6 +29,8 @@ export interface DiscussionCardProps {
   onLike?: (id: string) => void;
   onBookmark?: (id: string) => void;
   onClick?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  currentUserId?: string;
 }
 
 export interface Comment {
