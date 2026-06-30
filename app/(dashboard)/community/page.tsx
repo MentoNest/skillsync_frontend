@@ -1,31 +1,23 @@
 'use client';
 
-import React from 'react';
-import { SortOption } from '@/components/ui/discussion-sort';
+import { useState, useEffect, useMemo } from 'react';
 import { useCommunity } from './community-context';
+import type { DiscussionMetadata } from '@/lib/community-types';
+import StartDiscussionModal from '@/components/community/StartDiscussionModal';
 
 export default function CommunityPage() {
   const {
-    getFilteredDiscussions,
     filters,
     setSortBy,
+    setCategoryFilter,
     statistics,
     categories,
     loading,
-    error
   } = useCommunity();
 
-  const sortedDiscussions = getFilteredDiscussions();
-import React, { useState, useMemo, useEffect } from 'react';
-import { DiscussionSort, SortOption } from '@/components/ui/discussion-sort';
-import CreateDiscussionForm from '@/components/community/CreateDiscussionForm';
-import type { DiscussionMetadata } from '@/lib/community-types';
-
-export default function CommunityPage() {
-  const [currentSort, setCurrentSort] = useState<SortOption>('trending');
   const [discussions, setDiscussions] = useState<DiscussionMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDiscussions();
@@ -44,77 +36,20 @@ export default function CommunityPage() {
       setIsLoading(false);
     }
   };
-import StartDiscussionModal from '@/components/community/StartDiscussionModal';
-
-interface Discussion {
-  id: string;
-  title: string;
-  author: string;
-  createdAt: Date;
-  replies: number;
-  likes: number;
-  trending: number;
-}
-
-const mockDiscussions: Discussion[] = [
-  {
-    id: '1',
-    title: 'How to transition into a career in UX design?',
-    author: 'Sarah Johnson',
-    createdAt: new Date('2025-06-25'),
-    replies: 12,
-    likes: 24,
-    trending: 85
-  },
-  {
-    id: '2',
-    title: 'Best resources for learning cloud computing',
-    author: 'Mike Chen',
-    createdAt: new Date('2025-06-27'),
-    replies: 8,
-    likes: 18,
-    trending: 72
-  },
-  {
-    id: '3',
-    title: 'Tips for negotiating a salary raise',
-    author: 'Emily Rodriguez',
-    createdAt: new Date('2025-06-28'),
-    replies: 23,
-    likes: 31,
-    trending: 95
-  },
-  {
-    id: '4',
-    title: 'How to build a personal brand as a developer',
-    author: 'James Wilson',
-    createdAt: new Date('2025-06-26'),
-    replies: 15,
-    likes: 42,
-    trending: 78
-  }
-];
-
-export default function CommunityPage() {
-  const [currentSort, setCurrentSort] = useState<SortOption>('trending');
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sortedDiscussions = useMemo(() => {
-    const discussionsList = [...discussions];
-    
-    switch (currentSort) {
-      case 'trending':
-        return discussionsList.sort((a, b) => (b.isTrending ? 1 : 0) - (a.isTrending ? 1 : 0));
+    const list = [...discussions];
+    switch (filters.sortBy) {
       case 'latest':
-        return discussionsList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       case 'most-replies':
-        return discussionsList.sort((a, b) => b.commentCount - a.commentCount);
+        return list.sort((a, b) => b.commentCount - a.commentCount);
       case 'most-liked':
-        return discussionsList.sort((a, b) => b.likeCount - a.likeCount);
+        return list.sort((a, b) => b.likeCount - a.likeCount);
       default:
-        return discussionsList;
+        return list.sort((a, b) => (b.isTrending ? 1 : 0) - (a.isTrending ? 1 : 0));
     }
-  }, [currentSort, discussions]);
+  }, [discussions, filters.sortBy]);
 
   return (
     <div>
@@ -126,10 +61,6 @@ export default function CommunityPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors"
-        >
-          {showCreateForm ? 'Cancel' : 'New Discussion'}
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-colors"
         >
@@ -138,40 +69,34 @@ export default function CommunityPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {showCreateForm && (
-        <div className="mb-6">
-          <CreateDiscussionForm onSuccess={() => { setShowCreateForm(false); fetchDiscussions(); }} />
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Discussions */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6 order-1 lg:order-1">
+        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Discussions</h2>
-            <DiscussionSort 
-              currentSort={filters.sortBy as SortOption} 
-              onSortChange={(sort) => setSortBy(sort)} 
-            />
+            <SortBar currentSort={filters.sortBy} onSortChange={setSortBy} />
           </div>
-          
+
           {isLoading ? (
             <div className="text-center py-8 text-gray-500">Loading discussions...</div>
+          ) : discussions.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">No discussions found.</div>
           ) : (
             <div className="space-y-4">
               {sortedDiscussions.map((discussion) => (
-                <div key={discussion.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div
+                  key={discussion.id}
+                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   <h3 className="font-medium text-gray-900 mb-2">{discussion.title}</h3>
                   <p className="text-sm text-gray-600 mb-3">Started by {discussion.author.name}</p>
                   <div className="flex gap-4 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                       {discussion.commentCount} replies
                     </span>
                     <span className="flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                       {discussion.likeCount} likes
@@ -183,45 +108,14 @@ export default function CommunityPage() {
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="flex flex-col gap-6 order-2 lg:order-2">
-          {/* Categories */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Categories</h2>
-            <div className="space-y-2">
-              <button
-                onClick={() => setCategoryFilter(null)}
-                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                  filters.category === null 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                <span className="flex justify-between">
-                  <span>All Discussions</span>
-                  <span className="text-gray-500">{statistics.totalDiscussions}</span>
-                </span>
-              </button>
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setCategoryFilter(category.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                    filters.category === category.id 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'hover:bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  <span className="flex justify-between">
-                    <span>{category.name}</span>
-                    <span className="text-gray-500">{category.count}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          {/* Events */}
+        <div className="flex flex-col gap-6">
+          <CategorySidebar
+            categories={categories}
+            selectedCategory={filters.category}
+            onSelect={setCategoryFilter}
+            totalDiscussions={statistics.totalDiscussions}
+          />
+
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h2>
             <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500">
@@ -229,7 +123,6 @@ export default function CommunityPage() {
             </div>
           </div>
 
-          {/* Active members */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Members</h2>
             <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500">
@@ -237,10 +130,9 @@ export default function CommunityPage() {
             </div>
           </div>
 
-          {/* Community Statistics Widget */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Community Statistics</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 text-center">
                 <p className="text-2xl font-bold text-gray-900">{statistics.totalMembers.toLocaleString()}</p>
                 <p className="text-xs text-gray-600 mt-1">Total Members</p>
@@ -262,10 +154,127 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      <StartDiscussionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      <StartDiscussionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </div>
+  );
+}
+
+interface CategoryItem {
+  id: string;
+  name: string;
+  count: number;
+}
+
+interface SortBarProps {
+  currentSort: string;
+  onSortChange: (sort: string) => void;
+}
+
+function SortBar({ currentSort, onSortChange }: SortBarProps) {
+  const options = [
+    { value: 'trending', label: 'Trending' },
+    { value: 'latest', label: 'Latest' },
+    { value: 'most-replies', label: 'Most Replies' },
+    { value: 'most-liked', label: 'Most Liked' },
+  ] as const;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          onClick={() => onSortChange(option.value)}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            currentSort === option.value
+              ? 'bg-cyan-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+interface CategorySidebarProps {
+  categories: CategoryItem[];
+  selectedCategory: string | null;
+  onSelect: (category: string | null) => void;
+  totalDiscussions: number;
+}
+
+function CategorySidebar({ categories, selectedCategory, onSelect, totalDiscussions }: CategorySidebarProps) {
+  const [followed, setFollowed] = useState<Set<string>>(new Set());
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  const toggleFollow = (categoryId: string) => {
+    setFollowed((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Categories</h2>
+      <div className="space-y-2">
+        <button
+          onClick={() => onSelect(null)}
+          className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+            selectedCategory === null ? 'bg-cyan-100 text-cyan-700' : 'hover:bg-gray-100 text-gray-700'
+          }`}
+        >
+          <span className="flex justify-between">
+            <span>All Discussions</span>
+              <span className="text-gray-500">{totalDiscussions}</span>
+          </span>
+        </button>
+        {categories.map((category) => {
+          const isFollowed = followed.has(category.id);
+          return (
+            <div
+              key={category.id}
+              className="group relative"
+              onMouseEnter={() => setHovered(category.id)}
+              onMouseLeave={() => setHovered(null)}
+            >
+              <button
+                onClick={() => onSelect(category.id)}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                  selectedCategory === category.id ? 'bg-cyan-100 text-cyan-700' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                <span className="flex justify-between items-center gap-2">
+                  <span className="truncate">{category.name}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-gray-500 text-sm">{category.count}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFollow(category.id);
+                      }}
+                      className={`text-xs px-2 py-0.5 rounded-full transition-colors ${
+                        isFollowed
+                          ? 'bg-cyan-100 text-cyan-700'
+                          : 'opacity-0 group-hover:opacity-100 bg-gray-100 text-gray-600 hover:bg-cyan-50 hover:text-cyan-700'
+                      }`}
+                      aria-label={isFollowed ? 'Unfollow category' : 'Follow category'}
+                    >
+                      {isFollowed ? 'Following' : 'Follow'}
+                    </button>
+                  </span>
+                </span>
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -24,6 +24,12 @@ export const communityService = {
   removeBookmark: (id: string) =>
     request<{ bookmarked: boolean }>(`/api/community/discussions/${id}/bookmark`, { method: 'DELETE' }),
 
+  followCategory: (categoryId: string) =>
+    request<{ followed: boolean }>(`/api/community/categories/${categoryId}/follow`, { method: 'POST' }),
+
+  unfollowCategory: (categoryId: string) =>
+    request<{ followed: boolean }>(`/api/community/categories/${categoryId}/follow`, { method: 'DELETE' }),
+
   fetchDiscussions: (params?: { page?: number; limit?: number; category?: string; sort?: string }) => {
     const query = new URLSearchParams();
     if (params?.page) query.set('page', String(params.page));
