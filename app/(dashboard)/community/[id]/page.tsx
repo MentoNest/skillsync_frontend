@@ -6,7 +6,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Avatar from '@/components/Avatar';
 import CategoryBadge from '@/components/CategoryBadge';
 import DiscussionMetadata from '@/components/community/DiscussionMetadata';
-import type { Discussion, Comment } from '@/lib/community-types';
+import Comment from '@/components/community/Comment';
+import type { Discussion, Comment as CommentType } from '@/lib/community-types';
 
 // Simulate current user role (in a real app this would come from auth context)
 const CURRENT_USER_IS_MODERATOR = true;
@@ -840,7 +841,7 @@ export default function DiscussionDetailsPage() {
   const handleAddComment = () => {
     if (!newComment.trim()) return;
 
-    const comment: Comment = {
+    const comment: CommentType = {
       id: `c${Date.now()}`,
       author: {
         id: 'current-user',
@@ -864,7 +865,7 @@ export default function DiscussionDetailsPage() {
   const handleReply = (commentId: string) => {
     if (!replyContent.trim()) return;
 
-    const addReply = (comments: Comment[]): Comment[] => {
+    const addReply = (comments: CommentType[]): CommentType[] => {
       return comments.map(comment => {
         if (comment.id === commentId) {
           return {
@@ -903,7 +904,7 @@ export default function DiscussionDetailsPage() {
   };
 
   const handleCommentLike = (commentId: string) => {
-    const toggleLike = (comments: Comment[]): Comment[] => {
+    const toggleLike = (comments: CommentType[]): CommentType[] => {
       return comments.map(comment => {
         if (comment.id === commentId) {
           return {
@@ -951,48 +952,15 @@ export default function DiscussionDetailsPage() {
     return new Date(date).toLocaleDateString();
   };
 
-  const renderComment = (comment: Comment, isReply = false) => (
-    <div
-      key={comment.id}
-      className={`${isReply ? 'ml-12 mt-3' : 'mb-4'} bg-gray-50 rounded-lg p-4`}
-    >
-      <div className="flex items-start gap-3 mb-2">
-        <Avatar
-          src={comment.author.avatarUrl}
-          alt={comment.author.name}
-          name={comment.author.name}
-          size="sm"
-        />
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-medium text-gray-900 text-sm">{comment.author.name}</span>
-            {comment.author.role && (
-              <span className="text-xs text-gray-500">{comment.author.role}</span>
-            )}
-            <span className="text-xs text-gray-400">{timeAgo(comment.createdAt)}</span>
-          </div>
-          <p className="text-gray-700 text-sm leading-relaxed">{comment.content}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-4 ml-11">
-        <button
-          onClick={() => handleCommentLike(comment.id)}
-          className={`flex items-center gap-1 text-sm hover:text-cyan-600 transition-colors ${comment.isLiked ? 'text-cyan-600' : 'text-gray-500'}`}
-        >
-          <svg className="w-4 h-4" fill={comment.isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-          {comment.likeCount}
-        </button>
-        {!isReply && (
-          <button
-            onClick={() => setReplyTo(comment.id)}
-            className="text-sm text-gray-500 hover:text-cyan-600 transition-colors"
-          >
-            Reply
-          </button>
-        )}
-      </div>
+  const renderComment = (comment: CommentType, isReply = false) => (
+    <div key={comment.id}>
+      <Comment
+        comment={comment}
+        isReply={isReply}
+        onLike={handleCommentLike}
+        onReply={setReplyTo}
+        showReplyButton={!isReply}
+      />
       {replyTo === comment.id && (
         <div className="ml-11 mt-3">
           <textarea
