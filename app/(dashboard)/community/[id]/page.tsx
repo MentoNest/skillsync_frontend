@@ -185,6 +185,11 @@ export default function DiscussionDetailsPage() {
   const [newComment, setNewComment] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [editTags, setEditTags] = useState('');
 
   if (!discussion) {
     return (
@@ -221,6 +226,39 @@ export default function DiscussionDetailsPage() {
     } : null);
   };
 
+  const handleStartEdit = () => {
+    if (!discussion) return;
+    setEditTitle(discussion.title);
+    setEditContent(discussion.content);
+    setEditCategory(discussion.category);
+    setEditTags(discussion.tags?.join(', ') || '');
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!discussion || !editTitle.trim() || !editContent.trim()) return;
+
+    const updatedTags = editTags
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+
+    setDiscussion(prev => prev ? {
+      ...prev,
+      title: editTitle,
+      content: editContent,
+      category: editCategory,
+      tags: updatedTags
+    } : null);
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditTitle('');
+    setEditContent('');
+    setEditCategory('');
+    setEditTags('');
   const handleTogglePin = () => {
     setDiscussion(prev => prev ? { ...prev, isPinned: !prev.isPinned } : null);
   };
@@ -458,11 +496,19 @@ export default function DiscussionDetailsPage() {
             size="lg"
           />
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-gray-900">{discussion.author.name}</span>
-              {discussion.author.role && (
-                <span className="text-sm text-gray-500">{discussion.author.role}</span>
-              )}
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-gray-900">{discussion.author.name}</span>
+                {discussion.author.role && (
+                  <span className="text-sm text-gray-500">{discussion.author.role}</span>
+                )}
+              </div>
+              <button
+                onClick={handleStartEdit}
+                className="px-3 py-1.5 text-sm text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50 rounded-lg transition-colors"
+              >
+                Edit
+              </button>
             </div>
             <div className="flex items-center gap-2 mb-3">
               <CategoryBadge category={discussion.category} />
@@ -513,25 +559,92 @@ export default function DiscussionDetailsPage() {
           )}
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">{discussion.title}</h1>
-
-        {discussion.tags && discussion.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {discussion.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-0.5 text-sm font-medium text-gray-600"
+        {isEditing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                placeholder="Discussion title"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <input
+                type="text"
+                value={editCategory}
+                onChange={(e) => setEditCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                placeholder="Category"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
+                placeholder="Discussion content"
+                rows={6}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
+              <input
+                type="text"
+                value={editTags}
+                onChange={(e) => setEditTags(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                placeholder="tag1, tag2, tag3"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSaveEdit}
+                disabled={!editTitle.trim() || !editContent.trim()}
+                className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                #{tag}
-              </span>
-            ))}
+                Save Changes
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{discussion.title}</h1>
+
+            {discussion.tags && discussion.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {discussion.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-0.5 text-sm font-medium text-gray-600"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="prose prose-gray max-w-none mb-6">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">{discussion.content}</p>
+            </div>
+
+            <DiscussionMetadata
+              metadata={discussion}
+              onLike={handleLike}
+              onBookmark={handleBookmark}
+            />
+          </>
         )}
-
-        <div className="prose prose-gray max-w-none mb-6">
-          <p className="text-gray-700 leading-relaxed whitespace-pre-line">{discussion.content}</p>
-        </div>
-
         <DiscussionMetadata
           metadata={discussion}
           onLike={handleLike}
