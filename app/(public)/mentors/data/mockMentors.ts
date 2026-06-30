@@ -1,40 +1,4 @@
-// Domain types & mock dataset for the Mentor Discovery experience.
-// Lives next to the (public)/mentors route group so the page and its
-// components can share data without polluting the global components/lib.
-
-export type ExperienceLevel = 'Junior' | 'Mid-Level' | 'Senior' | 'Executive';
-
-export type AvailabilityStatus = 'available' | 'busy' | 'fully-booked';
-
-export type SortOption = 'top-rated' | 'price-asc' | 'price-desc' | 'most-reviewed';
-
-export type PriceRangeId = 'any' | 'budget' | 'mid' | 'premium';
-
-export interface Mentor {
-  /** Stable identifier used for keys, URL params, and analytics. */
-  id: string;
-  /** Display name. */
-  name: string;
-  /** A short professional tagline — drives the "Headline" search target. */
-  headline: string;
-  /** Long-form bio shown on hover, card body, and the profile page. */
-  bio: string;
-  /** Optional remote image URL for the avatar. Falls back to initials. */
-  avatarUrl?: string;
-  /** Skill stack surfaced as chips on the card and matched by search. */
-  skills: string[];
-  /** Domain / vertical tags used by the Industry filter. */
-  industries: string[];
-  experienceLevel: ExperienceLevel;
-  availability: AvailabilityStatus;
-  /** 0 – 5 inclusive, one decimal place. */
-  rating: number;
-  reviewCount: number;
-  /** Price in USD per 60-minute session. */
-  pricePerSession: number;
-  /** Years of professional experience driving the headline credibility. */
-  yearsExperience: number;
-}
+import { Mentor, ExperienceLevel, AvailabilityStatus, SortOption, PriceRangeId, Industry } from '@/lib/types';
 
 export const INDUSTRIES = [
   'Technology',
@@ -97,6 +61,7 @@ export const MENTORS: Mentor[] = [
     reviewCount: 248,
     pricePerSession: 120,
     yearsExperience: 12,
+    isFeatured: true,
   },
   {
     id: 'jordan-park',
@@ -111,6 +76,7 @@ export const MENTORS: Mentor[] = [
     reviewCount: 192,
     pricePerSession: 95,
     yearsExperience: 9,
+    isFeatured: true,
   },
   {
     id: 'priya-shankar',
