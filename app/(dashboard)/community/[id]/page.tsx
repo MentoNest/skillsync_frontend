@@ -756,6 +756,7 @@ export default function DiscussionDetailsPage() {
   const [newComment, setNewComment] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
+  const [collapsedReplies, setCollapsedReplies] = useState<Set<string>>(new Set());
 
   if (!discussion) {
     return (
@@ -875,6 +876,18 @@ export default function DiscussionDetailsPage() {
     } : null);
   };
 
+  const toggleCollapse = (commentId: string) => {
+    setCollapsedReplies((prev) => {
+      const next = new Set(prev);
+      if (next.has(commentId)) {
+        next.delete(commentId);
+      } else {
+        next.add(commentId);
+      }
+      return next;
+    });
+  };
+
   const timeAgo = (date: string) => {
     const now = Date.now();
     const then = new Date(date).getTime();
@@ -961,7 +974,19 @@ export default function DiscussionDetailsPage() {
       )}
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-3">
-          {comment.replies.map(reply => renderComment(reply, true))}
+          <button
+            onClick={() => toggleCollapse(comment.id)}
+            className="text-xs text-gray-500 hover:text-cyan-600 transition-colors mb-2"
+          >
+            {collapsedReplies.has(comment.id)
+              ? `Show ${comment.replies!.length} ${comment.replies!.length === 1 ? 'reply' : 'replies'}`
+              : 'Hide replies'}
+          </button>
+          {!collapsedReplies.has(comment.id) && (
+            <div>
+              {comment.replies!.map(reply => renderComment(reply, true))}
+            </div>
+          )}
         </div>
       )}
     </div>
