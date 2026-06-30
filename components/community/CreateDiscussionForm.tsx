@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CATEGORIES } from '@/lib/filters';
+import RichTextEditor from './RichTextEditor';
 
 const createDiscussionSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(200, 'Title must be less than 200 characters'),
@@ -21,14 +22,19 @@ interface Props {
 export default function CreateDiscussionForm({ onSuccess }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [content, setContent] = useState('');
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset,
   } = useForm<CreateDiscussionFormData>({
     resolver: zodResolver(createDiscussionSchema),
+    defaultValues: {
+      content: '',
+    },
   });
 
   const onSubmit = async (data: CreateDiscussionFormData) => {
@@ -36,12 +42,17 @@ export default function CreateDiscussionForm({ onSuccess }: Props) {
     setError(null);
 
     try {
+      const submissionData = {
+        ...data,
+        content,
+      };
+
       const response = await fetch('/api/discussions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submissionData),
       });
 
       if (!response.ok) {
@@ -50,6 +61,7 @@ export default function CreateDiscussionForm({ onSuccess }: Props) {
       }
 
       reset();
+      setContent('');
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
@@ -110,13 +122,7 @@ export default function CreateDiscussionForm({ onSuccess }: Props) {
           <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
             Content
           </label>
-          <textarea
-            id="content"
-            rows={6}
-            {...register('content')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
-            placeholder="Share your thoughts, questions, or experiences..."
-          />
+          <RichTextEditor content={content} onChange={setContent} />
           {errors.content && (
             <p className="mt-1 text-sm text-red-600">{errors.content.message}</p>
           )}
