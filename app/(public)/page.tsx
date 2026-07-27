@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import HeroSection from '@/components/landing/HeroSection';
+import WhyChooseUsSection from '@/components/landing/WhyChooseUsSection';
+import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
+import LearningPathResourcesSection from '@/components/landing/LearningPathResourcesSection';
 import MentorDiscoverySection from '@/components/landing/MentorDiscoverySection';
 import FeaturedMentorHighlight from '@/components/landing/FeaturedMentorHighlight';
-import FeaturedLearningTracks from '@/components/FeaturedLearningTracks';
 import FeaturedArticles from '@/components/FeaturedArticles';
 import ToolsAndTemplates from '@/components/ToolsAndTemplates';
 import ResourceSearchBar from '@/components/ResourceSearchBar';
@@ -95,8 +97,15 @@ export default function Home() {
 
       <FeaturedMentorHighlight />
 
-      {/* Dynamic Landing Sections */}
-      <FeaturedLearningTracks />
+      {/* Why Choose Us — Issue #599 */}
+      <WhyChooseUsSection />
+
+      {/* Learning Path & Resources — Issue #600 */}
+      <LearningPathResourcesSection />
+
+      {/* Platform Statistics — Issue #601 */}
+      <PlatformStatisticsSection />
+
       <FeaturedArticles />
       <ToolsAndTemplates />
 
