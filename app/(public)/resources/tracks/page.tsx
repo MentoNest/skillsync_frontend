@@ -1,6 +1,10 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 import LearningTrackCard from '@/components/landing/LearningTrackCard';
+import { useDebounce } from '@/hooks/useDebounce';
+import { SearchIcon } from '@/components/resources/icons';
 
 const learningTracks = [
   {
@@ -82,14 +86,28 @@ const learningTracks = [
     duration: '8h 30m',
     imageSrc: '/Image (Marcus Williams).svg',
     href: '/resources/backend-design',
-  }
+  },
 ];
 
 export default function TracksPage() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+
+  const filtered = debouncedQuery.trim()
+    ? learningTracks.filter((track) => {
+        const q = debouncedQuery.toLowerCase();
+        return (
+          track.title.toLowerCase().includes(q) ||
+          track.category.toLowerCase().includes(q) ||
+          track.description.toLowerCase().includes(q)
+        );
+      })
+    : learningTracks;
+
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* Back to Resources link */}
         <div className="mb-6">
           <Link
@@ -111,7 +129,7 @@ export default function TracksPage() {
         </div>
 
         {/* Page Header */}
-        <div className="border-b border-slate-200 dark:border-gray-800 pb-8 mb-10">
+        <div className="border-b border-slate-200 dark:border-gray-800 pb-8 mb-8">
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
             Learning Tracks
           </h1>
@@ -120,12 +138,53 @@ export default function TracksPage() {
           </p>
         </div>
 
-        {/* Tracks Grid */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {learningTracks.map((track) => (
-            <LearningTrackCard key={track.title} {...track} />
-          ))}
+        {/* Search */}
+        <div className="relative mb-8 max-w-xl">
+          <label htmlFor="tracks-search" className="sr-only">
+            Search learning tracks
+          </label>
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+            <SearchIcon className="w-4 h-4 text-gray-400" />
+          </div>
+          <input
+            id="tracks-search"
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by title, category, or keyword…"
+            className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500 transition-all"
+          />
         </div>
+
+        {/* Results count */}
+        {debouncedQuery.trim() && (
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
+            {filtered.length === 0
+              ? 'No tracks found.'
+              : `${filtered.length} track${filtered.length === 1 ? '' : 's'} found`}
+          </p>
+        )}
+
+        {/* Tracks Grid */}
+        {filtered.length > 0 ? (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((track) => (
+              <LearningTrackCard key={track.title} {...track} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center">
+            <p className="text-gray-500 dark:text-gray-400 text-base">
+              No learning tracks match <span className="font-semibold text-gray-700 dark:text-gray-200">&quot;{debouncedQuery}&quot;</span>.
+            </p>
+            <button
+              onClick={() => setQuery('')}
+              className="mt-4 text-sm font-semibold text-cyan-600 hover:text-cyan-700 transition-colors focus:outline-none focus:underline"
+            >
+              Clear search
+            </button>
+          </div>
+        )}
       </div>
     </main>
   );
