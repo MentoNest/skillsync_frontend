@@ -1,3 +1,4 @@
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import React from 'react';
 
 export default function MenteeLayout({
@@ -6,9 +7,11 @@ export default function MenteeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <h1>Mentee Layout</h1>
-      {children}
-    </div>
+    <ProtectedRoute>
+      <div>
+        <h1>Mentee Layout</h1>
+        {children}
+      </div>
+    </ProtectedRoute>
   );
 }

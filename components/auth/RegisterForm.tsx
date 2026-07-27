@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import PasswordInput from './PasswordInput';
 
 const registerSchema = z
@@ -21,17 +23,23 @@ const registerSchema = z
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
+  const router = useRouter();
+  const { register: registerUser, isLoading, error } = useAuth();
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     mode: 'onTouched',
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    console.log('Register:', data);
+  const onSubmit = async (data: RegisterFormValues) => {
+    try {
+      await registerUser(data);
+      router.push('/dashboard');
+    } catch {
+    }
   };
 
   const fieldClass = (hasError: boolean) =>
@@ -130,12 +138,15 @@ export default function RegisterForm() {
           )}
         </div>
 
+        {error && (
+          <p role="alert" className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+        )}
         <button
           type="submit"
-          disabled={isDirty && !isValid}
+          disabled={isLoading}
           className="bg-cyan-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Account
+          {isLoading ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
     </div>

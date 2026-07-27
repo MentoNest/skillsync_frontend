@@ -5,6 +5,7 @@ import { MENTORS } from '@/app/(public)/mentors/data/mockMentors';
 import MentorCard from '@/components/MentorCard';
 import { Mentor } from '@/lib/types';
 import Link from 'next/link';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 export default function SavedMentorsPage() {
   const [mentors, setMentors] = useState<Mentor[]>(MENTORS.filter(m => m.isBookmarked));
@@ -16,6 +17,7 @@ export default function SavedMentorsPage() {
   };
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
         <div className="text-center mb-12">
@@ -63,5 +65,6 @@ export default function SavedMentorsPage() {
         )}
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import PasswordInput from './PasswordInput';
 
 const loginSchema = z.object({
@@ -14,17 +16,23 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const router = useRouter();
+  const { login, isLoading, error } = useAuth();
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     mode: 'onTouched',
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    console.log('Login:', data);
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      await login(data);
+      router.push('/dashboard');
+    } catch {
+    }
   };
 
   return (
@@ -81,12 +89,15 @@ export default function LoginForm() {
           )}
         </div>
 
+        {error && (
+          <p role="alert" className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+        )}
         <button
           type="submit"
-          disabled={isDirty && !isValid}
+          disabled={isLoading}
           className="bg-cyan-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Login
+          {isLoading ? 'Signing in...' : 'Login'}
         </button>
       </form>
     </div>

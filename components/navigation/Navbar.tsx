@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -15,6 +16,13 @@ const navLinks = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -42,18 +50,38 @@ export default function Navbar() {
 
         {/* Auth buttons (desktop) */}
         <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/login"
-            className="text-sm font-medium text-gray-700 hover:text-cyan-600 transition-colors"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="text-sm font-medium bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors"
-          >
-            Register
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-gray-700 hover:text-cyan-600 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <span className="text-sm text-gray-500">{user?.name}</span>
+              <button
+                onClick={handleLogout}
+                className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-sm font-medium text-gray-700 hover:text-cyan-600 transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="text-sm font-medium bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Hamburger button (mobile) */}
@@ -95,20 +123,41 @@ export default function Navbar() {
             ))}
           </ul>
           <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-100">
-            <Link
-              href="/login"
-              onClick={() => setMenuOpen(false)}
-              className="text-center text-sm font-medium text-gray-700 border border-gray-200 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              onClick={() => setMenuOpen(false)}
-              className="text-center text-sm font-medium bg-cyan-600 text-white py-2 rounded-lg hover:bg-cyan-700 transition-colors"
-            >
-              Register
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-center text-sm font-medium text-gray-700 border border-gray-200 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <span className="text-center text-sm text-gray-500 py-1">{user?.name}</span>
+                <button
+                  onClick={() => { setMenuOpen(false); handleLogout(); }}
+                  className="text-center text-sm font-medium text-red-600 border border-red-200 py-2 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-center text-sm font-medium text-gray-700 border border-gray-200 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-center text-sm font-medium bg-cyan-600 text-white py-2 rounded-lg hover:bg-cyan-700 transition-colors"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
