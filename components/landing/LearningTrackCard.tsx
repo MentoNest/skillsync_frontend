@@ -1,9 +1,7 @@
-'use client';
-
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export interface LearningTrackCardProps {
+interface LearningTrackCardProps {
   title: string;
   category: string;
   description: string;
@@ -11,7 +9,6 @@ export interface LearningTrackCardProps {
   duration: string;
   imageSrc: string;
   href: string;
-  alt?: string;
 }
 
 export default function LearningTrackCard({
@@ -22,52 +19,52 @@ export default function LearningTrackCard({
   duration,
   imageSrc,
   href,
-  alt,
 }: LearningTrackCardProps) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative overflow-hidden bg-slate-100">
-        <div className="aspect-[16/10] w-full">
+    <Link href={href} className="group block h-full">
+      <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg group-hover:border-cyan-300 overflow-hidden">
+        {/* Image header */}
+        <div className="relative h-44 w-full overflow-hidden bg-slate-100">
           <Image
             src={imageSrc}
-            alt={alt ?? title}
+            alt={`Illustration for ${title}`}
             fill
-            className="object-cover transition duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
           />
+          <span className="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-700 shadow-sm backdrop-blur-sm">
+            {category}
+          </span>
         </div>
-        <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-700 shadow-sm ring-1 ring-slate-200">
-          {category}
-        </span>
-      </div>
 
-      <div className="flex flex-1 flex-col gap-5 p-6 sm:p-7">
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+        {/* Card body */}
+        <div className="flex flex-1 flex-col gap-3 p-5">
+          <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-cyan-600">
             {title}
           </h3>
-          <p className="text-sm leading-6 text-slate-600 sm:text-base">
+          <p className="text-sm leading-6 text-slate-600 line-clamp-3">
             {description}
           </p>
-        </div>
 
-        <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
-            <span className="whitespace-nowrap font-medium text-slate-700">{lessons} lessons</span>
-          </div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
-            <span className="whitespace-nowrap font-medium text-slate-700">{duration}</span>
+          {/* Meta info */}
+          <div className="mt-auto flex items-center gap-4 pt-3 text-xs text-slate-500">
+            <span className="flex items-center gap-1.5">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              {duration}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              {lessons} lessons
+            </span>
           </div>
         </div>
-
-        <div className="mt-auto">
-          <Link
-            href={href}
-            className="inline-flex w-full items-center justify-center rounded-full bg-cyan-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-cyan-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-          >
-            Start learning
-          </Link>
-        </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   );
 }

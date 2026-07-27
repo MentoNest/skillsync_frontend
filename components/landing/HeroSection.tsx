@@ -1,39 +1,27 @@
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function HeroSection() {
   return (
-    <section className="hero-section bg-white py-20">
-      <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-600">Mentorship for every step</p>
-            <h1 className="mt-6 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-              Get the guidance you need to move faster in your career.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              Connect with hand-picked mentors from top companies who help you sharpen your goals, prepare for promotion, and land the next role with confidence.
-            </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-4 text-sm font-semibold text-white transition hover:bg-slate-800"
-              >
-                Join SkillSync
-              </Link>
-              <Link
-                href="/mentors"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-4 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
-              >
-                Explore mentors
-              </Link>
-            </div>
-          </div>
-          <div className="rounded-[2rem] bg-slate-950 p-10 text-white shadow-2xl shadow-slate-900/20">
-            <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Featured mentor</p>
-            <h2 className="mt-6 text-3xl font-semibold">Launch your next promotion with expert support</h2>
-            <p className="mt-5 text-base leading-7 text-slate-300">
-              Our mentors have guided thousands of professionals through high-impact career decisions, technical interviews, and leadership growth.
-            </p>
+    <section className="bg-white dark:bg-gray-900 transition-colors" aria-label="Hero Section">
+      <div className="grid max-w-screen-xl px-4 py-12 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
+        <div className="mr-auto place-self-center lg:col-span-7">
+          <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
+            Find Your Perfect Mentor
+          </h1>
+          <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
+            SkillSync helps you connect with experienced professionals to
+            guide you on your career path.
+          </p>
+          <Link href="/register" className="inline-flex">
+            <Button>Get Started</Button>
+          </Link>
+        </div>
+        <div className="hidden lg:mt-0 lg:col-span-5 lg:flex justify-center">
+          <div className="w-80 h-80 rounded-full bg-gradient-to-br from-cyan-400/20 to-purple-500/20 flex items-center justify-center animate-pulse">
+            <span className="text-6xl font-bold text-cyan-600/40 dark:text-cyan-400/40">
+              S²
+            </span>
           </div>
         </div>
       </div>

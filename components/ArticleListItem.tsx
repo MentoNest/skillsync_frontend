@@ -1,44 +1,46 @@
-import Link from 'next/link'
+import React from 'react';
+import Link from 'next/link';
 
-type ArticleListItemProps = {
-  category: string
-  title: string
-  author: string
-  readTime: string
-  href: string
+interface ArticleListItemProps {
+  category: string;
+  title: string;
+  author: string;
+  readTime: string;
+  href?: string;
 }
 
-export default function ArticleListItem({
-  category,
-  title,
-  author,
-  readTime,
-  href,
-}: ArticleListItemProps) {
+export default function ArticleListItem({ category, title, author, readTime, href }: ArticleListItemProps) {
+  const articleSlug = title.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-p\-]/g, '');
+  const targetHref = href || `/resources/articles/${articleSlug}`;
+
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <Link href={href} className="group block h-full rounded-3xl p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2">
-        <p className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-700">
+    <Link
+      href={targetHref}
+      className="flex items-center justify-between gap-4 py-4 px-2 hover:bg-slate-50 dark:hover:bg-gray-800/60 rounded-xl transition-all group focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+    >
+      <div>
+        <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide">
           {category}
-        </p>
-        <h3 className="mt-4 text-xl font-semibold text-slate-900 transition group-hover:text-slate-700">
+        </span>
+        <h3 className="text-base font-bold text-gray-900 dark:text-white mt-1 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
           {title}
         </h3>
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-          <span>By {author}</span>
-          <span aria-hidden="true">•</span>
-          <span>{readTime}</span>
-        </div>
-        <div className="mt-6 flex items-center justify-between text-slate-700">
-          <span className="text-sm font-medium text-slate-900">Read article</span>
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition group-hover:bg-slate-900 group-hover:text-white">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
-              <path d="M13 5.5l6.5 6.5-6.5 6.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M4.5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </span>
-        </div>
-      </Link>
-    </article>
-  )
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          By {author} &middot; {readTime}
+        </p>
+      </div>
+      <div className="flex-shrink-0 p-2 bg-slate-50 rounded-full group-hover:bg-cyan-50 group-hover:text-cyan-600 dark:bg-gray-800 dark:group-hover:bg-cyan-900/30 dark:group-hover:text-cyan-400 transition-colors">
+        <svg
+          className="w-4 h-4 text-cyan-600 dark:text-cyan-400 transform group-hover:translate-x-0.5 transition-transform"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </Link>
+  );
 }

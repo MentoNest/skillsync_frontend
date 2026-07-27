@@ -1,48 +1,67 @@
-# Skillsync Frontend (Scaffold)
+# SkillSync
 
-This repository is a minimal scaffold for a mentorship platform using Next.js (App Router), TypeScript and Tailwind CSS.
+A mentorship platform connecting mentees with industry-leading mentors. Built with Next.js (App Router), TypeScript, and Tailwind CSS.
 
-Structure highlights:
+## Tech Stack
 
-- `app/` — Next.js App Router routes and layouts with role-based route groups: `(public)`, `(mentor)`, `(mentee)`, `(admin)`.
-- `components/` — shared UI components (placeholder).
-- `lib/` — helper libraries (placeholder).
-- `styles/` — global Tailwind CSS entry.
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Linting:** ESLint
+- **PostCSS**
 
-This scaffold intentionally includes placeholders only; UI content and features are out of scope.
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Project Structure
+
+```
+app/
+├── (public)/              # Public-facing pages (landing, mentors, resources)
+│   ├── layout.tsx         # Public layout with Navbar + Footer
+│   └── page.tsx           # Landing page
+├── (mentor)/              # Mentor dashboard
+│   ├── layout.tsx         # Mentor role layout
+│   └── mentor/page.tsx
+├── (mentee)/              # Mentee dashboard
+│   ├── layout.tsx         # Mentee role layout
+│   └── mentee/page.tsx
+├── (admin)/               # Admin dashboard
+│   ├── layout.tsx         # Admin role layout
+│   └── admin/page.tsx
+├── (auth)/                # Authentication pages
+├── (dashboard)/           # Shared dashboard views
+├── api/                   # API routes
+├── layout.tsx             # Root layout
+└── globals.css            # Global styles + Tailwind config
+```
+
+## Shared Directories
+
+```
+components/
+├── landing/               # Landing page section components
+├── mentors/               # Mentor discovery & filtering
+├── community/             # Discussion & moderation features
+├── navigation/            # Navbar, Footer
+├── ui/                    # Reusable UI primitives (Button, StarRating, etc.)
+└── *.tsx                  # Feature-level components (MentorCard, Testimonials, etc.)
+
+lib/
+├── types.ts               # Shared TypeScript interfaces
+├── community-service.ts   # Community data layer
+├── filters.ts             # Filtering utilities
+└── realtime-discussion.ts # Real-time discussion support
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Path Aliases
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `@/components` — Component library
+- `@/lib` — Utilities and types
+- `@/styles` — Global styles

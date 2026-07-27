@@ -1,10 +1,14 @@
-import React from 'react'
+import React from 'react';
+import ModerationDashboard from '@/components/community/ModerationDashboard';
 
-export default function AdminPage() {
+export default function Page() {
   return (
-    <div className="p-4">
-      <h2 className="text-xl">Admin Home</h2>
-      <p className="text-sm text-slate-600">Placeholder for admin dashboard content.</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-semibold text-gray-900">Community moderation</h1>
+        <p className="mt-2 text-gray-600">Review reports and keep community discussions safe.</p>
+      </div>
+      <ModerationDashboard />
     </div>
-  )
+  );
 }
