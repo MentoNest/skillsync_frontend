@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import MentorCard from '@/components/MentorCard';
+import HeroSection from '@/components/landing/HeroSection';
+import MentorDiscoverySection from '@/components/landing/MentorDiscoverySection';
+import FeaturedMentorHighlight from '@/components/landing/FeaturedMentorHighlight';
 import FeaturedLearningTracks from '@/components/FeaturedLearningTracks';
 import FeaturedArticles from '@/components/FeaturedArticles';
 import ToolsAndTemplates from '@/components/ToolsAndTemplates';
@@ -8,68 +10,10 @@ import ResourceSearchBar from '@/components/ResourceSearchBar';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import Image from 'next/image';
 
-const mentors = [
-  {
-    mentorId: 'sarah-doe',
-    name: 'Sarah Doe',
-    title: 'Software Engineer @ Google',
-    bio: 'Expert in React, Node.js, and cloud infrastructure.',
-    avatarUrl: '/avatars/sarah.jpg',
-    rating: 4.8,
-    reviewCount: 124,
-    pricePerSession: 85,
-    skills: ['React', 'Node.js', 'Cloud'],
-  },
-  {
-    mentorId: 'john-smith',
-    name: 'John Smith',
-    title: 'Product Manager @ Microsoft',
-    bio: 'Specializes in product strategy and user-centric design.',
-    avatarUrl: '/avatars/john.jpg',
-    rating: 4.6,
-    reviewCount: 98,
-    pricePerSession: 75,
-    skills: ['Product Strategy', 'UX', 'Agile'],
-  },
-  {
-    mentorId: 'jane-roe',
-    name: 'Jane Roe',
-    title: 'UX Designer @ Apple',
-    bio: 'Passionate about creating beautiful and intuitive user experiences.',
-    avatarUrl: '/avatars/jane.jpg',
-    rating: 4.9,
-    reviewCount: 156,
-    pricePerSession: 90,
-    skills: ['UX Design', 'Figma', 'Prototyping'],
-  },
-];
 export default function Home() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="bg-white dark:bg-gray-900 transition-colors" aria-label="Hero Section">
-        <div className="grid max-w-screen-xl px-4 py-12 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
-          <div className="mr-auto place-self-center lg:col-span-7">
-            <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
-              Find Your Perfect Mentor
-            </h1>
-            <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
-              SkillSync helps you connect with experienced professionals to
-              guide you on your career path.
-            </p>
-            <Link href="/register" className="inline-flex">
-              <Button>Get Started</Button>
-            </Link>
-          </div>
-          <div className="hidden lg:mt-0 lg:col-span-5 lg:flex justify-center">
-            <div className="w-80 h-80 rounded-full bg-gradient-to-br from-cyan-400/20 to-purple-500/20 flex items-center justify-center animate-pulse">
-              <span className="text-6xl font-bold text-cyan-600/40 dark:text-cyan-400/40">
-                S²
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       <div className="block lg:hidden">
         <Link
@@ -147,36 +91,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Mentors Grid Section */}
-      <section
-        className="bg-gray-50 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-800 transition-colors"
-        aria-labelledby="mentors-heading"
-      >
-        <div className="py-12 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-          <div className="mx-auto max-w-screen-sm text-center mb-10 lg:mb-14">
-            <h2
-              id="mentors-heading"
-              className="mb-4 text-3xl md:text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white"
-            >
-              Meet Our Mentors
-            </h2>
-            <p className="font-light text-gray-500 sm:text-xl dark:text-gray-400">
-              Our mentors are industry experts with a passion for sharing their
-              knowledge and guiding you.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {mentors.map((mentor) => (
-              <MentorCard key={mentor.mentorId} {...mentor} />
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/mentors">
-              <Button variant="secondary">View All Mentors</Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <MentorDiscoverySection />
+
+      <FeaturedMentorHighlight />
 
       {/* Dynamic Landing Sections */}
       <FeaturedLearningTracks />
