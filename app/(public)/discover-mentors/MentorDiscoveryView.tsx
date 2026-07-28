@@ -45,6 +45,11 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sort, setSort] = useState<SortOption>('rating-desc');
+  // Bookmark state
+  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+  // Infinite scroll state
+  const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
+  const [hasMore, setHasMore] = useState(true);
   // Issue 479 – comparison state
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
@@ -490,9 +495,14 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                 {paginatedMentors.map((mentor) => {
                   const isSelected = compareIds.includes(mentor.id);
                   const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                  const mentorWithBookmark = {
+                    ...mentor,
+                    isBookmarked: bookmarkedMentors.has(mentor.id),
+                    onToggleBookmark: () => toggleBookmark(mentor.id)
+                  };
                   return (
                     <li key={mentor.id} className="h-full flex flex-col">
-                      <DiscoveryMentorCard mentor={mentor} />
+                      <DiscoveryMentorCard mentor={mentorWithBookmark} />
 
                       <button
                         type="button"
@@ -564,7 +574,6 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
           )}
           </main>
         </div>
-      </section>
       </div>
 
       {/* Issue 479 – Comparison drawer */}
