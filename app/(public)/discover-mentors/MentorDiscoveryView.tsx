@@ -45,6 +45,11 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sort, setSort] = useState<SortOption>('rating-desc');
+  // Bookmark state
+  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+  // Infinite scroll state
+  const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
+  const [hasMore, setHasMore] = useState(true);
   // Issue 479 – comparison state
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
@@ -664,7 +669,6 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
           )}
           </main>
         </div>
-      </section>
       </div>
 
       {/* Issue 479 – Comparison drawer */}
