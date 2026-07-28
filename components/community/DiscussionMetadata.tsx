@@ -1,4 +1,4 @@
-import { DiscussionMetadata as Metadata } from '@/lib/community-types';
+import type { DiscussionMetadata as Metadata } from '@/lib/community-types';
 
 interface Props {
   metadata: Metadata;
@@ -27,7 +27,10 @@ export default function DiscussionMetadata({ metadata, onLike, onBookmark, onFol
     <div className="flex items-center gap-4 text-sm text-gray-500">
       <span className="flex items-center gap-1">
         <button
-          onClick={() => !disableInteractions && onLike?.(metadata.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!disableInteractions) onLike?.(metadata.id);
+          }}
           className={`flex items-center gap-1 transition-colors ${
             disableInteractions ? 'text-gray-400 cursor-not-allowed' : `hover:text-cyan-600 ${metadata.isLiked ? 'text-cyan-600' : ''}`
           }`}
@@ -61,7 +64,10 @@ export default function DiscussionMetadata({ metadata, onLike, onBookmark, onFol
       <div className="ml-auto flex items-center gap-2">
         {onFollow && (
           <button
-            onClick={() => onFollow?.(metadata.author.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onFollow?.(metadata.author.id);
+            }}
             className={`rounded-full border px-2 py-1 text-xs font-medium transition-colors ${metadata.isFollowing ? 'border-cyan-600 bg-cyan-50 text-cyan-700' : 'border-gray-300 text-gray-600 hover:border-cyan-600 hover:text-cyan-600'}`}
           >
             {metadata.isFollowing ? 'Following' : 'Follow'}
@@ -70,7 +76,10 @@ export default function DiscussionMetadata({ metadata, onLike, onBookmark, onFol
 
         {onShare && (
           <button
-            onClick={() => onShare?.(metadata.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onShare?.(metadata.id);
+            }}
             className="rounded-full border border-gray-300 px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:border-cyan-600 hover:text-cyan-600"
           >
             Share
@@ -79,7 +88,10 @@ export default function DiscussionMetadata({ metadata, onLike, onBookmark, onFol
 
         {onReport && (
           <button
-            onClick={() => onReport?.(metadata.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onReport?.(metadata.id);
+            }}
             className={`rounded-full border px-2 py-1 text-xs font-medium transition-colors ${metadata.isReported ? 'border-rose-600 bg-rose-50 text-rose-700' : 'border-gray-300 text-gray-600 hover:border-rose-600 hover:text-rose-600'}`}
           >
             {metadata.isReported ? 'Reported' : 'Report'}
@@ -87,7 +99,10 @@ export default function DiscussionMetadata({ metadata, onLike, onBookmark, onFol
         )}
 
         <button
-          onClick={() => !disableInteractions && onBookmark?.(metadata.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!disableInteractions) onBookmark?.(metadata.id);
+          }}
           className={`transition-colors ${disableInteractions ? 'text-gray-300 cursor-not-allowed' : `hover:text-cyan-600 ${metadata.isBookmarked ? 'text-cyan-600' : ''}`}`}
           aria-label={metadata.isBookmarked ? 'Remove bookmark' : 'Bookmark'}
           disabled={disableInteractions}
