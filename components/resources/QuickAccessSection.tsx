@@ -1,4 +1,4 @@
-import { FileText, Video, BookOpen, Download } from 'lucide-react';
+import { FileText, Video, BookOpen, Download } from "lucide-react";
 
 /**
  * QuickAccessSection — Grid layout for Quick Access resource categories.
@@ -25,7 +25,14 @@ interface QuickAccessCardProps {
   iconBgColor: string;
 }
 
-function QuickAccessCard({ icon, title, description, href, iconColor, iconBgColor }: QuickAccessCardProps) {
+function QuickAccessCard({
+  icon,
+  title,
+  description,
+  href,
+  iconColor,
+  iconBgColor,
+}: QuickAccessCardProps) {
   return (
     <a
       href={href}
@@ -40,7 +47,9 @@ function QuickAccessCard({ icon, title, description, href, iconColor, iconBgColo
       {/* Content */}
       <div className="relative z-10">
         {/* Icon */}
-        <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl ${iconBgColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
+        <div
+          className={`inline-flex items-center justify-center w-14 h-14 rounded-xl ${iconBgColor} mb-4 group-hover:scale-110 transition-transform duration-300`}
+        >
           <div className={iconColor} aria-hidden="true">
             {icon}
           </div>
@@ -67,7 +76,11 @@ function QuickAccessCard({ icon, title, description, href, iconColor, iconBgColo
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </div>
       </div>
@@ -85,43 +98,44 @@ export default function QuickAccessSection() {
   const quickAccessItems = [
     {
       icon: <FileText className="h-7 w-7" />,
-      title: 'Resume Templates',
-      description: 'Professional resume templates designed to help you stand out and get noticed by recruiters.',
-      href: '/resources/templates/resume',
-      iconColor: 'text-blue-600 dark:text-blue-400',
-      iconBgColor: 'bg-blue-100 dark:bg-blue-950/40',
+      title: "Resume Templates",
+      description:
+        "Professional resume templates designed to help you stand out and get noticed by recruiters.",
+      href: "/resources/templates/resume",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      iconBgColor: "bg-blue-100 dark:bg-blue-950/40",
     },
     {
       icon: <Video className="h-7 w-7" />,
-      title: 'Video Tutorials',
-      description: 'Step-by-step video guides covering career development, interview prep, and professional skills.',
-      href: '/resources/tutorials',
-      iconColor: 'text-purple-600 dark:text-purple-400',
-      iconBgColor: 'bg-purple-100 dark:bg-purple-950/40',
+      title: "Video Tutorials",
+      description:
+        "Step-by-step video guides covering career development, interview prep, and professional skills.",
+      href: "/resources/tutorials",
+      iconColor: "text-purple-600 dark:text-purple-400",
+      iconBgColor: "bg-purple-100 dark:bg-purple-950/40",
     },
     {
       icon: <BookOpen className="h-7 w-7" />,
-      title: 'Career Guides',
-      description: 'Comprehensive guides on career planning, job search strategies, and professional growth.',
-      href: '/resources/guides',
-      iconColor: 'text-green-600 dark:text-green-400',
-      iconBgColor: 'bg-green-100 dark:bg-green-950/40',
+      title: "Career Guides",
+      description:
+        "Comprehensive guides on career planning, job search strategies, and professional growth.",
+      href: "/resources/guides",
+      iconColor: "text-green-600 dark:text-green-400",
+      iconBgColor: "bg-green-100 dark:bg-green-950/40",
     },
     {
       icon: <Download className="h-7 w-7" />,
-      title: 'Downloadable Tools',
-      description: 'Free tools, checklists, and worksheets to accelerate your career development journey.',
-      href: '/resources/downloads',
-      iconColor: 'text-orange-600 dark:text-orange-400',
-      iconBgColor: 'bg-orange-100 dark:bg-orange-950/40',
+      title: "Downloadable Tools",
+      description:
+        "Free tools, checklists, and worksheets to accelerate your career development journey.",
+      href: "/resources/downloads",
+      iconColor: "text-orange-600 dark:text-orange-400",
+      iconBgColor: "bg-orange-100 dark:bg-orange-950/40",
     },
   ];
 
   return (
-    <section
-      className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20"
-      aria-labelledby="quick-access-heading"
-    >
+    <div className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20">
       {/* Section Header */}
       <div className="mb-12 text-center lg:text-left">
         <h2
@@ -149,6 +163,6 @@ export default function QuickAccessSection() {
           />
         ))}
       </div>
-    </section>
+    </div>
   );
 }

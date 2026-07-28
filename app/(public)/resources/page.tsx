@@ -1,9 +1,9 @@
-import React, { Suspense } from 'react';
-import HeroSection from '@/components/resources/HeroSection';
-import ResourceSearchBarWrapper from '@/components/resources/ResourceSearchBarWrapper';
-import { CategoryGrid } from '@/components/resources/CategoryGrid';
-import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection';
-import QuickAccessSection from '@/components/resources/QuickAccessSection';
+import React, { Suspense } from "react";
+import HeroSection from "@/components/resources/HeroSection";
+import ResourceSearchBarWrapper from "@/components/resources/ResourceSearchBarWrapper";
+import { CategoryGrid } from "@/components/resources/CategoryGrid";
+import ToolsTemplatesSection from "@/components/resources/ToolsTemplatesSection";
+import QuickAccessSection from "@/components/resources/QuickAccessSection";
 
 function CategoryGridFallback() {
   return (
@@ -14,7 +14,10 @@ function CategoryGridFallback() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="p-6 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/80 rounded-2xl">
+          <div
+            key={i}
+            className="p-6 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/80 rounded-2xl"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-purple-100 dark:bg-purple-950/40 rounded-xl animate-pulse" />
               <div className="w-20 h-5 bg-purple-100 dark:bg-purple-950/40 rounded-full animate-pulse" />
@@ -31,10 +34,13 @@ function CategoryGridFallback() {
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors">
+    <main className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors">
       <HeroSection />
 
-      <section className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 transition-colors" aria-label="Resources Search">
+      <section
+        className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 transition-colors"
+        aria-label="Resources Search"
+      >
         <ResourceSearchBarWrapper />
       </section>
 
@@ -43,14 +49,20 @@ export default function ResourcesPage() {
       </Suspense>
 
       {/* Quick Access Section */}
-      <section className="bg-slate-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors">
+      <section
+        className="bg-slate-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors"
+        aria-labelledby="quick-access-heading"
+      >
         <QuickAccessSection />
       </section>
 
       {/* Tools & Templates Section */}
-      <section className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors">
+      <section
+        className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors"
+        aria-labelledby="tools-templates-heading"
+      >
         <ToolsTemplatesSection />
       </section>
-    </div>
+    </main>
   );
 }

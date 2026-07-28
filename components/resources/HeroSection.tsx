@@ -1,4 +1,4 @@
-import { SearchIcon } from '@/components/resources/icons';
+import { SearchIcon } from "@/components/resources/icons";
 
 /**
  * HeroSection — Resources page gradient hero.
@@ -41,11 +41,13 @@ export default function HeroSection() {
 
       {/* ── Content ── */}
       <div className="relative z-10 mx-auto max-w-screen-xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-
         {/* Eyebrow */}
         <div className="flex justify-center mb-5">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-purple-100 backdrop-blur-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-purple-300" aria-hidden="true" />
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-purple-300"
+              aria-hidden="true"
+            />
             SkillSync Resources
           </span>
         </div>
@@ -60,23 +62,38 @@ export default function HeroSection() {
           </h1>
 
           <p className="mx-auto mt-5 max-w-2xl text-base font-normal leading-8 text-purple-100/90 sm:text-lg">
-            Explore our curated collection of guides, tutorials, and tools — hand-picked
-            to help you build real skills and accelerate your career at every stage.
+            Explore our curated collection of guides, tutorials, and tools —
+            hand-picked to help you build real skills and accelerate your career
+            at every stage.
           </p>
 
           {/* Search prompt CTA */}
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <div className="flex w-full max-w-md items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-purple-200 backdrop-blur-sm sm:w-auto sm:min-w-[320px]">
               <SearchIcon className="h-4 w-4 shrink-0 text-purple-300" />
-              <span className="text-purple-200/80">Search guides, tutorials, tools…</span>
+              <span className="text-purple-200/80">
+                Search guides, tutorials, tools…
+              </span>
             </div>
             <a
               href="#categories"
+              aria-label="Browse resource topics"
               className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-purple-700 shadow-sm transition hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-700"
             >
               Browse topics
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </a>
           </div>
@@ -85,10 +102,10 @@ export default function HeroSection() {
         {/* ── Stats row ── */}
         <dl className="mt-14 grid grid-cols-2 gap-6 sm:grid-cols-4 lg:gap-8">
           {[
-            { value: '200+', label: 'Guides & tutorials' },
-            { value: '6',    label: 'Topic categories' },
-            { value: '50+',  label: 'Tools & templates' },
-            { value: 'Free', label: 'Always free to access' },
+            { value: "200+", label: "Guides & tutorials" },
+            { value: "6", label: "Topic categories" },
+            { value: "50+", label: "Tools & templates" },
+            { value: "Free", label: "Always free to access" },
           ].map(({ value, label }) => (
             <div
               key={label}
@@ -103,7 +120,6 @@ export default function HeroSection() {
             </div>
           ))}
         </dl>
-
       </div>
 
       {/* ── Bottom fade into page background ── */}
