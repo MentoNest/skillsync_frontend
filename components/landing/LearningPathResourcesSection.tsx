@@ -150,8 +150,13 @@ export default function LearningPathResourcesSection() {
           </div>
 
           <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {learningTracks.map((track) => (
-              <LearningTrackCard key={track.title} {...track} />
+            {learningTracks.map((track, index) => (
+              <LearningTrackCard
+                key={track.title}
+                {...track}
+                // First card is the most likely LCP image in this section
+                priority={index === 0}
+              />
             ))}
           </div>
         </div>
