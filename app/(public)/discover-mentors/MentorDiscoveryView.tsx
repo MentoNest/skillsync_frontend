@@ -14,6 +14,7 @@ import {
 } from "@/app/(public)/mentors/data";
 import ExperienceLevelFilter from "@/app/(public)/mentors/components/ExperienceLevelFilter";
 import IndustryFilter from "@/app/(public)/mentors/components/IndustryFilter";
+import PriceRangeFilter from "@/app/(public)/mentors/components/PriceRangeFilter";
 
 export default function MentorDiscoveryView() {
   const [initialMentors] = useState<Mentor[]>(() => MOCK_MENTORS);
@@ -23,6 +24,7 @@ export default function MentorDiscoveryView() {
   const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<
     ExperienceLevel[]
   >([]);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
 
   const toggleIndustry = useCallback((industry: string) => {
     setSelectedIndustries((prev) =>
@@ -43,6 +45,7 @@ export default function MentorDiscoveryView() {
   const clearFilters = useCallback(() => {
     setSelectedIndustries([]);
     setSelectedExperienceLevels([]);
+    setPriceRange({ min: 0, max: 1000 });
   }, []);
 
   const filteredMentors = useMemo(() => {
@@ -65,17 +68,25 @@ export default function MentorDiscoveryView() {
           ? selectedExperienceLevels.includes(mentor.experienceLevel)
           : true;
 
-      return searchMatch && industryMatch && experienceLevelMatch;
+      const priceMatch =
+        mentor.pricePerSession >= priceRange.min &&
+        mentor.pricePerSession <= priceRange.max;
+
+      return searchMatch && industryMatch && experienceLevelMatch && priceMatch;
     });
   }, [
     initialMentors,
     searchQuery,
     selectedIndustries,
     selectedExperienceLevels,
+    priceRange,
   ]);
 
   const hasFilters =
-    selectedIndustries.length > 0 || selectedExperienceLevels.length > 0;
+    selectedIndustries.length > 0 ||
+    selectedExperienceLevels.length > 0 ||
+    priceRange.min > 0 ||
+    priceRange.max < 1000;
 
   const FilterPanel = ({ isMobile }: { isMobile?: boolean }) => (
     <div className={isMobile ? "" : "py-6"}>
@@ -110,6 +121,15 @@ export default function MentorDiscoveryView() {
           mentors={initialMentors}
           selected={selectedExperienceLevels}
           onToggle={toggleExperienceLevel}
+        />
+      </div>
+
+      <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-6">
+        <PriceRangeFilter
+          min={0}
+          max={1000}
+          value={priceRange}
+          onChange={setPriceRange}
         />
       </div>
     </div>
