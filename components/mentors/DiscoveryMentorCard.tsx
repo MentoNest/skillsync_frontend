@@ -42,10 +42,13 @@ function slugFor(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-');
 }
 
+import MentorSkillTag from './MentorSkillTag';
+
 export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
   const initials = initialsFor(mentor.name);
   const gradient = gradientFor(mentor.name);
-  const profileHref = `/mentors/${slugFor(mentor.name)}`;
+  const targetId = mentor.mentorId || mentor.id || slugFor(mentor.name);
+  const profileHref = `/mentors/${targetId}`;
   const isFullyBooked = mentor.availability === 'fully-booked';
 
   return (
@@ -156,12 +159,7 @@ export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
         {mentor.skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5" aria-label="Skills">
             {mentor.skills.map((skill) => (
-              <span
-                key={skill}
-                className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-300"
-              >
-                {skill}
-              </span>
+              <MentorSkillTag key={skill} skill={skill} />
             ))}
           </div>
         )}

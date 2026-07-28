@@ -2,6 +2,8 @@ import React, { Suspense } from 'react';
 import HeroSection from '@/components/resources/HeroSection';
 import ResourceSearchBarWrapper from '@/components/resources/ResourceSearchBarWrapper';
 import { CategoryGrid } from '@/components/resources/CategoryGrid';
+import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection';
+import QuickAccessSection from '@/components/resources/QuickAccessSection';
 
 function CategoryGridFallback() {
   return (
@@ -39,6 +41,16 @@ export default function ResourcesPage() {
       <Suspense fallback={<CategoryGridFallback />}>
         <CategoryGrid />
       </Suspense>
+
+      {/* Quick Access Section */}
+      <section className="bg-slate-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors">
+        <QuickAccessSection />
+      </section>
+
+      {/* Tools & Templates Section */}
+      <section className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors">
+        <ToolsTemplatesSection />
+      </section>
     </div>
   );
 }
