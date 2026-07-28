@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import ExpertiseFilter from '@/components/mentors/ExpertiseFilter';
 import DiscoveryMentorCard from '@/components/mentors/DiscoveryMentorCard';
 import EmptyState from '@/components/mentors/EmptyState';
+import MentorCardSkeleton from '@/components/mentor-card-skeleton';
 import {
   EXPERTISE_OPTIONS,
   type Expertise,
@@ -48,8 +49,10 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   // Bookmark state
   const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
   // Infinite scroll state
-  const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  // Loading state for initial data fetch
+  const [isLoading, setIsLoading] = useState(true);
   // Issue 479 – comparison state
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
@@ -68,6 +71,15 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
       setInfiniteLimit((prev) => prev + PAGE_SIZE);
     }, 400);
   };
+
+  // Simulate initial data loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMentors(initialMentors);
+      setIsLoading(false);
+    }, 1500); // Simulate network delay
+    return () => clearTimeout(timer);
+  }, [initialMentors]);
 
   const fetchMoreMentors = () => {
     // In a real app, you'd fetch data from an API.
@@ -526,104 +538,116 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
               </div>
             </>
           ) : (
-            displayMode === 'infinite' ? (
-              <InfiniteScroll
-                dataLength={infiniteMentors.length}
-                next={fetchMoreData}
-                hasMore={infiniteMentors.length < filteredMentors.length}
-                loader={
-                  <div className="flex justify-center items-center py-8">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
-                      <span className="h-4 w-4 rounded-full border-2 border-cyan-600 border-t-transparent animate-spin" />
-                      Loading more mentors...
-                    </div>
-                  </div>
-                }
-                endMessage={
-                  <p className="text-center py-8 text-xs font-semibold text-gray-400 dark:text-gray-500">
-                    You&apos;ve viewed all {filteredMentors.length} mentors
-                  </p>
-                }
+            isLoading ? (
+              // Show loading skeletons while initial data is loading
+              <ul
+                role="list"
+                aria-label="Loading mentors"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
               >
-                <ul
-                  role="list"
-                  aria-label="Mentor cards"
-                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
-                >
-                  {infiniteMentors.map((mentor) => {
-                    const isSelected = compareIds.includes(mentor.id);
-                    const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
-                    return (
-                      <li key={mentor.id} className="h-full flex flex-col">
-                        <DiscoveryMentorCard mentor={mentor} />
-
-                        <button
-                          type="button"
-                          disabled={isDisabled}
-                          onClick={() => toggleCompare(mentor.id)}
-                          aria-pressed={isSelected}
-                          aria-label={
-                            isSelected
-                              ? `Remove ${mentor.name} from comparison`
-                              : isDisabled
-                                ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
-                                : `Add ${mentor.name} to comparison`
-                          }
-                          className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
-                            isSelected
-                              ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
-                              : isDisabled
-                                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
-                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
-                          }`}
-                        >
-                          {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </InfiniteScroll>
+                {Array.from({ length: PAGE_SIZE }, (_, i) => (
+                  <MentorCardSkeleton key={`skeleton-${i}`} />
+                ))}
+              </ul>
             ) : (
-              <>
-                <ul
-                  role="list"
-                  aria-label="Mentor cards"
-                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+              displayMode === 'infinite' ? (
+                <InfiniteScroll
+                  dataLength={infiniteMentors.length}
+                  next={fetchMoreData}
+                  hasMore={infiniteMentors.length < filteredMentors.length}
+                  loader={
+                    <div className="flex justify-center items-center py-8">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+                        <span className="h-4 w-4 rounded-full border-2 border-cyan-600 border-t-transparent animate-spin" />
+                        Loading more mentors...
+                      </div>
+                    </div>
+                  }
+                  endMessage={
+                    <p className="text-center py-8 text-xs font-semibold text-gray-400 dark:text-gray-500">
+                      You&apos;ve viewed all {filteredMentors.length} mentors
+                    </p>
+                  }
                 >
-                  {paginatedMentors.map((mentor) => {
-                    const isSelected = compareIds.includes(mentor.id);
-                    const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
-                    return (
-                      <li key={mentor.id} className="h-full flex flex-col">
-                        <DiscoveryMentorCard mentor={mentor} />
+                  <ul
+                    role="list"
+                    aria-label="Mentor cards"
+                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                  >
+                    {infiniteMentors.map((mentor) => {
+                      const isSelected = compareIds.includes(mentor.id);
+                      const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                      return (
+                        <li key={mentor.id} className="h-full flex flex-col">
+                          <DiscoveryMentorCard mentor={mentor} />
 
-                        <button
-                          type="button"
-                          disabled={isDisabled}
-                          onClick={() => toggleCompare(mentor.id)}
-                          aria-pressed={isSelected}
-                          aria-label={
-                            isSelected
-                              ? `Remove ${mentor.name} from comparison`
-                              : isDisabled
-                                ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
-                                : `Add ${mentor.name} to comparison`
-                          }
-                          className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
-                            isSelected
-                              ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
-                              : isDisabled
-                                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
-                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
-                          }`}
-                        >
-                          {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+                          <button
+                            type="button"
+                            disabled={isDisabled}
+                            onClick={() => toggleCompare(mentor.id)}
+                            aria-pressed={isSelected}
+                            aria-label={
+                              isSelected
+                                ? `Remove ${mentor.name} from comparison`
+                                : isDisabled
+                                  ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                                  : `Add ${mentor.name} to comparison`
+                            }
+                            className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                              isSelected
+                                ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                                : isDisabled
+                                  ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
+                                  : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                            }`}
+                          >
+                            {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </InfiniteScroll>
+              ) : (
+                <>
+                  <ul
+                    role="list"
+                    aria-label="Mentor cards"
+                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                  >
+                    {paginatedMentors.map((mentor) => {
+                      const isSelected = compareIds.includes(mentor.id);
+                      const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                      return (
+                        <li key={mentor.id} className="h-full flex flex-col">
+                          <DiscoveryMentorCard mentor={mentor} />
+
+                          <button
+                            type="button"
+                            disabled={isDisabled}
+                            onClick={() => toggleCompare(mentor.id)}
+                            aria-pressed={isSelected}
+                            aria-label={
+                              isSelected
+                                ? `Remove ${mentor.name} from comparison`
+                                : isDisabled
+                                  ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                                  : `Add ${mentor.name} to comparison`
+                            }
+                            className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                              isSelected
+                                ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                                : isDisabled
+                                  ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
+                                  : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                            }`}
+                          >
+                            {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
 
                 {totalPages > 1 && (
                   <nav aria-label="Mentor discovery pagination" className="flex items-center justify-center gap-2 mt-10">
