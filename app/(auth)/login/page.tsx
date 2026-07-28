@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -105,12 +106,12 @@ export default function LoginPage() {
               >
                 Password
               </label>
-              <a
+              <Link
                 href="/forgot-password"
                 className="text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
             <input
               id="password"
@@ -145,18 +146,18 @@ export default function LoginPage() {
         {/* Sign Up Link */}
         <p className="text-center text-sm text-gray-500 mt-6">
           Don&apos;t have an account?{" "}
-          <a href="/register" className="font-semibold text-purple-600 hover:text-purple-700 transition-colors">
+          <Link href="/register" className="font-semibold text-purple-600 hover:text-purple-700 transition-colors">
             Sign up for free
-          </a>
+          </Link>
         </p>
       </div>
 
       {/* Footer */}
       <p className="text-center text-xs text-gray-400 mt-6">
         By signing in, you agree to our{" "}
-        <a href="#" className="text-purple-600 hover:underline">Terms of Service</a>
+        <Link href="#" className="text-purple-600 hover:underline">Terms of Service</Link>
         {" "}and{" "}
-        <a href="#" className="text-purple-600 hover:underline">Privacy Policy</a>
+        <Link href="#" className="text-purple-600 hover:underline">Privacy Policy</Link>
       </p>
     </div>
   );
