@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Avatar from './Avatar';
 import MentorAvailabilityBadge from './MentorAvailabilityBadge';
+import MentorSkillTag from './MentorSkillTag';
 import StarRating from './ui/StarRating';
 import { Mentor } from '@/lib/types';
 
@@ -115,12 +116,7 @@ export default function MentorCard({
         {skills && skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5" aria-label="Skills">
             {skills.slice(0, 5).map((skill) => (
-              <span
-                key={skill}
-                className="inline-flex items-center rounded-full bg-cyan-50 dark:bg-cyan-900/30 px-2.5 py-0.5 text-xs font-medium text-cyan-700 dark:text-cyan-400"
-              >
-                {skill}
-              </span>
+              <MentorSkillTag key={skill} skill={skill} />
             ))}
             {skills.length > 5 && (
               <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400">
