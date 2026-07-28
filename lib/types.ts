@@ -30,5 +30,5 @@ export interface Mentor {
   profileHref?: string;
   onBook?: () => void;
   isBookmarked?: boolean;
-  onToggleBookmark?: ()_=> void;
+  onToggleBookmark?: () => void;
 }
