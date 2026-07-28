@@ -7,17 +7,12 @@ interface Props {
   onFollow?: (userId: string) => void;
   onShare?: (id: string) => void;
   onReport?: (id: string) => void;
-}
-
-export default function DiscussionMetadata({ metadata, onLike, onBookmark, onFollow, onShare, onReport }: Props) {
   disableInteractions?: boolean;
 }
 
-export default function DiscussionMetadata({ metadata, onLike, onBookmark, disableInteractions = false }: Props) {
+export default function DiscussionMetadata({ metadata, onLike, onBookmark, onFollow, onShare, onReport, disableInteractions = false }: Props) {
   const timeAgo = (date: string) => {
-    const now = Date.now();
-    const then = new Date(date).getTime();
-    const diffMs = now - then;
+    const diffMs = Date.now() - new Date(date).getTime();
     const minutes = Math.floor(diffMs / 60000);
     if (minutes < 1) return 'just now';
     if (minutes < 60) return `${minutes}m ago`;
@@ -34,9 +29,7 @@ export default function DiscussionMetadata({ metadata, onLike, onBookmark, disab
         <button
           onClick={() => !disableInteractions && onLike?.(metadata.id)}
           className={`flex items-center gap-1 transition-colors ${
-            disableInteractions
-              ? 'text-gray-400 cursor-not-allowed'
-              : `hover:text-cyan-600 ${metadata.isLiked ? 'text-cyan-600' : ''}`
+            disableInteractions ? 'text-gray-400 cursor-not-allowed' : `hover:text-cyan-600 ${metadata.isLiked ? 'text-cyan-600' : ''}`
           }`}
           aria-label={metadata.isLiked ? 'Unlike' : 'Like'}
           disabled={disableInteractions}
@@ -94,29 +87,16 @@ export default function DiscussionMetadata({ metadata, onLike, onBookmark, disab
         )}
 
         <button
-          onClick={() => onBookmark?.(metadata.id)}
-          className={`hover:text-cyan-600 transition-colors ${metadata.isBookmarked ? 'text-cyan-600' : ''}`}
+          onClick={() => !disableInteractions && onBookmark?.(metadata.id)}
+          className={`transition-colors ${disableInteractions ? 'text-gray-300 cursor-not-allowed' : `hover:text-cyan-600 ${metadata.isBookmarked ? 'text-cyan-600' : ''}`}`}
           aria-label={metadata.isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+          disabled={disableInteractions}
         >
           <svg className="w-4 h-4" fill={metadata.isBookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
           </svg>
         </button>
       </div>
-      <button
-        onClick={() => !disableInteractions && onBookmark?.(metadata.id)}
-        className={`ml-auto transition-colors ${
-          disableInteractions
-            ? 'text-gray-300 cursor-not-allowed'
-            : `hover:text-cyan-600 ${metadata.isBookmarked ? 'text-cyan-600' : ''}`
-        }`}
-        aria-label={metadata.isBookmarked ? 'Remove bookmark' : 'Bookmark'}
-        disabled={disableInteractions}
-      >
-        <svg className="w-4 h-4" fill={metadata.isBookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-        </svg>
-      </button>
     </div>
   );
 }
