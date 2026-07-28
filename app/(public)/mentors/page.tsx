@@ -163,7 +163,7 @@ export default function MentorsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-12">
+          <nav aria-label="Mentor search pagination" className="flex items-center justify-center gap-2 mt-12">
             <Button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -171,9 +171,25 @@ export default function MentorsPage() {
             >
               Previous
             </Button>
-            <span className="text-sm text-gray-600 dark:text-gray-400 px-3">
-              Page {page} of {totalPages}
-            </span>
+
+            <div className="flex items-center gap-1.5 px-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  aria-label={`Page ${p}`}
+                  aria-current={page === p ? 'page' : undefined}
+                  className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                    page === p
+                      ? 'bg-cyan-600 text-white shadow-sm'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+
             <Button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
@@ -181,7 +197,7 @@ export default function MentorsPage() {
             >
               Next
             </Button>
-          </div>
+          </nav>
         )}
       </section>
     </main>

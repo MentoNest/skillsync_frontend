@@ -47,7 +47,8 @@ import MentorSkillTag from './MentorSkillTag';
 export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
   const initials = initialsFor(mentor.name);
   const gradient = gradientFor(mentor.name);
-  const profileHref = `/mentors/${slugFor(mentor.name)}`;
+  const targetId = mentor.mentorId || mentor.id || slugFor(mentor.name);
+  const profileHref = `/mentors/${targetId}`;
   const isFullyBooked = mentor.availability === 'fully-booked';
 
   return (
