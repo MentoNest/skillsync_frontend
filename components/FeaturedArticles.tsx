@@ -6,6 +6,8 @@ const articles = [
   { category: 'Career', title: 'How to Land Your First Tech Job', author: 'Jane Doe', readTime: '5 min read' },
   { category: 'Skills', title: 'Top 10 In-Demand Skills for 2025', author: 'John Smith', readTime: '7 min read' },
   { category: 'Mentorship', title: 'Getting the Most Out of a Mentor', author: 'Sarah Lee', readTime: '4 min read' },
+  { category: 'Leadership', title: 'Building Effective Remote Teams', author: 'Mike Johnson', readTime: '6 min read' },
+  { category: 'Productivity', title: 'Time Management Tips for Developers', author: 'Emily Chen', readTime: '5 min read' },
 ];
 
 export default function FeaturedArticles() {
