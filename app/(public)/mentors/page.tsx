@@ -161,16 +161,43 @@ export default function MentorsPage() {
     [compareIds],
   );
 
-  const filteredMentors = mentors.filter((mentor) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      mentor.name.toLowerCase().includes(q) ||
-      (mentor.title && mentor.title.toLowerCase().includes(q)) ||
-      (mentor.bio && mentor.bio.toLowerCase().includes(q)) ||
-      (mentor.skills &&
-        mentor.skills.some((skill) => skill.toLowerCase().includes(q)))
+  const [selectedExpertise, setSelectedExpertise] = useState<string[]>([]);
+
+  const allExpertise = useMemo(() => {
+    const expertiseSet = new Set<string>();
+    mentors.forEach((m) => m.expertise?.forEach((e) => expertiseSet.add(e)));
+    return Array.from(expertiseSet);
+  }, []);
+
+  const toggleExpertise = (expertise: string) => {
+    setSelectedExpertise((prev) =>
+      prev.includes(expertise)
+        ? prev.filter((e) => e !== expertise)
+        : [...prev, expertise],
     );
+    setPage(1);
+    setInfiniteLimit(PAGE_SIZE);
+  };
+
+  const filteredMentors = mentors.filter((mentor) => {
+    const searchMatch =
+      !searchQuery ||
+      mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (mentor.title &&
+        mentor.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (mentor.bio &&
+        mentor.bio.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (mentor.skills &&
+        mentor.skills.some((skill) =>
+          skill.toLowerCase().includes(searchQuery.toLowerCase()),
+        ));
+
+    const expertiseMatch =
+      selectedExpertise.length === 0 ||
+      (mentor.expertise &&
+        selectedExpertise.every((e) => mentor.expertise.includes(e)));
+
+    return searchMatch && expertiseMatch;
   });
 
   const totalPages = Math.ceil(filteredMentors.length / PAGE_SIZE);
@@ -247,7 +274,12 @@ export default function MentorsPage() {
       {/* Mentors Grid */}
       <section className="max-w-screen-xl mx-auto py-12 px-4 lg:px-6">
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-          <FilterSidebar className="hidden md:block md:sticky md:top-24 h-fit w-full md:w-64 lg:w-72" />
+          <FilterSidebar
+            className="hidden md:block md:sticky md:top-24 h-fit w-full md:w-64 lg:w-72"
+            allExpertise={allExpertise}
+            selectedExpertise={selectedExpertise}
+            onToggleExpertise={toggleExpertise}
+          />
           <div className="flex-1">
             {/* Comparison bar */}
             {compareIds.length >= 2 && (
