@@ -52,9 +52,8 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   // Issue 482 – ref to announce live region messages
   const announceRef = useRef<HTMLParagraphElement>(null);
-  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
-  const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
-  const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 6;
 
   const fetchMoreMentors = () => {
     // In a real app, you'd fetch data from an API.
@@ -173,6 +172,11 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   );
 
   const hasFilters = selectedExpertise.length > 0 || minPrice !== '' || maxPrice !== '';
+  const totalPages = Math.ceil(filteredMentors.length / PAGE_SIZE);
+  const paginatedMentors = useMemo(() => {
+    return filteredMentors.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  }, [filteredMentors, currentPage]);
+
   const resultNoun = filteredMentors.length === 1 ? 'mentor' : 'mentors';
 
   // Issue 480 – shared filter panel markup (reused for both sidebar and mobile drawer)
@@ -477,44 +481,86 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
               </div>
             </>
           ) : (
-            <ul
-              role="list"
-              aria-label="Mentor cards"
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
-            >
-              {filteredMentors.map((mentor) => {
-                const isSelected = compareIds.includes(mentor.id);
-                const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
-                return (
-                  <li key={mentor.id} className="h-full flex flex-col">
-                    <DiscoveryMentorCard mentor={mentor} />
+            <>
+              <ul
+                role="list"
+                aria-label="Mentor cards"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+              >
+                {paginatedMentors.map((mentor) => {
+                  const isSelected = compareIds.includes(mentor.id);
+                  const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                  return (
+                    <li key={mentor.id} className="h-full flex flex-col">
+                      <DiscoveryMentorCard mentor={mentor} />
 
-                    <button
-                      type="button"
-                      disabled={isDisabled}
-                      onClick={() => toggleCompare(mentor.id)}
-                      aria-pressed={isSelected}
-                      aria-label={
-                        isSelected
-                          ? `Remove ${mentor.name} from comparison`
-                          : isDisabled
-                            ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
-                            : `Add ${mentor.name} to comparison`
-                      }
-                      className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
-                        isSelected
-                          ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
-                          : isDisabled
-                            ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
-                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
-                      }`}
-                    >
-                      {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+                      <button
+                        type="button"
+                        disabled={isDisabled}
+                        onClick={() => toggleCompare(mentor.id)}
+                        aria-pressed={isSelected}
+                        aria-label={
+                          isSelected
+                            ? `Remove ${mentor.name} from comparison`
+                            : isDisabled
+                              ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                              : `Add ${mentor.name} to comparison`
+                        }
+                        className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                          isSelected
+                            ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                            : isDisabled
+                              ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
+                              : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                        }`}
+                      >
+                        {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {totalPages > 1 && (
+                <nav aria-label="Mentor discovery pagination" className="flex items-center justify-center gap-2 mt-10">
+                  <button
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    aria-label="Previous page"
+                  >
+                    Previous
+                  </button>
+
+                  <div className="flex items-center gap-1.5 px-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setCurrentPage(p)}
+                        aria-label={`Page ${p}`}
+                        aria-current={currentPage === p ? 'page' : undefined}
+                        className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                          currentPage === p
+                            ? 'bg-cyan-600 text-white shadow-sm'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    aria-label="Next page"
+                  >
+                    Next
+                  </button>
+                </nav>
+              )}
+            </>
           )}
           </main>
         </div>
