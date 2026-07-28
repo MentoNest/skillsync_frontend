@@ -1,22 +1,152 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import HeroSection from '@/components/landing/HeroSection';
-import WhyChooseUsSection from '@/components/landing/WhyChooseUsSection';
-import PlatformStatisticsSection from '@/components/landing/PlatformStatisticsSection';
-import LearningPathResourcesSection from '@/components/landing/LearningPathResourcesSection';
-import MentorDiscoverySection from '@/components/landing/MentorDiscoverySection';
-import FeaturedMentorHighlight from '@/components/landing/FeaturedMentorHighlight';
-import FeaturedArticles from '@/components/FeaturedArticles';
-import ToolsAndTemplates from '@/components/ToolsAndTemplates';
-import ResourceSearchBar from '@/components/ResourceSearchBar';
-import TestimonialsSection from '@/components/TestimonialsSection';
 import Image from 'next/image';
+
+// ─── Critical above-the-fold sections — statically imported ──────────────────
+// These are rendered server-side and painted on first load, so they must not
+// be deferred. Static imports also allow Next.js to include them in the
+// initial HTML and eliminate layout shift.
+import HeroSection from '@/components/landing/HeroSection';
+import ResourceSearchBar from '@/components/ResourceSearchBar';
+
+// ─── Below-the-fold sections — dynamically imported ──────────────────────────
+// next/dynamic splits these into separate JS chunks that are only downloaded
+// once the browser has finished painting the critical path, directly improving
+// Time to Interactive (TTI) and Lighthouse performance scores.
+
+const MentorDiscoverySection = dynamic(
+  () => import('@/components/landing/MentorDiscoverySection'),
+  {
+    loading: () => (
+      <div className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4" aria-hidden="true">
+        <div className="mx-auto max-w-screen-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-72 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+  }
+);
+
+const FeaturedMentorHighlight = dynamic(
+  () => import('@/components/landing/FeaturedMentorHighlight'),
+  {
+    loading: () => (
+      <div className="bg-white dark:bg-gray-900 py-16 px-4" aria-hidden="true">
+        <div className="mx-auto max-w-screen-xl">
+          <div className="h-64 rounded-3xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+        </div>
+      </div>
+    ),
+  }
+);
+
+const WhyChooseUsSection = dynamic(
+  () => import('@/components/landing/WhyChooseUsSection'),
+  {
+    loading: () => (
+      <div className="bg-slate-900 py-20 px-6" aria-hidden="true">
+        <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-36 rounded-2xl bg-white/5 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const LearningPathResourcesSection = dynamic(
+  () => import('@/components/landing/LearningPathResourcesSection'),
+  {
+    loading: () => (
+      <div className="bg-slate-50 py-20 px-6" aria-hidden="true">
+        <div className="mx-auto max-w-7xl grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const PlatformStatisticsSection = dynamic(
+  () => import('@/components/landing/PlatformStatisticsSection'),
+  {
+    loading: () => (
+      <div className="bg-slate-950 py-20 px-6" aria-hidden="true">
+        <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-32 rounded-2xl bg-white/5 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const FeaturedArticles = dynamic(
+  () => import('@/components/FeaturedArticles'),
+  {
+    loading: () => (
+      <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
+        <div className="mx-auto max-w-screen-xl space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-16 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const ToolsAndTemplates = dynamic(
+  () => import('@/components/ToolsAndTemplates'),
+  {
+    loading: () => (
+      <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
+        <div className="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="h-48 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const TestimonialsSection = dynamic(
+  () => import('@/components/TestimonialsSection'),
+  {
+    loading: () => (
+      <div className="bg-slate-50 dark:bg-gray-800/40 py-16 px-4" aria-hidden="true">
+        <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-48 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   return (
     <>
+      {/* ── Critical path: rendered and painted on first load ── */}
+
+      {/* 1. Hero — LCP candidate, always above fold */}
       <HeroSection />
 
+      {/* Mobile-only browse shortcut — no layout shift risk (text only) */}
       <div className="block lg:hidden">
         <Link
           href="/mentors"
@@ -26,7 +156,7 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* Resource Search Section */}
+      {/* 2. Resource Search — above fold on most viewports, keep synchronous */}
       <section
         className="bg-slate-50 dark:bg-gray-800/40 border-y border-slate-100 dark:border-gray-800 transition-colors"
         aria-label="Resource Search"
@@ -34,30 +164,36 @@ export default function Home() {
         <ResourceSearchBar />
       </section>
 
-      {/* About SkillSync Section */}
+      {/* 3. About SkillSync — first image section.
+            - Light image gets priority (LCP on desktop), dark variant is hidden
+              until dark mode is resolved client-side so we lazy-load it.
+            - explicit width/height prevents layout shift.
+            - sizes attr lets the browser pick the smallest fitting source. */}
       <section
         className="bg-white dark:bg-gray-900 transition-colors"
         aria-label="About SkillSync tools"
       >
         <div className="gap-8 items-center py-12 px-4 mx-auto max-w-screen-xl xl:gap-16 grid grid-cols-1 md:grid-cols-2 lg:px-6">
           <div className="w-full flex justify-center">
+            {/* Light-mode mockup — priority because it is visible on first paint */}
             <Image
-              width={1200}
-              height={800}
-              loading="lazy"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="w-full h-auto max-w-md md:max-w-full rounded-2xl shadow-md border border-gray-100 dark:hidden"
               src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup.svg"
               alt="SkillSync web platform interface preview showing mentors list and schedule builder"
+              width={1200}
+              height={800}
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="w-full h-auto max-w-md md:max-w-full rounded-2xl shadow-md border border-gray-100 dark:hidden"
             />
+            {/* Dark-mode mockup — hidden until dark mode activates, lazy load */}
             <Image
+              src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup-dark.svg"
+              alt="SkillSync dark mode platform interface preview showcasing career progress dashboard"
               width={1200}
               height={800}
               loading="lazy"
               sizes="(max-width: 768px) 100vw, 50vw"
               className="w-full h-auto max-w-md md:max-w-full rounded-2xl shadow-md border border-gray-800 hidden dark:block"
-              src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/cta/cta-dashboard-mockup-dark.svg"
-              alt="SkillSync dark mode platform interface preview showcasing career progress dashboard"
             />
           </div>
           <div className="mt-4 md:mt-0 flex flex-col items-start">
@@ -93,26 +229,109 @@ export default function Home() {
         </div>
       </section>
 
-      <MentorDiscoverySection />
+      {/* ── Below-the-fold: loaded after critical path ── */}
 
-      <FeaturedMentorHighlight />
+      {/* 4. Mentor Discovery */}
+      <Suspense fallback={
+        <div className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4" aria-hidden="true">
+          <div className="mx-auto max-w-screen-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-72 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }>
+        <MentorDiscoverySection />
+      </Suspense>
 
-      {/* Why Choose Us — Issue #599 */}
-      <WhyChooseUsSection />
+      {/* 5. Featured Mentor Highlight */}
+      <Suspense fallback={
+        <div className="bg-white dark:bg-gray-900 py-16 px-4" aria-hidden="true">
+          <div className="mx-auto max-w-screen-xl h-64 rounded-3xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+        </div>
+      }>
+        <FeaturedMentorHighlight />
+      </Suspense>
 
-      {/* Learning Path & Resources — Issue #600 */}
-      <LearningPathResourcesSection />
+      {/* 6. Why Choose Us — Issue #599 */}
+      <Suspense fallback={
+        <div className="bg-slate-900 py-20 px-6" aria-hidden="true">
+          <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-36 rounded-2xl bg-white/5 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }>
+        <WhyChooseUsSection />
+      </Suspense>
 
-      {/* Platform Statistics — Issue #601 */}
-      <PlatformStatisticsSection />
+      {/* 7. Learning Path & Resources — Issue #600 */}
+      <Suspense fallback={
+        <div className="bg-slate-50 py-20 px-6" aria-hidden="true">
+          <div className="mx-auto max-w-7xl grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }>
+        <LearningPathResourcesSection />
+      </Suspense>
 
-      <FeaturedArticles />
-      <ToolsAndTemplates />
+      {/* 8. Platform Statistics — Issue #601 */}
+      <Suspense fallback={
+        <div className="bg-slate-950 py-20 px-6" aria-hidden="true">
+          <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-32 rounded-2xl bg-white/5 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }>
+        <PlatformStatisticsSection />
+      </Suspense>
 
-      {/* Testimonials Section */}
-      <TestimonialsSection />
+      {/* 9. Featured Articles */}
+      <Suspense fallback={
+        <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
+          <div className="mx-auto max-w-screen-xl space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-16 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }>
+        <FeaturedArticles />
+      </Suspense>
 
-      {/* Bottom CTA / Sign Up Section */}
+      {/* 10. Tools & Templates */}
+      <Suspense fallback={
+        <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
+          <div className="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="h-48 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }>
+        <ToolsAndTemplates />
+      </Suspense>
+
+      {/* 11. Testimonials */}
+      <Suspense fallback={
+        <div className="bg-slate-50 dark:bg-gray-800/40 py-16 px-4" aria-hidden="true">
+          <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-48 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }>
+        <TestimonialsSection />
+      </Suspense>
+
+      {/* 12. Bottom CTA — text-only, no images, no layout shift risk */}
       <section
         className="bg-cyan-600 dark:bg-cyan-800 transition-colors"
         aria-label="CTA Sign Up"
