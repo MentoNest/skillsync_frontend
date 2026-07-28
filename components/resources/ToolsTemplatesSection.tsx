@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileText, TrendingUp } from "lucide-react";
+import { ArrowRight, FileText, TrendingUp } from "@/components/icons";
 
 /**
  * ToolsTemplatesSection — Large tool cards for Resume Builder & Career Planner.

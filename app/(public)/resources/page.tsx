@@ -1,9 +1,14 @@
-import React, { Suspense } from "react";
+import React, { Suspense, lazy } from "react";
 import HeroSection from "@/components/resources/HeroSection";
 import ResourceSearchBarWrapper from "@/components/resources/ResourceSearchBarWrapper";
 import { CategoryGrid } from "@/components/resources/CategoryGrid";
-import ToolsTemplatesSection from "@/components/resources/ToolsTemplatesSection";
-import QuickAccessSection from "@/components/resources/QuickAccessSection";
+
+const ToolsTemplatesSection = lazy(
+  () => import("@/components/resources/ToolsTemplatesSection"),
+);
+const QuickAccessSection = lazy(
+  () => import("@/components/resources/QuickAccessSection"),
+);
 
 function CategoryGridFallback() {
   return (
@@ -32,6 +37,21 @@ function CategoryGridFallback() {
   );
 }
 
+function SectionFallback() {
+  return (
+    <section className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20">
+      <div className="mb-12 text-center lg:text-left">
+        <div className="h-10 w-64 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse mx-auto lg:mx-0" />
+        <div className="mt-3 h-6 w-96 bg-gray-100 dark:bg-gray-800 rounded-md animate-pulse mx-auto lg:mx-0" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+        <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />
+        <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />
+      </div>
+    </section>
+  );
+}
+
 export default function ResourcesPage() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors">
@@ -53,7 +73,9 @@ export default function ResourcesPage() {
         className="bg-slate-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors"
         aria-labelledby="quick-access-heading"
       >
-        <QuickAccessSection />
+        <Suspense fallback={<SectionFallback />}>
+          <QuickAccessSection />
+        </Suspense>
       </section>
 
       {/* Tools & Templates Section */}
@@ -61,7 +83,9 @@ export default function ResourcesPage() {
         className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors"
         aria-labelledby="tools-templates-heading"
       >
-        <ToolsTemplatesSection />
+        <Suspense fallback={<SectionFallback />}>
+          <ToolsTemplatesSection />
+        </Suspense>
       </section>
     </main>
   );

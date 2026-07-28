@@ -1,4 +1,4 @@
-import { FileText, Video, BookOpen, Download } from "lucide-react";
+import { FileText, Video, BookOpen, Download } from "@/components/icons";
 
 /**
  * QuickAccessSection — Grid layout for Quick Access resource categories.
