@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import LearningTrackCard from '@/components/landing/LearningTrackCard';
+import LearningTrackCard from '@/components/LearningTrackCard';
 
 const learningTracks = [
   {

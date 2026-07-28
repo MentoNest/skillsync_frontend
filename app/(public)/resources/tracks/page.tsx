@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import LearningTrackCard from '@/components/landing/LearningTrackCard';
+import LearningTrackCard from '@/components/LearningTrackCard';
 import { useDebounce } from '@/hooks/useDebounce';
 import { SearchIcon } from '@/components/resources/icons';
 
