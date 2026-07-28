@@ -169,10 +169,10 @@ export default function DiscoveryMentorCard({ mentor }: DiscoveryMentorCardProps
         <div className="flex items-center gap-2">
           <Link
             href={profileHref}
-            className="text-sm font-semibold text-cyan-600 transition-colors hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+            className="inline-flex items-center gap-1 rounded-lg bg-cyan-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
             aria-label={`View profile of ${mentor.name}`}
           >
-            Profile
+            View Profile
             <svg
               className="ml-1 inline h-3.5 w-3.5"
               fill="none"

@@ -1,7 +1,11 @@
+import Link from 'next/link';
+import Avatar from './Avatar';
+import MentorAvailabilityBadge from './MentorAvailabilityBadge';
 import { Mentor } from '@/lib/types';
 
 export default function MentorCard({
   mentorId,
+  id,
   name,
   role,
   title,
@@ -31,7 +35,8 @@ export default function MentorCard({
   ];
   const gradient = bgGradients[name.length % bgGradients.length];
 
-  const resolvedProfileHref = profileHref ?? (mentorId ? `/mentors/${mentorId}` : '#');
+  const targetId = mentorId || id || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const resolvedProfileHref = profileHref ?? `/mentors/${targetId}`;
 
   return (
     <article className="w-full max-w-sm mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 dark:bg-gray-800 dark:border-gray-700/80 flex flex-col justify-between overflow-hidden group">
@@ -140,12 +145,12 @@ export default function MentorCard({
         <div className="flex items-center gap-2 ml-auto">
           <Link
             href={resolvedProfileHref}
-            className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 flex items-center gap-1 group/link focus:outline-none focus:underline"
+            className="inline-flex items-center gap-1 text-xs font-semibold bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
             aria-label={`View profile of ${name}`}
           >
-            Profile
+            View Profile
             <svg
-              className="w-4 h-4 transform group-hover/link:translate-x-0.5 transition-transform"
+              className="w-3.5 h-3.5 transform group-hover/link:translate-x-0.5 transition-transform"
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
@@ -159,14 +164,14 @@ export default function MentorCard({
           {availability !== 'fully-booked' && onBook && (
             <button
               onClick={onBook}
-              className="text-xs font-semibold bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+              className="text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
               aria-label={`Book a session with ${name}`}
             >
-              Book Session
+              Book
             </button>
           )}
           {availability === 'fully-booked' && (
-            <span className="text-xs font-semibold bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500 px-3.5 py-1.5 rounded-lg cursor-not-allowed">
+            <span className="text-xs font-semibold bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500 px-3 py-1.5 rounded-lg cursor-not-allowed">
               Unavailable
             </span>
           )}
