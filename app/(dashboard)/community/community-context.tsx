@@ -4,10 +4,11 @@ import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import type { SortOption } from '@/components/ui/discussion-sort';
 
 // Types
-interface Discussion {
+export interface Discussion {
   id: string;
   title: string;
   author: string;
+  authorId?: string;
   createdAt: Date;
   replies: number;
   likes: number;
@@ -73,6 +74,7 @@ const initialDiscussions: Discussion[] = [
     id: '1',
     title: 'How to transition into a career in UX design?',
     author: 'Sarah Johnson',
+    authorId: 'user-1',
     createdAt: new Date('2025-06-25'),
     replies: 12,
     likes: 24,
@@ -83,6 +85,7 @@ const initialDiscussions: Discussion[] = [
     id: '2',
     title: 'Best resources for learning cloud computing',
     author: 'Mike Chen',
+    authorId: 'user-2',
     createdAt: new Date('2025-06-27'),
     replies: 8,
     likes: 18,
@@ -93,6 +96,7 @@ const initialDiscussions: Discussion[] = [
     id: '3',
     title: 'Tips for negotiating a salary raise',
     author: 'Emily Rodriguez',
+    authorId: 'current-user',
     createdAt: new Date('2025-06-28'),
     replies: 23,
     likes: 31,
@@ -103,6 +107,7 @@ const initialDiscussions: Discussion[] = [
     id: '4',
     title: 'How to build a personal brand as a developer',
     author: 'James Wilson',
+    authorId: 'user-4',
     createdAt: new Date('2025-06-26'),
     replies: 15,
     likes: 42,

@@ -1,3 +1,5 @@
+'use client';
+
 interface StarRatingProps {
   rating: number;
   maxRating?: number;
@@ -27,6 +29,7 @@ export default function StarRating({
 
   return (
     <div
+      key={rating}
       className={`inline-flex items-center ${gap} ${className}`}
       role="img"
       aria-label={`${rating} out of ${maxRating} stars`}

@@ -58,7 +58,16 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   // Issue 482 – ref to announce live region messages
   const announceRef = useRef<HTMLParagraphElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [displayMode, setDisplayMode] = useState<'pagination' | 'infinite'>('infinite');
   const PAGE_SIZE = 6;
+  const [infiniteLimit, setInfiniteLimit] = useState(PAGE_SIZE);
+
+  const fetchMoreData = () => {
+    if (infiniteLimit >= filteredMentors.length) return;
+    setTimeout(() => {
+      setInfiniteLimit((prev) => prev + PAGE_SIZE);
+    }, 400);
+  };
 
   const fetchMoreMentors = () => {
     // In a real app, you'd fetch data from an API.
@@ -181,6 +190,10 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   const paginatedMentors = useMemo(() => {
     return filteredMentors.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   }, [filteredMentors, currentPage]);
+
+  const infiniteMentors = useMemo(() => {
+    return filteredMentors.slice(0, infiniteLimit);
+  }, [filteredMentors, infiniteLimit]);
 
   const resultNoun = filteredMentors.length === 1 ? 'mentor' : 'mentors';
 
@@ -408,33 +421,60 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                 {hasFilters ? ' match your filters' : ' available'}
               </p>
 
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="sort-select"
-                  className="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
-                >
-                  Sort by
-                </label>
-                <div className="relative">
-                  <select
-                    id="sort-select"
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value as SortOption)}
-                    className="appearance-none rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-3 pr-9 py-2 text-sm font-medium text-gray-900 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors"
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="inline-flex rounded-lg p-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <button
+                    type="button"
+                    onClick={() => setDisplayMode('infinite')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
+                      displayMode === 'infinite'
+                        ? 'bg-white dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
                   >
-                    {SORT_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <svg
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400"
-                    fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-                    aria-hidden="true" focusable="false"
+                    Infinite Scroll
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDisplayMode('pagination')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
+                      displayMode === 'pagination'
+                        ? 'bg-white dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
+                    Pagination
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="sort-select"
+                    className="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                  >
+                    Sort by
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="sort-select"
+                      value={sort}
+                      onChange={(e) => setSort(e.target.value as SortOption)}
+                      className="appearance-none rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-3 pr-9 py-2 text-sm font-medium text-gray-900 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors"
+                    >
+                      {SORT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <svg
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400"
+                      fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+                      aria-hidden="true" focusable="false"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -486,91 +526,146 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
               </div>
             </>
           ) : (
-            <>
-              <ul
-                role="list"
-                aria-label="Mentor cards"
-                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
-              >
-                {paginatedMentors.map((mentor) => {
-                  const isSelected = compareIds.includes(mentor.id);
-                  const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
-                  const mentorWithBookmark = {
-                    ...mentor,
-                    isBookmarked: bookmarkedMentors.has(mentor.id),
-                    onToggleBookmark: () => toggleBookmark(mentor.id)
-                  };
-                  return (
-                    <li key={mentor.id} className="h-full flex flex-col">
-                      <DiscoveryMentorCard mentor={mentorWithBookmark} />
-
-                      <button
-                        type="button"
-                        disabled={isDisabled}
-                        onClick={() => toggleCompare(mentor.id)}
-                        aria-pressed={isSelected}
-                        aria-label={
-                          isSelected
-                            ? `Remove ${mentor.name} from comparison`
-                            : isDisabled
-                              ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
-                              : `Add ${mentor.name} to comparison`
-                        }
-                        className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
-                          isSelected
-                            ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
-                            : isDisabled
-                              ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
-                              : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
-                        }`}
-                      >
-                        {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              {totalPages > 1 && (
-                <nav aria-label="Mentor discovery pagination" className="flex items-center justify-center gap-2 mt-10">
-                  <button
-                    disabled={currentPage <= 1}
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    aria-label="Previous page"
-                  >
-                    Previous
-                  </button>
-
-                  <div className="flex items-center gap-1.5 px-2">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setCurrentPage(p)}
-                        aria-label={`Page ${p}`}
-                        aria-current={currentPage === p ? 'page' : undefined}
-                        className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                          currentPage === p
-                            ? 'bg-cyan-600 text-white shadow-sm'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
+            displayMode === 'infinite' ? (
+              <InfiniteScroll
+                dataLength={infiniteMentors.length}
+                next={fetchMoreData}
+                hasMore={infiniteMentors.length < filteredMentors.length}
+                loader={
+                  <div className="flex justify-center items-center py-8">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+                      <span className="h-4 w-4 rounded-full border-2 border-cyan-600 border-t-transparent animate-spin" />
+                      Loading more mentors...
+                    </div>
                   </div>
+                }
+                endMessage={
+                  <p className="text-center py-8 text-xs font-semibold text-gray-400 dark:text-gray-500">
+                    You&apos;ve viewed all {filteredMentors.length} mentors
+                  </p>
+                }
+              >
+                <ul
+                  role="list"
+                  aria-label="Mentor cards"
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                >
+                  {infiniteMentors.map((mentor) => {
+                    const isSelected = compareIds.includes(mentor.id);
+                    const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                    return (
+                      <li key={mentor.id} className="h-full flex flex-col">
+                        <DiscoveryMentorCard mentor={mentor} />
 
-                  <button
-                    disabled={currentPage >= totalPages}
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    aria-label="Next page"
-                  >
-                    Next
-                  </button>
-                </nav>
-              )}
-            </>
+                        <button
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => toggleCompare(mentor.id)}
+                          aria-pressed={isSelected}
+                          aria-label={
+                            isSelected
+                              ? `Remove ${mentor.name} from comparison`
+                              : isDisabled
+                                ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                                : `Add ${mentor.name} to comparison`
+                          }
+                          className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                            isSelected
+                              ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                              : isDisabled
+                                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
+                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                          }`}
+                        >
+                          {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </InfiniteScroll>
+            ) : (
+              <>
+                <ul
+                  role="list"
+                  aria-label="Mentor cards"
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                >
+                  {paginatedMentors.map((mentor) => {
+                    const isSelected = compareIds.includes(mentor.id);
+                    const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                    return (
+                      <li key={mentor.id} className="h-full flex flex-col">
+                        <DiscoveryMentorCard mentor={mentor} />
+
+                        <button
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => toggleCompare(mentor.id)}
+                          aria-pressed={isSelected}
+                          aria-label={
+                            isSelected
+                              ? `Remove ${mentor.name} from comparison`
+                              : isDisabled
+                                ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                                : `Add ${mentor.name} to comparison`
+                          }
+                          className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                            isSelected
+                              ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                              : isDisabled
+                                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
+                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                          }`}
+                        >
+                          {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {totalPages > 1 && (
+                  <nav aria-label="Mentor discovery pagination" className="flex items-center justify-center gap-2 mt-10">
+                    <button
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      aria-label="Previous page"
+                    >
+                      Previous
+                    </button>
+
+                    <div className="flex items-center gap-1.5 px-2">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setCurrentPage(p)}
+                          aria-label={`Page ${p}`}
+                          aria-current={currentPage === p ? 'page' : undefined}
+                          className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                            currentPage === p
+                              ? 'bg-cyan-600 text-white shadow-sm'
+                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      className="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      aria-label="Next page"
+                    >
+                      Next
+                    </button>
+                  </nav>
+                )}
+              </>
+            )
           )}
           </main>
         </div>
