@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MentorCard from "@/components/MentorCard";
 import MentorSearchBar from "@/components/MentorSearchBar";
+import FilterSidebar from "@/components/mentors/FilterSidebar";
 import { Button } from "@/components/ui/button";
 
 import { Mentor } from "@/lib/types";
@@ -245,194 +246,212 @@ export default function MentorsPage() {
 
       {/* Mentors Grid */}
       <section className="max-w-screen-xl mx-auto py-12 px-4 lg:px-6">
-        {/* Comparison bar */}
-        {compareIds.length >= 2 && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-700 px-4 py-3"
-          >
-            <p className="text-sm font-semibold text-cyan-800 dark:text-cyan-200">
-              {compareIds.length} mentor{compareIds.length > 1 ? "s" : ""}{" "}
-              selected for comparison
-            </p>
-            <button
-              type="button"
-              onClick={() => setShowComparison(true)}
-              className="text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-            >
-              Compare now
-            </button>
-          </div>
-        )}
-
-        {filteredMentors.length > 0 ? (
-          displayMode === "infinite" ? (
-            <InfiniteScroll
-              dataLength={infiniteMentors.length}
-              next={fetchMoreData}
-              hasMore={infiniteMentors.length < filteredMentors.length}
-              loader={
-                <div className="flex justify-center items-center py-8">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
-                    <span className="h-4 w-4 rounded-full border-2 border-cyan-600 border-t-transparent animate-spin" />
-                    Loading more mentors...
-                  </div>
-                </div>
-              }
-              endMessage={
-                <p className="text-center py-8 text-xs font-semibold text-gray-400 dark:text-gray-500">
-                  You&apos;ve viewed all {filteredMentors.length} mentors
+        <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+          <FilterSidebar className="hidden md:block md:sticky md:top-24 h-fit w-full md:w-64 lg:w-72" />
+          <div className="flex-1">
+            {/* Comparison bar */}
+            {compareIds.length >= 2 && (
+              <div
+                role="status"
+                aria-live="polite"
+                className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-700 px-4 py-3"
+              >
+                <p className="text-sm font-semibold text-cyan-800 dark:text-cyan-200">
+                  {compareIds.length} mentor{compareIds.length > 1 ? "s" : ""}{" "}
+                  selected for comparison
                 </p>
-              }
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                {infiniteMentors.map((mentor) => {
-                  const isSelected = compareIds.includes(
-                    mentor.mentorId as string,
-                  );
-                  const isDisabled =
-                    !isSelected && compareIds.length >= MAX_COMPARE;
-                  return (
-                    <div key={mentor.mentorId} className="flex flex-col">
-                      <MentorCard
-                        {...mentor}
-                        isBookmarked={bookmarkedMentors.has(
-                          mentor.mentorId as string,
-                        )}
-                        onToggleBookmark={() =>
-                          toggleBookmark(mentor.mentorId as string)
-                        }
-                      />
-                      <button
-                        type="button"
-                        disabled={isDisabled}
-                        onClick={() => toggleCompare(mentor.mentorId as string)}
-                        aria-pressed={isSelected}
-                        aria-label={
-                          isSelected
-                            ? `Remove ${mentor.name} from comparison`
-                            : isDisabled
-                              ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
-                              : `Add ${mentor.name} to comparison`
-                        }
-                        className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
-                          isSelected
-                            ? "border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700"
-                            : isDisabled
-                              ? "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent"
-                              : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent"
-                        }`}
-                      >
-                        {isSelected
-                          ? "✓ Added to compare"
-                          : `+ Compare${isDisabled ? " (limit reached)" : ""}`}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </InfiniteScroll>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-              {displayedMentors.map((mentor) => {
-                const isSelected = compareIds.includes(
-                  mentor.mentorId as string,
-                );
-                const isDisabled =
-                  !isSelected && compareIds.length >= MAX_COMPARE;
-                return (
-                  <div key={mentor.mentorId} className="flex flex-col">
-                    <MentorCard
-                      {...mentor}
-                      isBookmarked={bookmarkedMentors.has(
-                        mentor.mentorId as string,
-                      )}
-                      onToggleBookmark={() =>
-                        toggleBookmark(mentor.mentorId as string)
-                      }
-                    />
-                    <button
-                      type="button"
-                      disabled={isDisabled}
-                      onClick={() => toggleCompare(mentor.mentorId as string)}
-                      aria-pressed={isSelected}
-                      aria-label={
-                        isSelected
-                          ? `Remove ${mentor.name} from comparison`
-                          : isDisabled
-                            ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
-                            : `Add ${mentor.name} to comparison`
-                      }
-                      className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
-                        isSelected
-                          ? "border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700"
-                          : isDisabled
-                            ? "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent"
-                            : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent"
-                      }`}
-                    >
-                      {isSelected
-                        ? "✓ Added to compare"
-                        : `+ Compare${isDisabled ? " (limit reached)" : ""}`}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )
-        ) : (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              No mentors found
-            </h3>
-            <p className="mt-1 text-gray-500 dark:text-gray-400">
-              Try searching for something else.
-            </p>
-          </div>
-        )}
-
-        {/* Pagination (only in pagination mode) */}
-        {displayMode === "pagination" && totalPages > 1 && (
-          <nav
-            aria-label="Mentor search pagination"
-            className="flex items-center justify-center gap-2 mt-12"
-          >
-            <Button
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              aria-label="Previous page"
-            >
-              Previous
-            </Button>
-
-            <div className="flex items-center gap-1.5 px-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  aria-label={`Page ${p}`}
-                  aria-current={page === p ? "page" : undefined}
-                  className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                    page === p
-                      ? "bg-cyan-600 text-white shadow-sm"
-                      : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  }`}
+                  type="button"
+                  onClick={() => setShowComparison(true)}
+                  className="text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
                 >
-                  {p}
+                  Compare now
                 </button>
-              ))}
-            </div>
+              </div>
+            )}
 
-            <Button
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              aria-label="Next page"
-            >
-              Next
-            </Button>
-          </nav>
-        )}
+            {filteredMentors.length > 0 ? (
+              displayMode === "infinite" ? (
+                <InfiniteScroll
+                  dataLength={infiniteMentors.length}
+                  next={fetchMoreData}
+                  hasMore={infiniteMentors.length < filteredMentors.length}
+                  loader={
+                    <div className="flex justify-center items-center py-8">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+                        <span className="h-4 w-4 rounded-full border-2 border-cyan-600 border-t-transparent animate-spin" />
+                        Loading more mentors...
+                      </div>
+                    </div>
+                  }
+                  endMessage={
+                    <p className="text-center py-8 text-xs font-semibold text-gray-400 dark:text-gray-500">
+                      You&apos;ve viewed all {filteredMentors.length} mentors
+                    </p>
+                  }
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8"
+                >
+                  {infiniteMentors.map((mentor) => {
+                    const isSelected = compareIds.includes(
+                      mentor.mentorId as string,
+                    );
+                    const isDisabled =
+                      !isSelected && compareIds.length >= MAX_COMPARE;
+                    return (
+                      <div key={mentor.mentorId} className="flex flex-col">
+                        <MentorCard
+                          {...mentor}
+                          isBookmarked={bookmarkedMentors.has(
+                            mentor.mentorId as string,
+                          )}
+                          onToggleBookmark={() =>
+                            toggleBookmark(mentor.mentorId as string)
+                          }
+                        />
+                        <button
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() =>
+                            toggleCompare(mentor.mentorId as string)
+                          }
+                          aria-pressed={isSelected}
+                          aria-label={
+                            isSelected
+                              ? `Remove ${mentor.name} from comparison`
+                              : isDisabled
+                                ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                                : `Add ${mentor.name} to comparison`
+                          }
+                          className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                            isSelected
+                              ? "border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700"
+                              : isDisabled
+                                ? "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent"
+                                : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent"
+                          }`}
+                        >
+                          {isSelected
+                            ? "✓ Added to compare"
+                            : `+ Compare${
+                                isDisabled ? " (limit reached)" : ""
+                              }`}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </InfiniteScroll>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+                    {displayedMentors.map((mentor) => {
+                      const isSelected = compareIds.includes(
+                        mentor.mentorId as string,
+                      );
+                      const isDisabled =
+                        !isSelected && compareIds.length >= MAX_COMPARE;
+                      return (
+                        <div key={mentor.mentorId} className="flex flex-col">
+                          <MentorCard
+                            {...mentor}
+                            isBookmarked={bookmarkedMentors.has(
+                              mentor.mentorId as string,
+                            )}
+                            onToggleBookmark={() =>
+                              toggleBookmark(mentor.mentorId as string)
+                            }
+                          />
+                          <button
+                            type="button"
+                            disabled={isDisabled}
+                            onClick={() =>
+                              toggleCompare(mentor.mentorId as string)
+                            }
+                            aria-pressed={isSelected}
+                            aria-label={
+                              isSelected
+                                ? `Remove ${mentor.name} from comparison`
+                                : isDisabled
+                                  ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                                  : `Add ${mentor.name} to comparison`
+                            }
+                            className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                              isSelected
+                                ? "border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700"
+                                : isDisabled
+                                  ? "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent"
+                                  : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent"
+                            }`}
+                          >
+                            {isSelected
+                              ? "✓ Added to compare"
+                              : `+ Compare${
+                                  isDisabled ? " (limit reached)" : ""
+                                }`}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Pagination (only in pagination mode) */}
+                  {totalPages > 1 && (
+                    <nav
+                      aria-label="Mentor search pagination"
+                      className="flex items-center justify-center gap-2 mt-12"
+                    >
+                      <Button
+                        disabled={page <= 1}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        aria-label="Previous page"
+                      >
+                        Previous
+                      </Button>
+
+                      <div className="flex items-center gap-1.5 px-2">
+                        {Array.from(
+                          { length: totalPages },
+                          (_, i) => i + 1,
+                        ).map((p) => (
+                          <button
+                            key={p}
+                            onClick={() => setPage(p)}
+                            aria-label={`Page ${p}`}
+                            aria-current={page === p ? "page" : undefined}
+                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                              page === p
+                                ? "bg-cyan-600 text-white shadow-sm"
+                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+
+                      <Button
+                        disabled={page >= totalPages}
+                        onClick={() =>
+                          setPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        aria-label="Next page"
+                      >
+                        Next
+                      </Button>
+                    </nav>
+                  )}
+                </>
+              )
+            ) : (
+              <div className="text-center py-12">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  No mentors found
+                </h3>
+                <p className="mt-1 text-gray-500 dark:text-gray-400">
+                  Try searching for something else.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </section>
 
       {/* Comparison drawer */}
