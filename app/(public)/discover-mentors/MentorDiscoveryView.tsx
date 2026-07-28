@@ -1,37 +1,43 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import dynamic from 'next/dynamic';
-import ExpertiseFilter from '@/components/mentors/ExpertiseFilter';
-import DiscoveryMentorCard from '@/components/mentors/DiscoveryMentorCard';
-import EmptyState from '@/components/mentors/EmptyState';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import dynamic from "next/dynamic";
+import ExpertiseFilter from "@/components/mentors/ExpertiseFilter";
+import DiscoveryMentorCard from "@/components/mentors/DiscoveryMentorCard";
+import EmptyState from "@/components/mentors/EmptyState";
+import IndustryFilter from "@/app/(public)/mentors/components/IndustryFilter";
 import {
   EXPERTISE_OPTIONS,
   type Expertise,
   type Mentor,
-} from '@/components/mentors/data';
+  INDUSTRIES,
+} from "@/components/mentors/data";
 
 type SortOption =
-  | 'rating-desc'
-  | 'price-asc'
-  | 'price-desc'
-  | 'experience-desc'
-  | 'popularity-desc';
+  | "rating-desc"
+  | "price-asc"
+  | "price-desc"
+  | "experience-desc"
+  | "popularity-desc";
 // Issue 481 – lazy-load the comparison drawer (only needed when user selects mentors)
 const MentorComparisonDrawer = dynamic(
-  () => import('@/components/mentors/MentorComparisonDrawer'),
+  () => import("@/components/mentors/MentorComparisonDrawer"),
   { ssr: false },
 );
 
-type SortOption = 'rating-desc' | 'price-asc' | 'price-desc' | 'experience-desc';
+type SortOption =
+  | "rating-desc"
+  | "price-asc"
+  | "price-desc"
+  | "experience-desc";
 
 const SORT_OPTIONS: ReadonlyArray<{ value: SortOption; label: string }> = [
-  { value: 'rating-desc', label: 'Highest rated' },
-  { value: 'popularity-desc', label: 'Most popular' },
-  { value: 'price-asc', label: 'Price: low to high' },
-  { value: 'price-desc', label: 'Price: high to low' },
-  { value: 'experience-desc', label: 'Most experienced' },
+  { value: "rating-desc", label: "Highest rated" },
+  { value: "popularity-desc", label: "Most popular" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
+  { value: "experience-desc", label: "Most experienced" },
 ];
 
 const MAX_COMPARE = 3;
@@ -40,13 +46,18 @@ interface MentorDiscoveryViewProps {
   mentors: Mentor[];
 }
 
-export default function MentorDiscoveryView({ mentors: initialMentors }: MentorDiscoveryViewProps) {
+export default function MentorDiscoveryView({
+  mentors: initialMentors,
+}: MentorDiscoveryViewProps) {
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedExpertise, setSelectedExpertise] = useState<Expertise[]>([]);
-  const [minPrice, setMinPrice] = useState<string>('');
-  const [maxPrice, setMaxPrice] = useState<string>('');
-  const [sort, setSort] = useState<SortOption>('rating-desc');
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
+  const [sort, setSort] = useState<SortOption>("rating-desc");
   // Bookmark state
-  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+  const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(
+    new Set(),
+  );
   // Infinite scroll state
   const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
   const [hasMore, setHasMore] = useState(true);
@@ -58,7 +69,9 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   // Issue 482 – ref to announce live region messages
   const announceRef = useRef<HTMLParagraphElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [displayMode, setDisplayMode] = useState<'pagination' | 'infinite'>('infinite');
+  const [displayMode, setDisplayMode] = useState<"pagination" | "infinite">(
+    "infinite",
+  );
   const PAGE_SIZE = 6;
   const [infiniteLimit, setInfiniteLimit] = useState(PAGE_SIZE);
 
@@ -72,14 +85,18 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   const fetchMoreMentors = () => {
     // In a real app, you'd fetch data from an API.
     // Here, we'll just simulate it by duplicating the initial mentors.
-    if (mentors.length >= 50) { // Cap at 50 mentors for this demo
+    if (mentors.length >= 50) {
+      // Cap at 50 mentors for this demo
       setHasMore(false);
       return;
     }
     setTimeout(() => {
-      setMentors(prevMentors => [
+      setMentors((prevMentors) => [
         ...prevMentors,
-        ...initialMentors.map(m => ({ ...m, id: `${m.id}-${mentors.length}` })),
+        ...initialMentors.map((m) => ({
+          ...m,
+          id: `${m.id}-${mentors.length}`,
+        })),
       ]);
     }, 1500);
   };
@@ -100,31 +117,39 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   const mainRef = useRef<HTMLElement>(null);
 
   // Issue 481 – memoized callbacks to avoid re-renders
+  const toggleIndustry = useCallback((industry: string) => {
+    setSelectedIndustries((prev) =>
+      prev.includes(industry)
+        ? prev.filter((i) => i !== industry)
+        : [...prev, industry],
+    );
+  }, []);
+
   const toggleExpertise = useCallback((expertise: Expertise) => {
     setSelectedExpertise((prev) =>
-      prev.includes(expertise) ? prev.filter((e) => e !== expertise) : [...prev, expertise],
+      prev.includes(expertise)
+        ? prev.filter((e) => e !== expertise)
+        : [...prev, expertise],
     );
   }, []);
 
   const clearFilters = useCallback(() => {
+    setSelectedIndustries([]);
     setSelectedExpertise([]);
-    setMinPrice('');
-    setMaxPrice('');
+    setMinPrice("");
+    setMaxPrice("");
   }, []);
 
   const clearExpertise = useCallback(() => setSelectedExpertise([]), []);
 
   // Issue 479 – compare toggle
-  const toggleCompare = useCallback(
-    (id: string) => {
-      setCompareIds((prev) => {
-        if (prev.includes(id)) return prev.filter((x) => x !== id);
-        if (prev.length >= MAX_COMPARE) return prev; // silently cap
-        return [...prev, id];
-      });
-    },
-    [],
-  );
+  const toggleCompare = useCallback((id: string) => {
+    setCompareIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= MAX_COMPARE) return prev; // silently cap
+      return [...prev, id];
+    });
+  }, []);
 
   const removeFromComparison = useCallback((id: string) => {
     setCompareIds((prev) => prev.filter((x) => x !== id));
@@ -136,6 +161,16 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   }, []);
 
   // Issue 481 – memoized counts
+  const industryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const mentor of mentors) {
+      for (const industry of mentor.industries) {
+        counts[industry] = (counts[industry] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [mentors]);
+
   const counts = useMemo<Record<Expertise, number>>(() => {
     const initial = {} as Record<Expertise, number>;
     for (const exp of EXPERTISE_OPTIONS) initial[exp] = 0;
@@ -151,27 +186,35 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
   const filteredMentors = useMemo<Mentor[]>(() => {
     const matched = mentors.filter((mentor) => {
       if (
+        selectedIndustries.length > 0 &&
+        !mentor.industries.some((i) => selectedIndustries.includes(i))
+      ) {
+        return false;
+      }
+      if (
         selectedExpertise.length > 0 &&
         !mentor.expertise.some((e) => selectedExpertise.includes(e))
       ) {
         return false;
       }
-      if (minPrice !== '' && mentor.pricePerSession < parseFloat(minPrice)) return false;
-      if (maxPrice !== '' && mentor.pricePerSession > parseFloat(maxPrice)) return false;
+      if (minPrice !== "" && mentor.pricePerSession < parseFloat(minPrice))
+        return false;
+      if (maxPrice !== "" && mentor.pricePerSession > parseFloat(maxPrice))
+        return false;
       return true;
     });
 
     return [...matched].sort((a, b) => {
       switch (sort) {
-        case 'rating-desc':
+        case "rating-desc":
           return b.rating - a.rating;
-        case 'price-asc':
+        case "price-asc":
           return a.pricePerSession - b.pricePerSession;
-        case 'price-desc':
+        case "price-desc":
           return b.pricePerSession - a.pricePerSession;
-        case 'experience-desc':
+        case "experience-desc":
           return b.experienceYears - a.experienceYears;
-        case 'popularity-desc':
+        case "popularity-desc":
           return b.reviewCount - a.reviewCount;
         default:
           return 0;
@@ -185,17 +228,25 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
     [mentors, compareIds],
   );
 
-  const hasFilters = selectedExpertise.length > 0 || minPrice !== '' || maxPrice !== '';
+  const hasFilters =
+    selectedIndustries.length > 0 ||
+    selectedExpertise.length > 0 ||
+    minPrice !== "" ||
+    maxPrice !== "";
+  ("");
   const totalPages = Math.ceil(filteredMentors.length / PAGE_SIZE);
   const paginatedMentors = useMemo(() => {
-    return filteredMentors.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    return filteredMentors.slice(
+      (currentPage - 1) * PAGE_SIZE,
+      currentPage * PAGE_SIZE,
+    );
   }, [filteredMentors, currentPage]);
 
   const infiniteMentors = useMemo(() => {
     return filteredMentors.slice(0, infiniteLimit);
   }, [filteredMentors, infiniteLimit]);
 
-  const resultNoun = filteredMentors.length === 1 ? 'mentor' : 'mentors';
+  const resultNoun = filteredMentors.length === 1 ? "mentor" : "mentors";
 
   // Issue 480 – shared filter panel markup (reused for both sidebar and mobile drawer)
   const FilterPanel = (
@@ -216,19 +267,31 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
           </button>
         )}
       </div>
-      <ExpertiseFilter
-        selected={selectedExpertise}
-        counts={counts}
-        onToggle={toggleExpertise}
-        onClear={clearExpertise}
+      <IndustryFilter
+        mentors={initialMentors}
+        selected={selectedIndustries}
+        onToggle={toggleIndustry}
       />
+      <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-6">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+          Expertise
+        </h3>
+        <ExpertiseFilter
+          selected={selectedExpertise}
+          counts={counts}
+          onToggle={toggleExpertise}
+          onClear={clearExpertise}
+        />
+      </div>
       <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-6">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
           Hourly Rate ($)
         </h3>
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <label htmlFor="min-price" className="sr-only">Minimum price</label>
+            <label htmlFor="min-price" className="sr-only">
+              Minimum price
+            </label>
             <input
               id="min-price"
               type="number"
@@ -239,9 +302,13 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
               className="block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
             />
           </div>
-          <span className="text-gray-400 text-sm" aria-hidden="true">to</span>
+          <span className="text-gray-400 text-sm" aria-hidden="true">
+            to
+          </span>
           <div className="flex-1">
-            <label htmlFor="max-price" className="sr-only">Maximum price</label>
+            <label htmlFor="max-price" className="sr-only">
+              Maximum price
+            </label>
             <input
               id="max-price"
               type="number"
@@ -286,13 +353,26 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
             aria-haspopup="dialog"
             aria-expanded={mobileFiltersOpen}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M10 12h4" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 4h18M7 8h10M10 12h4"
+              />
             </svg>
             Filters
             {hasFilters && (
               <span className="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-cyan-600 text-white text-[10px] font-bold">
-                {selectedExpertise.length + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0)}
+                {selectedExpertise.length +
+                  (minPrice ? 1 : 0) +
+                  (maxPrice ? 1 : 0)}
               </span>
             )}
           </button>
@@ -315,7 +395,9 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
             {/* Drawer panel */}
             <div className="absolute inset-y-0 left-0 w-80 max-w-[90vw] bg-white dark:bg-gray-900 shadow-xl flex flex-col overflow-y-auto">
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
-                <h2 className="text-base font-bold text-gray-900 dark:text-white">Filters</h2>
+                <h2 className="text-base font-bold text-gray-900 dark:text-white">
+                  Filters
+                </h2>
                 <button
                   type="button"
                   onClick={() => setMobileFiltersOpen(false)}
@@ -325,8 +407,19 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                   // eslint-disable-next-line jsx-a11y/no-autofocus
                   autoFocus
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -338,10 +431,14 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                   onClear={clearExpertise}
                 />
                 <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-6">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Hourly Rate ($)</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                    Hourly Rate ($)
+                  </h3>
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
-                      <label htmlFor="min-price-mobile" className="sr-only">Minimum price</label>
+                      <label htmlFor="min-price-mobile" className="sr-only">
+                        Minimum price
+                      </label>
                       <input
                         id="min-price-mobile"
                         type="number"
@@ -352,9 +449,13 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                         className="block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
                       />
                     </div>
-                    <span className="text-gray-400 text-sm" aria-hidden="true">to</span>
+                    <span className="text-gray-400 text-sm" aria-hidden="true">
+                      to
+                    </span>
                     <div className="flex-1">
-                      <label htmlFor="max-price-mobile" className="sr-only">Maximum price</label>
+                      <label htmlFor="max-price-mobile" className="sr-only">
+                        Maximum price
+                      </label>
                       <input
                         id="max-price-mobile"
                         type="number"
@@ -371,7 +472,10 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
               <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700 flex gap-3">
                 <button
                   type="button"
-                  onClick={() => { clearFilters(); setMobileFiltersOpen(false); }}
+                  onClick={() => {
+                    clearFilters();
+                    setMobileFiltersOpen(false);
+                  }}
                   className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
                   Clear all
@@ -394,9 +498,7 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
             aria-label="Mentor filters"
             className="hidden md:block w-full md:w-64 lg:w-72 shrink-0"
           >
-            <div className="md:sticky md:top-28">
-              {FilterPanel}
-            </div>
+            <div className="md:sticky md:top-28">{FilterPanel}</div>
           </aside>
 
           {/* Listing */}
@@ -416,31 +518,31 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
               >
                 <span className="font-semibold text-gray-900 dark:text-white tabular-nums">
                   {filteredMentors.length}
-                </span>{' '}
+                </span>{" "}
                 {resultNoun}
-                {hasFilters ? ' match your filters' : ' available'}
+                {hasFilters ? " match your filters" : " available"}
               </p>
 
               <div className="flex flex-wrap items-center gap-3">
                 <div className="inline-flex rounded-lg p-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                   <button
                     type="button"
-                    onClick={() => setDisplayMode('infinite')}
+                    onClick={() => setDisplayMode("infinite")}
                     className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
-                      displayMode === 'infinite'
-                        ? 'bg-white dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      displayMode === "infinite"
+                        ? "bg-white dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     Infinite Scroll
                   </button>
                   <button
                     type="button"
-                    onClick={() => setDisplayMode('pagination')}
+                    onClick={() => setDisplayMode("pagination")}
                     className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
-                      displayMode === 'pagination'
-                        ? 'bg-white dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      displayMode === "pagination"
+                        ? "bg-white dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     Pagination
@@ -469,64 +571,87 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                     </select>
                     <svg
                       className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400"
-                      fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-                      aria-hidden="true" focusable="false"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 </div>
               </div>
             </div>
 
-          {filteredMentors.length === 0 ? (
-            <>
-              <EmptyState onClearFilters={hasFilters ? clearFilters : undefined} />
-              {compareIds.length >= 2 && (
-                <div
-                  role="status"
-                  aria-live="polite"
-                  className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-700 px-4 py-3"
-                >
-                  <p className="text-sm font-semibold text-cyan-800 dark:text-cyan-200">
-                    {compareIds.length} mentor{compareIds.length > 1 ? 's' : ''} selected for comparison
+            {filteredMentors.length === 0 ? (
+              <>
+                <EmptyState
+                  onClearFilters={hasFilters ? clearFilters : undefined}
+                />
+                {compareIds.length >= 2 && (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-700 px-4 py-3"
+                  >
+                    <p className="text-sm font-semibold text-cyan-800 dark:text-cyan-200">
+                      {compareIds.length} mentor
+                      {compareIds.length > 1 ? "s" : ""} selected for comparison
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowComparison(true)}
+                      className="text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                    >
+                      Compare now
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 py-16 px-6 text-center">
+                  <div
+                    className="w-12 h-12 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.8"
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21 21l-4.35-4.35m1.85-5.4a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                    No mentors match your filters
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+                    Try removing a tag or two from the expertise filter to
+                    broaden your search.
                   </p>
                   <button
                     type="button"
-                    onClick={() => setShowComparison(true)}
-                    className="text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                    onClick={clearExpertise}
+                    className="mt-2 text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 focus:outline-none focus:underline"
                   >
-                    Compare now
+                    Clear expertise filters
                   </button>
                 </div>
-              )}
-
-              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 py-16 px-6 text-center">
-                <div
-                  className="w-12 h-12 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400"
-                  aria-hidden="true"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor" className="w-6 h-6" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m1.85-5.4a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                  No mentors match your filters
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
-                  Try removing a tag or two from the expertise filter to broaden your search.
-                </p>
-                <button
-                  type="button"
-                  onClick={clearExpertise}
-                  className="mt-2 text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 focus:outline-none focus:underline"
-                >
-                  Clear expertise filters
-                </button>
-              </div>
-            </>
-          ) : (
-            displayMode === 'infinite' ? (
+              </>
+            ) : displayMode === "infinite" ? (
               <InfiniteScroll
                 dataLength={infiniteMentors.length}
                 next={fetchMoreData}
@@ -552,7 +677,8 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                 >
                   {infiniteMentors.map((mentor) => {
                     const isSelected = compareIds.includes(mentor.id);
-                    const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                    const isDisabled =
+                      !isSelected && compareIds.length >= MAX_COMPARE;
                     return (
                       <li key={mentor.id} className="h-full flex flex-col">
                         <DiscoveryMentorCard mentor={mentor} />
@@ -571,13 +697,15 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                           }
                           className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
                             isSelected
-                              ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                              ? "border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700"
                               : isDisabled
-                                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
-                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                                ? "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent"
+                                : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent"
                           }`}
                         >
-                          {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                          {isSelected
+                            ? "✓ Added to compare"
+                            : `+ Compare${isDisabled ? " (limit reached)" : ""}`}
                         </button>
                       </li>
                     );
@@ -593,7 +721,8 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                 >
                   {paginatedMentors.map((mentor) => {
                     const isSelected = compareIds.includes(mentor.id);
-                    const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+                    const isDisabled =
+                      !isSelected && compareIds.length >= MAX_COMPARE;
                     return (
                       <li key={mentor.id} className="h-full flex flex-col">
                         <DiscoveryMentorCard mentor={mentor} />
@@ -612,13 +741,15 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                           }
                           className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
                             isSelected
-                              ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                              ? "border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700"
                               : isDisabled
-                                ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
-                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                                ? "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent"
+                                : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent"
                           }`}
                         >
-                          {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                          {isSelected
+                            ? "✓ Added to compare"
+                            : `+ Compare${isDisabled ? " (limit reached)" : ""}`}
                         </button>
                       </li>
                     );
@@ -626,7 +757,10 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                 </ul>
 
                 {totalPages > 1 && (
-                  <nav aria-label="Mentor discovery pagination" className="flex items-center justify-center gap-2 mt-10">
+                  <nav
+                    aria-label="Mentor discovery pagination"
+                    className="flex items-center justify-center gap-2 mt-10"
+                  >
                     <button
                       disabled={currentPage <= 1}
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -637,26 +771,32 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                     </button>
 
                     <div className="flex items-center gap-1.5 px-2">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                        <button
-                          key={p}
-                          onClick={() => setCurrentPage(p)}
-                          aria-label={`Page ${p}`}
-                          aria-current={currentPage === p ? 'page' : undefined}
-                          className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                            currentPage === p
-                              ? 'bg-cyan-600 text-white shadow-sm'
-                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                          }`}
-                        >
-                          {p}
-                        </button>
-                      ))}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (p) => (
+                          <button
+                            key={p}
+                            onClick={() => setCurrentPage(p)}
+                            aria-label={`Page ${p}`}
+                            aria-current={
+                              currentPage === p ? "page" : undefined
+                            }
+                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+                              currentPage === p
+                                ? "bg-cyan-600 text-white shadow-sm"
+                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        ),
+                      )}
                     </div>
 
                     <button
                       disabled={currentPage >= totalPages}
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
                       className="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
                       aria-label="Next page"
                     >
@@ -665,8 +805,7 @@ export default function MentorDiscoveryView({ mentors: initialMentors }: MentorD
                   </nav>
                 )}
               </>
-            )
-          )}
+            )}
           </main>
         </div>
       </div>
