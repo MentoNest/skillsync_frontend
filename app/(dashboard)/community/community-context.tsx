@@ -359,11 +359,10 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
         addDiscussion,
         updateDiscussionLikes,
         updateDiscussionReplies,
-        getFilteredDiscussions,
-        handleEventRegistration
         togglePin,
         toggleLock,
-        getFilteredDiscussions
+        getFilteredDiscussions,
+        handleEventRegistration,
       }}
     >
       {children}

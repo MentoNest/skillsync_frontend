@@ -1,11 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import MentorCard from '@/components/MentorCard';
 import MentorSearchBar from '@/components/MentorSearchBar';
 import { Button } from '@/components/ui/button';
 
 import { Mentor } from '@/lib/types';
+
+// Lazy-load the comparison drawer (only needed when user selects mentors)
+const MentorComparisonDrawer = dynamic(
+  () => import('@/components/mentors/MentorComparisonDrawer'),
+  { ssr: false },
+);
+
+const MAX_COMPARE = 3;
 
 const mentors: Mentor[] = [
   {
@@ -18,6 +27,8 @@ const mentors: Mentor[] = [
     reviewCount: 124,
     pricePerSession: 85,
     skills: ['React', 'Node.js', 'Cloud', 'System Design'],
+    expertise: ['Frontend Development', 'Full-Stack Engineering'],
+    yearsExperience: 10,
     isFeatured: true,
   },
   {
@@ -30,6 +41,8 @@ const mentors: Mentor[] = [
     reviewCount: 98,
     pricePerSession: 75,
     skills: ['Product Strategy', 'UX', 'Agile', 'Leadership'],
+    expertise: ['Product Management', 'Engineering Leadership'],
+    yearsExperience: 8,
   },
   {
     mentorId: 'jane-roe',
@@ -41,6 +54,8 @@ const mentors: Mentor[] = [
     reviewCount: 156,
     pricePerSession: 90,
     skills: ['UX Design', 'Figma', 'Prototyping'],
+    expertise: ['UI/UX Design', 'Frontend Development'],
+    yearsExperience: 7,
   },
   {
     mentorId: 'emma-wilson',
@@ -51,6 +66,8 @@ const mentors: Mentor[] = [
     reviewCount: 87,
     pricePerSession: 80,
     skills: ['Machine Learning', 'Python', 'SQL', 'Statistics'],
+    expertise: ['Data Science & ML'],
+    yearsExperience: 5,
   },
   {
     mentorId: 'james-brown',
@@ -61,6 +78,8 @@ const mentors: Mentor[] = [
     reviewCount: 203,
     pricePerSession: 120,
     skills: ['Startups', 'Leadership', 'Strategy', 'Fundraising'],
+    expertise: ['Engineering Leadership', 'System Architecture'],
+    yearsExperience: 15,
   },
   {
     mentorId: 'priya-patel',
@@ -71,6 +90,8 @@ const mentors: Mentor[] = [
     reviewCount: 76,
     pricePerSession: 100,
     skills: ['DevOps', 'Kubernetes', 'AWS', 'CI/CD'],
+    expertise: ['DevOps & Cloud'],
+    yearsExperience: 9,
   },
   {
     mentorId: 'carlos-garcia',
@@ -81,6 +102,8 @@ const mentors: Mentor[] = [
     reviewCount: 64,
     pricePerSession: 110,
     skills: ['Deep Learning', 'NLP', 'Python', 'Research'],
+    expertise: ['Data Science & ML'],
+    yearsExperience: 6,
   },
 ];
 
@@ -90,6 +113,9 @@ export default function MentorsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [bookmarkedMentors, setBookmarkedMentors] = useState<Set<string>>(new Set());
+  // Comparison state
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
 
   const toggleBookmark = (mentorId: string) => {
     setBookmarkedMentors((prev) => {
@@ -102,6 +128,30 @@ export default function MentorsPage() {
       return newSet;
     });
   };
+
+  // Toggle mentor for comparison
+  const toggleCompare = (id: string) => {
+    setCompareIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= MAX_COMPARE) return prev; // silently cap
+      return [...prev, id];
+    });
+  };
+
+  const removeFromComparison = (id: string) => {
+    setCompareIds((prev) => prev.filter((x) => x !== id));
+  };
+
+  const closeComparison = () => {
+    setShowComparison(false);
+    setCompareIds([]);
+  };
+
+  // Get mentors selected for comparison
+  const mentorsToCompare = useMemo(
+    () => mentors.filter((m) => compareIds.includes(m.mentorId as string)),
+    [compareIds],
+  );
 
   const filteredMentors = mentors.filter((mentor) => {
     if (!searchQuery) return true;
@@ -139,16 +189,63 @@ export default function MentorsPage() {
 
       {/* Mentors Grid */}
       <section className="max-w-screen-xl mx-auto py-12 px-4 lg:px-6">
+        {/* Comparison bar */}
+        {compareIds.length >= 2 && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-700 px-4 py-3"
+          >
+            <p className="text-sm font-semibold text-cyan-800 dark:text-cyan-200">
+              {compareIds.length} mentor{compareIds.length > 1 ? 's' : ''} selected for comparison
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowComparison(true)}
+              className="text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+            >
+              Compare now
+            </button>
+          </div>
+        )}
+
         {displayedMentors.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {displayedMentors.map((mentor) => (
-              <MentorCard
-                key={mentor.mentorId}
-                {...mentor}
-                isBookmarked={bookmarkedMentors.has(mentor.mentorId as string)}
-                onToggleBookmark={() => toggleBookmark(mentor.mentorId as string)}
-              />
-            ))}
+            {displayedMentors.map((mentor) => {
+              const isSelected = compareIds.includes(mentor.mentorId as string);
+              const isDisabled = !isSelected && compareIds.length >= MAX_COMPARE;
+              return (
+                <div key={mentor.mentorId} className="flex flex-col">
+                  <MentorCard
+                    {...mentor}
+                    isBookmarked={bookmarkedMentors.has(mentor.mentorId as string)}
+                    onToggleBookmark={() => toggleBookmark(mentor.mentorId as string)}
+                  />
+                  <button
+                    type="button"
+                    disabled={isDisabled}
+                    onClick={() => toggleCompare(mentor.mentorId as string)}
+                    aria-pressed={isSelected}
+                    aria-label={
+                      isSelected
+                        ? `Remove ${mentor.name} from comparison`
+                        : isDisabled
+                          ? `Cannot add ${mentor.name}: maximum ${MAX_COMPARE} mentors already selected`
+                          : `Add ${mentor.name} to comparison`
+                    }
+                    className={`mt-2 w-full rounded-lg border py-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
+                      isSelected
+                        ? 'border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700'
+                        : isDisabled
+                          ? 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed bg-transparent'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 bg-transparent'
+                    }`}
+                  >
+                    {isSelected ? '✓ Added to compare' : `+ Compare${isDisabled ? ' (limit reached)' : ''}`}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -200,6 +297,15 @@ export default function MentorsPage() {
           </nav>
         )}
       </section>
+
+      {/* Comparison drawer */}
+      {showComparison && mentorsToCompare.length >= 2 && (
+        <MentorComparisonDrawer
+          mentors={mentorsToCompare}
+          onRemove={removeFromComparison}
+          onClose={closeComparison}
+        />
+      )}
     </main>
   );
 }

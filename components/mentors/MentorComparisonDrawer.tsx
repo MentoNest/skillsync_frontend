@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import type { Mentor } from './data';
+import type { Mentor } from '@/lib/types';
 import StarRating from '@/components/ui/StarRating';
 
 interface MentorComparisonDrawerProps {
@@ -14,14 +14,14 @@ const FIELDS: ReadonlyArray<{
   label: string;
   render: (m: Mentor) => string | number;
 }> = [
-  { label: 'Rating', render: (m) => `${m.rating.toFixed(1)} (${m.reviewCount.toLocaleString()} reviews)` },
-  { label: 'Price / session', render: (m) => `$${m.pricePerSession}` },
-  { label: 'Experience', render: (m) => `${m.experienceYears}+ yrs` },
-  { label: 'Company', render: (m) => m.company },
-  { label: 'Title', render: (m) => m.title },
-  { label: 'Expertise', render: (m) => m.expertise.join(', ') },
-  { label: 'Skills', render: (m) => m.skills.join(', ') },
-  { label: 'Availability', render: (m) => m.availability },
+  { label: 'Rating', render: (m) => `${m.rating?.toFixed(1) || 'N/A'} (${m.reviewCount?.toLocaleString() || '0'} reviews)` },
+  { label: 'Price / session', render: (m) => m.pricePerSession ? `$${m.pricePerSession}` : 'N/A' },
+  { label: 'Experience', render: (m) => m.yearsExperience ? `${m.yearsExperience}+ yrs` : 'N/A' },
+  { label: 'Company', render: (m) => m.company || 'N/A' },
+  { label: 'Title', render: (m) => m.title || 'N/A' },
+  { label: 'Expertise', render: (m) => m.expertise?.join(', ') || 'N/A' },
+  { label: 'Skills', render: (m) => m.skills?.join(', ') || 'N/A' },
+  { label: 'Availability', render: (m) => m.availability || 'N/A' },
 ];
 
 export default function MentorComparisonDrawer({
