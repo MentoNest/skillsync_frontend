@@ -149,12 +149,12 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
                 Password
               </label>
-              <a
+              <Link
                 href="/forgot-password"
                 className="text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 transition-colors"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
             <input
               id="password"
@@ -208,6 +208,10 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* Sign Up Link */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="font-semibold text-purple-600 hover:text-purple-700 transition-colors">
         {/* Register link */}
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
           Don&apos;t have an account?{' '}
@@ -216,7 +220,7 @@ export default function LoginPage() {
             className="font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 transition-colors"
           >
             Sign up for free
-          </a>
+          </Link>
         </p>
       </div>
 
