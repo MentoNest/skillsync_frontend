@@ -4,6 +4,7 @@ import ResourceSearchBarWrapper from '@/components/resources/ResourceSearchBarWr
 import { CategoryGrid } from '@/components/resources/CategoryGrid';
 import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection';
 import QuickAccessSection from '@/components/resources/QuickAccessSection';
+import CTASection from '@/components/resources/CTASection';
 
 function CategoryGridFallback() {
   return (
@@ -51,6 +52,9 @@ export default function ResourcesPage() {
       <section className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors">
         <ToolsTemplatesSection />
       </section>
+
+      {/* CTA Section */}
+      <CTASection />
     </div>
   );
 }
