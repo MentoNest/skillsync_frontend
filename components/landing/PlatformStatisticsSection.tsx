@@ -55,13 +55,15 @@ export default function PlatformStatisticsSection() {
               key={stat.label}
               className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-6 py-8 text-center transition duration-300 hover:border-white/20 hover:bg-white/[0.08]"
             >
-              <dt className="order-2 mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+              {/* Value shown first visually via ordering, but DOM order is label → value
+                  so screen readers read "Verified mentors: 500+" naturally */}
+              <dt className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
                 {stat.label}
               </dt>
-              <dd className="order-1 text-5xl font-bold tracking-tight text-white">
+              <dd className="mt-2 text-5xl font-bold tracking-tight text-white">
                 {stat.value}
               </dd>
-              <p className="order-3 mt-3 text-sm leading-6 text-slate-500">
+              <p className="mt-3 text-sm leading-6 text-slate-500">
                 {stat.description}
               </p>
             </div>

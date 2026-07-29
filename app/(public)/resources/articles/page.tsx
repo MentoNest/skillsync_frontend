@@ -5,7 +5,8 @@ import Link from 'next/link';
 import ArticleListItem from '@/components/ArticleListItem';
 import { useDebounce } from '@/hooks/useDebounce';
 import { SearchIcon } from '@/components/resources/icons';
-
+import Articles from "./Articles";
+        
 const articles = [
   { category: 'Career', title: 'How to Land Your First Tech Job', author: 'Jane Doe', readTime: '5 min read' },
   { category: 'Skills', title: 'Top 10 In-Demand Skills for 2025', author: 'John Smith', readTime: '7 min read' },
@@ -50,7 +51,11 @@ export default function ArticlesPage() {
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Resources
           </Link>
@@ -62,7 +67,8 @@ export default function ArticlesPage() {
             Articles &amp; Guides
           </h1>
           <p className="mt-3 text-lg text-slate-600 dark:text-gray-400 max-w-3xl">
-            Stay up to date with the latest industry insights, career advice, and deep dives written by experienced mentors.
+            Stay up to date with the latest industry insights, career advice,
+            and deep dives written by experienced mentors.
           </p>
         </div>
 
