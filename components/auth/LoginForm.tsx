@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import PasswordInput from './PasswordInput';
 import { authApi, ApiError } from '@/lib/api/auth';
 
@@ -17,52 +18,23 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
+  const { login, isLoading, error } = useAuth();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     mode: 'onTouched',
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    setIsLoading(true);
-    setApiError(null);
-
     try {
-      const response = await authApi.login(data);
-      
-      // Store token (you may want to use a more secure method)
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-
-      // Redirect based on role
-      switch (response.user.role) {
-        case 'admin':
-          router.push('/admin');
-          break;
-        case 'mentor':
-          router.push('/mentor');
-          break;
-        case 'mentee':
-          router.push('/mentee');
-          break;
-        default:
-          router.push('/');
-      }
-    } catch (error) {
-      if (error instanceof ApiError) {
-        setApiError(error.message);
-      } else {
-        setApiError('An unexpected error occurred. Please try again.');
-      }
-    } finally {
-      setIsLoading(false);
+      await login(data);
+      router.push('/dashboard');
+    } catch {
     }
   };
 
@@ -78,12 +50,12 @@ export default function LoginForm() {
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
         {/* API Error Message */}
-        {apiError && (
+        {error && (
           <div
             role="alert"
             className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
           >
-            {apiError}
+            {error}
           </div>
         )}
 
@@ -130,38 +102,15 @@ export default function LoginForm() {
           )}
         </div>
 
+        {error && (
+          <p role="alert" className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+        )}
         <button
           type="submit"
-          disabled={isLoading || (isDirty && !isValid)}
-          className="bg-cyan-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          disabled={isLoading}
+          className="bg-cyan-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? (
-            <>
-              <svg
-                className="animate-spin h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              Logging in...
-            </>
-          ) : (
-            'Login'
-          )}
+          {isLoading ? 'Signing in...' : 'Login'}
         </button>
       </form>
     </div>

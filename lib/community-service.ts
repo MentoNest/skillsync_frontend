@@ -2,9 +2,26 @@ import type { DiscussionMetadata } from './community-types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('skillsync_auth');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.token) {
+          headers['Authorization'] = `Bearer ${parsed.token}`;
+        }
+      }
+    } catch {
+    }
+  }
+  return headers;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...getAuthHeaders(), ...options?.headers },
     ...options,
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);

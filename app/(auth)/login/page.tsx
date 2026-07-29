@@ -1,5 +1,6 @@
 'use client';
 
+import LoginForm from "@/components/auth/LoginForm";
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -19,6 +20,8 @@ import type { UserRole } from '@/lib/auth';
  * comes from the server's auth response.
  */
 export default function LoginPage() {
+  return (
+    <div className="w-full max-w-md">
   const { login } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -71,6 +74,7 @@ export default function LoginPage() {
         </p>
       </div>
 
+      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
       {/* Card */}
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none p-8 border border-gray-100 dark:border-gray-700">
 
@@ -101,7 +105,6 @@ export default function LoginPage() {
             </svg>
             Continue with Google
           </button>
-
           <button
             type="button"
             className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
@@ -113,7 +116,6 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* Divider */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200 dark:border-gray-600" />
@@ -125,6 +127,7 @@ export default function LoginPage() {
           </div>
         </div>
 
+        <LoginForm />
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
 
@@ -241,7 +244,6 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Footer */}
       <p className="text-center text-xs text-gray-400 mt-6">
         By signing in, you agree to our{' '}
         <a href="#" className="text-purple-600 hover:underline">Terms of Service</a>
