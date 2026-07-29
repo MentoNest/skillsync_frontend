@@ -1,4 +1,4 @@
-import { Button } from './button';
+import { Button } from "./button";
 
 interface LoadMoreButtonProps {
   onClick: () => void;
@@ -13,9 +13,9 @@ export function LoadMoreButton({
   onClick,
   isLoading = false,
   disabled = false,
-  className = '',
-  loadingText = 'Loading...',
-  defaultText = 'Load More Discussions'
+  className = "",
+  loadingText = "Loading...",
+  defaultText = "Load More Discussions",
 }: LoadMoreButtonProps) {
   return (
     <div className={`flex justify-center py-8 ${className}`}>

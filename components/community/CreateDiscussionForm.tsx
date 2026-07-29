@@ -1,23 +1,32 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { CATEGORIES } from '@/lib/filters';
-import RichTextEditor from './RichTextEditor';
-import { X, Tag } from 'lucide-react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { CATEGORIES } from "@/lib/filters";
+import RichTextEditor from "./RichTextEditor";
+import { X, Tag } from "lucide-react";
+import Toast from "@/components/ui/toast";
 
 const createDiscussionSchema = z.object({
-  title: z.string().min(5, 'Title must be at least 5 characters').max(200, 'Title must be less than 200 characters'),
-  category: z.string().min(1, 'Please select a category'),
-  content: z.string().min(20, 'Content must be at least 20 characters').max(5000, 'Content must be less than 5000 characters'),
+  title: z
+    .string()
+    .min(5, "Title must be at least 5 characters")
+    .max(200, "Title must be less than 200 characters"),
+  category: z.string().min(1, "Please select a category"),
+  content: z
+    .string()
+    .min(20, "Content must be at least 20 characters")
+    .max(5000, "Content must be less than 5000 characters"),
 });
 
 type CreateDiscussionFormData = z.infer<typeof createDiscussionSchema>;
 
 interface Props {
-  onSubmit?: (data: CreateDiscussionFormData & { tags: string[] }) => Promise<void> | void;
+  onSubmit?: (
+    data: CreateDiscussionFormData & { tags: string[] },
+  ) => Promise<void> | void;
   onSuccess?: () => void;
 }
 
@@ -25,9 +34,9 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, setTagInput] = useState("");
 
   const {
     register,
@@ -38,9 +47,9 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
   } = useForm<CreateDiscussionFormData>({
     resolver: zodResolver(createDiscussionSchema),
     defaultValues: {
-      title: '',
-      category: '',
-      content: '',
+      title: "",
+      category: "",
+      content: "",
     },
   });
 
@@ -48,16 +57,16 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
     const trimmedTag = tagInput.trim().toLowerCase();
     if (trimmedTag && !tags.includes(trimmedTag) && tags.length < 5) {
       setTags([...tags, trimmedTag]);
-      setTagInput('');
+      setTagInput("");
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag();
     }
@@ -71,28 +80,30 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
       if (onSubmit) {
         await onSubmit({ ...data, tags });
       } else {
-        const response = await fetch('/api/discussions', {
-          method: 'POST',
+        const response = await fetch("/api/discussions", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ ...data, content, tags }),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to create discussion');
+          throw new Error(errorData.message || "Failed to create discussion");
         }
       }
 
-      setSuccess('Discussion created successfully');
+      setSuccess("Discussion created successfully");
       reset();
-      setContent('');
+      setContent("");
       setTags([]);
-      setTagInput('');
+      setTagInput("");
       onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -100,7 +111,9 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Create New Discussion</h2>
+      <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        Create New Discussion
+      </h2>
 
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -110,13 +123,16 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
 
       <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Title
           </label>
           <input
             id="title"
             type="text"
-            {...register('title')}
+            {...register("title")}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="What would you like to discuss?"
           />
@@ -126,12 +142,15 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
         </div>
 
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Category
           </label>
           <select
             id="category"
-            {...register('category')}
+            {...register("category")}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           >
             <option value="">Select a category</option>
@@ -142,28 +161,38 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
             ))}
           </select>
           {errors.category && (
-            <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.category.message}
+            </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="content"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Content
           </label>
           <RichTextEditor
             content={content}
             onChange={(newContent) => {
               setContent(newContent);
-              setValue('content', newContent, { shouldValidate: true });
+              setValue("content", newContent, { shouldValidate: true });
             }}
           />
           {errors.content && (
-            <p className="mt-1 text-sm text-red-600">{errors.content.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.content.message}
+            </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="tag-input" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="tag-input"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Tags <span className="text-gray-400 font-normal">(optional)</span>
           </label>
           <div className="flex flex-wrap gap-2 mb-2">
@@ -215,11 +244,17 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
             disabled={isSubmitting}
             className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isSubmitting ? 'Creating...' : 'Create Discussion'}
+            {isSubmitting ? "Creating..." : "Create Discussion"}
           </button>
         </div>
       </form>
-      {success && <Toast message={success} type="success" onClose={() => setSuccess(null)} />}
+      {success && (
+        <Toast
+          message={success}
+          type="success"
+          onClose={() => setSuccess(null)}
+        />
+      )}
     </div>
   );
 }

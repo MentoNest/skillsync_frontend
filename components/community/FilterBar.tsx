@@ -1,7 +1,11 @@
-'use client';
+"use client";
 
-import CategoryFilter from './CategoryFilter';
-import { SORT_OPTIONS, type SortOrder, DEFAULT_FILTER_STATE } from '@/lib/filters';
+import CategoryFilter from "./CategoryFilter";
+import {
+  SORT_OPTIONS,
+  type SortOrder,
+  DEFAULT_FILTER_STATE,
+} from "@/lib/filters";
 
 interface Props {
   category: string | null;
@@ -22,7 +26,8 @@ export default function FilterBar({
   onSearchChange,
   onReset,
 }: Props) {
-  const hasActiveFilters = category !== null || sort !== 'latest' || search !== '';
+  const hasActiveFilters =
+    category !== null || sort !== "latest" || search !== "";
 
   return (
     <div className="space-y-4">
@@ -34,7 +39,12 @@ export default function FilterBar({
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             type="text"

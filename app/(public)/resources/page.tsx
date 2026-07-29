@@ -1,10 +1,10 @@
-import React, { Suspense } from 'react';
-import HeroSection from '@/components/resources/HeroSection';
-import ResourceSearchBarWrapper from '@/components/resources/ResourceSearchBarWrapper';
-import { CategoryGrid } from '@/components/resources/CategoryGrid';
-import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection';
-import QuickAccessSection from '@/components/resources/QuickAccessSection';
-import CTASection from '@/components/resources/CTASection';
+import React, { Suspense } from "react";
+import HeroSection from "@/components/resources/HeroSection";
+import ResourceSearchBarWrapper from "@/components/resources/ResourceSearchBarWrapper";
+import { CategoryGrid } from "@/components/resources/CategoryGrid";
+import ToolsTemplatesSection from "@/components/resources/ToolsTemplatesSection";
+import QuickAccessSection from "@/components/resources/QuickAccessSection";
+import CTASection from "@/components/resources/CTASection";
 
 function CategoryGridFallback() {
   return (

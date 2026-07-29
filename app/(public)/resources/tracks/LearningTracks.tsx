@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import LearningTrackCard from "@/components/landing/LearningTrackCard";
+import LearningTrackCard from "@/components/LearningTrackCard";
 import LearningTrackCardSkeleton from "@/components/skeletons/LearningTrackCardSkeleton";
 
 const learningTracks = [

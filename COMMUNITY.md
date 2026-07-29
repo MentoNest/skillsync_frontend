@@ -56,36 +56,39 @@ components/community/
 ### Key component props
 
 **DiscussionCard**
-| Prop | Type | Description |
-|------|------|-------------|
-| `discussion` | `DiscussionMetadata` | Discussion data including `isPinned`, `isLocked` |
-| `onLike` | `(id: string) => void` | Called when like button is clicked (no-op when locked) |
+
+| Prop         | Type                   | Description                                                |
+| ------------ | ---------------------- | ---------------------------------------------------------- |
+| `discussion` | `DiscussionMetadata`   | Discussion data including `isPinned`, `isLocked`           |
+| `onLike`     | `(id: string) => void` | Called when like button is clicked (no-op when locked)     |
 | `onBookmark` | `(id: string) => void` | Called when bookmark button is clicked (no-op when locked) |
-| `onClick` | `(id: string) => void` | Called when the card is clicked/Enter-pressed |
+| `onClick`    | `(id: string) => void` | Called when the card is clicked/Enter-pressed              |
 
 **DiscussionMetadata**
-| Prop | Type | Description |
-|------|------|-------------|
-| `metadata` | `DiscussionMetadata` | Source data |
-| `onLike` | `(id: string) => void` | Like handler |
-| `onBookmark` | `(id: string) => void` | Bookmark handler |
-| `disableInteractions` | `boolean` | Disables like and bookmark buttons (used for locked discussions) |
+
+| Prop                  | Type                   | Description                                                      |
+| --------------------- | ---------------------- | ---------------------------------------------------------------- |
+| `metadata`            | `DiscussionMetadata`   | Source data                                                      |
+| `onLike`              | `(id: string) => void` | Like handler                                                     |
+| `onBookmark`          | `(id: string) => void` | Bookmark handler                                                 |
+| `disableInteractions` | `boolean`              | Disables like and bookmark buttons (used for locked discussions) |
 
 **DiscussionFeed**
-| Prop | Type | Description |
-|------|------|-------------|
-| `discussions` | `DiscussionMetadata[]` | Pre-sorted/filtered list to render |
-| `onLike` | `(id: string) => void` | Forwarded to each card |
-| `onBookmark` | `(id: string) => void` | Forwarded to each card |
-| `onDiscussionClick` | `(id: string) => void` | Forwarded to each card |
+
+| Prop                | Type                   | Description                        |
+| ------------------- | ---------------------- | ---------------------------------- |
+| `discussions`       | `DiscussionMetadata[]` | Pre-sorted/filtered list to render |
+| `onLike`            | `(id: string) => void` | Forwarded to each card             |
+| `onBookmark`        | `(id: string) => void` | Forwarded to each card             |
+| `onDiscussionClick` | `(id: string) => void` | Forwarded to each card             |
 
 ---
 
 ## Routing Structure
 
-| Route | Component | Description |
-|-------|-----------|-------------|
-| `/community` | `app/(dashboard)/community/page.tsx` | Discussion feed + sidebar |
+| Route             | Component                                 | Description                  |
+| ----------------- | ----------------------------------------- | ---------------------------- |
+| `/community`      | `app/(dashboard)/community/page.tsx`      | Discussion feed + sidebar    |
 | `/community/[id]` | `app/(dashboard)/community/[id]/page.tsx` | Discussion detail + comments |
 
 Both routes are nested inside `app/(dashboard)/layout.tsx`, which wraps the page in the shared dashboard shell (navigation, etc.).
@@ -102,33 +105,38 @@ State lives in `CommunityContext` (`community-context.tsx`) using `useReducer`.
 
 ```ts
 interface CommunityState {
-  discussions: Discussion[];   // includes isPinned, isLocked
+  discussions: Discussion[]; // includes isPinned, isLocked
   categories: Category[];
   filters: {
-    sortBy: DiscussionSort;    // 'trending' | 'latest' | 'most-replies' | 'most-liked'
+    sortBy: DiscussionSort; // 'trending' | 'latest' | 'most-replies' | 'most-liked'
     category: string | null;
     searchQuery: string;
   };
   loading: boolean;
   error: string | null;
   recommended: Discussion[];
-  statistics: { totalMembers, activeDiscussions, totalDiscussions, eventsThisMonth };
+  statistics: {
+    totalMembers;
+    activeDiscussions;
+    totalDiscussions;
+    eventsThisMonth;
+  };
 }
 ```
 
 ### Available actions (via context methods)
 
-| Method | Purpose |
-|--------|---------|
-| `setSortBy(sort)` | Change sort order |
-| `setCategoryFilter(category)` | Filter by category; `null` = all |
-| `setSearchQuery(query)` | Text search filter |
-| `addDiscussion(discussion)` | Prepend a new discussion |
-| `updateDiscussionLikes(id, likes)` | Update like count |
-| `updateDiscussionReplies(id, replies)` | Update reply count |
-| `togglePin(id)` | Toggle `isPinned` on a discussion |
-| `toggleLock(id)` | Toggle `isLocked` on a discussion |
-| `getFilteredDiscussions()` | Returns discussions with filters, sort, and pinned-first ordering applied |
+| Method                                 | Purpose                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------- |
+| `setSortBy(sort)`                      | Change sort order                                                         |
+| `setCategoryFilter(category)`          | Filter by category; `null` = all                                          |
+| `setSearchQuery(query)`                | Text search filter                                                        |
+| `addDiscussion(discussion)`            | Prepend a new discussion                                                  |
+| `updateDiscussionLikes(id, likes)`     | Update like count                                                         |
+| `updateDiscussionReplies(id, replies)` | Update reply count                                                        |
+| `togglePin(id)`                        | Toggle `isPinned` on a discussion                                         |
+| `toggleLock(id)`                       | Toggle `isLocked` on a discussion                                         |
+| `getFilteredDiscussions()`             | Returns discussions with filters, sort, and pinned-first ordering applied |
 
 ### Pinned-first ordering
 
@@ -140,13 +148,13 @@ interface CommunityState {
 
 API calls are in `lib/community-service.ts`. All methods use a shared `request<T>()` helper that reads `NEXT_PUBLIC_API_URL` from environment variables.
 
-| Method | HTTP | Endpoint | Description |
-|--------|------|----------|-------------|
-| `likeDiscussion(id)` | POST | `/api/community/discussions/:id/like` | Like a discussion |
-| `unlikeDiscussion(id)` | DELETE | `/api/community/discussions/:id/like` | Remove a like |
-| `bookmarkDiscussion(id)` | POST | `/api/community/discussions/:id/bookmark` | Bookmark a discussion |
-| `removeBookmark(id)` | DELETE | `/api/community/discussions/:id/bookmark` | Remove a bookmark |
-| `fetchDiscussions(params)` | GET | `/api/community/discussions` | Paginated discussion list |
+| Method                     | HTTP   | Endpoint                                  | Description               |
+| -------------------------- | ------ | ----------------------------------------- | ------------------------- |
+| `likeDiscussion(id)`       | POST   | `/api/community/discussions/:id/like`     | Like a discussion         |
+| `unlikeDiscussion(id)`     | DELETE | `/api/community/discussions/:id/like`     | Remove a like             |
+| `bookmarkDiscussion(id)`   | POST   | `/api/community/discussions/:id/bookmark` | Bookmark a discussion     |
+| `removeBookmark(id)`       | DELETE | `/api/community/discussions/:id/bookmark` | Remove a bookmark         |
+| `fetchDiscussions(params)` | GET    | `/api/community/discussions`              | Paginated discussion list |
 
 ### Next.js API route (mock)
 
@@ -205,14 +213,14 @@ Configuration: `jest.config.ts` (uses `next/jest.js`), setup file: `jest.setup.t
 
 ### Test files
 
-| File | Type | What it covers |
-|------|------|---------------|
-| `DiscussionCard.test.tsx` | Unit | Rendering, pin badge, lock badge, aria-labels, click/keydown |
-| `DiscussionMetadata.test.tsx` | Unit | Stats display, like/bookmark callbacks, `disableInteractions`, `timeAgo` |
-| `CommunityTabs.test.tsx` | Unit | Rendering, `aria-current`, count badges, tab switching |
-| `FilterBar.test.tsx` | Unit | Search input, sort select, clear-filters button |
-| `DiscussionFeed.test.tsx` | Integration | Empty state, pagination, load-more, like/bookmark/click callbacks |
-| `PinLock.test.tsx` | Integration | Pin/lock visual output across DiscussionCard and DiscussionFeed |
+| File                          | Type        | What it covers                                                           |
+| ----------------------------- | ----------- | ------------------------------------------------------------------------ |
+| `DiscussionCard.test.tsx`     | Unit        | Rendering, pin badge, lock badge, aria-labels, click/keydown             |
+| `DiscussionMetadata.test.tsx` | Unit        | Stats display, like/bookmark callbacks, `disableInteractions`, `timeAgo` |
+| `CommunityTabs.test.tsx`      | Unit        | Rendering, `aria-current`, count badges, tab switching                   |
+| `FilterBar.test.tsx`          | Unit        | Search input, sort select, clear-filters button                          |
+| `DiscussionFeed.test.tsx`     | Integration | Empty state, pagination, load-more, like/bookmark/click callbacks        |
+| `PinLock.test.tsx`            | Integration | Pin/lock visual output across DiscussionCard and DiscussionFeed          |
 
 ### Writing new tests
 

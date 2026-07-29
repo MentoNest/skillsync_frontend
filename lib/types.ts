@@ -1,10 +1,11 @@
-import { AvailabilityStatus } from '@/components/MentorAvailabilityBadge';
+import { AvailabilityStatus } from "@/components/MentorAvailabilityBadge";
 
-export type ExperienceLevel = 'Junior' | 'Mid-Level' | 'Senior' | 'Executive';
+export type ExperienceLevel = "Junior" | "Mid-Level" | "Senior" | "Executive";
 
-export type SortOption = 'top-rated' | 'price-asc' | 'price-desc' | 'most-reviewed';
+export type SortOption =
+  "top-rated" | "price-asc" | "price-desc" | "most-reviewed";
 
-export type PriceRangeId = 'any' | 'budget' | 'mid' | 'premium';
+export type PriceRangeId = "any" | "budget" | "mid" | "premium";
 
 export interface Article {
   category: string;
@@ -34,6 +35,8 @@ export interface Mentor {
   experienceLevel?: ExperienceLevel;
   availability?: AvailabilityStatus;
   yearsExperience?: number;
+  experienceYears?: number;
+  image?: string;
   isFeatured?: boolean;
   profileHref?: string;
   onBook?: () => void;

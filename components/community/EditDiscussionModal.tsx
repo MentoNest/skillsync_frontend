@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface EditModalProps {
   isOpen: boolean;
@@ -13,8 +13,8 @@ interface EditModalProps {
 export function EditDiscussionModal({
   isOpen,
   onClose,
-  initialTitle = '',
-  initialContent = '',
+  initialTitle = "",
+  initialContent = "",
   onSave,
 }: EditModalProps) {
   const [title, setTitle] = useState(initialTitle);
@@ -34,7 +34,9 @@ export function EditDiscussionModal({
         <h2 className="text-lg font-bold text-gray-900">Edit Discussion</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Title</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Title
+            </label>
             <input
               type="text"
               value={title}
@@ -45,7 +47,9 @@ export function EditDiscussionModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Content</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Content
+            </label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}

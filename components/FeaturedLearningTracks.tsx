@@ -1,62 +1,89 @@
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
+import LearningTrackCard from "@/components/LearningTrackCard";
 
-const tracks = [
+export interface LearningTrack {
+  title: string;
+  category: string;
+  description: string;
+  imageSrc: string;
+  lessons: number;
+  duration: string;
+  href: string;
+}
+
+export const defaultFeaturedTracks: LearningTrack[] = [
   {
-    title: 'Frontend Development',
-    description: 'Master HTML, CSS, JavaScript and modern frameworks.',
-    icon: '🖥️',
-    label: 'Computer screen',
+    title: "Frontend Development",
+    category: "Engineering",
+    description:
+      "Master HTML, CSS, JavaScript, and modern frameworks like React and Next.js to build fast, responsive user interfaces.",
+    lessons: 24,
+    duration: "9h 15m",
+    imageSrc: "/file.svg",
+    href: "/resources/tracks/frontend-development",
   },
   {
-    title: 'Data Science',
-    description: 'Explore data analysis, ML, and statistical modeling.',
-    icon: '📊',
-    label: 'Bar chart',
+    title: "Data Science & Analytics",
+    category: "Data",
+    description:
+      "Apply data-driven thinking, analytics, statistical modeling, and machine learning to solve real-world industry problems.",
+    lessons: 20,
+    duration: "7h 45m",
+    imageSrc: "/file.svg",
+    href: "/resources/tracks/data-science",
   },
   {
-    title: 'Product Management',
-    description: 'Learn to build and ship products users love.',
-    icon: '🚀',
-    label: 'Rocket launch',
+    title: "Product Management",
+    category: "Product",
+    description:
+      "Master product strategy, user research, roadmapping, and cross-functional execution to build products users love.",
+    lessons: 14,
+    duration: "5h 10m",
+    imageSrc: "/file.svg",
+    href: "/resources/tracks/product-management",
   },
 ];
 
-export default function FeaturedLearningTracks() {
+export interface FeaturedLearningTracksProps {
+  tracks?: LearningTrack[];
+  className?: string;
+}
+
+export default function FeaturedLearningTracks({
+  tracks = defaultFeaturedTracks,
+  className = "",
+}: FeaturedLearningTracksProps) {
+  const featuredTracks = tracks.slice(0, 3);
+
   return (
-    <section className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4 border-y border-gray-150 dark:border-gray-850 transition-colors" aria-labelledby="tracks-heading">
+    <section
+      className={`bg-gray-50 dark:bg-gray-800/40 py-12 px-4 sm:px-6 lg:px-8 border-y border-gray-150 dark:border-gray-850 transition-colors ${className}`}
+      aria-labelledby="featured-tracks-heading"
+    >
       <div className="mx-auto max-w-screen-xl">
         <div className="flex items-center justify-between mb-8">
-          <h2 id="tracks-heading" className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h2
+            id="featured-tracks-heading"
+            className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight"
+          >
             Featured Learning Tracks
           </h2>
-          <Link 
-            href="/resources/tracks" 
-            className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 transition-colors focus:outline-none focus:underline"
+          <Link
+            href="/resources/tracks"
+            className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 transition-colors focus:outline-none focus:underline flex items-center gap-1"
           >
-            View All Tracks &rarr;
+            View All
+            <span aria-hidden="true">&rarr;</span>
           </Link>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {tracks.map((track) => (
-            <article
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {featuredTracks.map((track, index) => (
+            <LearningTrackCard
               key={track.title}
-              className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition duration-300 flex flex-col items-start"
-            >
-              <span 
-                className="text-3xl mb-4 p-3 bg-slate-50 dark:bg-gray-750 rounded-xl" 
-                role="img" 
-                aria-label={track.label}
-              >
-                {track.icon}
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                {track.title}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                {track.description}
-              </p>
-            </article>
+              {...track}
+              priority={index === 0}
+            />
           ))}
         </div>
       </div>

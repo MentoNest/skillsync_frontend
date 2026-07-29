@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Props {
   loadMore: () => Promise<void>;
@@ -9,7 +9,12 @@ interface Props {
   children: React.ReactNode;
 }
 
-export default function InfiniteScrollWrapper({ loadMore, hasMore, threshold = 200, children }: Props) {
+export default function InfiniteScrollWrapper({
+  loadMore,
+  hasMore,
+  threshold = 200,
+  children,
+}: Props) {
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 

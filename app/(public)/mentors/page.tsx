@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MentorCard from "@/components/MentorCard";
 import MentorSearchBar from "@/components/MentorSearchBar";
-import FilterSidebar from "@/components/mentors/FilterSidebar";
+import FilterSidebar from "@/app/(public)/mentors/components/FilterSidebar";
 import { Button } from "@/components/ui/button";
 
 import { Mentor } from "@/lib/types";
@@ -124,7 +124,6 @@ export default function MentorsPage() {
   // Comparison state
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
-
   const toggleBookmark = (mentorId: string) => {
     setBookmarkedMentors((prev) => {
       const newSet = new Set(prev);
@@ -195,7 +194,7 @@ export default function MentorsPage() {
     const expertiseMatch =
       selectedExpertise.length === 0 ||
       (mentor.expertise &&
-        selectedExpertise.every((e) => mentor.expertise.includes(e)));
+        selectedExpertise.every((e) => mentor.expertise?.includes(e)));
 
     return searchMatch && expertiseMatch;
   });
@@ -215,7 +214,6 @@ export default function MentorsPage() {
     }, 400);
   };
 
-export default function MentorDiscoveryPage() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Search Header */}

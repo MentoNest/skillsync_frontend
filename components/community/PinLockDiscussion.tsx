@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface PinLockProps {
   discussionId: string;
@@ -34,13 +34,13 @@ export function PinLockDiscussion({
           onClick={() => setIsPinned(!isPinned)}
           className="text-xs px-2 py-1 border rounded hover:bg-gray-200"
         >
-          {isPinned ? 'Unpin' : 'Pin to Top'}
+          {isPinned ? "Unpin" : "Pin to Top"}
         </button>
         <button
           onClick={() => setIsLocked(!isLocked)}
           className="text-xs px-2 py-1 border rounded hover:bg-gray-200"
         >
-          {isLocked ? 'Unlock' : 'Lock Discussion'}
+          {isLocked ? "Unlock" : "Lock Discussion"}
         </button>
       </div>
     </div>

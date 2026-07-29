@@ -1,4 +1,4 @@
-export const mockMentors = [
+export const MOCK_MENTORS = [
   {
     id: 1,
     name: "John Doe",
@@ -16,3 +16,6 @@ export const mockMentors = [
     image: "https://randomuser.me/api/portraits/women/44.jpg",
   },
 ];
+
+export const MENTORS = MOCK_MENTORS;
+export const mockMentors = MOCK_MENTORS;

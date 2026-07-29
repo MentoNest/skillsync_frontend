@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -13,7 +13,7 @@ export function DeleteDiscussionModal({
   isOpen,
   onClose,
   onConfirmDelete,
-  discussionTitle = 'this discussion',
+  discussionTitle = "this discussion",
 }: DeleteModalProps) {
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +33,9 @@ export function DeleteDiscussionModal({
       <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl space-y-4">
         <h2 className="text-lg font-bold text-gray-900">Delete Discussion</h2>
         <p className="text-xs text-gray-600">
-          Are you sure you want to delete <span className="font-semibold">{discussionTitle}</span>? This action cannot be undone.
+          Are you sure you want to delete{" "}
+          <span className="font-semibold">{discussionTitle}</span>? This action
+          cannot be undone.
         </p>
 
         <div className="flex justify-end gap-2 pt-2">
@@ -50,7 +52,7 @@ export function DeleteDiscussionModal({
             disabled={loading}
             className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 font-semibold disabled:opacity-50"
           >
-            {loading ? 'Deleting...' : 'Delete Discussion'}
+            {loading ? "Deleting..." : "Delete Discussion"}
           </button>
         </div>
       </div>

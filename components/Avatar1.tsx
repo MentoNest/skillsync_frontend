@@ -66,7 +66,7 @@ function getColorForName(name: string): string {
 }
 
 function resolveSize(size: AvatarSize): number {
-  return typeof size === "number" ? size : SIZE_MAP[size] ?? SIZE_MAP.md;
+  return typeof size === "number" ? size : (SIZE_MAP[size] ?? SIZE_MAP.md);
 }
 
 export default function Avatar({

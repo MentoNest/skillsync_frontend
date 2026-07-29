@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { SearchIcon } from '@/components/resources/icons';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { SearchIcon } from "@/components/icons";
 
 /**
  * HeroSearchBar — Functional search input styled for the hero section.
@@ -14,7 +14,7 @@ import { SearchIcon } from '@/components/resources/icons';
  * ResourceSearchBar can pick up the query.
  */
 export default function HeroSearchBar() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,7 +25,12 @@ export default function HeroSearchBar() {
   };
 
   return (
-    <form onSubmit={handleSubmit} role="search" className="w-full max-w-md sm:w-auto sm:min-w-[320px]" aria-label="Quick resource search">
+    <form
+      onSubmit={handleSubmit}
+      role="search"
+      className="w-full max-w-md sm:w-auto sm:min-w-[320px]"
+      aria-label="Quick resource search"
+    >
       <label htmlFor="hero-resource-search" className="sr-only">
         Search guides, tutorials, and tools
       </label>

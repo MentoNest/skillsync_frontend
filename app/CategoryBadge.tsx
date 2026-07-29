@@ -26,11 +26,13 @@ const COLOR_MAP = {
   gray: { bg: "#F1EFE8", text: "#444441", border: "#B4B2A9" },
 };
 
-const COLOR_KEYS = Object.keys(COLOR_MAP);
+export type BadgeColorKey = keyof typeof COLOR_MAP;
+
+const COLOR_KEYS = Object.keys(COLOR_MAP) as BadgeColorKey[];
 
 // Deterministically map a string to one of the palette colors,
 // so the same category name always gets the same color.
-function hashStringToColorKey(str) {
+function hashStringToColorKey(str: string): BadgeColorKey {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -40,8 +42,18 @@ function hashStringToColorKey(str) {
   return COLOR_KEYS[index];
 }
 
-export default function CategoryBadge({ category, color, className = "" }) {
-  const colorKey =
+export interface CategoryBadgeProps {
+  category: string;
+  color?: BadgeColorKey;
+  className?: string;
+}
+
+export default function CategoryBadge({
+  category,
+  color,
+  className = "",
+}: CategoryBadgeProps) {
+  const colorKey: BadgeColorKey =
     color && COLOR_MAP[color] ? color : hashStringToColorKey(category || "");
   const { bg, text, border } = COLOR_MAP[colorKey];
 
@@ -77,7 +89,9 @@ export function CategoryBadgeDemo() {
   ];
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", padding: "16px" }}>
+    <div
+      style={{ display: "flex", flexWrap: "wrap", gap: "8px", padding: "16px" }}
+    >
       {categories.map((cat) => (
         <CategoryBadge key={cat} category={cat} />
       ))}

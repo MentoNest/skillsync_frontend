@@ -1,10 +1,13 @@
 "use client";
 
-import {
-  EXPERIENCE_LEVELS,
-  type Mentor,
-  type ExperienceLevel,
-} from "@/components/mentors/data";
+import type { Mentor, ExperienceLevel } from "@/lib/types";
+
+export const EXPERIENCE_LEVELS: ExperienceLevel[] = [
+  "Junior",
+  "Mid-Level",
+  "Senior",
+  "Executive",
+];
 
 interface ExperienceLevelFilterProps {
   mentors: Mentor[];

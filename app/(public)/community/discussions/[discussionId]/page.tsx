@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { DiscussionCommentsSection } from '@/components/community/DiscussionCommentsSection';
+import React from "react";
+import Link from "next/link";
+import { DiscussionCommentsSection } from "@/components/community/DiscussionCommentsSection";
 
 interface PageProps {
   params: Promise<{ discussionId: string }>;
@@ -40,8 +40,9 @@ export default function DiscussionDetailPage({ params }: PageProps) {
 
         <div className="prose text-sm text-gray-700 leading-relaxed">
           <p>
-            When building large-scale frontend applications, modular component structure, clean routing,
-            and optimistic UI updates are key to maintaining performance and developer velocity.
+            When building large-scale frontend applications, modular component
+            structure, clean routing, and optimistic UI updates are key to
+            maintaining performance and developer velocity.
           </p>
         </div>
       </article>

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface CommunityStatCardProps {
   label: string;
@@ -7,7 +7,12 @@ interface CommunityStatCardProps {
   icon?: React.ReactNode;
 }
 
-export default function CommunityStatCard({ label, value, trend, icon }: CommunityStatCardProps) {
+export default function CommunityStatCard({
+  label,
+  value,
+  trend,
+  icon,
+}: CommunityStatCardProps) {
   return (
     <div className="bg-white rounded-lg shadow p-4 flex items-center gap-3 hover:shadow-md transition-shadow">
       {icon && (
@@ -20,8 +25,11 @@ export default function CommunityStatCard({ label, value, trend, icon }: Communi
         <p className="text-xs text-gray-500 truncate">{label}</p>
       </div>
       {trend && (
-        <span className={`text-xs font-medium ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-          {trend.isPositive ? '+' : ''}{trend.value}%
+        <span
+          className={`text-xs font-medium ${trend.isPositive ? "text-green-600" : "text-red-600"}`}
+        >
+          {trend.isPositive ? "+" : ""}
+          {trend.value}%
         </span>
       )}
     </div>
