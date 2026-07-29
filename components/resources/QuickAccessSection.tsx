@@ -21,43 +21,44 @@ export default function QuickAccessSection() {
   const quickAccessItems = [
     {
       icon: <FileText className="h-7 w-7" />,
-      title: 'Resume Templates',
-      description: 'Professional resume templates designed to help you stand out and get noticed by recruiters.',
-      href: '/resources/templates/resume',
-      iconColor: 'text-blue-600 dark:text-blue-400',
-      iconBgColor: 'bg-blue-100 dark:bg-blue-950/40',
+      title: "Resume Templates",
+      description:
+        "Professional resume templates designed to help you stand out and get noticed by recruiters.",
+      href: "/resources/templates/resume",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      iconBgColor: "bg-blue-100 dark:bg-blue-950/40",
     },
     {
       icon: <Video className="h-7 w-7" />,
-      title: 'Video Tutorials',
-      description: 'Step-by-step video guides covering career development, interview prep, and professional skills.',
-      href: '/resources/tutorials',
-      iconColor: 'text-purple-600 dark:text-purple-400',
-      iconBgColor: 'bg-purple-100 dark:bg-purple-950/40',
+      title: "Video Tutorials",
+      description:
+        "Step-by-step video guides covering career development, interview prep, and professional skills.",
+      href: "/resources/tutorials",
+      iconColor: "text-purple-600 dark:text-purple-400",
+      iconBgColor: "bg-purple-100 dark:bg-purple-950/40",
     },
     {
       icon: <BookOpen className="h-7 w-7" />,
-      title: 'Career Guides',
-      description: 'Comprehensive guides on career planning, job search strategies, and professional growth.',
-      href: '/resources/guides',
-      iconColor: 'text-green-600 dark:text-green-400',
-      iconBgColor: 'bg-green-100 dark:bg-green-950/40',
+      title: "Career Guides",
+      description:
+        "Comprehensive guides on career planning, job search strategies, and professional growth.",
+      href: "/resources/guides",
+      iconColor: "text-green-600 dark:text-green-400",
+      iconBgColor: "bg-green-100 dark:bg-green-950/40",
     },
     {
       icon: <Download className="h-7 w-7" />,
-      title: 'Downloadable Tools',
-      description: 'Free tools, checklists, and worksheets to accelerate your career development journey.',
-      href: '/resources/downloads',
-      iconColor: 'text-orange-600 dark:text-orange-400',
-      iconBgColor: 'bg-orange-100 dark:bg-orange-950/40',
+      title: "Downloadable Tools",
+      description:
+        "Free tools, checklists, and worksheets to accelerate your career development journey.",
+      href: "/resources/downloads",
+      iconColor: "text-orange-600 dark:text-orange-400",
+      iconBgColor: "bg-orange-100 dark:bg-orange-950/40",
     },
   ];
 
   return (
-    <section
-      className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20"
-      aria-labelledby="quick-access-heading"
-    >
+    <div className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20">
       {/* Section Header */}
       <div className="mb-12 text-center lg:text-left">
         <h2
@@ -85,6 +86,6 @@ export default function QuickAccessSection() {
           />
         ))}
       </div>
-    </section>
+    </div>
   );
 }

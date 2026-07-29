@@ -215,6 +215,7 @@ export default function MentorsPage() {
     }, 400);
   };
 
+export default function MentorDiscoveryPage() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Search Header */}
