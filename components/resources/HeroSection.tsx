@@ -1,4 +1,4 @@
-import { SearchIcon } from "@/components/resources/icons";
+import HeroSearchBar from '@/components/resources/HeroSearchBar';
 
 /**
  * HeroSection — Resources page gradient hero.
@@ -67,18 +67,13 @@ export default function HeroSection() {
             at every stage.
           </p>
 
-          {/* Search prompt CTA */}
+          {/* Search + Browse CTA */}
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <div className="flex w-full max-w-md items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-purple-200 backdrop-blur-sm sm:w-auto sm:min-w-[320px]">
-              <SearchIcon className="h-4 w-4 shrink-0 text-purple-300" />
-              <span className="text-purple-200/80">
-                Search guides, tutorials, tools…
-              </span>
-            </div>
+            <HeroSearchBar />
             <a
               href="#categories"
               aria-label="Browse resource topics"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-purple-700 shadow-sm transition hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-700"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-purple-700 shadow-sm transition hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-700 shrink-0"
             >
               Browse topics
               <svg

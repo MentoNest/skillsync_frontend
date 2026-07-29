@@ -86,6 +86,6 @@ export default function ResourcesPage() {
 
       {/* CTA Section */}
       <CTASection />
-    </div>
+    </main>
   );
 }
