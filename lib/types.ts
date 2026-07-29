@@ -6,6 +6,14 @@ export type SortOption = 'top-rated' | 'price-asc' | 'price-desc' | 'most-review
 
 export type PriceRangeId = 'any' | 'budget' | 'mid' | 'premium';
 
+export interface Article {
+  category: string;
+  title: string;
+  author: string;
+  readTime: string;
+  href?: string;
+}
+
 export interface Mentor {
   mentorId?: string;
   id?: string;

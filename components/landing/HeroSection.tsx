@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 /**
  * HeroSection — above-the-fold, server-rendered, no images.
@@ -13,23 +12,40 @@ import { Button } from '@/components/ui/button';
  *   the same visual quality with zero runtime cost.
  * - Text content is rendered server-side so it is immediately readable even
  *   before any JS hydrates, benefiting both FCP and SEO.
+ *
+ * Accessibility notes:
+ * - Section labelled via aria-labelledby pointing at the h1 so screen readers
+ *   announce the landmark correctly.
+ * - CTA is a plain <Link> styled as a button — avoids the invalid nested
+ *   interactive element pattern of <Link><Button>.
+ * - Decorative orb is aria-hidden so it is skipped by assistive technology.
  */
 export default function HeroSection() {
   return (
-    <section className="bg-white dark:bg-gray-900 transition-colors" aria-label="Hero Section">
+    <section
+      className="bg-white dark:bg-gray-900 transition-colors"
+      aria-labelledby="hero-heading"
+    >
       <div className="grid max-w-screen-xl px-4 py-12 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
 
         {/* Copy column */}
         <div className="mr-auto place-self-center lg:col-span-7">
-          <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
+          <h1
+            id="hero-heading"
+            className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white"
+          >
             Find Your Perfect Mentor
           </h1>
           <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
             SkillSync helps you connect with experienced professionals to
             guide you on your career path.
           </p>
-          <Link href="/register" className="inline-flex">
-            <Button>Get Started</Button>
+          {/* Styled as a button but rendered as a link — no nested interactive elements */}
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center rounded-md bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-900 transition-colors"
+          >
+            Get Started
           </Link>
         </div>
 

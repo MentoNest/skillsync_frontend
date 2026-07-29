@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
 // ─── Critical above-the-fold sections — statically imported ──────────────────
@@ -140,7 +139,7 @@ const TestimonialsSection = dynamic(
 
 export default function Home() {
   return (
-    <>
+    <main aria-label="SkillSync home page">
       {/* ── Critical path: rendered and painted on first load ── */}
 
       {/* 1. Hero — LCP candidate, always above fold */}
@@ -150,7 +149,8 @@ export default function Home() {
       <div className="block lg:hidden">
         <Link
           href="/mentors"
-          className="block text-center mx-auto max-w-xs bg-cyan-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-cyan-700 transition-colors mb-6"
+          aria-label="Browse all mentors"
+          className="block text-center mx-auto max-w-xs bg-cyan-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 transition-colors mb-6"
         >
           Browse Mentors
         </Link>
@@ -171,7 +171,7 @@ export default function Home() {
             - sizes attr lets the browser pick the smallest fitting source. */}
       <section
         className="bg-white dark:bg-gray-900 transition-colors"
-        aria-label="About SkillSync tools"
+        aria-labelledby="about-skillsync-heading"
       >
         <div className="gap-8 items-center py-12 px-4 mx-auto max-w-screen-xl xl:gap-16 grid grid-cols-1 md:grid-cols-2 lg:px-6">
           <div className="w-full flex justify-center">
@@ -197,7 +197,10 @@ export default function Home() {
             />
           </div>
           <div className="mt-4 md:mt-0 flex flex-col items-start">
-            <h2 className="mb-4 text-3xl md:text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
+            <h2
+              id="about-skillsync-heading"
+              className="mb-4 text-3xl md:text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white"
+            >
               Let&apos;s create more tools and ideas that bring us together.
             </h2>
             <p className="mb-6 font-light text-gray-500 md:text-lg dark:text-gray-400">
@@ -334,26 +337,27 @@ export default function Home() {
       {/* 12. Bottom CTA — text-only, no images, no layout shift risk */}
       <section
         className="bg-cyan-600 dark:bg-cyan-800 transition-colors"
-        aria-label="CTA Sign Up"
+        aria-labelledby="bottom-cta-heading"
       >
         <div className="py-16 px-4 mx-auto max-w-screen-xl sm:py-20 lg:px-6 text-center">
-          <h2 className="mb-4 text-3xl md:text-4xl tracking-tight font-extrabold text-white">
+          <h2
+            id="bottom-cta-heading"
+            className="mb-4 text-3xl md:text-4xl tracking-tight font-extrabold text-white"
+          >
             Ready to elevate your career?
           </h2>
           <p className="mb-8 font-light text-cyan-100 md:text-lg max-w-xl mx-auto">
             Join SkillSync today and connect with mentors who can help you
             achieve your goals. Take control of your career journey.
           </p>
-          <Link href="/register" className="inline-flex">
-            <Button
-              variant="secondary"
-              className="bg-white text-cyan-700 hover:bg-gray-100 font-bold px-8 py-3 rounded-xl transition"
-            >
-              Sign Up Now
-            </Button>
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center rounded-xl bg-white px-8 py-3 text-sm font-bold text-cyan-700 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2 focus:ring-offset-cyan-600 transition-colors"
+          >
+            Sign Up Now
           </Link>
         </div>
       </section>
-    </>
+    </main>
   );
 }

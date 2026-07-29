@@ -63,9 +63,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, category, content } = body;
+    const { title, category, content, tags } = body;
 
-    // Validate required fields
     if (!title || !category || !content) {
       return NextResponse.json(
         { message: 'Title, category, and content are required' },
@@ -73,7 +72,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create new discussion
     const newDiscussion = {
       id: String(discussions.length + 1),
       title,
@@ -89,7 +87,7 @@ export async function POST(request: NextRequest) {
       commentCount: 0,
       viewCount: 0,
       isTrending: false,
-      tags: [],
+      tags: Array.isArray(tags) ? tags : [],
     };
 
     discussions.unshift(newDiscussion);
