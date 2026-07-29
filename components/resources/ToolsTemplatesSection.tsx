@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ArrowRight, FileText, TrendingUp } from 'lucide-react';
+import Link from "next/link";
+import { ArrowRight, FileText, TrendingUp } from "@/components/icons";
 
 /**
  * ToolsTemplatesSection — Large tool cards for Resume Builder & Career Planner.
@@ -29,10 +29,19 @@ interface ToolCardProps {
   ctaText: string;
 }
 
-function ToolCard({ title, description, href, icon, gradientFrom, gradientTo, ctaText }: ToolCardProps) {
+function ToolCard({
+  title,
+  description,
+  href,
+  icon,
+  gradientFrom,
+  gradientTo,
+  ctaText,
+}: ToolCardProps) {
   return (
     <Link
       href={href}
+      aria-label={`Learn more about ${title}`}
       className="group relative overflow-hidden rounded-3xl border border-gray-200 dark:border-gray-700/60 bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
     >
       {/* Gradient background */}
@@ -50,7 +59,9 @@ function ToolCard({ title, description, href, icon, gradientFrom, gradientTo, ct
       {/* Content */}
       <div className="relative z-10 p-8 lg:p-10">
         {/* Icon */}
-        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${gradientFrom} ${gradientTo} shadow-lg mb-6 group-hover:scale-110 transition-transform duration-300`}>
+        <div
+          className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${gradientFrom} ${gradientTo} shadow-lg mb-6 group-hover:scale-110 transition-transform duration-300`}
+        >
           <div className="text-white" aria-hidden="true">
             {icon}
           </div>
@@ -67,16 +78,21 @@ function ToolCard({ title, description, href, icon, gradientFrom, gradientTo, ct
         </p>
 
         {/* CTA Button */}
-        <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r ${gradientFrom} ${gradientTo} text-white font-semibold shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:gap-3`}>
+        <div
+          className={`inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r ${gradientFrom} ${gradientTo} text-white font-semibold shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:gap-3`}
+        >
           <span>{ctaText}</span>
-          <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" aria-hidden="true" />
+          <ArrowRight
+            className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300"
+            aria-hidden="true"
+          />
         </div>
       </div>
 
       {/* Border glow effect on hover */}
       <div
         className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r ${gradientFrom} ${gradientTo} blur-xl`}
-        style={{ padding: '2px', zIndex: -1 }}
+        style={{ padding: "2px", zIndex: -1 }}
         aria-hidden="true"
       />
     </Link>
@@ -94,10 +110,7 @@ function CareerPlannerIcon() {
 
 export default function ToolsTemplatesSection() {
   return (
-    <section
-      className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20"
-      aria-labelledby="tools-templates-heading"
-    >
+    <div className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20">
       {/* Section Header */}
       <div className="mb-12 text-center lg:text-left">
         <h2
@@ -107,7 +120,8 @@ export default function ToolsTemplatesSection() {
           Tools & Templates
         </h2>
         <p className="mt-3 text-lg text-gray-600 dark:text-gray-300 max-w-2xl lg:max-w-none">
-          Powerful tools to help you build your professional profile and plan your career journey
+          Powerful tools to help you build your professional profile and plan
+          your career journey
         </p>
       </div>
 
@@ -135,6 +149,6 @@ export default function ToolsTemplatesSection() {
           ctaText="Plan Your Career"
         />
       </div>
-    </section>
+    </div>
   );
 }

@@ -122,7 +122,11 @@ export default function TracksPage() {
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Resources
           </Link>
@@ -134,7 +138,9 @@ export default function TracksPage() {
             Learning Tracks
           </h1>
           <p className="mt-3 text-lg text-slate-600 dark:text-gray-400 max-w-3xl">
-            Explore curated learning tracks designed to guide you step-by-step through core industry disciplines and advance your professional capabilities.
+            Explore curated learning tracks designed to guide you step-by-step
+            through core industry disciplines and advance your professional
+            capabilities.
           </p>
         </div>
 

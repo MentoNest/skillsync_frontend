@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import MentorCard from '@/components/MentorCard';
 
 const mentors = [
@@ -63,8 +62,11 @@ export default function MentorDiscoverySection() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <Link href="/mentors">
-            <Button variant="secondary">View All Mentors</Button>
+          <Link
+            href="/mentors"
+            className="inline-flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-2.5 text-sm font-semibold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 transition-colors"
+          >
+            View All Mentors
           </Link>
         </div>
       </div>
