@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import PasswordInput from './PasswordInput';
+import { authApi, ApiError } from '@/lib/api/auth';
 
 const registerSchema = z
   .object({
@@ -25,6 +27,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function RegisterForm() {
   const router = useRouter();
   const { register: registerUser, isLoading, error } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -60,6 +63,16 @@ export default function RegisterForm() {
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+        {/* API Error Message */}
+        {error && (
+          <div
+            role="alert"
+            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+          >
+            {error}
+          </div>
+        )}
+
         {/* Full Name */}
         <div className="flex flex-col gap-1.5">
           <label htmlFor="name" className="text-sm font-medium text-gray-700">

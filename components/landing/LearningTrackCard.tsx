@@ -84,7 +84,7 @@ export default function LearningTrackCard({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
                 <circle cx="12" cy="12" r="10" />
               </svg>
-              {duration}
+              <span aria-label={`Duration: ${duration}`}>{duration}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <svg
@@ -97,7 +97,7 @@ export default function LearningTrackCard({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              {lessons} lessons
+              <span aria-label={`${lessons} lessons`}>{lessons} lessons</span>
             </span>
           </div>
         </div>

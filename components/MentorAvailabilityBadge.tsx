@@ -1,14 +1,20 @@
 import React from 'react';
 
-export type AvailabilityStatus = 'available' | 'busy' | 'fully-booked';
+export type AvailabilityStatus =
+  | 'available'
+  | 'busy'
+  | 'fully-booked'
+  | 'Available'
+  | 'Busy'
+  | 'Fully Booked';
 
 interface MentorAvailabilityBadgeProps {
-  status: AvailabilityStatus;
+  status?: AvailabilityStatus | string;
   className?: string;
 }
 
 const statusConfig: Record<
-  AvailabilityStatus,
+  string,
   { label: string; dot: string; badge: string }
 > = {
   available: {
@@ -32,10 +38,16 @@ const statusConfig: Record<
 };
 
 export default function MentorAvailabilityBadge({
-  status,
+  status = 'available',
   className = '',
 }: MentorAvailabilityBadgeProps) {
-  const { label, dot, badge } = statusConfig[status];
+  const normalizedKey = (status || 'available')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+|_/g, '-');
+
+  const config = statusConfig[normalizedKey] || statusConfig.available;
+  const { label, dot, badge } = config;
 
   return (
     <span
@@ -45,7 +57,7 @@ export default function MentorAvailabilityBadge({
     >
       {/* Animated dot for "available", static for others */}
       <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-        {status === 'available' && (
+        {normalizedKey === 'available' && (
           <span
             className={`animate-ping absolute inline-flex h-full w-full rounded-full ${dot} opacity-75`}
           />
