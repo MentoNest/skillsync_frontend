@@ -24,6 +24,7 @@ interface Props {
 export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [content, setContent] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -84,6 +85,7 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
         }
       }
 
+      setSuccess('Discussion created successfully');
       reset();
       setContent('');
       setTags([]);
@@ -217,6 +219,7 @@ export default function CreateDiscussionForm({ onSubmit, onSuccess }: Props) {
           </button>
         </div>
       </form>
+      {success && <Toast message={success} type="success" onClose={() => setSuccess(null)} />}
     </div>
   );
 }
