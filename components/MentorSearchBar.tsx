@@ -1,28 +1,23 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React from "react";
 
 export interface MentorSearchBarProps {
-  onSearch?: (query: string) => void;
+  onSearch: (query: string) => void;
+  value: string;
   placeholder?: string;
   className?: string;
 }
 
 export default function MentorSearchBar({
   onSearch,
-  placeholder = 'Search mentors by name, skill, or expertise...',
-  className = '',
+  value,
+  placeholder = "Search mentors by name, skill, or expertise...",
+  className = "",
 }: MentorSearchBarProps) {
-  const [query, setQuery] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch?.(query);
-  };
-
   return (
     <div className={`w-full max-w-3xl mx-auto px-4 py-6 ${className}`}>
-      <form onSubmit={handleSubmit} role="search" className="relative">
+      <div className="relative">
         <label htmlFor="mentor-search" className="sr-only">
           Search mentors
         </label>
@@ -48,20 +43,13 @@ export default function MentorSearchBar({
           <input
             id="mentor-search"
             type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            value={value}
+            onChange={(e) => onSearch(e.target.value)}
             placeholder={placeholder}
-            className="block w-full p-4 pl-12 pr-28 text-sm md:text-base text-gray-900 border border-gray-200 rounded-full bg-white shadow-sm hover:border-gray-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:border-cyan-500 dark:focus:ring-cyan-500/20 transition-all outline-none"
+            className="block w-full p-4 pl-12 pr-4 text-sm md:text-base text-gray-900 border border-gray-200 rounded-full bg-white shadow-sm hover:border-gray-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:border-cyan-500 dark:focus:ring-cyan-500/20 transition-all outline-none"
           />
-          {/* Action button inside input */}
-          <button
-            type="submit"
-            className="absolute right-2 top-1.5 bottom-1.5 px-6 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 rounded-full transition-all cursor-pointer"
-          >
-            Search
-          </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
