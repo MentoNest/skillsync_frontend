@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CATEGORIES } from '@/lib/filters';
+import RichTextEditor from './RichTextEditor';
 import { X, Paperclip, Tag } from 'lucide-react';
 
 const createDiscussionSchema = z.object({
@@ -23,6 +24,7 @@ interface Props {
 
 export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [content, setContent] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
@@ -31,10 +33,14 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset,
   } = useForm<CreateDiscussionFormData>({
     resolver: zodResolver(createDiscussionSchema),
+    defaultValues: {
+      content: '',
+    },
   });
 
   // Handle focus trap and body scroll lock
@@ -91,6 +97,7 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
       console.log('Discussion created:', { ...data, tags });
       
       reset();
+      setContent('');
       setTags([]);
       setTagInput('');
       onSuccess?.();
@@ -196,18 +203,17 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
             )}
           </div>
 
-          {/* Rich Text Editor (simplified textarea) */}
+          {/* Rich Text Editor */}
           <div>
             <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
               Content
             </label>
-            <textarea
-              id="content"
-              rows={8}
-              {...register('content')}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
-              placeholder="Share your thoughts, questions, or experiences..."
-              aria-describedby="content-error"
+            <RichTextEditor
+              content={content}
+              onChange={(newContent) => {
+                setContent(newContent);
+                setValue('content', newContent, { shouldValidate: true });
+              }}
             />
             {errors.content && (
               <p id="content-error" className="mt-1 text-sm text-red-600" role="alert">
