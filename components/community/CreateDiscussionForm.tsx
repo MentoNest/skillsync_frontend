@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CATEGORIES } from '@/lib/filters';
 import RichTextEditor from './RichTextEditor';
+import Toast from '@/components/ui/toast';
 
 const createDiscussionSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(200, 'Title must be less than 200 characters'),
@@ -22,6 +23,7 @@ interface Props {
 export default function CreateDiscussionForm({ onSuccess }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [content, setContent] = useState('');
 
   const {
@@ -47,7 +49,7 @@ export default function CreateDiscussionForm({ onSuccess }: Props) {
         content,
       };
 
-      const response = await fetch('/api/discussions', {
+      const response = await fetch('/community/discussions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,6 +62,7 @@ export default function CreateDiscussionForm({ onSuccess }: Props) {
         throw new Error(errorData.message || 'Failed to create discussion');
       }
 
+      setSuccess('Discussion created successfully');
       reset();
       setContent('');
       onSuccess?.();
@@ -73,7 +76,7 @@ export default function CreateDiscussionForm({ onSuccess }: Props) {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Create New Discussion</h2>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
           <p className="text-sm text-red-600">{error}</p>
@@ -138,6 +141,7 @@ export default function CreateDiscussionForm({ onSuccess }: Props) {
           </button>
         </div>
       </form>
+      {success && <Toast message={success} type="success" onClose={() => setSuccess(null)} />}
     </div>
   );
 }
