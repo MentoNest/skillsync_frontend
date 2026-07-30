@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // In-memory storage for discussions (replace with actual database in production)
-let discussions: any[] = [
+const discussions: Record<string, unknown>[] = [
   {
     id: "1",
     title: "How to transition into a career in UX design?",
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     discussions.unshift(newDiscussion);
 
     return NextResponse.json(newDiscussion, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },

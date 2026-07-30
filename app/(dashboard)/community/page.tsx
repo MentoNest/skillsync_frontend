@@ -125,7 +125,7 @@ export default function CommunityPage() {
   );
 
   const visibleDiscussions = useMemo(() => {
-    let list = [...allDiscussions];
+    const list = [...allDiscussions];
 
     if (view === "my-posts") {
       return list.filter((d) => d.author.id === CURRENT_USER.id);

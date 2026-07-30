@@ -48,7 +48,7 @@ function findMentor(rawId: string): Mentor | undefined {
     return (
       canonicalId === normalised ||
       nameSlug === normalised ||
-      (mentor.id && mentorSlug(mentor as any) === normalised)
+      (mentor.id && mentorSlug(mentor) === normalised)
     );
   });
 }
@@ -71,7 +71,7 @@ export default async function MentorProfilePage({
   const skills = mentor.skills ?? [];
   const industries = mentor.industries ?? mentor.expertise ?? [];
   const experienceYears =
-    mentor.yearsExperience ?? (mentor as any).experienceYears ?? 5;
+    mentor.yearsExperience ?? mentor.experienceYears ?? 5;
   const experienceLevel = mentor.experienceLevel ?? "Senior";
   const isUnavailable = mentor.availability === "fully-booked";
 

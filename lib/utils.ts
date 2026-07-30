@@ -4,7 +4,7 @@ export type ClassValue =
   | boolean
   | undefined
   | null
-  | { [key: string]: any }
+  | { [key: string]: boolean | null | undefined | string | number }
   | ClassValue[];
 
 function toVal(mix: ClassValue): string {

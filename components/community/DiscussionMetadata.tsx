@@ -10,6 +10,18 @@ interface Props {
   disableInteractions?: boolean;
 }
 
+function timeAgo(date: string) {
+  const diffMs = Date.now() - new Date(date).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(date).toLocaleDateString();
+}
+
 export default function DiscussionMetadata({
   metadata,
   onLike,
@@ -19,17 +31,6 @@ export default function DiscussionMetadata({
   onReport,
   disableInteractions = false,
 }: Props) {
-  const timeAgo = (date: string) => {
-    const diffMs = Date.now() - new Date(date).getTime();
-    const minutes = Math.floor(diffMs / 60000);
-    if (minutes < 1) return "just now";
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d ago`;
-    return new Date(date).toLocaleDateString();
-  };
 
   return (
     <div className="flex items-center gap-4 text-sm text-gray-500">

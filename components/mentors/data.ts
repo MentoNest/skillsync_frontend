@@ -1,4 +1,3 @@
-import type { AvailabilityStatus } from "@/components/MentorAvailabilityBadge";
 
 /**
  * High-level expertise areas used to group mentors on the discovery page.

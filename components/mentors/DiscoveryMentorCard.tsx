@@ -44,7 +44,9 @@ function slugFor(name: string): string {
 
 import MentorSkillTag from "./MentorSkillTag";
 
-export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
+export default function DiscoveryMentorCard({
+  mentor,
+}: DiscoveryMentorCardProps) {
   const initials = initialsFor(mentor.name);
   const gradient = gradientFor(mentor.name);
   const targetId = mentor.mentorId || mentor.id || slugFor(mentor.name);
