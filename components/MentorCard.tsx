@@ -127,9 +127,9 @@ export default function MentorCard({
         )}
       </div>
 
-      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 dark:bg-gray-800/50 dark:border-gray-700/60 flex items-center justify-between gap-3">
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 dark:bg-gray-800/50 dark:border-gray-700/60 flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
         {pricePerSession !== undefined && (
-          <div className="flex flex-col">
+          <div className="flex flex-col shrink-0">
             <span className="text-xs text-gray-500 dark:text-gray-400 leading-none">per session</span>
             <span className="text-lg font-bold text-gray-900 dark:text-white leading-snug">
               ${pricePerSession}
@@ -137,7 +137,7 @@ export default function MentorCard({
           </div>
         )}
 
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2 sm:ml-auto shrink-0">
           <Link
             href={resolvedProfileHref}
             className="inline-flex items-center gap-1 text-xs font-semibold bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"

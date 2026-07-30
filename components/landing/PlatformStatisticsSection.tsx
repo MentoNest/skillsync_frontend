@@ -53,17 +53,17 @@ export default function PlatformStatisticsSection() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-6 py-8 text-center transition duration-300 hover:border-white/20 hover:bg-white/[0.08]"
+              className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-4 py-6 sm:px-6 sm:py-8 text-center transition duration-300 hover:border-white/20 hover:bg-white/[0.08]"
             >
               {/* Value shown first visually via ordering, but DOM order is label → value
                   so screen readers read "Verified mentors: 500+" naturally */}
-              <dt className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+              <dt className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
                 {stat.label}
               </dt>
-              <dd className="mt-2 text-5xl font-bold tracking-tight text-white">
+              <dd className="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-white">
                 {stat.value}
               </dd>
-              <p className="mt-3 text-sm leading-6 text-slate-500">
+              <p className="mt-3 text-xs sm:text-sm leading-6 text-slate-500">
                 {stat.description}
               </p>
             </div>

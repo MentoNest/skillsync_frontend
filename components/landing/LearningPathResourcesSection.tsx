@@ -139,7 +139,7 @@ export default function LearningPathResourcesSection() {
 
         {/* Learning tracks */}
         <div className="mt-16">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-xl font-semibold text-slate-900">Learning tracks</h3>
             <Link
               href="/resources/tracks"
@@ -163,7 +163,7 @@ export default function LearningPathResourcesSection() {
 
         {/* Quick access resources */}
         <div className="mt-20">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-xl font-semibold text-slate-900">Quick access resources</h3>
             <Link
               href="/resources"

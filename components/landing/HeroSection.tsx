@@ -29,21 +29,21 @@ export default function HeroSection() {
       <div className="grid max-w-screen-xl px-4 py-12 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
 
         {/* Copy column */}
-        <div className="mr-auto place-self-center lg:col-span-7">
+        <div className="mr-auto place-self-center lg:col-span-7 text-center sm:text-left w-full">
           <h1
             id="hero-heading"
-            className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white"
+            className="max-w-2xl mx-auto sm:mx-0 mb-4 text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold tracking-tight leading-tight sm:leading-none dark:text-white"
           >
             Find Your Perfect Mentor
           </h1>
-          <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
+          <p className="max-w-2xl mx-auto sm:mx-0 mb-6 font-light text-gray-500 lg:mb-8 text-base md:text-lg lg:text-xl dark:text-gray-400">
             SkillSync helps you connect with experienced professionals to
             guide you on your career path.
           </p>
           {/* Styled as a button but rendered as a link — no nested interactive elements */}
           <Link
             href="/register"
-            className="inline-flex items-center justify-center rounded-md bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-900 transition-colors"
+            className="inline-flex items-center justify-center w-full sm:w-auto rounded-md bg-cyan-600 px-6 py-3 text-base sm:text-sm font-semibold text-white hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-900 transition-colors"
           >
             Get Started
           </Link>
