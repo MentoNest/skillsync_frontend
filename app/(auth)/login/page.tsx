@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import LoginForm from '@/components/auth/LoginForm';
-import SocialAuthButtons from '@/components/auth/SocialAuthButtons';
-import Link from 'next/link';
+import LoginForm from "@/components/auth/LoginForm";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
+import Link from "next/link";
 
 /**
  * LoginPage
@@ -35,8 +35,12 @@ export default function LoginPage() {
             />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome back</h1>
-        <p className="text-gray-500 dark:text-gray-400">Sign in to continue to SkillSync</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          Welcome back
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400">
+          Sign in to continue to SkillSync
+        </p>
       </div>
 
       {/* Card */}
@@ -48,11 +52,11 @@ export default function LoginPage() {
 
       {/* Footer links */}
       <p className="text-center text-xs text-gray-400 mt-6">
-        By signing in, you agree to our{' '}
+        By signing in, you agree to our{" "}
         <Link href="#" className="text-purple-600 hover:underline">
           Terms of Service
-        </Link>{' '}
-        and{' '}
+        </Link>{" "}
+        and{" "}
         <Link href="#" className="text-purple-600 hover:underline">
           Privacy Policy
         </Link>

@@ -1,11 +1,11 @@
-import type { Metadata } from 'next';
-import MentorDiscoveryView from './MentorDiscoveryView';
-import { MOCK_MENTORS } from '@/components/mentors/data';
+import type { Metadata } from "next";
+import MentorDiscoveryView from "./MentorDiscoveryView";
+import { MOCK_MENTORS } from "@/components/mentors/data";
 
 export const metadata: Metadata = {
-  title: 'Discover Mentors · SkillSync',
+  title: "Discover Mentors · SkillSync",
   description:
-    'Browse vetted mentors by expertise, availability, and price. Find the right mentor for your goals on SkillSync.',
+    "Browse vetted mentors by expertise, availability, and price. Find the right mentor for your goals on SkillSync.",
 };
 
 export default function DiscoverMentorsPage() {
@@ -27,9 +27,9 @@ export default function DiscoverMentorsPage() {
             Find a mentor who fits your goals
           </h1>
           <p className="mt-4 text-base sm:text-lg text-cyan-50/90 max-w-2xl leading-relaxed">
-            Browse {MOCK_MENTORS.length}+ vetted mentors across frontend, backend, design,
-            product, and more. Use the filters on the left to narrow down by expertise
-            area — results update instantly.
+            Browse {MOCK_MENTORS.length}+ vetted mentors across frontend,
+            backend, design, product, and more. Use the filters on the left to
+            narrow down by expertise area — results update instantly.
           </p>
         </div>
       </section>

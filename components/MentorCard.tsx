@@ -1,9 +1,9 @@
-import Link from 'next/link';
-import Avatar from './Avatar';
-import MentorAvailabilityBadge from './MentorAvailabilityBadge';
-import MentorSkillTag from './MentorSkillTag';
-import StarRating from './ui/StarRating';
-import { Mentor } from '@/lib/types';
+import Link from "next/link";
+import Avatar from "./Avatar";
+import MentorAvailabilityBadge from "./MentorAvailabilityBadge";
+import MentorSkillTag from "./MentorSkillTag";
+import StarRating from "./ui/StarRating";
+import { Mentor } from "@/lib/types";
 
 export default function MentorCard({
   mentorId,
@@ -18,26 +18,32 @@ export default function MentorCard({
   reviewCount,
   pricePerSession,
   skills,
-  availability = 'available',
+  availability = "available",
   isFeatured,
   profileHref,
   onBook,
   isBookmarked,
   onToggleBookmark,
 }: Mentor) {
-  const resolvedRole = role ?? title ?? '';
-  const resolvedDescription = description ?? bio ?? '';
+  const resolvedRole = role ?? title ?? "";
+  const resolvedDescription = description ?? bio ?? "";
 
   // Deterministic gradient derived from name length so it never flickers
   const bgGradients = [
-    'from-cyan-500 to-blue-600',
-    'from-purple-500 to-indigo-600',
-    'from-emerald-500 to-teal-600',
-    'from-pink-500 to-rose-600',
+    "from-cyan-500 to-blue-600",
+    "from-purple-500 to-indigo-600",
+    "from-emerald-500 to-teal-600",
+    "from-pink-500 to-rose-600",
   ];
   const gradient = bgGradients[name.length % bgGradients.length];
 
-  const targetId = mentorId || id || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const targetId =
+    mentorId ||
+    id ||
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
   const resolvedProfileHref = profileHref ?? `/mentors/${targetId}`;
 
   return (
@@ -57,12 +63,12 @@ export default function MentorCard({
             <button
               onClick={onToggleBookmark}
               className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+              aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
-                fill={isBookmarked ? 'currentColor' : 'none'}
+                fill={isBookmarked ? "currentColor" : "none"}
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
@@ -96,7 +102,10 @@ export default function MentorCard({
         </div>
 
         {rating !== undefined && (
-          <div className="flex items-center gap-2" aria-label={`Rating: ${rating.toFixed(1)} out of 5`}>
+          <div
+            className="flex items-center gap-2"
+            aria-label={`Rating: ${rating.toFixed(1)} out of 5`}
+          >
             <StarRating rating={rating} size="sm" />
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
               {rating.toFixed(1)}
@@ -130,7 +139,9 @@ export default function MentorCard({
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 dark:bg-gray-800/50 dark:border-gray-700/60 flex items-center justify-between gap-3">
         {pricePerSession !== undefined && (
           <div className="flex flex-col">
-            <span className="text-xs text-gray-500 dark:text-gray-400 leading-none">per session</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 leading-none">
+              per session
+            </span>
             <span className="text-lg font-bold text-gray-900 dark:text-white leading-snug">
               ${pricePerSession}
             </span>
@@ -152,11 +163,15 @@ export default function MentorCard({
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </Link>
 
-          {availability !== 'fully-booked' && onBook && (
+          {availability !== "fully-booked" && onBook && (
             <button
               onClick={onBook}
               className="text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
@@ -165,7 +180,7 @@ export default function MentorCard({
               Book
             </button>
           )}
-          {availability === 'fully-booked' && (
+          {availability === "fully-booked" && (
             <span className="text-xs font-semibold bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500 px-3 py-1.5 rounded-lg cursor-not-allowed">
               Unavailable
             </span>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 /**
  * ResourceCategoryCard — Reusable card for resource category navigation.
@@ -78,7 +78,11 @@ export function ResourceCategoryCard({
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </div>
       </div>

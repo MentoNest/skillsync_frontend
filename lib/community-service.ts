@@ -1,20 +1,21 @@
-import type { DiscussionMetadata } from './community-types';
+import type { DiscussionMetadata } from "./community-types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 function getAuthHeaders(): Record<string, string> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (typeof window !== 'undefined') {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (typeof window !== "undefined") {
     try {
-      const raw = localStorage.getItem('skillsync_auth');
+      const raw = localStorage.getItem("skillsync_auth");
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed?.token) {
-          headers['Authorization'] = `Bearer ${parsed.token}`;
+          headers["Authorization"] = `Bearer ${parsed.token}`;
         }
       }
-    } catch {
-    }
+    } catch {}
   }
   return headers;
 }
@@ -30,58 +31,100 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const communityService = {
   likeDiscussion: (id: string) =>
-    request<{ liked: boolean }>(`/api/community/discussions/${id}/like`, { method: 'POST' }),
+    request<{ liked: boolean }>(`/api/community/discussions/${id}/like`, {
+      method: "POST",
+    }),
 
   unlikeDiscussion: (id: string) =>
-    request<{ liked: boolean }>(`/api/community/discussions/${id}/like`, { method: 'DELETE' }),
+    request<{ liked: boolean }>(`/api/community/discussions/${id}/like`, {
+      method: "DELETE",
+    }),
 
   bookmarkDiscussion: (id: string) =>
-    request<{ bookmarked: boolean }>(`/api/community/discussions/${id}/bookmark`, { method: 'POST' }),
+    request<{ bookmarked: boolean }>(
+      `/api/community/discussions/${id}/bookmark`,
+      { method: "POST" },
+    ),
 
   removeBookmark: (id: string) =>
-    request<{ bookmarked: boolean }>(`/api/community/discussions/${id}/bookmark`, { method: 'DELETE' }),
+    request<{ bookmarked: boolean }>(
+      `/api/community/discussions/${id}/bookmark`,
+      { method: "DELETE" },
+    ),
 
   followUser: (userId: string) =>
-    request<{ following: boolean }>(`/api/community/users/${userId}/follow`, { method: 'POST' }),
+    request<{ following: boolean }>(`/api/community/users/${userId}/follow`, {
+      method: "POST",
+    }),
 
   unfollowUser: (userId: string) =>
-    request<{ following: boolean }>(`/api/community/users/${userId}/follow`, { method: 'DELETE' }),
+    request<{ following: boolean }>(`/api/community/users/${userId}/follow`, {
+      method: "DELETE",
+    }),
 
-  reportDiscussion: (id: string, reason = 'Inappropriate content') =>
+  reportDiscussion: (id: string, reason = "Inappropriate content") =>
     request<{ reported: boolean }>(`/api/community/discussions/${id}/report`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({ reason }),
     }),
 
   getReportedDiscussions: async () => {
-    const reports = await request<{ id: string; title: string; reason: string; reportedAt: string; status: string }[]>(
-      '/api/community/moderation/reports',
-    );
-    return reports.map((item) => ({ ...item, status: item.status as 'Pending' | 'Approved' | 'Removed' }));
+    const reports = await request<
+      {
+        id: string;
+        title: string;
+        reason: string;
+        reportedAt: string;
+        status: string;
+      }[]
+    >("/api/community/moderation/reports");
+    return reports.map((item) => ({
+      ...item,
+      status: item.status as "Pending" | "Approved" | "Removed",
+    }));
   },
 
-  reviewReport: async (id: string, action: 'approve' | 'remove') => {
-    const reports = await request<{ id: string; title: string; reason: string; reportedAt: string; status: string }[]>(
-      `/api/community/moderation/reports/${id}`,
+  reviewReport: async (id: string, action: "approve" | "remove") => {
+    const reports = await request<
       {
-        method: 'PATCH',
-        body: JSON.stringify({ action }),
-      },
-    );
-    return reports.map((item) => ({ ...item, status: item.status as 'Pending' | 'Approved' | 'Removed' }));
+        id: string;
+        title: string;
+        reason: string;
+        reportedAt: string;
+        status: string;
+      }[]
+    >(`/api/community/moderation/reports/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ action }),
+    });
+    return reports.map((item) => ({
+      ...item,
+      status: item.status as "Pending" | "Approved" | "Removed",
+    }));
   },
   followCategory: (categoryId: string) =>
-    request<{ followed: boolean }>(`/api/community/categories/${categoryId}/follow`, { method: 'POST' }),
+    request<{ followed: boolean }>(
+      `/api/community/categories/${categoryId}/follow`,
+      { method: "POST" },
+    ),
 
   unfollowCategory: (categoryId: string) =>
-    request<{ followed: boolean }>(`/api/community/categories/${categoryId}/follow`, { method: 'DELETE' }),
+    request<{ followed: boolean }>(
+      `/api/community/categories/${categoryId}/follow`,
+      { method: "DELETE" },
+    ),
 
-  fetchDiscussions: (params?: { page?: number; limit?: number; category?: string; sort?: string }) => {
+  fetchDiscussions: (params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    sort?: string;
+  }) => {
     const query = new URLSearchParams();
-    if (params?.page) query.set('page', String(params.page));
-    if (params?.limit) query.set('limit', String(params.limit));
-    if (params?.category) query.set('category', params.category);
-    if (params?.sort) query.set('sort', params.sort);
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.limit) query.set("limit", String(params.limit));
+    if (params?.category) query.set("category", params.category);
+    if (params?.sort) query.set("sort", params.sort);
     return request<{ discussions: DiscussionMetadata[]; total: number }>(
       `/api/community/discussions?${query.toString()}`,
     );

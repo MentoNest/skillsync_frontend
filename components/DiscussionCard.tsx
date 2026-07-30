@@ -70,7 +70,8 @@ function useAvatarFallback(name: string) {
     .map((p) => p[0]?.toUpperCase() ?? "")
     .join("");
   let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < name.length; i++)
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
   const hue = Math.abs(hash) % 360;
   return { initials, hue };
 }
@@ -109,7 +110,11 @@ export const DiscussionCard: React.FC<DiscussionCardProps> = ({
     >
       {isTrending && (
         <div className="absolute -top-3 right-4 flex items-center gap-1 rounded-full bg-[#FFF1EA] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-[#E85D1F] shadow-[0_1px_3px_rgba(232,93,31,0.25)]">
-          <Flame size={12} strokeWidth={2.5} className="fill-[#FF6B35] text-[#FF6B35]" />
+          <Flame
+            size={12}
+            strokeWidth={2.5}
+            className="fill-[#FF6B35] text-[#FF6B35]"
+          />
           TRENDING
         </div>
       )}
@@ -133,8 +138,12 @@ export const DiscussionCard: React.FC<DiscussionCardProps> = ({
           </div>
         )}
         <div className="min-w-0">
-          <p className="truncate text-[14px] font-semibold text-[#14161F]">{authorName}</p>
-          <p className="font-mono text-[11px] text-[#8A8EA3]">{formatRelativeTime(timestamp)}</p>
+          <p className="truncate text-[14px] font-semibold text-[#14161F]">
+            {authorName}
+          </p>
+          <p className="font-mono text-[11px] text-[#8A8EA3]">
+            {formatRelativeTime(timestamp)}
+          </p>
         </div>
       </div>
 

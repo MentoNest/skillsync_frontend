@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * SocialAuthButtons
@@ -59,15 +59,19 @@ function FacebookIcon() {
 }
 
 const socialButtonClass =
-  'w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800';
+  "w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800";
 
 export default function SocialAuthButtons({
-  dividerLabel = 'or continue with email',
+  dividerLabel = "or continue with email",
 }: SocialAuthButtonsProps) {
   return (
     <>
       {/* Social buttons */}
-      <div className="space-y-3 mb-6" role="group" aria-label="Social sign-in options">
+      <div
+        className="space-y-3 mb-6"
+        role="group"
+        aria-label="Social sign-in options"
+      >
         <button
           id="btn-continue-with-google"
           type="button"

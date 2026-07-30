@@ -1,21 +1,28 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import StarRating from '@/components/ui/StarRating';
-import MentorAvailabilityBadge from '@/components/MentorAvailabilityBadge';
-import { MENTORS, mentorSlug } from '../data/mockMentors';
-import { MOCK_MENTORS } from '@/components/mentors/data';
-import type { Mentor } from '@/lib/types';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import StarRating from "@/components/ui/StarRating";
+import MentorAvailabilityBadge from "@/components/MentorAvailabilityBadge";
+import { MENTORS, mentorSlug } from "../data/mockMentors";
+import { MOCK_MENTORS } from "@/components/mentors/data";
+import type { Mentor } from "@/lib/types";
 
 // Combine datasets ensuring all mentor IDs and slugs can be resolved
 const ALL_MENTORS: Mentor[] = [
   ...MENTORS,
   ...MOCK_MENTORS.filter(
-    (m) => !MENTORS.some((existing) => (existing.id || existing.mentorId) === (m.id || m.mentorId))
+    (m) =>
+      !MENTORS.some(
+        (existing: Mentor) =>
+          (existing.id || existing.mentorId) === (m.id || m.mentorId),
+      ),
   ),
 ];
 
 function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 interface MentorProfilePageProps {
@@ -36,7 +43,7 @@ export function generateStaticParams() {
 function findMentor(rawId: string): Mentor | undefined {
   const normalised = decodeURIComponent(rawId).toLowerCase();
   return ALL_MENTORS.find((mentor) => {
-    const canonicalId = (mentor.id || mentor.mentorId || '').toLowerCase();
+    const canonicalId = (mentor.id || mentor.mentorId || "").toLowerCase();
     const nameSlug = slugify(mentor.name);
     return (
       canonicalId === normalised ||
@@ -46,21 +53,27 @@ function findMentor(rawId: string): Mentor | undefined {
   });
 }
 
-export default async function MentorProfilePage({ params }: MentorProfilePageProps) {
+export default async function MentorProfilePage({
+  params,
+}: MentorProfilePageProps) {
   const { id } = await params;
   const mentor = findMentor(id);
   if (!mentor) notFound();
 
   const profileSlug = mentor.id || mentor.mentorId || slugify(mentor.name);
-  const headline = mentor.headline || mentor.title || mentor.role || 'Mentor';
-  const bio = mentor.bio || mentor.description || 'Experienced professional offering mentorship and career guidance.';
+  const headline = mentor.headline || mentor.title || mentor.role || "Mentor";
+  const bio =
+    mentor.bio ||
+    mentor.description ||
+    "Experienced professional offering mentorship and career guidance.";
   const rating = mentor.rating ?? 5.0;
   const reviewCount = mentor.reviewCount ?? 0;
   const skills = mentor.skills ?? [];
   const industries = mentor.industries ?? mentor.expertise ?? [];
-  const experienceYears = mentor.yearsExperience ?? (mentor as any).experienceYears ?? 5;
-  const experienceLevel = mentor.experienceLevel ?? 'Senior';
-  const isUnavailable = mentor.availability === 'fully-booked';
+  const experienceYears =
+    mentor.yearsExperience ?? (mentor as any).experienceYears ?? 5;
+  const experienceLevel = mentor.experienceLevel ?? "Senior";
+  const isUnavailable = mentor.availability === "fully-booked";
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-12">
@@ -76,7 +89,11 @@ export default async function MentorProfilePage({ params }: MentorProfilePagePro
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
         Back to mentors
       </Link>
@@ -96,7 +113,9 @@ export default async function MentorProfilePage({ params }: MentorProfilePagePro
               </p>
             )}
           </div>
-          <MentorAvailabilityBadge status={mentor.availability ?? 'available'} />
+          <MentorAvailabilityBadge
+            status={mentor.availability ?? "available"}
+          />
         </div>
 
         <div className="mt-4 flex items-center gap-2">
@@ -132,7 +151,10 @@ export default async function MentorProfilePage({ params }: MentorProfilePagePro
         )}
 
         {industries.length > 0 && (
-          <section className="mt-6" aria-labelledby={`industries-${profileSlug}`}>
+          <section
+            className="mt-6"
+            aria-labelledby={`industries-${profileSlug}`}
+          >
             <h2
               id={`industries-${profileSlug}`}
               className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useState } from "react";
+import Link from "next/link";
 
 interface SavedDiscussion {
   id: string;
@@ -14,18 +14,20 @@ interface SavedDiscussion {
 export default function SavedDiscussionsPage() {
   const [savedDiscussions, setSavedDiscussions] = useState<SavedDiscussion[]>([
     {
-      id: 'd1',
-      title: 'Architecting Scalable Microservices with NestJS and Event-Driven Architecture',
-      author: 'Jane Doe',
-      category: 'Backend',
-      savedAt: '2 days ago',
+      id: "d1",
+      title:
+        "Architecting Scalable Microservices with NestJS and Event-Driven Architecture",
+      author: "Jane Doe",
+      category: "Backend",
+      savedAt: "2 days ago",
     },
     {
-      id: 'd2',
-      title: 'Mastering React 19 Compiler and Server Components for Next-Gen Web Apps',
-      author: 'John Smith',
-      category: 'Frontend',
-      savedAt: '1 week ago',
+      id: "d2",
+      title:
+        "Mastering React 19 Compiler and Server Components for Next-Gen Web Apps",
+      author: "John Smith",
+      category: "Frontend",
+      savedAt: "1 week ago",
     },
   ]);
 
@@ -37,12 +39,15 @@ export default function SavedDiscussionsPage() {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-2">Saved Discussions</h1>
       <p className="text-gray-600 text-sm mb-6">
-        View and manage your bookmarked discussions for quick offline or future reading.
+        View and manage your bookmarked discussions for quick offline or future
+        reading.
       </p>
 
       {savedDiscussions.length === 0 ? (
         <div className="text-center p-12 border-2 border-dashed border-gray-200 rounded-lg">
-          <p className="text-gray-500 text-sm mb-3">You have no saved discussions yet.</p>
+          <p className="text-gray-500 text-sm mb-3">
+            You have no saved discussions yet.
+          </p>
           <Link
             href="/community"
             className="text-xs bg-blue-600 text-white px-3 py-2 rounded font-semibold hover:bg-blue-700"

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import RegisterForm from '@/components/auth/RegisterForm';
-import SocialAuthButtons from '@/components/auth/SocialAuthButtons';
-import Link from 'next/link';
+import RegisterForm from "@/components/auth/RegisterForm";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
+import Link from "next/link";
 
 /**
  * RegisterPage
@@ -35,8 +35,12 @@ export default function RegisterPage() {
             />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create an account</h1>
-        <p className="text-gray-500 dark:text-gray-400">Sign up to start learning and connecting</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          Create an account
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400">
+          Sign up to start learning and connecting
+        </p>
       </div>
 
       {/* Card */}
@@ -48,11 +52,11 @@ export default function RegisterPage() {
 
       {/* Footer links */}
       <p className="text-center text-xs text-gray-400 mt-6">
-        By signing up, you agree to our{' '}
+        By signing up, you agree to our{" "}
         <Link href="#" className="text-purple-600 hover:underline">
           Terms of Service
-        </Link>{' '}
-        and{' '}
+        </Link>{" "}
+        and{" "}
         <Link href="#" className="text-purple-600 hover:underline">
           Privacy Policy
         </Link>

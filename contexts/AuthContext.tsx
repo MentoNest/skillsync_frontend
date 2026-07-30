@@ -1,13 +1,28 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useReducer, useEffect, useCallback, type ReactNode } from 'react';
-import { authService } from '@/lib/auth-service';
-import type { AuthState, LoginCredentials, RegisterCredentials, User } from '@/lib/auth-types';
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from "react";
+import { authService } from "@/lib/auth-service";
+import type {
+  AuthState,
+  LoginCredentials,
+  RegisterCredentials,
+  User,
+} from "@/lib/auth-types";
 
-const STORAGE_KEY = 'skillsync_auth';
+const STORAGE_KEY = "skillsync_auth";
 
-function loadPersistedState(): Pick<AuthState, 'user' | 'token' | 'isAuthenticated'> {
-  if (typeof window === 'undefined') {
+function loadPersistedState(): Pick<
+  AuthState,
+  "user" | "token" | "isAuthenticated"
+> {
+  if (typeof window === "undefined") {
     return { user: null, token: null, isAuthenticated: false };
   }
   try {
@@ -15,7 +30,11 @@ function loadPersistedState(): Pick<AuthState, 'user' | 'token' | 'isAuthenticat
     if (!raw) return { user: null, token: null, isAuthenticated: false };
     const parsed = JSON.parse(raw);
     if (parsed?.token) {
-      return { user: parsed.user ?? null, token: parsed.token, isAuthenticated: true };
+      return {
+        user: parsed.user ?? null,
+        token: parsed.token,
+        isAuthenticated: true,
+      };
     }
     return { user: null, token: null, isAuthenticated: false };
   } catch {
@@ -30,22 +49,21 @@ function persistState(user: User | null, token: string | null) {
     } else {
       localStorage.removeItem(STORAGE_KEY);
     }
-  } catch {
-  }
+  } catch {}
 }
 
 type Action =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string } }
-  | { type: 'LOGOUT' }
-  | { type: 'SET_USER'; payload: User }
-  | { type: 'SET_ERROR'; payload: string | null };
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "LOGIN_SUCCESS"; payload: { user: User; token: string } }
+  | { type: "LOGOUT" }
+  | { type: "SET_USER"; payload: User }
+  | { type: "SET_ERROR"; payload: string | null };
 
 function authReducer(state: AuthState, action: Action): AuthState {
   switch (action.type) {
-    case 'SET_LOADING':
+    case "SET_LOADING":
       return { ...state, isLoading: action.payload, error: null };
-    case 'LOGIN_SUCCESS':
+    case "LOGIN_SUCCESS":
       return {
         user: action.payload.user,
         token: action.payload.token,
@@ -53,11 +71,17 @@ function authReducer(state: AuthState, action: Action): AuthState {
         isLoading: false,
         error: null,
       };
-    case 'LOGOUT':
-      return { user: null, token: null, isAuthenticated: false, isLoading: false, error: null };
-    case 'SET_USER':
+    case "LOGOUT":
+      return {
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+      };
+    case "SET_USER":
       return { ...state, user: action.payload };
-    case 'SET_ERROR':
+    case "SET_ERROR":
       return { ...state, error: action.payload, isLoading: false };
     default:
       return state;
@@ -89,47 +113,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!persisted.token) return;
     let cancelled = false;
-    authService.getMe(persisted.token).then((user) => {
-      if (!cancelled) {
-        dispatch({ type: 'SET_USER', payload: user });
-        dispatch({ type: 'SET_LOADING', payload: false });
-      }
-    }).catch(() => {
-      if (!cancelled) {
-        localStorage.removeItem(STORAGE_KEY);
-        dispatch({ type: 'LOGOUT' });
-      }
-    });
-    return () => { cancelled = true; };
+    authService
+      .getMe(persisted.token)
+      .then((user) => {
+        if (!cancelled) {
+          dispatch({ type: "SET_USER", payload: user });
+          dispatch({ type: "SET_LOADING", payload: false });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          localStorage.removeItem(STORAGE_KEY);
+          dispatch({ type: "LOGOUT" });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const res = await authService.login(credentials);
-      dispatch({ type: 'LOGIN_SUCCESS', payload: res });
+      dispatch({ type: "LOGIN_SUCCESS", payload: res });
     } catch (err) {
-      dispatch({ type: 'SET_ERROR', payload: err instanceof Error ? err.message : 'Login failed' });
+      dispatch({
+        type: "SET_ERROR",
+        payload: err instanceof Error ? err.message : "Login failed",
+      });
     }
   }, []);
 
   const register = useCallback(async (credentials: RegisterCredentials) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const res = await authService.register(credentials);
-      dispatch({ type: 'LOGIN_SUCCESS', payload: res });
+      dispatch({ type: "LOGIN_SUCCESS", payload: res });
     } catch (err) {
-      dispatch({ type: 'SET_ERROR', payload: err instanceof Error ? err.message : 'Registration failed' });
+      dispatch({
+        type: "SET_ERROR",
+        payload: err instanceof Error ? err.message : "Registration failed",
+      });
     }
   }, []);
 
   const logout = useCallback(async () => {
     try {
       await authService.logout();
-    } catch {
-    }
+    } catch {}
     localStorage.removeItem(STORAGE_KEY);
-    dispatch({ type: 'LOGOUT' });
+    dispatch({ type: "LOGOUT" });
   }, []);
 
   return (
@@ -141,6 +175,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
   return ctx;
 }

@@ -1,4 +1,4 @@
-import { Button } from './button';
+import { Button } from "./button";
 
 interface ErrorStateProps {
   message?: string;
@@ -6,13 +6,15 @@ interface ErrorStateProps {
   className?: string;
 }
 
-export function ErrorState({ 
-  message = 'Something went wrong. Please try again.', 
-  onRetry, 
-  className = '' 
+export function ErrorState({
+  message = "Something went wrong. Please try again.",
+  onRetry,
+  className = "",
 }: ErrorStateProps) {
   return (
-    <div className={`flex flex-col items-center justify-center p-8 text-center ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center p-8 text-center ${className}`}
+    >
       <div className="mb-4 rounded-full bg-red-100 p-3">
         <svg
           className="h-6 w-6 text-red-600"

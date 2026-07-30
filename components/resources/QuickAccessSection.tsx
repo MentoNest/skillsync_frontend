@@ -1,5 +1,5 @@
-import { FileText, Video, BookOpen, Download } from 'lucide-react';
-import { ResourceCategoryCard } from './ResourceCategoryCard';
+import { FileText, Video, BookOpen, Download } from "lucide-react";
+import { ResourceCategoryCard } from "./ResourceCategoryCard";
 
 /**
  * QuickAccessSection — Grid layout for Quick Access resource categories.

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef } from "react";
 
 /**
  * Community Analytics Event Types
@@ -9,16 +9,16 @@ import { useCallback, useRef } from 'react';
  * Each event captures a specific user interaction.
  */
 export type CommunityEvent =
-  | 'discussion_created'
-  | 'discussion_viewed'
-  | 'discussion_liked'
-  | 'discussion_unliked'
-  | 'discussion_replied'
-  | 'discussion_shared'
-  | 'discussion_bookmarked'
-  | 'discussion_unbookmarked'
-  | 'event_registered'
-  | 'event_unregistered';
+  | "discussion_created"
+  | "discussion_viewed"
+  | "discussion_liked"
+  | "discussion_unliked"
+  | "discussion_replied"
+  | "discussion_shared"
+  | "discussion_bookmarked"
+  | "discussion_unbookmarked"
+  | "event_registered"
+  | "event_unregistered";
 
 export interface AnalyticsPayload {
   event: CommunityEvent;
@@ -54,14 +54,14 @@ export function useCommunityAnalytics() {
       // Send batch to analytics endpoint (no-op if endpoint doesn't exist yet)
       if (process.env.NEXT_PUBLIC_ANALYTICS_URL) {
         await fetch(process.env.NEXT_PUBLIC_ANALYTICS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ events: batch }),
         });
       } else {
         // Development: log to console for debugging
-        if (process.env.NODE_ENV === 'development') {
-          console.debug('[CommunityAnalytics] batch:', batch);
+        if (process.env.NODE_ENV === "development") {
+          console.debug("[CommunityAnalytics] batch:", batch);
         }
       }
     } catch {
@@ -81,7 +81,11 @@ export function useCommunityAnalytics() {
   const track = useCallback(
     (
       event: CommunityEvent,
-      options?: { discussionId?: string; category?: string; metadata?: Record<string, string | number | boolean> }
+      options?: {
+        discussionId?: string;
+        category?: string;
+        metadata?: Record<string, string | number | boolean>;
+      },
     ) => {
       const payload: AnalyticsPayload = {
         event,
@@ -94,7 +98,7 @@ export function useCommunityAnalytics() {
       queueRef.current.push(payload);
       scheduleFlush();
     },
-    [scheduleFlush]
+    [scheduleFlush],
   );
 
   return { track, flush };

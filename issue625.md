@@ -16,4 +16,3 @@ Acceptance Criteria
 Proper image ratio
 Button styled
 Responsive
-

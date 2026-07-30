@@ -1,6 +1,6 @@
-import { CommunityProvider } from './community-context';
-import { SkipToContent } from '@/components/community/a11y';
-import NotificationDropdown from '@/components/community/NotificationDropdown';
+import { CommunityProvider } from "./community-context";
+import { SkipToContent } from "@/components/community/a11y";
+import NotificationDropdown from "@/components/community/NotificationDropdown";
 
 export default function CommunityLayout({
   children,

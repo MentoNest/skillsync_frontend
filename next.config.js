@@ -2,7 +2,7 @@
 const nextConfig = {
   images: {
     // Serve modern formats (AVIF then WebP) for better compression
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
 
     // Breakpoints matching Tailwind's responsive scale
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -11,8 +11,8 @@ const nextConfig = {
     // Remote image hosts
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'flowbite.s3.amazonaws.com',
+        protocol: "https",
+        hostname: "flowbite.s3.amazonaws.com",
       },
     ],
 

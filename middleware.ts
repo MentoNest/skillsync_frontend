@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import {
   SESSION_COOKIE,
   isProtectedRoute,
   isAuthRoute,
   getDashboardPath,
-} from '@/lib/auth';
+} from "@/lib/auth";
 
 /**
  * middleware.ts
@@ -34,7 +34,7 @@ export function middleware(request: NextRequest) {
   let role: string | null = null;
   if (sessionCookie) {
     try {
-      const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8');
+      const decoded = Buffer.from(sessionCookie, "base64").toString("utf-8");
       const parsed = JSON.parse(decoded) as { role?: string };
       role = parsed.role ?? null;
     } catch {
@@ -47,9 +47,9 @@ export function middleware(request: NextRequest) {
   // ── 1. Protect dashboard routes ──────────────────────────────────────────
   if (isProtectedRoute(pathname) && !isAuthenticated) {
     const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
+    loginUrl.pathname = "/login";
     // Preserve the original destination so we can redirect back after login
-    loginUrl.searchParams.set('redirect', pathname);
+    loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -57,7 +57,7 @@ export function middleware(request: NextRequest) {
   if (isAuthRoute(pathname) && isAuthenticated) {
     const dashboardUrl = request.nextUrl.clone();
     dashboardUrl.pathname = getDashboardPath(role!);
-    dashboardUrl.search = '';
+    dashboardUrl.search = "";
     return NextResponse.redirect(dashboardUrl);
   }
 
@@ -72,7 +72,7 @@ export function middleware(request: NextRequest) {
     if (mismatch) {
       const correctedUrl = request.nextUrl.clone();
       correctedUrl.pathname = dashboard;
-      correctedUrl.search = '';
+      correctedUrl.search = "";
       return NextResponse.redirect(correctedUrl);
     }
   }
@@ -85,11 +85,11 @@ export function middleware(request: NextRequest) {
 // Static assets, API routes, and Next.js internals are excluded.
 export const config = {
   matcher: [
-    '/mentor/:path*',
-    '/mentee/:path*',
-    '/admin/:path*',
-    '/dashboard/:path*',
-    '/login',
-    '/register',
+    "/mentor/:path*",
+    "/mentee/:path*",
+    "/admin/:path*",
+    "/dashboard/:path*",
+    "/login",
+    "/register",
   ],
 };

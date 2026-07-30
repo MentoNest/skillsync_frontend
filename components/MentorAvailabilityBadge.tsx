@@ -1,12 +1,7 @@
-import React from 'react';
+import React from "react";
 
 export type AvailabilityStatus =
-  | 'available'
-  | 'busy'
-  | 'fully-booked'
-  | 'Available'
-  | 'Busy'
-  | 'Fully Booked';
+  "available" | "busy" | "fully-booked" | "Available" | "Busy" | "Fully Booked";
 
 interface MentorAvailabilityBadgeProps {
   status?: AvailabilityStatus | string;
@@ -18,33 +13,33 @@ const statusConfig: Record<
   { label: string; dot: string; badge: string }
 > = {
   available: {
-    label: 'Available',
-    dot: 'bg-emerald-500',
+    label: "Available",
+    dot: "bg-emerald-500",
     badge:
-      'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-700/50',
+      "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-700/50",
   },
   busy: {
-    label: 'Busy',
-    dot: 'bg-amber-500',
+    label: "Busy",
+    dot: "bg-amber-500",
     badge:
-      'bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-700/50',
+      "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-700/50",
   },
-  'fully-booked': {
-    label: 'Fully Booked',
-    dot: 'bg-red-500',
+  "fully-booked": {
+    label: "Fully Booked",
+    dot: "bg-red-500",
     badge:
-      'bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-700/50',
+      "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-700/50",
   },
 };
 
 export default function MentorAvailabilityBadge({
-  status = 'available',
-  className = '',
+  status = "available",
+  className = "",
 }: MentorAvailabilityBadgeProps) {
-  const normalizedKey = (status || 'available')
+  const normalizedKey = (status || "available")
     .toLowerCase()
     .trim()
-    .replace(/\s+|_/g, '-');
+    .replace(/\s+|_/g, "-");
 
   const config = statusConfig[normalizedKey] || statusConfig.available;
   const { label, dot, badge } = config;
@@ -57,7 +52,7 @@ export default function MentorAvailabilityBadge({
     >
       {/* Animated dot for "available", static for others */}
       <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-        {normalizedKey === 'available' && (
+        {normalizedKey === "available" && (
           <span
             className={`animate-ping absolute inline-flex h-full w-full rounded-full ${dot} opacity-75`}
           />

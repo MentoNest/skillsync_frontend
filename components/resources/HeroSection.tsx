@@ -1,4 +1,4 @@
-import HeroSearchBar from '@/components/resources/HeroSearchBar';
+import HeroSearchBar from "@/components/resources/HeroSearchBar";
 
 /**
  * HeroSection — Resources page gradient hero.

@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCommunity } from './community-context';
-import CommunityHeroBanner from '@/components/community/CommunityHeroBanner';
-import StartDiscussionModal from '@/components/community/StartDiscussionModal';
-import DiscussionFeed from '@/components/community/DiscussionFeed';
-import { Tabs, TabItem } from '@/components/ui/tabs';
-import { CategoriesWidget } from '@/components/ui/categories-widget';
-import { UpcomingEventsWidget } from '@/components/ui/upcoming-events-widget';
-import { StatisticCard } from '@/components/ui/statistic-card';
-import type { DiscussionMetadata } from '@/lib/community-types';
-import type { Discussion } from './community-context';
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useCommunity } from "./community-context";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import StartDiscussionModal from "@/components/community/StartDiscussionModal";
+import DiscussionFeed from "@/components/community/DiscussionFeed";
+import { Tabs, TabItem } from "@/components/ui/tabs";
+import { CategoriesWidget } from "@/components/ui/categories-widget";
+import { UpcomingEventsWidget } from "@/components/ui/upcoming-events-widget";
+import { StatisticCard } from "@/components/ui/statistic-card";
+import type { DiscussionMetadata } from "@/lib/community-types";
+import type { Discussion } from "./community-context";
 
-type DiscussionView = 'trending' | 'latest' | 'my-posts';
+type DiscussionView = "trending" | "latest" | "my-posts";
 
 const VIEW_TABS: TabItem<DiscussionView>[] = [
-  { value: 'trending', label: 'Trending' },
-  { value: 'latest', label: 'Latest' },
-  { value: 'my-posts', label: 'My Posts' },
+  { value: "trending", label: "Trending" },
+  { value: "latest", label: "Latest" },
+  { value: "my-posts", label: "My Posts" },
 ];
 
-const CURRENT_USER = { id: 'current-user', name: 'Emily Rodriguez' };
+const CURRENT_USER = { id: "current-user", name: "Emily Rodriguez" };
 
 function toDiscussionMetadata(discussion: Discussion): DiscussionMetadata {
   return {
@@ -30,7 +30,7 @@ function toDiscussionMetadata(discussion: Discussion): DiscussionMetadata {
     author: {
       id: discussion.authorId ?? discussion.id,
       name: discussion.author,
-      role: 'Community Member',
+      role: "Community Member",
     },
     category: discussion.category,
     createdAt: discussion.createdAt.toISOString(),
@@ -43,7 +43,12 @@ function toDiscussionMetadata(discussion: Discussion): DiscussionMetadata {
 }
 
 const UsersIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -54,7 +59,12 @@ const UsersIcon = () => (
 );
 
 const MessageIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -65,13 +75,28 @@ const MessageIcon = () => (
 );
 
 const ActiveIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M13 10V3L4 14h7v7l9-11h-7z"
+    />
   </svg>
 );
 
 const CalendarIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -82,7 +107,7 @@ const CalendarIcon = () => (
 );
 
 export default function CommunityPage() {
-  const [view, setView] = useState<DiscussionView>('trending');
+  const [view, setView] = useState<DiscussionView>("trending");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
@@ -96,20 +121,20 @@ export default function CommunityPage() {
 
   const allDiscussions = useMemo(
     () => getFilteredDiscussions().map(toDiscussionMetadata),
-    [getFilteredDiscussions]
+    [getFilteredDiscussions],
   );
 
   const visibleDiscussions = useMemo(() => {
     let list = [...allDiscussions];
 
-    if (view === 'my-posts') {
+    if (view === "my-posts") {
       return list.filter((d) => d.author.id === CURRENT_USER.id);
     }
 
     list.sort((a, b) => {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
-      if (view === 'trending') return (b.viewCount || 0) - (a.viewCount || 0);
+      if (view === "trending") return (b.viewCount || 0) - (a.viewCount || 0);
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
@@ -122,12 +147,12 @@ export default function CommunityPage() {
 
   const handleLike = (id: string) => {
     // Placeholder for future API integration (issue #676 follow-up)
-    console.log('Like discussion:', id);
+    console.log("Like discussion:", id);
   };
 
   const handleBookmark = (id: string) => {
     // Placeholder for future API integration (issue #676 follow-up)
-    console.log('Bookmark discussion:', id);
+    console.log("Bookmark discussion:", id);
   };
 
   return (
@@ -137,7 +162,11 @@ export default function CommunityPage() {
 
       {/* Community statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatisticCard label="Total Members" value={statistics.totalMembers} icon={<UsersIcon />} />
+        <StatisticCard
+          label="Total Members"
+          value={statistics.totalMembers}
+          icon={<UsersIcon />}
+        />
         <StatisticCard
           label="Active Discussions"
           value={statistics.activeDiscussions}
@@ -157,7 +186,10 @@ export default function CommunityPage() {
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Issue #676: Discussion Feed Container */}
-        <section className="w-full lg:flex-1 min-w-0 space-y-4" aria-label="Discussions">
+        <section
+          className="w-full lg:flex-1 min-w-0 space-y-4"
+          aria-label="Discussions"
+        >
           <div className="bg-white rounded-lg shadow">
             {/* Issue #675: Community Navigation Tabs */}
             <Tabs
@@ -189,10 +221,15 @@ export default function CommunityPage() {
             totalDiscussions={statistics.totalDiscussions}
           />
 
-          <UpcomingEventsWidget events={events} onRegister={handleEventRegistration} />
+          <UpcomingEventsWidget
+            events={events}
+            onRegister={handleEventRegistration}
+          />
 
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Community Statistics</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Community Statistics
+            </h2>
             <dl className="grid grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 text-center">
                 <dt className="text-xs text-gray-600">Total Members</dt>
@@ -208,7 +245,9 @@ export default function CommunityPage() {
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
                 <dt className="text-xs text-gray-600">Total Discussions</dt>
-                <dd className="text-2xl font-bold text-gray-900">{statistics.totalDiscussions}</dd>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {statistics.totalDiscussions}
+                </dd>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
                 <dt className="text-xs text-gray-600">Events This Month</dt>
@@ -222,7 +261,10 @@ export default function CommunityPage() {
       </div>
 
       {/* Issue #674: Start a Discussion CTA modal */}
-      <StartDiscussionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <StartDiscussionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

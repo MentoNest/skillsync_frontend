@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { CATEGORIES } from '@/lib/filters';
-import RichTextEditor from './RichTextEditor';
-import { X, Paperclip, Tag } from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { CATEGORIES } from "@/lib/filters";
+import RichTextEditor from "./RichTextEditor";
+import { X, Paperclip, Tag } from "lucide-react";
 
 const createDiscussionSchema = z.object({
-  title: z.string().min(5, 'Title must be at least 5 characters').max(200, 'Title must be less than 200 characters'),
-  category: z.string().min(1, 'Please select a category'),
-  content: z.string().min(20, 'Content must be at least 20 characters').max(5000, 'Content must be less than 5000 characters'),
+  title: z
+    .string()
+    .min(5, "Title must be at least 5 characters")
+    .max(200, "Title must be less than 200 characters"),
+  category: z.string().min(1, "Please select a category"),
+  content: z
+    .string()
+    .min(20, "Content must be at least 20 characters")
+    .max(5000, "Content must be less than 5000 characters"),
 });
 
 type CreateDiscussionFormData = z.infer<typeof createDiscussionSchema>;
@@ -22,11 +28,15 @@ interface Props {
   onSuccess?: () => void;
 }
 
-export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Props) {
+export default function StartDiscussionModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, setTagInput] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
@@ -39,7 +49,7 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
   } = useForm<CreateDiscussionFormData>({
     resolver: zodResolver(createDiscussionSchema),
     defaultValues: {
-      content: '',
+      content: "",
     },
   });
 
@@ -47,43 +57,49 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = 'hidden';
-      
+      document.body.style.overflow = "hidden";
+
       // Focus first input when modal opens
       setTimeout(() => {
-        const firstInput = modalRef.current?.querySelector('input') as HTMLInputElement;
+        const firstInput = modalRef.current?.querySelector(
+          "input",
+        ) as HTMLInputElement;
         firstInput?.focus();
       }, 100);
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
       previousActiveElement.current?.focus();
     }
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
   // Handle escape key and click outside
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         onClose();
       }
     };
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node) && isOpen) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(e.target as Node) &&
+        isOpen
+      ) {
         onClose();
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen, onClose]);
 
@@ -92,18 +108,18 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
 
     try {
       // Simulate API call (backend integration is out of scope)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Discussion created:', { ...data, tags });
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      console.log("Discussion created:", { ...data, tags });
+
       reset();
-      setContent('');
+      setContent("");
       setTags([]);
-      setTagInput('');
+      setTagInput("");
       onSuccess?.();
       onClose();
     } catch (error) {
-      console.error('Failed to create discussion:', error);
+      console.error("Failed to create discussion:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -113,16 +129,16 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
     const trimmedTag = tagInput.trim().toLowerCase();
     if (trimmedTag && !tags.includes(trimmedTag) && tags.length < 5) {
       setTags([...tags, trimmedTag]);
-      setTagInput('');
+      setTagInput("");
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag();
     }
@@ -160,19 +176,26 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Discussion Title
             </label>
             <input
               id="title"
               type="text"
-              {...register('title')}
+              {...register("title")}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
               placeholder="What would you like to discuss?"
               aria-describedby="title-error"
             />
             {errors.title && (
-              <p id="title-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="title-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.title.message}
               </p>
             )}
@@ -180,12 +203,15 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Category
             </label>
             <select
               id="category"
-              {...register('category')}
+              {...register("category")}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
               aria-describedby="category-error"
             >
@@ -197,7 +223,11 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
               ))}
             </select>
             {errors.category && (
-              <p id="category-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="category-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.category.message}
               </p>
             )}
@@ -205,18 +235,25 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
 
           {/* Rich Text Editor */}
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="content"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Content
             </label>
             <RichTextEditor
               content={content}
               onChange={(newContent) => {
                 setContent(newContent);
-                setValue('content', newContent, { shouldValidate: true });
+                setValue("content", newContent, { shouldValidate: true });
               }}
             />
             {errors.content && (
-              <p id="content-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="content-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.content.message}
               </p>
             )}
@@ -224,7 +261,10 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
 
           {/* Tags */}
           <div>
-            <label htmlFor="tag-input" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="tag-input"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Tags <span className="text-gray-400 font-normal">(optional)</span>
             </label>
             <div className="flex flex-wrap gap-2 mb-2">
@@ -273,7 +313,8 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
           {/* Attachments (placeholder) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Attachments <span className="text-gray-400 font-normal">(coming soon)</span>
+              Attachments{" "}
+              <span className="text-gray-400 font-normal">(coming soon)</span>
             </label>
             <button
               type="button"
@@ -299,7 +340,7 @@ export default function StartDiscussionModal({ isOpen, onClose, onSuccess }: Pro
               disabled={isSubmitting}
               className="flex-1 px-4 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSubmitting ? 'Publishing...' : 'Publish Discussion'}
+              {isSubmitting ? "Publishing..." : "Publish Discussion"}
             </button>
           </div>
         </form>

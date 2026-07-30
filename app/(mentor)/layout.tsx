@@ -1,5 +1,5 @@
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import React from 'react';
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import React from "react";
 
 export default function MentorLayout({
   children,
