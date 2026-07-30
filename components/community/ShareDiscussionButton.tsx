@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface ShareButtonProps {
   title: string;
@@ -11,7 +11,8 @@ export function ShareDiscussionButton({ title, url }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
-    const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+    const shareUrl =
+      url || (typeof window !== "undefined" ? window.location.href : "");
 
     if (navigator.share) {
       try {
@@ -20,7 +21,7 @@ export function ShareDiscussionButton({ title, url }: ShareButtonProps) {
           url: shareUrl,
         });
         return;
-      } catch (err) {
+      } catch (_err) {
         // Fallback to clipboard if share cancelled or unavailable
       }
     }
@@ -38,7 +39,7 @@ export function ShareDiscussionButton({ title, url }: ShareButtonProps) {
       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition"
     >
       <span>🔗</span>
-      <span>{copied ? 'Copied Link!' : 'Share'}</span>
+      <span>{copied ? "Copied Link!" : "Share"}</span>
     </button>
   );
 }

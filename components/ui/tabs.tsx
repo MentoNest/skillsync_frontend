@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export interface TabItem<T extends string = string> {
   value: T;
@@ -17,7 +17,7 @@ export function Tabs<T extends string = string>({
   tabs,
   activeTab,
   onChange,
-  ariaLabel = 'Tabs',
+  ariaLabel = "Tabs",
 }: TabsProps<T>) {
   return (
     <nav aria-label={ariaLabel} className="border-b border-gray-200">
@@ -33,15 +33,17 @@ export function Tabs<T extends string = string>({
                 onClick={() => onChange(tab.value)}
                 className={`relative whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 rounded-t-lg ${
                   isActive
-                    ? 'text-cyan-700'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ? "text-cyan-700"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 {tab.label}
                 {tab.count !== undefined && (
                   <span
                     className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                      isActive ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-500'
+                      isActive
+                        ? "bg-cyan-100 text-cyan-700"
+                        : "bg-gray-100 text-gray-500"
                     }`}
                   >
                     {tab.count}

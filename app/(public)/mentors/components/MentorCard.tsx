@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { StarIcon } from "@heroicons/react/20/solid";
+import { Star as StarIcon } from "lucide-react";
 
 import type { Mentor } from "@/lib/types";
 import { cn } from "@/lib/utils";

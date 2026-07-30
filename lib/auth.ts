@@ -8,7 +8,7 @@
 
 // ─── Role ────────────────────────────────────────────────────────────────────
 
-export type UserRole = 'mentor' | 'mentee' | 'admin';
+export type UserRole = "mentor" | "mentee" | "admin";
 
 // ─── Dashboard routes per role ───────────────────────────────────────────────
 
@@ -18,9 +18,9 @@ export type UserRole = 'mentor' | 'mentee' | 'admin';
  * redirect already-authenticated users away from auth pages.
  */
 export const ROLE_DASHBOARD: Record<UserRole, string> = {
-  mentor: '/mentor',
-  mentee: '/mentee',
-  admin: '/admin',
+  mentor: "/mentor",
+  mentee: "/mentee",
+  admin: "/admin",
 };
 
 // ─── Protected route prefixes ────────────────────────────────────────────────
@@ -30,17 +30,17 @@ export const ROLE_DASHBOARD: Record<UserRole, string> = {
  * Middleware checks every incoming request against this list.
  */
 export const PROTECTED_PREFIXES: string[] = [
-  '/mentor',
-  '/mentee',
-  '/admin',
-  '/dashboard',
+  "/mentor",
+  "/mentee",
+  "/admin",
+  "/dashboard",
 ];
 
 /**
  * URL prefixes that are only for unauthenticated users
  * (auth pages redirect away if the user is already logged in).
  */
-export const AUTH_PREFIXES: string[] = ['/login', '/register'];
+export const AUTH_PREFIXES: string[] = ["/login", "/register"];
 
 // ─── Session cookie name ─────────────────────────────────────────────────────
 
@@ -49,7 +49,7 @@ export const AUTH_PREFIXES: string[] = ['/login', '/register'];
  * Middleware reads this cookie to determine auth state without touching
  * client-side storage.
  */
-export const SESSION_COOKIE = 'skillsync_session';
+export const SESSION_COOKIE = "skillsync_session";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -66,5 +66,5 @@ export function isAuthRoute(pathname: string): boolean {
 /** Returns the correct dashboard path for a given role string.
  *  Falls back to '/' if the role is unknown. */
 export function getDashboardPath(role: string): string {
-  return ROLE_DASHBOARD[role as UserRole] ?? '/';
+  return ROLE_DASHBOARD[role as UserRole] ?? "/";
 }

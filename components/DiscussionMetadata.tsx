@@ -12,10 +12,18 @@ import React from "react";
  * - aria-labels for icon-only or ambiguous numeric content
  */
 
-function formatRelativeTime(dateInput) {
+interface DiscussionMetadataProps {
+  postedAt: string | Date;
+  category?: string;
+  likeCount?: number;
+  replyCount?: number;
+  className?: string;
+}
+
+function formatRelativeTime(dateInput: string | Date): string {
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   const now = new Date();
-  const diffMs = now - date;
+  const diffMs = now.getTime() - date.getTime();
   const diffSec = Math.round(diffMs / 1000);
   const diffMin = Math.round(diffSec / 60);
   const diffHour = Math.round(diffMin / 60);
@@ -33,10 +41,22 @@ function formatRelativeTime(dateInput) {
   });
 }
 
-function formatCount(count) {
+function formatCount(count: number): string {
   if (count >= 1000) return `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k`;
   return String(count);
 }
+
+const visuallyHidden: React.CSSProperties = {
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  padding: 0,
+  margin: "-1px",
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0,
+};
 
 export default function DiscussionMetadata({
   postedAt,
@@ -44,10 +64,12 @@ export default function DiscussionMetadata({
   likeCount = 0,
   replyCount = 0,
   className = "",
-}) {
+}: DiscussionMetadataProps) {
   const date = postedAt instanceof Date ? postedAt : new Date(postedAt);
   const isoTime = isNaN(date.getTime()) ? undefined : date.toISOString();
-  const displayTime = isNaN(date.getTime()) ? String(postedAt) : formatRelativeTime(date);
+  const displayTime = isNaN(date.getTime())
+    ? String(postedAt)
+    : formatRelativeTime(date);
 
   return (
     <dl
@@ -118,26 +140,3 @@ export default function DiscussionMetadata({
     </dl>
   );
 }
-
-const visuallyHidden = {
-  position: "absolute",
-  width: "1px",
-  height: "1px",
-  padding: 0,
-  margin: "-1px",
-  overflow: "hidden",
-  clip: "rect(0, 0, 0, 0)",
-  whiteSpace: "nowrap",
-  border: 0,
-};
-
-/* Example usage:
-
-<DiscussionMetadata
-  postedAt="2026-07-28T10:00:00Z"
-  category="General"
-  likeCount={128}
-  replyCount={34}
-/>
-
-*/

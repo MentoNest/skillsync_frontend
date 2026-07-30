@@ -1,39 +1,39 @@
-import Link from 'next/link';
-import MentorCard from '@/components/MentorCard';
+import Link from "next/link";
+import MentorCard from "@/components/MentorCard";
 
 const mentors = [
   {
-    mentorId: 'sarah-doe',
-    name: 'Sarah Doe',
-    title: 'Software Engineer @ Google',
-    bio: 'Expert in React, Node.js, and cloud infrastructure.',
-    avatarUrl: '/avatars/sarah.jpg',
+    mentorId: "sarah-doe",
+    name: "Sarah Doe",
+    title: "Software Engineer @ Google",
+    bio: "Expert in React, Node.js, and cloud infrastructure.",
+    avatarUrl: "/avatars/sarah.jpg",
     rating: 4.8,
     reviewCount: 124,
     pricePerSession: 85,
-    skills: ['React', 'Node.js', 'Cloud'],
+    skills: ["React", "Node.js", "Cloud"],
   },
   {
-    mentorId: 'john-smith',
-    name: 'John Smith',
-    title: 'Product Manager @ Microsoft',
-    bio: 'Specializes in product strategy and user-centric design.',
-    avatarUrl: '/avatars/john.jpg',
+    mentorId: "john-smith",
+    name: "John Smith",
+    title: "Product Manager @ Microsoft",
+    bio: "Specializes in product strategy and user-centric design.",
+    avatarUrl: "/avatars/john.jpg",
     rating: 4.6,
     reviewCount: 98,
     pricePerSession: 75,
-    skills: ['Product Strategy', 'UX', 'Agile'],
+    skills: ["Product Strategy", "UX", "Agile"],
   },
   {
-    mentorId: 'jane-roe',
-    name: 'Jane Roe',
-    title: 'UX Designer @ Apple',
-    bio: 'Passionate about creating beautiful and intuitive user experiences.',
-    avatarUrl: '/avatars/jane.jpg',
+    mentorId: "jane-roe",
+    name: "Jane Roe",
+    title: "UX Designer @ Apple",
+    bio: "Passionate about creating beautiful and intuitive user experiences.",
+    avatarUrl: "/avatars/jane.jpg",
     rating: 4.9,
     reviewCount: 156,
     pricePerSession: 90,
-    skills: ['UX Design', 'Figma', 'Prototyping'],
+    skills: ["UX Design", "Figma", "Prototyping"],
   },
 ];
 

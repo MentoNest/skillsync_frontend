@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * SkipToContent
@@ -9,7 +9,11 @@
  *
  * Place this as the first child of the page layout.
  */
-export function SkipToContent({ targetId = 'main-content' }: { targetId?: string }) {
+export function SkipToContent({
+  targetId = "main-content",
+}: {
+  targetId?: string;
+}) {
   return (
     <a
       href={`#${targetId}`}
@@ -35,14 +39,17 @@ export function VisuallyHidden({ children }: { children: React.ReactNode }) {
  * Traps keyboard focus within a container (useful for modals/dialogs).
  * Pressing Tab or Shift+Tab cycles focus within focusable children.
  */
-export function useFocusTrap(containerRef: React.RefObject<HTMLElement | null>, isActive: boolean) {
-  if (typeof window === 'undefined') return;
+export function useFocusTrap(
+  containerRef: React.RefObject<HTMLElement | null>,
+  isActive: boolean,
+) {
+  if (typeof window === "undefined") return;
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (!isActive || !containerRef.current || e.key !== 'Tab') return;
+    if (!isActive || !containerRef.current || e.key !== "Tab") return;
 
     const focusable = containerRef.current.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
     );
 
     if (focusable.length === 0) return;
@@ -61,11 +68,11 @@ export function useFocusTrap(containerRef: React.RefObject<HTMLElement | null>, 
 
   // Attach/detach listener
   if (isActive) {
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
   }
 
   return () => {
-    document.removeEventListener('keydown', handleKeyDown);
+    document.removeEventListener("keydown", handleKeyDown);
   };
 }
 
@@ -75,13 +82,18 @@ export function useFocusTrap(containerRef: React.RefObject<HTMLElement | null>, 
  */
 export function LiveRegion({
   message,
-  politeness = 'polite',
+  politeness = "polite",
 }: {
   message: string;
-  politeness?: 'polite' | 'assertive';
+  politeness?: "polite" | "assertive";
 }) {
   return (
-    <div aria-live={politeness} aria-atomic="true" className="sr-only" role="status">
+    <div
+      aria-live={politeness}
+      aria-atomic="true"
+      className="sr-only"
+      role="status"
+    >
       {message}
     </div>
   );

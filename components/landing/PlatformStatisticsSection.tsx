@@ -6,32 +6,34 @@ interface Stat {
 
 const stats: Stat[] = [
   {
-    value: '500+',
-    label: 'Verified mentors',
-    description: 'Rigorously vetted professionals from leading companies',
+    value: "500+",
+    label: "Verified mentors",
+    description: "Rigorously vetted professionals from leading companies",
   },
   {
-    value: '10k+',
-    label: 'Mentees guided',
-    description: 'Professionals accelerating their careers on SkillSync',
+    value: "10k+",
+    label: "Mentees guided",
+    description: "Professionals accelerating their careers on SkillSync",
   },
   {
-    value: '92%',
-    label: 'Return rate',
-    description: 'Mentees who book a second session after their first',
+    value: "92%",
+    label: "Return rate",
+    description: "Mentees who book a second session after their first",
   },
   {
-    value: '4.9/5',
-    label: 'Average rating',
-    description: 'Consistent quality across every mentoring session',
+    value: "4.9/5",
+    label: "Average rating",
+    description: "Consistent quality across every mentoring session",
   },
 ];
 
 export default function PlatformStatisticsSection() {
   return (
-    <section aria-labelledby="platform-stats-heading" className="bg-slate-950 py-20">
+    <section
+      aria-labelledby="platform-stats-heading"
+      className="bg-slate-950 py-20"
+    >
       <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
-
         {/* Section header */}
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">
@@ -44,7 +46,8 @@ export default function PlatformStatisticsSection() {
             Trusted by professionals worldwide.
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-400">
-            Real numbers from real people who have invested in their growth through SkillSync.
+            Real numbers from real people who have invested in their growth
+            through SkillSync.
           </p>
         </div>
 
@@ -69,7 +72,6 @@ export default function PlatformStatisticsSection() {
             </div>
           ))}
         </dl>
-
       </div>
     </section>
   );

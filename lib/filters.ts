@@ -10,33 +10,32 @@ export interface FilterState {
   search: string;
 }
 
-export type SortOrder = 'latest' | 'popular' | 'trending';
+export type SortOrder = "latest" | "popular" | "trending";
 
 export const CATEGORIES: FilterOption[] = [
-  { value: 'general', label: 'General', count: 42 },
-  { value: 'mentorship', label: 'Mentorship', count: 28 },
-  { value: 'courses', label: 'Courses', count: 35 },
-  { value: 'career', label: 'Career', count: 19 },
-  { value: 'technical', label: 'Technical', count: 31 },
-  { value: 'events', label: 'Events', count: 15 },
+  { value: "general", label: "General", count: 42 },
+  { value: "mentorship", label: "Mentorship", count: 28 },
+  { value: "courses", label: "Courses", count: 35 },
+  { value: "career", label: "Career", count: 19 },
+  { value: "technical", label: "Technical", count: 31 },
+  { value: "events", label: "Events", count: 15 },
 ];
 
 export const SORT_OPTIONS: { value: SortOrder; label: string }[] = [
-  { value: 'latest', label: 'Latest' },
-  { value: 'popular', label: 'Most Popular' },
-  { value: 'trending', label: 'Trending' },
+  { value: "latest", label: "Latest" },
+  { value: "popular", label: "Most Popular" },
+  { value: "trending", label: "Trending" },
 ];
 
 export const DEFAULT_FILTER_STATE: FilterState = {
   category: null,
-  sort: 'latest',
-  search: '',
+  sort: "latest",
+  search: "",
 };
 
-export function filterDiscussions<T extends { category?: string; title?: string }>(
-  items: T[],
-  filters: FilterState
-): T[] {
+export function filterDiscussions<
+  T extends { category?: string; title?: string },
+>(items: T[], filters: FilterState): T[] {
   let result = [...items];
 
   if (filters.category) {
@@ -45,9 +44,7 @@ export function filterDiscussions<T extends { category?: string; title?: string 
 
   if (filters.search) {
     const query = filters.search.toLowerCase();
-    result = result.filter((item) =>
-      item.title?.toLowerCase().includes(query)
-    );
+    result = result.filter((item) => item.title?.toLowerCase().includes(query));
   }
 
   return result;

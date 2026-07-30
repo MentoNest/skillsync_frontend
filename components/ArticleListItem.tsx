@@ -1,14 +1,24 @@
-import React from 'react';
-import Link from 'next/link';
-import { TrendingUp } from 'lucide-react';
-import type { Article } from '@/lib/types';
+import React from "react";
+import Link from "next/link";
+import { TrendingUp } from "lucide-react";
+import type { Article } from "@/lib/types";
 
 interface ArticleListItemProps extends Article {
   className?: string;
 }
 
-export default function ArticleListItem({ category, title, author, readTime, href, className = '' }: ArticleListItemProps) {
-  const articleSlug = title.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+export default function ArticleListItem({
+  category,
+  title,
+  author,
+  readTime,
+  href,
+  className = "",
+}: ArticleListItemProps) {
+  const articleSlug = title
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^a-z0-9-]/g, "");
   const targetHref = href || `/resources/articles/${articleSlug}`;
 
   return (
@@ -31,7 +41,10 @@ export default function ArticleListItem({ category, title, author, readTime, hre
           </p>
         </div>
         <div className="flex-shrink-0 p-2 bg-slate-50 rounded-full group-hover:bg-cyan-50 group-hover:text-cyan-600 dark:bg-gray-800 dark:group-hover:bg-cyan-900/30 dark:group-hover:text-cyan-400 transition-colors">
-          <TrendingUp className="w-4 h-4 text-cyan-600 dark:text-cyan-400 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
+          <TrendingUp
+            className="w-4 h-4 text-cyan-600 dark:text-cyan-400 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+            aria-hidden="true"
+          />
         </div>
       </Link>
     </article>

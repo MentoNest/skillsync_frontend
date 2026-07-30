@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'Discover Mentors', href: '/mentors' },
-  { label: 'How It Works', href: '/how-it-works' },
-  { label: 'Pricing', href: '/pricing' },
+  { label: "Home", href: "/" },
+  { label: "Discover Mentors", href: "/mentors" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Pricing", href: "/pricing" },
 ];
 
 export default function Navbar() {
@@ -20,14 +20,20 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/');
+    router.push("/");
   };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <nav aria-label="Main navigation" className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+      <nav
+        aria-label="Main navigation"
+        className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between"
+      >
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-cyan-600 tracking-tight">
+        <Link
+          href="/"
+          className="text-xl font-bold text-cyan-600 tracking-tight"
+        >
           SkillSync
         </Link>
 
@@ -38,7 +44,9 @@ export default function Navbar() {
               <Link
                 href={href}
                 className={`text-sm font-medium transition-colors hover:text-cyan-600 ${
-                  pathname === href ? 'text-cyan-600 border-b-2 border-cyan-600 pb-0.5' : 'text-gray-600'
+                  pathname === href
+                    ? "text-cyan-600 border-b-2 border-cyan-600 pb-0.5"
+                    : "text-gray-600"
                 }`}
               >
                 {label}
@@ -87,17 +95,41 @@ export default function Navbar() {
         <button
           className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
           onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
         >
           {menuOpen ? (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           )}
         </button>
@@ -105,7 +137,10 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div id="mobile-menu" className="md:hidden border-t border-gray-100 bg-white px-4 pb-4">
+        <div
+          id="mobile-menu"
+          className="md:hidden border-t border-gray-100 bg-white px-4 pb-4"
+        >
           <ul className="flex flex-col gap-1 mt-2">
             {navLinks.map(({ label, href }) => (
               <li key={href}>
@@ -113,7 +148,9 @@ export default function Navbar() {
                   href={href}
                   onClick={() => setMenuOpen(false)}
                   className={`block py-2 px-3 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50 hover:text-cyan-600 ${
-                    pathname === href ? 'text-cyan-600 bg-cyan-50' : 'text-gray-700'
+                    pathname === href
+                      ? "text-cyan-600 bg-cyan-50"
+                      : "text-gray-700"
                   }`}
                 >
                   {label}
@@ -131,9 +168,14 @@ export default function Navbar() {
                 >
                   Dashboard
                 </Link>
-                <span className="text-center text-sm text-gray-500 py-1">{user?.name}</span>
+                <span className="text-center text-sm text-gray-500 py-1">
+                  {user?.name}
+                </span>
                 <button
-                  onClick={() => { setMenuOpen(false); handleLogout(); }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleLogout();
+                  }}
                   className="text-center text-sm font-medium text-red-600 border border-red-200 py-2 rounded-lg hover:bg-red-50 transition-colors"
                 >
                   Logout

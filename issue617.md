@@ -14,4 +14,3 @@ Context API or Zustand
 Acceptance Criteria
 Auth state persists on refresh
 Unauthorized users redirected
-

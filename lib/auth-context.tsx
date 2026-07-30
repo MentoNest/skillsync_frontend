@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * lib/auth-context.tsx
@@ -17,10 +17,10 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from 'react';
-import { useRouter } from 'next/navigation';
-import type { UserRole } from '@/lib/auth';
-import { getDashboardPath } from '@/lib/auth';
+} from "react";
+import { useRouter } from "next/navigation";
+import type { UserRole } from "@/lib/auth";
+import { getDashboardPath } from "@/lib/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const STORAGE_KEY = 'skillsync_user';
+const STORAGE_KEY = "skillsync_user";
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUser(JSON.parse(stored) as AuthUser);
       }
     } catch {
@@ -79,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // ── Simulated successful auth response ──────────────────────────────
       const authedUser: AuthUser = {
         id: crypto.randomUUID(),
-        name: email.split('@')[0],
+        name: email.split("@")[0],
         email,
         role,
       };
@@ -92,13 +93,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const destination = getDashboardPath(role);
       router.push(destination);
     },
-    [router]
+    [router],
   );
 
   const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setUser(null);
-    router.push('/login');
+    router.push("/login");
   }, [router]);
 
   return (
@@ -118,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used inside <AuthProvider>');
+    throw new Error("useAuth must be used inside <AuthProvider>");
   }
   return ctx;
 }

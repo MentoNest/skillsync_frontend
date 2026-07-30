@@ -10,6 +10,7 @@ This directory contains the API client and authentication services for SkillSync
 ## Setup
 
 1. Copy `.env.example` to `.env.local` and configure your API URL:
+
    ```bash
    NEXT_PUBLIC_API_URL=http://localhost:8000/api
    ```
@@ -21,11 +22,11 @@ This directory contains the API client and authentication services for SkillSync
 ### Login
 
 ```typescript
-import { authApi } from '@/lib/api/auth';
+import { authApi } from "@/lib/api/auth";
 
 const response = await authApi.login({
-  email: 'user@example.com',
-  password: 'password123'
+  email: "user@example.com",
+  password: "password123",
 });
 
 // Response contains:
@@ -36,12 +37,12 @@ const response = await authApi.login({
 ### Register
 
 ```typescript
-import { authApi } from '@/lib/api/auth';
+import { authApi } from "@/lib/api/auth";
 
 const response = await authApi.register({
-  name: 'John Doe',
-  email: 'john@example.com',
-  password: 'password123'
+  name: "John Doe",
+  email: "john@example.com",
+  password: "password123",
 });
 
 // Response contains:
@@ -52,20 +53,25 @@ const response = await authApi.register({
 ## Features
 
 ### ✅ Loading States
+
 Both forms show a loading spinner during API calls and disable the submit button.
 
 ### ✅ Error Handling
+
 - Network errors display user-friendly messages
 - API errors are shown in a red alert box above the form
 - Field validation errors appear below each field
 
 ### ✅ Role-Based Redirect
+
 After successful login/registration, users are redirected based on their role:
+
 - `admin` → `/admin`
 - `mentor` → `/mentor`
 - `mentee` → `/mentee`
 
 ### ✅ Token Storage
+
 JWT tokens are stored in localStorage along with user information.
 
 ## API Error Handling
@@ -78,8 +84,8 @@ try {
 } catch (error) {
   if (error instanceof ApiError) {
     console.log(error.message); // User-friendly message
-    console.log(error.status);  // HTTP status code
-    console.log(error.data);    // Raw error data
+    console.log(error.status); // HTTP status code
+    console.log(error.data); // Raw error data
   }
 }
 ```
@@ -89,7 +95,9 @@ try {
 The backend should respond with the following format:
 
 ### POST /auth/login
+
 Request:
+
 ```json
 {
   "email": "user@example.com",
@@ -98,6 +106,7 @@ Request:
 ```
 
 Success Response (200):
+
 ```json
 {
   "token": "jwt-token-here",
@@ -111,6 +120,7 @@ Success Response (200):
 ```
 
 Error Response (400/401/500):
+
 ```json
 {
   "message": "Invalid credentials"
@@ -118,7 +128,9 @@ Error Response (400/401/500):
 ```
 
 ### POST /auth/register
+
 Request:
+
 ```json
 {
   "name": "John Doe",
@@ -128,6 +140,7 @@ Request:
 ```
 
 Success Response (201):
+
 ```json
 {
   "token": "jwt-token-here",
@@ -141,6 +154,7 @@ Success Response (201):
 ```
 
 Error Response (400/409/500):
+
 ```json
 {
   "message": "Email already exists"

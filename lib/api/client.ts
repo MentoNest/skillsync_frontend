@@ -2,16 +2,16 @@
  * API Client for making HTTP requests to the backend
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
-    public data?: unknown
+    public data?: unknown,
   ) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -21,17 +21,17 @@ interface RequestOptions extends RequestInit {
 
 async function request<T>(
   endpoint: string,
-  options: RequestOptions = {}
+  options: RequestOptions = {},
 ): Promise<T> {
   const { token, ...fetchOptions } = options;
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...fetchOptions.headers,
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(fetchOptions.headers as Record<string, string>),
   };
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   try {
@@ -44,9 +44,9 @@ async function request<T>(
 
     if (!response.ok) {
       throw new ApiError(
-        data.message || data.error || 'An error occurred',
+        data.message || data.error || "An error occurred",
         response.status,
-        data
+        data,
       );
     }
 
@@ -55,34 +55,34 @@ async function request<T>(
     if (error instanceof ApiError) {
       throw error;
     }
-    
+
     // Network or parsing error
     throw new ApiError(
-      'Network error. Please check your connection.',
+      "Network error. Please check your connection.",
       0,
-      error
+      error,
     );
   }
 }
 
 export const api = {
   get: <T>(endpoint: string, options?: RequestOptions) =>
-    request<T>(endpoint, { ...options, method: 'GET' }),
+    request<T>(endpoint, { ...options, method: "GET" }),
 
   post: <T>(endpoint: string, body?: unknown, options?: RequestOptions) =>
     request<T>(endpoint, {
       ...options,
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(body),
     }),
 
   put: <T>(endpoint: string, body?: unknown, options?: RequestOptions) =>
     request<T>(endpoint, {
       ...options,
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(body),
     }),
 
   delete: <T>(endpoint: string, options?: RequestOptions) =>
-    request<T>(endpoint, { ...options, method: 'DELETE' }),
+    request<T>(endpoint, { ...options, method: "DELETE" }),
 };

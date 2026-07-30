@@ -1,42 +1,65 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import type { Mentor } from '@/lib/types';
-import StarRating from '@/components/ui/StarRating';
+import { useCallback } from "react";
+import type { Mentor } from "@/lib/types";
+import StarRating from "@/components/ui/StarRating";
 
 interface MentorComparisonDrawerProps {
-  mentors: Mentor[];
-  onRemove: (id: string) => void;
-  onClose: () => void;
+  selectedMentors?: Mentor[];
+  mentors?: Mentor[];
+  onRemoveMentor?: (id: string) => void;
+  onRemove?: (id: string) => void;
+  onClearAll?: () => void;
+  onClose?: () => void;
 }
 
 const FIELDS: ReadonlyArray<{
   label: string;
   render: (m: Mentor) => string | number;
 }> = [
-  { label: 'Rating', render: (m) => `${m.rating?.toFixed(1) || 'N/A'} (${m.reviewCount?.toLocaleString() || '0'} reviews)` },
-  { label: 'Price / session', render: (m) => m.pricePerSession ? `$${m.pricePerSession}` : 'N/A' },
-  { label: 'Experience', render: (m) => m.yearsExperience ? `${m.yearsExperience}+ yrs` : 'N/A' },
-  { label: 'Company', render: (m) => m.company || 'N/A' },
-  { label: 'Title', render: (m) => m.title || 'N/A' },
-  { label: 'Expertise', render: (m) => m.expertise?.join(', ') || 'N/A' },
-  { label: 'Skills', render: (m) => m.skills?.join(', ') || 'N/A' },
-  { label: 'Availability', render: (m) => m.availability || 'N/A' },
+  {
+    label: "Rating",
+    render: (m) =>
+      `${m.rating?.toFixed(1) || "N/A"} (${m.reviewCount?.toLocaleString() || "0"} reviews)`,
+  },
+  {
+    label: "Price / session",
+    render: (m) => (m.pricePerSession ? `$${m.pricePerSession}` : "N/A"),
+  },
+  {
+    label: "Experience",
+    render: (m) =>
+      m.experienceYears || m.yearsExperience
+        ? `${m.experienceYears || m.yearsExperience}+ yrs`
+        : "N/A",
+  },
+  { label: "Company", render: (m) => m.company || "N/A" },
+  { label: "Title", render: (m) => m.title || "N/A" },
+  { label: "Expertise", render: (m) => m.expertise?.join(", ") || "N/A" },
+  { label: "Skills", render: (m) => m.skills?.join(", ") || "N/A" },
+  { label: "Availability", render: (m) => m.availability || "N/A" },
 ];
 
 export default function MentorComparisonDrawer({
+  selectedMentors,
   mentors,
+  onRemoveMentor,
   onRemove,
+  onClearAll,
   onClose,
 }: MentorComparisonDrawerProps) {
+  const mentorList = selectedMentors ?? mentors ?? [];
+  const handleRemove = onRemoveMentor ?? onRemove ?? (() => {});
+  const handleClose = onClose ?? onClearAll ?? (() => {});
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") handleClose();
     },
-    [onClose],
+    [handleClose],
   );
 
-  if (mentors.length === 0) return null;
+  if (mentorList.length === 0) return null;
 
   return (
     <section
@@ -50,11 +73,11 @@ export default function MentorComparisonDrawer({
       {/* Header */}
       <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <h2 className="text-sm font-bold text-gray-900 dark:text-white">
-          Comparing {mentors.length} mentor{mentors.length > 1 ? 's' : ''}
+          Comparing {mentorList.length} mentor{mentorList.length > 1 ? "s" : ""}
         </h2>
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:underline"
           aria-label="Close comparison panel"
         >
@@ -64,28 +87,53 @@ export default function MentorComparisonDrawer({
 
       {/* Comparison table */}
       <div className="max-w-screen-xl mx-auto px-4 pb-4 overflow-x-auto">
-        <table className="w-full text-sm border-collapse" aria-label="Side-by-side mentor comparison">
+        <table
+          className="w-full text-sm border-collapse"
+          aria-label="Side-by-side mentor comparison"
+        >
           <thead>
             <tr>
-              <th scope="col" className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2 pr-4 w-32">
+              <th
+                scope="col"
+                className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2 pr-4 w-32"
+              >
                 Field
               </th>
-              {mentors.map((m) => (
-                <th key={m.id} scope="col" className="text-left py-2 px-3 min-w-[160px]">
+              {mentorList.map((m) => (
+                <th
+                  key={m.id || m.mentorId}
+                  scope="col"
+                  className="text-left py-2 px-3 min-w-[160px]"
+                >
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-white leading-tight">{m.name}</p>
-                      <p className="text-xs text-cyan-600 dark:text-cyan-400">{m.title}</p>
-                      <StarRating rating={m.rating} size="sm" />
+                      <p className="font-bold text-gray-900 dark:text-white leading-tight">
+                        {m.name}
+                      </p>
+                      <p className="text-xs text-cyan-600 dark:text-cyan-400">
+                        {m.title}
+                      </p>
+                      <StarRating rating={m.rating ?? 0} size="sm" />
                     </div>
                     <button
                       type="button"
-                      onClick={() => onRemove(m.id)}
+                      onClick={() => handleRemove(m.id || m.mentorId || "")}
                       className="shrink-0 text-gray-400 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
                       aria-label={`Remove ${m.name} from comparison`}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -97,13 +145,16 @@ export default function MentorComparisonDrawer({
             {FIELDS.map((field, i) => (
               <tr
                 key={field.label}
-                className={i % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/40' : ''}
+                className={i % 2 === 0 ? "bg-gray-50 dark:bg-gray-800/40" : ""}
               >
                 <td className="py-2 pr-4 font-medium text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wide">
                   {field.label}
                 </td>
-                {mentors.map((m) => (
-                  <td key={m.id} className="py-2 px-3 text-gray-900 dark:text-white">
+                {mentorList.map((m) => (
+                  <td
+                    key={m.id || m.mentorId}
+                    className="py-2 px-3 text-gray-900 dark:text-white"
+                  >
                     {field.render(m)}
                   </td>
                 ))}

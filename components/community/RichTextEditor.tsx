@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
 import {
   Bold,
   Italic,
@@ -11,17 +11,42 @@ import {
   Link as LinkIcon,
   Code,
   Quote,
-} from 'lucide-react';
-import { useState } from 'react';
+} from "lucide-react";
+import React, { useState } from "react";
 
 interface Props {
   content: string;
   onChange: (content: string) => void;
 }
 
+function ToolbarButton({
+  onClick,
+  active,
+  children,
+  title,
+}: {
+  onClick: () => void;
+  active?: boolean;
+  children: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={`p-2 rounded hover:bg-gray-100 transition-colors ${
+        active ? "bg-cyan-100 text-cyan-700" : "text-gray-600"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function RichTextEditor({ content, onChange }: Props) {
   const [showLinkInput, setShowLinkInput] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
+  const [linkUrl, setLinkUrl] = useState("");
 
   const editor = useEditor({
     extensions: [
@@ -38,7 +63,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-cyan-600 underline cursor-pointer',
+          class: "text-cyan-600 underline cursor-pointer",
         },
       }),
     ],
@@ -48,8 +73,9 @@ export default function RichTextEditor({ content, onChange }: Props) {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[200px] px-3 py-2',
-        'data-placeholder': 'Share your thoughts, questions, or experiences...',
+        class:
+          "prose prose-sm max-w-none focus:outline-none min-h-[200px] px-3 py-2",
+        "data-placeholder": "Share your thoughts, questions, or experiences...",
       },
     },
   });
@@ -61,7 +87,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
   const setLink = () => {
     if (linkUrl) {
       editor.chain().focus().setLink({ href: linkUrl }).run();
-      setLinkUrl('');
+      setLinkUrl("");
       setShowLinkInput(false);
     }
   };
@@ -70,36 +96,13 @@ export default function RichTextEditor({ content, onChange }: Props) {
     editor.chain().focus().unsetLink().run();
   };
 
-  const ToolbarButton = ({
-    onClick,
-    active,
-    children,
-    title,
-  }: {
-    onClick: () => void;
-    active?: boolean;
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={`p-2 rounded hover:bg-gray-100 transition-colors ${
-        active ? 'bg-cyan-100 text-cyan-700' : 'text-gray-600'
-      }`}
-    >
-      {children}
-    </button>
-  );
-
   return (
     <div className="border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-cyan-500 focus-within:border-transparent">
       {/* Toolbar */}
       <div className="border-b border-gray-200 bg-gray-50 p-2 flex flex-wrap gap-1 items-center">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
-          active={editor.isActive('bold')}
+          active={editor.isActive("bold")}
           title="Bold"
         >
           <Bold size={18} />
@@ -107,7 +110,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          active={editor.isActive('italic')}
+          active={editor.isActive("italic")}
           title="Italic"
         >
           <Italic size={18} />
@@ -117,7 +120,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          active={editor.isActive('bulletList')}
+          active={editor.isActive("bulletList")}
           title="Bullet List"
         >
           <List size={18} />
@@ -125,7 +128,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          active={editor.isActive('orderedList')}
+          active={editor.isActive("orderedList")}
           title="Numbered List"
         >
           <ListOrdered size={18} />
@@ -135,7 +138,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          active={editor.isActive('codeBlock')}
+          active={editor.isActive("codeBlock")}
           title="Code Block"
         >
           <Code size={18} />
@@ -143,7 +146,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          active={editor.isActive('blockquote')}
+          active={editor.isActive("blockquote")}
           title="Quote"
         >
           <Quote size={18} />
@@ -154,13 +157,13 @@ export default function RichTextEditor({ content, onChange }: Props) {
         <div className="relative">
           <ToolbarButton
             onClick={() => {
-              if (editor.isActive('link')) {
+              if (editor.isActive("link")) {
                 unsetLink();
               } else {
                 setShowLinkInput(!showLinkInput);
               }
             }}
-            active={editor.isActive('link')}
+            active={editor.isActive("link")}
             title="Link"
           >
             <LinkIcon size={18} />
@@ -174,12 +177,12 @@ export default function RichTextEditor({ content, onChange }: Props) {
                 value={linkUrl}
                 onChange={(e) => setLinkUrl(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     setLink();
                   }
-                  if (e.key === 'Escape') {
+                  if (e.key === "Escape") {
                     setShowLinkInput(false);
-                    setLinkUrl('');
+                    setLinkUrl("");
                   }
                 }}
                 className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"

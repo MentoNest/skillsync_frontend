@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -8,9 +8,13 @@ interface ReportModalProps {
   discussionId: string;
 }
 
-export function ReportDiscussionModal({ isOpen, onClose, discussionId }: ReportModalProps) {
-  const [reason, setReason] = useState('Spam');
-  const [details, setDetails] = useState('');
+export function ReportDiscussionModal({
+  isOpen,
+  onClose,
+  discussionId,
+}: ReportModalProps) {
+  const [reason, setReason] = useState("Spam");
+  const [details, setDetails] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   if (!isOpen) return null;
@@ -35,7 +39,9 @@ export function ReportDiscussionModal({ isOpen, onClose, discussionId }: ReportM
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Reason for report</label>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Reason for report
+              </label>
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -50,7 +56,9 @@ export function ReportDiscussionModal({ isOpen, onClose, discussionId }: ReportM
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Additional details</label>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Additional details
+              </label>
               <textarea
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}

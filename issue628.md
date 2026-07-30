@@ -13,4 +13,3 @@ Small trending arrow icon
 Acceptance Criteria
 Semantic markup
 Clickable item
-

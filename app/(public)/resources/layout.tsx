@@ -1,5 +1,5 @@
-import React from 'react';
-import Footer from '@/components/navigation/Footer';
+import React from "react";
+import Footer from "@/components/navigation/Footer";
 
 export default function ResourcesLayout({
   children,
@@ -8,9 +8,7 @@ export default function ResourcesLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );

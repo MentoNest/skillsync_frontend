@@ -1,4 +1,4 @@
-export type SortOption = 'trending' | 'latest' | 'most-replies' | 'most-liked';
+export type SortOption = "trending" | "latest" | "most-replies" | "most-liked";
 
 interface DiscussionSortProps {
   currentSort: SortOption;
@@ -7,16 +7,16 @@ interface DiscussionSortProps {
 }
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'trending', label: 'Trending' },
-  { value: 'latest', label: 'Latest' },
-  { value: 'most-replies', label: 'Most Replies' },
-  { value: 'most-liked', label: 'Most Liked' },
+  { value: "trending", label: "Trending" },
+  { value: "latest", label: "Latest" },
+  { value: "most-replies", label: "Most Replies" },
+  { value: "most-liked", label: "Most Liked" },
 ];
 
 export function DiscussionSort({
   currentSort,
   onSortChange,
-  className = ''
+  className = "",
 }: DiscussionSortProps) {
   return (
     <div className={`flex flex-wrap gap-2 ${className}`}>
@@ -26,8 +26,8 @@ export function DiscussionSort({
           onClick={() => onSortChange(option.value)}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             currentSort === option.value
-              ? 'bg-cyan-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? "bg-cyan-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           {option.label}

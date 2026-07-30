@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 /**
  * CTASection — Full-width call-to-action encouraging users to sign up.
@@ -41,11 +41,13 @@ export default function CTASection() {
 
       {/* ── Content ── */}
       <div className="relative z-10 mx-auto max-w-screen-xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-28">
-
         {/* Eyebrow badge */}
         <div className="mb-6 flex justify-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-purple-100 backdrop-blur-sm">
-            <Sparkles className="h-3.5 w-3.5 text-purple-300" aria-hidden="true" />
+            <Sparkles
+              className="h-3.5 w-3.5 text-purple-300"
+              aria-hidden="true"
+            />
             Free to get started
           </span>
         </div>
@@ -55,14 +57,15 @@ export default function CTASection() {
           id="cta-heading"
           className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl"
         >
-          Ready to accelerate{' '}
+          Ready to accelerate{" "}
           <span className="block text-purple-200">your career?</span>
         </h2>
 
         {/* Supporting copy */}
         <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-purple-100/90 sm:text-lg">
           Join thousands of professionals using SkillSync to discover mentors,
-          access curated resources, and take their next big step — completely free.
+          access curated resources, and take their next big step — completely
+          free.
         </p>
 
         {/* Buttons */}
@@ -87,7 +90,8 @@ export default function CTASection() {
 
         {/* Trust line */}
         <p className="mt-8 text-xs text-purple-200/60">
-          No credit card required &nbsp;·&nbsp; Cancel anytime &nbsp;·&nbsp; Free forever plan
+          No credit card required &nbsp;·&nbsp; Cancel anytime &nbsp;·&nbsp;
+          Free forever plan
         </p>
       </div>
 

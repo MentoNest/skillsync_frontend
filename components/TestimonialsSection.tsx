@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface Testimonial {
   initials: string;
@@ -9,43 +9,43 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    initials: 'AK',
+    initials: "AK",
     quote:
       "SkillSync connected me with a mentor who completely transformed my approach to system design. Within three months, I earned my first promotion to senior engineer.",
-    name: 'Alex Kim',
-    role: 'Senior Engineer at Stripe',
+    name: "Alex Kim",
+    role: "Senior Engineer at Stripe",
   },
   {
-    initials: 'MJ',
+    initials: "MJ",
     quote:
       "The structured learning paths and one-on-one mentorship helped me transition from marketing to product management in just six months. Best career decision I have ever made.",
-    name: 'Maria Johnson',
-    role: 'Product Manager at Airbnb',
+    name: "Maria Johnson",
+    role: "Product Manager at Airbnb",
   },
   {
-    initials: 'DT',
+    initials: "DT",
     quote:
       "I was stuck in my career growth until I found SkillSync. My mentor gave me the honest feedback and strategic guidance I needed to break through to the next level.",
-    name: 'David Thompson',
-    role: 'Engineering Manager at Spotify',
+    name: "David Thompson",
+    role: "Engineering Manager at Spotify",
   },
   {
-    initials: 'SR',
+    initials: "SR",
     quote:
       "The community aspect sets SkillSync apart. I joined for mentorship but gained a network of incredible peers who constantly challenge and support me.",
-    name: 'Sarah Rivera',
-    role: 'UX Lead at Figma',
+    name: "Sarah Rivera",
+    role: "UX Lead at Figma",
   },
 ];
 
 // Deterministic gradient based on initials
 const gradients = [
-  'from-cyan-500 to-blue-600',
-  'from-purple-500 to-indigo-600',
-  'from-emerald-500 to-teal-600',
-  'from-pink-500 to-rose-600',
-  'from-amber-500 to-orange-600',
-  'from-violet-500 to-fuchsia-600',
+  "from-cyan-500 to-blue-600",
+  "from-purple-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-pink-500 to-rose-600",
+  "from-amber-500 to-orange-600",
+  "from-violet-500 to-fuchsia-600",
 ];
 
 function getGradient(initials: string): string {
@@ -75,8 +75,8 @@ export default function TestimonialsSection() {
             What our community says
           </h2>
           <p className="mt-4 text-lg leading-8 text-gray-600 dark:text-gray-400">
-            Real stories from professionals who transformed their careers through
-            SkillSync.
+            Real stories from professionals who transformed their careers
+            through SkillSync.
           </p>
         </div>
 
