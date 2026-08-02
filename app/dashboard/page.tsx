@@ -554,6 +554,131 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Weekly Goals & Learning Milestones */}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Weekly Goals */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Flame className="h-5 w-5 text-orange-500" />
+                Weekly Goals
+              </h2>
+              <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                {weeklyGoals.filter(g => g.completed).length}/{weeklyGoals.length} done
+              </span>
+            </div>
+            <div className="space-y-3">
+              {weeklyGoals.map((goal) => (
+                <div key={goal.id} className="flex items-start gap-3">
+                  {goal.completed ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-gray-300 dark:text-gray-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <span className={`text-sm ${goal.completed ? "text-gray-500 dark:text-gray-400 line-through" : "text-gray-700 dark:text-gray-300"}`}>
+                    {goal.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <button className="w-full py-2 text-sm font-medium text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors">
+                + Add new goal
+              </button>
+            </div>
+          </div>
+
+          {/* Current Learning */}
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Coffee className="h-5 w-5 text-cyan-600" />
+                Continue Learning
+              </h2>
+              <Link
+                href="/learning-resources"
+                className="text-sm font-medium text-cyan-600 hover:text-cyan-700 flex items-center gap-1"
+              >
+                View all <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {learningMilestones.map((milestone) => (
+                <div
+                  key={milestone.id}
+                  className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1">{milestone.icon}</div>
+                    <div className="flex-1">
+                      <span className="text-xs font-medium px-2 py-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full">
+                        {milestone.type}
+                      </span>
+                      <h3 className="font-medium text-gray-900 dark:text-white mt-2">{milestone.title}</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Next: {milestone.nextLesson}</p>
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{milestone.progress}% complete</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
+                          <div
+                            className="bg-cyan-500 h-1.5 rounded-full"
+                            style={{ width: `${milestone.progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      <button className="mt-3 text-xs px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors inline-flex items-center gap-1">
+                        <PlayCircle className="h-3 w-3" /> Continue
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Quick Links */}
+        <footer className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8 pb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Platform</h3>
+              <ul className="space-y-2">
+                <li><Link href="/discover-mentors" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Find Mentors</Link></li>
+                <li><Link href="/community" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Community</Link></li>
+                <li><Link href="/learning-resources" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Resources</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Support</h3>
+              <ul className="space-y-2">
+                <li><Link href="/help" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Help Center</Link></li>
+                <li><Link href="/contact" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Contact Us</Link></li>
+                <li><Link href="/feedback" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Send Feedback</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Account</h3>
+              <ul className="space-y-2">
+                <li><Link href="/dashboard/settings" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Settings</Link></li>
+                <li><Link href="/dashboard/profile" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Profile</Link></li>
+                <li><Link href="/logout" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Sign Out</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li><Link href="/privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Terms of Service</Link></li>
+                <li><Link href="/cookies" className="text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400">Cookie Policy</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">© 2026 SkillSync. All rights reserved. Empowering growth through mentorship.</p>
+          </div>
+        </footer>
       </main>
     </div>
   );
