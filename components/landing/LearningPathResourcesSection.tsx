@@ -9,7 +9,7 @@ const learningTracks = [
       "Develop the skills to lead technical teams, make stronger architectural decisions, and grow your impact as a senior engineer.",
     lessons: 18,
     duration: "6h 20m",
-    imageSrc: "/tony-adebanjo.jpg",
+    imageSrc: "/Image (Sarah Johnson).svg",
     href: "/resources/engineering-leadership",
   },
   {
@@ -49,7 +49,7 @@ const learningTracks = [
       "Build strategic thinking, financial fluency, and leadership skills to drive sustainable growth in any organisation.",
     lessons: 16,
     duration: "6h 00m",
-    imageSrc: "/tony-adebanjo.jpg",
+    imageSrc: "/Image (Cole Hathans).svg",
     href: "/resources/business-strategy",
   },
   {
