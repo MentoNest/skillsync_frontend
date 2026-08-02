@@ -23,7 +23,7 @@ export default function StarRating({
 }: StarRatingProps) {
   const { star: starSize, text: textSize, gap } = sizeMap[size];
   const stars = Array.from({ length: maxRating }, (_, i) => {
-    const fill = Math.max(0, Math.min(1, rating - (i + 1)));
+    const fill = Math.max(0, Math.min(1, rating - i));
     return fill;
   });
 

@@ -27,7 +27,7 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     mode: "onTouched",
@@ -79,6 +79,7 @@ export default function LoginForm() {
             placeholder="you@example.com"
             {...register("email")}
             aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
             className={`border rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 transition ${
               errors.email
                 ? "border-red-400 focus:ring-red-300 focus:border-red-400"
@@ -86,7 +87,7 @@ export default function LoginForm() {
             }`}
           />
           {errors.email && (
-            <p role="alert" className="text-xs text-red-500">
+            <p id="email-error" role="alert" className="text-xs text-red-500">
               {errors.email.message}
             </p>
           )}
@@ -105,6 +106,7 @@ export default function LoginForm() {
             placeholder="••••••••"
             {...register("password")}
             aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? "password-error" : undefined}
             className={
               errors.password
                 ? "border-red-400 focus:ring-red-300 focus:border-red-400"
@@ -112,26 +114,18 @@ export default function LoginForm() {
             }
           />
           {errors.password && (
-            <p role="alert" className="text-xs text-red-500">
+            <p id="password-error" role="alert" className="text-xs text-red-500">
               {errors.password.message}
             </p>
           )}
         </div>
 
-        {error && (
-          <p
-            role="alert"
-            className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg"
-          >
-            {error}
-          </p>
-        )}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={!isValid || isLoading}
           className="bg-cyan-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Signing in..." : "Login"}
+          {isLoading ? "Signing in..." : "Sign in"}
         </button>
       </form>
     </div>
