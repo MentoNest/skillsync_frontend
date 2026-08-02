@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -13,10 +13,22 @@ import {
   Award,
   Star,
   TrendingUp,
+  Menu,
+  X,
+  Search,
+  Bell,
+  Video,
+  BookOpen,
+  Compass,
+  MessageCircle,
 } from "lucide-react";
 
 export default function DashboardPage() {
-  // Mock data - no authentication required
+  // Mobile menu state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  
+  // Mock data - enhanced with more details
   const stats = [
     {
       title: "Total Connections",
@@ -24,6 +36,7 @@ export default function DashboardPage() {
       change: "+2 this week",
       icon: <Users className="h-6 w-6 text-cyan-600" />,
       bgColor: "bg-cyan-50",
+      changeType: "positive",
     },
     {
       title: "Active Sessions",
@@ -31,6 +44,7 @@ export default function DashboardPage() {
       change: "1 scheduled today",
       icon: <Calendar className="h-6 w-6 text-green-600" />,
       bgColor: "bg-green-50",
+      changeType: "neutral",
     },
     {
       title: "Unread Messages",
@@ -38,6 +52,7 @@ export default function DashboardPage() {
       change: "3 new today",
       icon: <MessageSquare className="h-6 w-6 text-amber-600" />,
       bgColor: "bg-amber-50",
+      changeType: "warning",
     },
     {
       title: "Saved Mentors",
@@ -45,6 +60,7 @@ export default function DashboardPage() {
       change: "1 added recently",
       icon: <Heart className="h-6 w-6 text-rose-600" />,
       bgColor: "bg-rose-50",
+      changeType: "positive",
     },
   ];
 
@@ -54,21 +70,27 @@ export default function DashboardPage() {
       mentorName: "Sarah Johnson",
       mentorRole: "Senior Product Manager at Google",
       date: "Today, 3:00 PM",
+      duration: "60 min",
       avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100",
+      status: "upcoming",
     },
     {
       id: "2",
       mentorName: "Michael Chen",
       mentorRole: "Staff Software Engineer at Meta",
       date: "Tomorrow, 11:00 AM",
+      duration: "45 min",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100&h=100",
+      status: "scheduled",
     },
     {
       id: "3",
       mentorName: "Emily Rodriguez",
       mentorRole: "Design Director at Airbnb",
       date: "Aug 5, 2:00 PM",
+      duration: "90 min",
       avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100&h=100",
+      status: "scheduled",
     },
   ];
 
@@ -94,26 +116,169 @@ export default function DashboardPage() {
       time: "3 days ago",
       icon: <Star className="h-4 w-4 text-amber-500" />,
     },
+    {
+      id: "4",
+      action: "New message from",
+      user: "Emma Thompson",
+      time: "5 hours ago",
+      icon: <MessageCircle className="h-4 w-4 text-purple-500" />,
+    },
+  ];
+
+  const notifications = [
+    { id: "1", message: "Sarah Johnson sent you a message", time: "10 min ago", read: false },
+    { id: "2", message: "Your session with Michael is tomorrow", time: "1 hour ago", read: false },
+    { id: "3", message: "New mentor matching available", time: "3 hours ago", read: true },
+  ];
+
+  const quickActions = [
+    {
+      title: "Find Mentors",
+      description: "Discover new mentors in your field",
+      icon: <Compass className="h-8 w-8 text-blue-600" />,
+      bgColor: "bg-blue-50",
+      link: "/discover-mentors",
+    },
+    {
+      title: "Join Session",
+      description: "Start your scheduled session",
+      icon: <Video className="h-8 w-8 text-green-600" />,
+      bgColor: "bg-green-50",
+      link: "/dashboard/sessions",
+    },
+    {
+      title: "Learning Paths",
+      description: "Continue your skill development",
+      icon: <BookOpen className="h-8 w-8 text-purple-600" />,
+      bgColor: "bg-purple-50",
+      link: "/learning-resources",
+    },
+  ];
+
+  const navLinks = [
+    { href: "/dashboard", label: "Dashboard", active: true },
+    { href: "/dashboard/sessions", label: "Sessions", active: false },
+    { href: "/dashboard/messages", label: "Messages", active: false },
+    { href: "/dashboard/saved-mentors", label: "Saved Mentors", active: false },
+    { href: "/dashboard/settings", label: "Settings", active: false },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Simple navigation - no auth required */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      {/* Enhanced navigation - with mobile support and user controls */}
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
+            {/* Logo */}
             <div className="flex items-center gap-2">
-              <Users className="h-6 w-6 text-cyan-600" />
-              <span className="text-xl font-bold text-gray-900">SkillSync Dashboard</span>
+              <div className="bg-cyan-100 dark:bg-cyan-900/30 p-2 rounded-lg">
+                <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+              </div>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">SkillSync</span>
             </div>
-            <nav className="hidden md:flex gap-6">
-              <Link href="/dashboard" className="text-cyan-600 font-medium">Dashboard</Link>
-              <Link href="/dashboard/sessions" className="text-gray-600 hover:text-gray-900 transition-colors">Sessions</Link>
-              <Link href="/dashboard/messages" className="text-gray-600 hover:text-gray-900 transition-colors">Messages</Link>
-              <Link href="/dashboard/saved-mentors" className="text-gray-600 hover:text-gray-900 transition-colors">Saved Mentors</Link>
-              <Link href="/dashboard/settings" className="text-gray-600 hover:text-gray-900 transition-colors">Settings</Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    link.active
+                      ? "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
+
+            {/* Right side controls */}
+            <div className="flex items-center gap-3">
+              {/* Search */}
+              <button className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <Search className="h-4 w-4" />
+                <span className="text-sm">Search...</span>
+              </button>
+
+              {/* Notifications */}
+              <div className="relative">
+                <button
+                  onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
+                  className="relative p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+
+                {/* Notification dropdown */}
+                {notificationDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                    </div>
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${!notification.read ? "bg-cyan-50 dark:bg-cyan-900/20" : ""}`}
+                      >
+                        <p className="text-sm text-gray-800 dark:text-gray-200">{notification.message}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notification.time}</p>
+                      </div>
+                    ))}
+                    <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-700">
+                      <Link
+                        href="/dashboard/notifications"
+                        className="text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300"
+                      >
+                        View all notifications
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* User avatar */}
+              <div className="flex items-center gap-3 pl-2 border-l border-gray-200 dark:border-gray-700">
+                <img
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=40&h=40"
+                  alt="User avatar"
+                  className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-700"
+                />
+              </div>
+
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <div className="lg:hidden mt-4 pb-4 border-t border-gray-100 dark:border-gray-700">
+              <nav className="flex flex-col gap-1 pt-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      link.active
+                        ? "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"
+                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          )}
         </div>
       </header>
 
