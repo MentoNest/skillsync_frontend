@@ -284,11 +284,32 @@ export default function DashboardPage() {
 
       {/* Main content - renders immediately, no loading state */}
       <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Welcome section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome back! 👋</h1>
           <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
             Here's what's happening with your mentorship journey today.
           </p>
+        </div>
+
+        {/* Quick Actions Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {quickActions.map((action, index) => (
+            <Link
+              key={index}
+              href={action.link}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-lg transition-all hover:-translate-y-1 group"
+            >
+              <div className={`${action.bgColor} w-16 h-16 rounded-xl flex items-center justify-center mb-4 group-hover:scale-105 transition-transform`}>
+                {action.icon}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{action.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{action.description}</p>
+              <div className="mt-4 flex items-center text-cyan-600 dark:text-cyan-400 text-sm font-medium">
+                Get started <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          ))}
         </div>
 
         {/* Stats grid */}
@@ -302,7 +323,11 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{stat.title}</p>
                   <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{stat.change}</p>
+                  <p className={`mt-1 text-xs ${
+                    stat.changeType === "positive" ? "text-green-600 dark:text-green-400" :
+                    stat.changeType === "warning" ? "text-amber-600 dark:text-amber-400" :
+                    "text-gray-500 dark:text-gray-400"
+                  }`}>{stat.change}</p>
                 </div>
                 <div className={`${stat.bgColor} p-3 rounded-lg`}>
                   {stat.icon}
