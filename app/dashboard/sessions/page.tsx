@@ -88,17 +88,16 @@ export default function SessionsPage() {
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-        <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
-          <div className="mb-10">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              My Sessions
-            </h1>
-            <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
-              Manage and track all your mentorship sessions in one place.
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            My Sessions
+          </h1>
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+            Manage and track all your mentorship sessions in one place.
+          </p>
+        </div>
 
           {/* Tabs and Filter */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -229,6 +228,5 @@ export default function SessionsPage() {
           )}
         </main>
       </div>
-    </ProtectedRoute>
   );
 }
