@@ -88,7 +88,6 @@ export const config = {
     "/mentor/:path*",
     "/mentee/:path*",
     "/admin/:path*",
-    "/dashboard/:path*",
     "/login",
     "/register",
   ],
