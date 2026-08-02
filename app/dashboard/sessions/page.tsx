@@ -225,7 +225,6 @@ export default function SessionsPage() {
               )}
             </div>
           )}
-        </main>
-      </div>
+    </>
   );
 }
