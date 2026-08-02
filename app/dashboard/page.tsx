@@ -100,17 +100,16 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-      <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
-        {/* Welcome Section */}
-        <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            Welcome back! 👋
-          </h1>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
-            Here's what's happening with your mentorship journey today.
-          </p>
-        </div>
+    <>
+      {/* Welcome Section */}
+      <div className="mb-10">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          Welcome back! 👋
+        </h1>
+        <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+          Here's what's happening with your mentorship journey today.
+        </p>
+      </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
