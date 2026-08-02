@@ -166,6 +166,34 @@ export default function DashboardPage() {
     },
   ];
 
+  // Weekly goals
+  const weeklyGoals = [
+    { id: "1", title: "Complete product management course", completed: true },
+    { id: "2", title: "Schedule 2 new mentorship sessions", completed: true },
+    { id: "3", title: "Read "The Lean Startup" book", completed: false },
+    { id: "4", title: "Update LinkedIn profile with new skills", completed: false },
+  ];
+
+  // Upcoming learning milestones
+  const learningMilestones = [
+    {
+      id: "1",
+      title: "Product Management Fundamentals",
+      type: "Course",
+      progress: 75,
+      nextLesson: "Agile Methodologies",
+      icon: <PlayCircle className="h-5 w-5 text-green-500" />,
+    },
+    {
+      id: "2",
+      title: "Leadership Workshop Series",
+      type: "Workshop",
+      progress: 40,
+      nextLesson: "Team Management",
+      icon: <FileText className="h-5 w-5 text-blue-500" />,
+    },
+  ];
+
   const quickActions = [
     {
       title: "Find Mentors",
