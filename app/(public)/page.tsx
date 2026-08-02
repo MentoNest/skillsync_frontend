@@ -1,14 +1,14 @@
-import Link from 'next/link';
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
-import Image from 'next/image';
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+import Image from "next/image";
 
 // ─── Critical above-the-fold sections — statically imported ──────────────────
 // These are rendered server-side and painted on first load, so they must not
 // be deferred. Static imports also allow Next.js to include them in the
 // initial HTML and eliminate layout shift.
-import HeroSection from '@/components/landing/HeroSection';
-import ResourceSearchBar from '@/components/ResourceSearchBar';
+import HeroSection from "@/components/landing/HeroSection";
+import ResourceSearchBar from "@/components/ResourceSearchBar";
 
 // ─── Below-the-fold sections — dynamically imported ──────────────────────────
 // next/dynamic splits these into separate JS chunks that are only downloaded
@@ -16,24 +16,30 @@ import ResourceSearchBar from '@/components/ResourceSearchBar';
 // Time to Interactive (TTI) and Lighthouse performance scores.
 
 const MentorDiscoverySection = dynamic(
-  () => import('@/components/landing/MentorDiscoverySection'),
+  () => import("@/components/landing/MentorDiscoverySection"),
   {
     loading: () => (
-      <div className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4" aria-hidden="true">
+      <div
+        className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4"
+        aria-hidden="true"
+      >
         <div className="mx-auto max-w-screen-xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-72 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              <div
+                key={i}
+                className="h-72 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"
+              />
             ))}
           </div>
         </div>
       </div>
     ),
-  }
+  },
 );
 
 const FeaturedMentorHighlight = dynamic(
-  () => import('@/components/landing/FeaturedMentorHighlight'),
+  () => import("@/components/landing/FeaturedMentorHighlight"),
   {
     loading: () => (
       <div className="bg-white dark:bg-gray-900 py-16 px-4" aria-hidden="true">
@@ -42,97 +48,118 @@ const FeaturedMentorHighlight = dynamic(
         </div>
       </div>
     ),
-  }
+  },
 );
 
 const WhyChooseUsSection = dynamic(
-  () => import('@/components/landing/WhyChooseUsSection'),
+  () => import("@/components/landing/WhyChooseUsSection"),
   {
     loading: () => (
       <div className="bg-slate-900 py-20 px-6" aria-hidden="true">
         <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-36 rounded-2xl bg-white/5 animate-pulse" />
+            <div
+              key={i}
+              className="h-36 rounded-2xl bg-white/5 animate-pulse"
+            />
           ))}
         </div>
       </div>
     ),
-  }
+  },
 );
 
 const LearningPathResourcesSection = dynamic(
-  () => import('@/components/landing/LearningPathResourcesSection'),
+  () => import("@/components/landing/LearningPathResourcesSection"),
   {
     loading: () => (
       <div className="bg-slate-50 py-20 px-6" aria-hidden="true">
         <div className="mx-auto max-w-7xl grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
+            <div
+              key={i}
+              className="h-64 rounded-2xl bg-gray-200 animate-pulse"
+            />
           ))}
         </div>
       </div>
     ),
-  }
+  },
 );
 
 const PlatformStatisticsSection = dynamic(
-  () => import('@/components/landing/PlatformStatisticsSection'),
+  () => import("@/components/landing/PlatformStatisticsSection"),
   {
     loading: () => (
       <div className="bg-slate-950 py-20 px-6" aria-hidden="true">
         <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl bg-white/5 animate-pulse" />
+            <div
+              key={i}
+              className="h-32 rounded-2xl bg-white/5 animate-pulse"
+            />
           ))}
         </div>
       </div>
     ),
-  }
+  },
 );
 
 const FeaturedArticles = dynamic(
-  () => import('@/components/FeaturedArticles'),
+  () => import("@/components/FeaturedArticles"),
   {
     loading: () => (
       <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
         <div className="mx-auto max-w-screen-xl space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-16 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+            <div
+              key={i}
+              className="h-16 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse"
+            />
           ))}
         </div>
       </div>
     ),
-  }
+  },
 );
 
 const ToolsAndTemplates = dynamic(
-  () => import('@/components/ToolsAndTemplates'),
+  () => import("@/components/ToolsAndTemplates"),
   {
     loading: () => (
       <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
         <div className="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-2 gap-6">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="h-48 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+            <div
+              key={i}
+              className="h-48 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse"
+            />
           ))}
         </div>
       </div>
     ),
-  }
+  },
 );
 
 const TestimonialsSection = dynamic(
-  () => import('@/components/TestimonialsSection'),
+  () => import("@/components/TestimonialsSection"),
   {
     loading: () => (
-      <div className="bg-slate-50 dark:bg-gray-800/40 py-16 px-4" aria-hidden="true">
+      <div
+        className="bg-slate-50 dark:bg-gray-800/40 py-16 px-4"
+        aria-hidden="true"
+      >
         <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-48 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div
+              key={i}
+              className="h-48 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"
+            />
           ))}
         </div>
       </div>
     ),
-  }
+  },
 );
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -235,102 +262,154 @@ export default function Home() {
       {/* ── Below-the-fold: loaded after critical path ── */}
 
       {/* 4. Mentor Discovery */}
-      <Suspense fallback={
-        <div className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4" aria-hidden="true">
-          <div className="mx-auto max-w-screen-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-72 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
-            ))}
+      <Suspense
+        fallback={
+          <div
+            className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4"
+            aria-hidden="true"
+          >
+            <div className="mx-auto max-w-screen-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-72 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <MentorDiscoverySection />
       </Suspense>
 
       {/* 5. Featured Mentor Highlight */}
-      <Suspense fallback={
-        <div className="bg-white dark:bg-gray-900 py-16 px-4" aria-hidden="true">
-          <div className="mx-auto max-w-screen-xl h-64 rounded-3xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div
+            className="bg-white dark:bg-gray-900 py-16 px-4"
+            aria-hidden="true"
+          >
+            <div className="mx-auto max-w-screen-xl h-64 rounded-3xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+          </div>
+        }
+      >
         <FeaturedMentorHighlight />
       </Suspense>
 
       {/* 6. Why Choose Us — Issue #599 */}
-      <Suspense fallback={
-        <div className="bg-slate-900 py-20 px-6" aria-hidden="true">
-          <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-36 rounded-2xl bg-white/5 animate-pulse" />
-            ))}
+      <Suspense
+        fallback={
+          <div className="bg-slate-900 py-20 px-6" aria-hidden="true">
+            <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-36 rounded-2xl bg-white/5 animate-pulse"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <WhyChooseUsSection />
       </Suspense>
 
       {/* 7. Learning Path & Resources — Issue #600 */}
-      <Suspense fallback={
-        <div className="bg-slate-50 py-20 px-6" aria-hidden="true">
-          <div className="mx-auto max-w-7xl grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
-            ))}
+      <Suspense
+        fallback={
+          <div className="bg-slate-50 py-20 px-6" aria-hidden="true">
+            <div className="mx-auto max-w-7xl grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-64 rounded-2xl bg-gray-200 animate-pulse"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <LearningPathResourcesSection />
       </Suspense>
 
       {/* 8. Platform Statistics — Issue #601 */}
-      <Suspense fallback={
-        <div className="bg-slate-950 py-20 px-6" aria-hidden="true">
-          <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-32 rounded-2xl bg-white/5 animate-pulse" />
-            ))}
+      <Suspense
+        fallback={
+          <div className="bg-slate-950 py-20 px-6" aria-hidden="true">
+            <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-32 rounded-2xl bg-white/5 animate-pulse"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <PlatformStatisticsSection />
       </Suspense>
 
       {/* 9. Featured Articles */}
-      <Suspense fallback={
-        <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
-          <div className="mx-auto max-w-screen-xl space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-16 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
-            ))}
+      <Suspense
+        fallback={
+          <div
+            className="bg-white dark:bg-gray-900 py-12 px-4"
+            aria-hidden="true"
+          >
+            <div className="mx-auto max-w-screen-xl space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-16 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <FeaturedArticles />
       </Suspense>
 
       {/* 10. Tools & Templates */}
-      <Suspense fallback={
-        <div className="bg-white dark:bg-gray-900 py-12 px-4" aria-hidden="true">
-          <div className="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="h-48 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
-            ))}
+      <Suspense
+        fallback={
+          <div
+            className="bg-white dark:bg-gray-900 py-12 px-4"
+            aria-hidden="true"
+          >
+            <div className="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-48 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <ToolsAndTemplates />
       </Suspense>
 
       {/* 11. Testimonials */}
-      <Suspense fallback={
-        <div className="bg-slate-50 dark:bg-gray-800/40 py-16 px-4" aria-hidden="true">
-          <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-48 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
-            ))}
+      <Suspense
+        fallback={
+          <div
+            className="bg-slate-50 dark:bg-gray-800/40 py-16 px-4"
+            aria-hidden="true"
+          >
+            <div className="mx-auto max-w-7xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-48 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <TestimonialsSection />
       </Suspense>
 

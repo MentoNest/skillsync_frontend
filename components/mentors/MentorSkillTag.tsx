@@ -1,4 +1,4 @@
-import MentorSkillTag, { MentorSkillTagProps } from '../MentorSkillTag';
+import MentorSkillTag, { MentorSkillTagProps } from "../MentorSkillTag";
 
 export type { MentorSkillTagProps };
 export { MentorSkillTag };

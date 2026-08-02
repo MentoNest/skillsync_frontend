@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { CATEGORIES } from '@/lib/filters';
+import { CATEGORIES } from "@/lib/filters";
 
 interface CategoriesSidebarWidgetProps {
   selected: string | null;
@@ -8,7 +8,11 @@ interface CategoriesSidebarWidgetProps {
   counts?: Record<string, number>;
 }
 
-export default function CategoriesSidebarWidget({ selected, onSelect, counts }: CategoriesSidebarWidgetProps) {
+export default function CategoriesSidebarWidget({
+  selected,
+  onSelect,
+  counts,
+}: CategoriesSidebarWidgetProps) {
   const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
 
   return (
@@ -18,7 +22,9 @@ export default function CategoriesSidebarWidget({ selected, onSelect, counts }: 
         <button
           onClick={() => onSelect(null)}
           className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-            selected === null ? 'bg-cyan-100 text-cyan-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+            selected === null
+              ? "bg-cyan-100 text-cyan-700 font-medium"
+              : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           <span className="flex justify-between">
@@ -31,12 +37,16 @@ export default function CategoriesSidebarWidget({ selected, onSelect, counts }: 
             key={cat.value}
             onClick={() => onSelect(selected === cat.value ? null : cat.value)}
             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-              selected === cat.value ? 'bg-cyan-100 text-cyan-700 font-medium' : 'text-gray-700 hover:bg-gray-100'
+              selected === cat.value
+                ? "bg-cyan-100 text-cyan-700 font-medium"
+                : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <span className="flex justify-between">
               <span>{cat.label}</span>
-              <span className="text-gray-400">{counts?.[cat.value] ?? cat.count ?? 0}</span>
+              <span className="text-gray-400">
+                {counts?.[cat.value] ?? cat.count ?? 0}
+              </span>
             </span>
           </button>
         ))}

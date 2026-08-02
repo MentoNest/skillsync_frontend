@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Search } from "lucide-react";
 
 export interface ResourceSearchBarProps {
   onSearch?: (query: string) => void;
@@ -11,16 +11,17 @@ export interface ResourceSearchBarProps {
 
 export default function ResourceSearchBar({
   onSearch,
-  placeholder = 'Search learning tracks, articles, tools, and templates...',
+  placeholder = "Search learning tracks, articles, tools, and templates...",
 }: ResourceSearchBarProps) {
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const router = useRouter();
 
-  // Keep query in sync if URL param changes externally (e.g. from HeroSearchBar)
   useEffect(() => {
-    const q = searchParams.get('q');
-    if (q !== null) setQuery(q);
+    const q = searchParams.get("q");
+    if (q !== null) {
+      void Promise.resolve().then(() => setQuery(q));
+    }
   }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -33,7 +34,12 @@ export default function ResourceSearchBar({
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 py-6">
-      <form onSubmit={handleSubmit} role="search" className="relative" aria-label="Search resources">
+      <form
+        onSubmit={handleSubmit}
+        role="search"
+        className="relative"
+        aria-label="Search resources"
+      >
         <label htmlFor="resource-search" className="sr-only">
           Search learning resources, guides, and templates
         </label>

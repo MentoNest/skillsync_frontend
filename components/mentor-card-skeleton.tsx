@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export const MentorCardSkeleton: React.FC = () => {
   return (
@@ -31,7 +31,10 @@ export const MentorCardSkeleton: React.FC = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex gap-1">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700" />
+                <div
+                  key={i}
+                  className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700"
+                />
               ))}
             </div>
             <div className="w-8 h-4 rounded bg-gray-200 dark:bg-gray-700" />

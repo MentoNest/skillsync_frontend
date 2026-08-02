@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export interface NotificationItem {
   id: string;
-  type: 'reply' | 'mention' | 'category' | 'event';
+  type: "reply" | "mention" | "category" | "event";
   title: string;
   message: string;
   isRead: boolean;
@@ -14,28 +14,28 @@ export interface NotificationItem {
 export function CommunityNotifications() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
-      id: '1',
-      type: 'reply',
-      title: 'New Reply',
-      message: 'Alex replied to your discussion on React 19 features',
+      id: "1",
+      type: "reply",
+      title: "New Reply",
+      message: "Alex replied to your discussion on React 19 features",
       isRead: false,
-      timestamp: '5m ago',
+      timestamp: "5m ago",
     },
     {
-      id: '2',
-      type: 'mention',
-      title: 'You were mentioned',
-      message: 'Sarah mentioned you in Frontend Best Practices',
+      id: "2",
+      type: "mention",
+      title: "You were mentioned",
+      message: "Sarah mentioned you in Frontend Best Practices",
       isRead: false,
-      timestamp: '1h ago',
+      timestamp: "1h ago",
     },
     {
-      id: '3',
-      type: 'category',
-      title: 'Category Activity',
-      message: 'New discussion posted in Next.js Development',
+      id: "3",
+      type: "category",
+      title: "Category Activity",
+      message: "New discussion posted in Next.js Development",
       isRead: true,
-      timestamp: '1d ago',
+      timestamp: "1d ago",
     },
   ]);
 
@@ -74,11 +74,15 @@ export function CommunityNotifications() {
             key={item.id}
             onClick={() => markAsRead(item.id)}
             className={`p-3 rounded-md cursor-pointer transition ${
-              item.isRead ? 'bg-gray-50' : 'bg-blue-50 border-l-4 border-blue-500'
+              item.isRead
+                ? "bg-gray-50"
+                : "bg-blue-50 border-l-4 border-blue-500"
             }`}
           >
             <div className="flex justify-between items-center">
-              <span className="font-medium text-sm text-gray-900">{item.title}</span>
+              <span className="font-medium text-sm text-gray-900">
+                {item.title}
+              </span>
               <span className="text-xs text-gray-500">{item.timestamp}</span>
             </div>
             <p className="text-xs text-gray-600 mt-1">{item.message}</p>

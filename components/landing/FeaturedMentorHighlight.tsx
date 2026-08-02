@@ -1,24 +1,29 @@
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
 const featuredMentor = {
-  name: 'Sarah Doe',
-  title: 'Software Engineer @ Google',
-  bio: 'With over 10 years of experience building scalable systems at Google, Sarah specialises in React, Node.js, and cloud infrastructure. She has mentored 200+ engineers through career transitions and is passionate about making senior-level engineering accessible to everyone.',
-  initials: 'SD',
+  name: "Sarah Doe",
+  title: "Software Engineer @ Google",
+  bio: "With over 10 years of experience building scalable systems at Google, Sarah specialises in React, Node.js, and cloud infrastructure. She has mentored 200+ engineers through career transitions and is passionate about making senior-level engineering accessible to everyone.",
+  initials: "SD",
   stats: [
-    { label: 'Sessions', value: '340+' },
-    { label: 'Rating', value: '4.9/5' },
-    { label: 'Mentees', value: '200+' },
+    { label: "Sessions", value: "340+" },
+    { label: "Rating", value: "4.9/5" },
+    { label: "Mentees", value: "200+" },
   ],
-  expertise: ['React', 'System Design', 'Cloud Architecture', 'Tech Leadership'],
+  expertise: [
+    "React",
+    "System Design",
+    "Cloud Architecture",
+    "Tech Leadership",
+  ],
 };
 
 const gradients = [
-  'from-cyan-500 to-blue-600',
-  'from-purple-500 to-indigo-600',
-  'from-emerald-500 to-teal-600',
-  'from-pink-500 to-rose-600',
+  "from-cyan-500 to-blue-600",
+  "from-purple-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-pink-500 to-rose-600",
 ];
 
 function getGradient(name: string): string {
@@ -97,7 +102,10 @@ export default function FeaturedMentorHighlight() {
               </dl>
 
               {/* Expertise tags */}
-              <div className="flex flex-wrap gap-2" aria-label="Areas of expertise">
+              <div
+                className="flex flex-wrap gap-2"
+                aria-label="Areas of expertise"
+              >
                 {featuredMentor.expertise.map((skill) => (
                   <span
                     key={skill}
@@ -115,8 +123,17 @@ export default function FeaturedMentorHighlight() {
                   className="inline-flex items-center justify-center rounded-lg bg-cyan-600 px-6 py-3 text-sm font-semibold text-white hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-900 transition-colors"
                 >
                   View Profile
-                  <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <svg
+                    className="ml-2 -mr-1 w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </Link>
                 <Link

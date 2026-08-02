@@ -1,25 +1,65 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import ArticleListItem from '@/components/ArticleListItem';
-import { useDebounce } from '@/hooks/useDebounce';
-import { SearchIcon } from '@/components/resources/icons';
+import React, { useState } from "react";
+import Link from "next/link";
+import ArticleListItem from "@/components/ArticleListItem";
+import { useDebounce } from "@/hooks/useDebounce";
+import { SearchIcon } from "@/components/resources/icons";
 import Articles from "./Articles";
-        
+
 const articles = [
-  { category: 'Career', title: 'How to Land Your First Tech Job', author: 'Jane Doe', readTime: '5 min read' },
-  { category: 'Skills', title: 'Top 10 In-Demand Skills for 2025', author: 'John Smith', readTime: '7 min read' },
-  { category: 'Mentorship', title: 'Getting the Most Out of a Mentor', author: 'Sarah Lee', readTime: '4 min read' },
-  { category: 'Engineering', title: 'Understanding System Design Basics', author: 'Alex Chen', readTime: '10 min read' },
-  { category: 'Product', title: 'Defining a Product MVP That Works', author: 'Rachel Green', readTime: '8 min read' },
-  { category: 'Design', title: 'Color Theory in Modern UI Design', author: 'David Foster', readTime: '6 min read' },
-  { category: 'Data', title: 'Introduction to Machine Learning Models', author: 'Priya Sharma', readTime: '12 min read' },
-  { category: 'Leadership', title: 'Transitioning from IC to Engineering Manager', author: 'Marcus Williams', readTime: '9 min read' },
+  {
+    category: "Career",
+    title: "How to Land Your First Tech Job",
+    author: "Jane Doe",
+    readTime: "5 min read",
+  },
+  {
+    category: "Skills",
+    title: "Top 10 In-Demand Skills for 2025",
+    author: "John Smith",
+    readTime: "7 min read",
+  },
+  {
+    category: "Mentorship",
+    title: "Getting the Most Out of a Mentor",
+    author: "Sarah Lee",
+    readTime: "4 min read",
+  },
+  {
+    category: "Engineering",
+    title: "Understanding System Design Basics",
+    author: "Alex Chen",
+    readTime: "10 min read",
+  },
+  {
+    category: "Product",
+    title: "Defining a Product MVP That Works",
+    author: "Rachel Green",
+    readTime: "8 min read",
+  },
+  {
+    category: "Design",
+    title: "Color Theory in Modern UI Design",
+    author: "David Foster",
+    readTime: "6 min read",
+  },
+  {
+    category: "Data",
+    title: "Introduction to Machine Learning Models",
+    author: "Priya Sharma",
+    readTime: "12 min read",
+  },
+  {
+    category: "Leadership",
+    title: "Transitioning from IC to Engineering Manager",
+    author: "Marcus Williams",
+    readTime: "9 min read",
+  },
 ];
 
 export default function ArticlesPage() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 300);
 
   const filtered = debouncedQuery.trim()
@@ -36,7 +76,6 @@ export default function ArticlesPage() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors py-12">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-
         {/* Back to Resources link */}
         <div className="mb-6">
           <Link
@@ -94,8 +133,8 @@ export default function ArticlesPage() {
         {debouncedQuery.trim() && (
           <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
             {filtered.length === 0
-              ? 'No articles found.'
-              : `${filtered.length} article${filtered.length === 1 ? '' : 's'} found`}
+              ? "No articles found."
+              : `${filtered.length} article${filtered.length === 1 ? "" : "s"} found`}
           </p>
         )}
 
@@ -111,10 +150,14 @@ export default function ArticlesPage() {
         ) : (
           <div className="py-20 text-center">
             <p className="text-gray-500 dark:text-gray-400 text-base">
-              No articles match <span className="font-semibold text-gray-700 dark:text-gray-200">&quot;{debouncedQuery}&quot;</span>.
+              No articles match{" "}
+              <span className="font-semibold text-gray-700 dark:text-gray-200">
+                &quot;{debouncedQuery}&quot;
+              </span>
+              .
             </p>
             <button
-              onClick={() => setQuery('')}
+              onClick={() => setQuery("")}
               className="mt-4 text-sm font-semibold text-cyan-600 hover:text-cyan-700 transition-colors focus:outline-none focus:underline"
             >
               Clear search

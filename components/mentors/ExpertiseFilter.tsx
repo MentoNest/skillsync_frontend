@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { EXPERTISE_OPTIONS, type Expertise } from './data';
+import { EXPERTISE_OPTIONS, type Expertise } from "./data";
 
 interface ExpertiseFilterProps {
   /** Currently selected expertise tags (rendered as checked). */
@@ -18,7 +18,7 @@ interface ExpertiseFilterProps {
  * Lower-cased + hyphenated so it survives in any HTML environment.
  */
 function checkboxId(expertise: Expertise): string {
-  return `expertise-${expertise.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  return `expertise-${expertise.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
 
 export default function ExpertiseFilter({
@@ -58,8 +58,8 @@ export default function ExpertiseFilter({
                 htmlFor={id}
                 className={`group flex items-center justify-between gap-3 cursor-pointer rounded-lg px-2 py-1.5 transition-colors ${
                   checked
-                    ? 'bg-cyan-50 dark:bg-cyan-900/25'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/60'
+                    ? "bg-cyan-50 dark:bg-cyan-900/25"
+                    : "hover:bg-gray-50 dark:hover:bg-gray-800/60"
                 }`}
               >
                 <span className="flex items-center gap-2.5 min-w-0">
@@ -73,8 +73,8 @@ export default function ExpertiseFilter({
                   <span
                     className={`text-sm truncate ${
                       checked
-                        ? 'font-semibold text-cyan-700 dark:text-cyan-300'
-                        : 'text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white'
+                        ? "font-semibold text-cyan-700 dark:text-cyan-300"
+                        : "text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white"
                     }`}
                   >
                     {expertise}
@@ -83,8 +83,8 @@ export default function ExpertiseFilter({
                 <span
                   className={`shrink-0 text-xs font-medium tabular-nums rounded-full px-2 py-0.5 ${
                     checked
-                      ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-800/60 dark:text-cyan-200'
-                      : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                      ? "bg-cyan-100 text-cyan-800 dark:bg-cyan-800/60 dark:text-cyan-200"
+                      : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
                   }`}
                   aria-hidden="true"
                 >

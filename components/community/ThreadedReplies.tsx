@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export interface ReplyItem {
   id: string;
@@ -16,11 +16,14 @@ interface ThreadedRepliesProps {
   initialReplies?: ReplyItem[];
 }
 
-export function ThreadedReplies({ commentId, initialReplies = [] }: ThreadedRepliesProps) {
+export function ThreadedReplies({
+  commentId,
+  initialReplies = [],
+}: ThreadedRepliesProps) {
   const [replies, setReplies] = useState<ReplyItem[]>(initialReplies);
   const [collapsed, setCollapsed] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState("");
 
   const handleAddReply = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,13 +31,13 @@ export function ThreadedReplies({ commentId, initialReplies = [] }: ThreadedRepl
 
     const newReply: ReplyItem = {
       id: `r-${Date.now()}`,
-      author: 'You',
+      author: "You",
       content: replyText.trim(),
-      timestamp: 'Just now',
+      timestamp: "Just now",
     };
 
     setReplies((prev) => [...prev, newReply]);
-    setReplyText('');
+    setReplyText("");
     setShowReplyForm(false);
   };
 
@@ -52,7 +55,7 @@ export function ThreadedReplies({ commentId, initialReplies = [] }: ThreadedRepl
             onClick={() => setCollapsed(!collapsed)}
             className="text-xs text-gray-500 hover:underline"
           >
-            {collapsed ? `Show ${replies.length} replies` : 'Collapse thread'}
+            {collapsed ? `Show ${replies.length} replies` : "Collapse thread"}
           </button>
         )}
       </div>
@@ -90,7 +93,9 @@ export function ThreadedReplies({ commentId, initialReplies = [] }: ThreadedRepl
             <div key={reply.id} className="bg-gray-50 p-2.5 rounded text-xs">
               <div className="flex justify-between font-semibold text-gray-800">
                 <span>{reply.author}</span>
-                <span className="text-gray-400 font-normal">{reply.timestamp}</span>
+                <span className="text-gray-400 font-normal">
+                  {reply.timestamp}
+                </span>
               </div>
               <p className="text-gray-600 mt-1">{reply.content}</p>
             </div>

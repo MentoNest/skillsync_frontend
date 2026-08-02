@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 /**
  * HeroSection — above-the-fold, server-rendered, no images.
@@ -27,7 +27,6 @@ export default function HeroSection() {
       aria-labelledby="hero-heading"
     >
       <div className="grid max-w-screen-xl px-4 py-12 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
-
         {/* Copy column */}
         <div className="mr-auto place-self-center lg:col-span-7">
           <h1
@@ -37,8 +36,8 @@ export default function HeroSection() {
             Find Your Perfect Mentor
           </h1>
           <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
-            SkillSync helps you connect with experienced professionals to
-            guide you on your career path.
+            SkillSync helps you connect with experienced professionals to guide
+            you on your career path.
           </p>
           {/* Styled as a button but rendered as a link — no nested interactive elements */}
           <Link
@@ -61,7 +60,6 @@ export default function HeroSection() {
             </span>
           </div>
         </div>
-
       </div>
     </section>
   );

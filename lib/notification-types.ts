@@ -1,4 +1,5 @@
-export type NotificationType = 'reply' | 'mention' | 'new_discussion' | 'event_reminder';
+export type NotificationType =
+  "reply" | "mention" | "new_discussion" | "event_reminder";
 
 export interface CommunityNotification {
   id: string;

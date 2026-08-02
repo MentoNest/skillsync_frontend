@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * lib/auth-context.tsx
@@ -11,16 +11,10 @@
  * implementation to drop in later.
  */
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-import { useRouter } from 'next/navigation';
-import type { UserRole } from '@/lib/auth';
-import { getDashboardPath } from '@/lib/auth';
+import React, { createContext, useCallback, useContext, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { UserRole } from "@/lib/auth";
+import { getDashboardPath } from "@/lib/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,28 +38,22 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const STORAGE_KEY = 'skillsync_user';
+const STORAGE_KEY = "skillsync_user";
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // Rehydrate user from localStorage on first mount
-  useEffect(() => {
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    if (typeof window === "undefined") return null;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setUser(JSON.parse(stored) as AuthUser);
-      }
+      return stored ? (JSON.parse(stored) as AuthUser) : null;
     } catch {
-      // Ignore parse errors — treat as logged out
-    } finally {
-      setLoading(false);
+      return null;
     }
-  }, []);
+  });
+  const loading = false;
 
   /**
    * login — authenticate the user and redirect to their role dashboard.
@@ -79,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // ── Simulated successful auth response ──────────────────────────────
       const authedUser: AuthUser = {
         id: crypto.randomUUID(),
-        name: email.split('@')[0],
+        name: email.split("@")[0],
         email,
         role,
       };
@@ -92,13 +80,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const destination = getDashboardPath(role);
       router.push(destination);
     },
-    [router]
+    [router],
   );
 
   const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setUser(null);
-    router.push('/login');
+    router.push("/login");
   }, [router]);
 
   return (
@@ -118,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used inside <AuthProvider>');
+    throw new Error("useAuth must be used inside <AuthProvider>");
   }
   return ctx;
 }

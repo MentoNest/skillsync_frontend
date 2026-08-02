@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
-import { AuthProvider } from "@/lib/auth-context";
-//SOmething good is comming
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -16,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SkillSync – Mentorship & Learning Resources",
-  description: "Connect with world-class mentors and explore curated learning resources to grow your skills and advance your career.",
+  description:
+    "Connect with world-class mentors and explore curated learning resources to grow your skills and advance your career.",
 };
 
 export default function RootLayout({

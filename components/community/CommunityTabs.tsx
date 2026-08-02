@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-export type CommunityTab = 'discussions' | 'events' | 'members' | 'resources';
+export type CommunityTab = "discussions" | "events" | "members" | "resources";
 
 interface Props {
   activeTab: CommunityTab;
@@ -9,13 +9,17 @@ interface Props {
 }
 
 const TABS: { key: CommunityTab; label: string }[] = [
-  { key: 'discussions', label: 'Discussions' },
-  { key: 'events', label: 'Events' },
-  { key: 'members', label: 'Members' },
-  { key: 'resources', label: 'Resources' },
+  { key: "discussions", label: "Discussions" },
+  { key: "events", label: "Events" },
+  { key: "members", label: "Members" },
+  { key: "resources", label: "Resources" },
 ];
 
-export default function CommunityTabs({ activeTab, onTabChange, counts }: Props) {
+export default function CommunityTabs({
+  activeTab,
+  onTabChange,
+  counts,
+}: Props) {
   return (
     <div className="border-b border-gray-200">
       <nav className="flex space-x-8" aria-label="Community tabs">
@@ -28,19 +32,17 @@ export default function CommunityTabs({ activeTab, onTabChange, counts }: Props)
               key={tab.key}
               onClick={() => onTabChange(tab.key)}
               className={`relative py-4 text-sm font-medium transition-colors ${
-                isActive
-                  ? 'text-cyan-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                isActive ? "text-cyan-600" : "text-gray-500 hover:text-gray-700"
               }`}
-              aria-current={isActive ? 'page' : undefined}
+              aria-current={isActive ? "page" : undefined}
             >
               {tab.label}
               {count !== undefined && (
                 <span
                   className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
                     isActive
-                      ? 'bg-cyan-100 text-cyan-700'
-                      : 'bg-gray-100 text-gray-500'
+                      ? "bg-cyan-100 text-cyan-700"
+                      : "bg-gray-100 text-gray-500"
                   }`}
                 >
                   {count}

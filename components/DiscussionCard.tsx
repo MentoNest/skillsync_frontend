@@ -70,7 +70,8 @@ function useAvatarFallback(name: string) {
     .map((p) => p[0]?.toUpperCase() ?? "")
     .join("");
   let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < name.length; i++)
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
   const hue = Math.abs(hash) % 360;
   return { initials, hue };
 }
@@ -109,7 +110,11 @@ export const DiscussionCard: React.FC<DiscussionCardProps> = ({
     >
       {isTrending && (
         <div className="absolute -top-3 right-4 flex items-center gap-1 rounded-full bg-[#FFF1EA] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-[#E85D1F] shadow-[0_1px_3px_rgba(232,93,31,0.25)]">
-          <Flame size={12} strokeWidth={2.5} className="fill-[#FF6B35] text-[#FF6B35]" />
+          <Flame
+            size={12}
+            strokeWidth={2.5}
+            className="fill-[#FF6B35] text-[#FF6B35]"
+          />
           TRENDING
         </div>
       )}
@@ -133,8 +138,12 @@ export const DiscussionCard: React.FC<DiscussionCardProps> = ({
           </div>
         )}
         <div className="min-w-0">
-          <p className="truncate text-[14px] font-semibold text-[#14161F]">{authorName}</p>
-          <p className="font-mono text-[11px] text-[#8A8EA3]">{formatRelativeTime(timestamp)}</p>
+          <p className="truncate text-[14px] font-semibold text-[#14161F]">
+            {authorName}
+          </p>
+          <p className="font-mono text-[11px] text-[#8A8EA3]">
+            {formatRelativeTime(timestamp)}
+          </p>
         </div>
       </div>
 
@@ -190,53 +199,54 @@ export const DiscussionCard: React.FC<DiscussionCardProps> = ({
  * app you would just `import { DiscussionCard } from "./DiscussionCard"`.)
  * ─────────────────────────────────────────────────────────────────────────
  */
-export default function DiscussionCardDemo() {
-  const threads: DiscussionCardProps[] = [
-    {
-      authorName: "Amara Chukwu",
-      title: "Is anyone else migrating off REST to tRPC for internal tools?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 47),
-      category: "backend",
-      likeCount: 128,
-      replyCount: 34,
-      isTrending: true,
-      avatarUrl: "https://i.pravatar.cc/100?img=12",
-    },
-    {
-      authorName: "Tunde Bakare",
-      title: "Best practices for structuring a Next.js 15 app router monorepo?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
-      category: "frontend",
-      likeCount: 42,
-      replyCount: 9,
-      avatarUrl: "broken-url-will-fallback",
-    },
-    {
-      authorName: "Ifeoma Nwosu",
-      title: "Sharing a small win: cut our CI pipeline time in half this week",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
-      category: "devops",
-      likeCount: 861,
-      replyCount: 152,
-      isTrending: true,
-    },
-    {
-      authorName: "Segun A.",
-      title: "What's your go-to approach for optimistic UI updates?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12),
-      category: "ux",
-      likeCount: 17,
-      replyCount: 3,
-    },
-  ];
+const DEMO_THREADS: DiscussionCardProps[] = [
+  {
+    authorName: "Amara Chukwu",
+    title: "Is anyone else migrating off REST to tRPC for internal tools?",
+    timestamp: "2026-07-30T08:00:00Z",
+    category: "backend",
+    likeCount: 128,
+    replyCount: 34,
+    isTrending: true,
+    avatarUrl: "https://i.pravatar.cc/100?img=12",
+  },
+  {
+    authorName: "Tunde Bakare",
+    title: "Best practices for structuring a Next.js 15 app router monorepo?",
+    timestamp: "2026-07-30T04:00:00Z",
+    category: "frontend",
+    likeCount: 42,
+    replyCount: 9,
+    avatarUrl: "broken-url-will-fallback",
+  },
+  {
+    authorName: "Ifeoma Nwosu",
+    title: "Sharing a small win: cut our CI pipeline time in half this week",
+    timestamp: "2026-07-27T08:00:00Z",
+    category: "devops",
+    likeCount: 861,
+    replyCount: 152,
+    isTrending: true,
+  },
+  {
+    authorName: "Segun A.",
+    title: "What's your go-to approach for optimistic UI updates?",
+    timestamp: "2026-07-18T08:00:00Z",
+    category: "ux",
+    likeCount: 17,
+    replyCount: 3,
+  },
+];
 
+export default function DiscussionCardDemo() {
   return (
+
     <div className="min-h-screen w-full bg-[#F5F6FA] px-4 py-10">
       <div className="mx-auto flex max-w-xl flex-col gap-4">
         <h1 className="mb-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-[#8A8EA3]">
           Recent discussions
         </h1>
-        {threads.map((t, i) => (
+        {DEMO_THREADS.map((t, i) => (
           <DiscussionCard
             key={i}
             {...t}

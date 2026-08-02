@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 // Type definitions
 interface Category {
@@ -21,7 +21,7 @@ function CategoryListItem({
   name,
   count,
   isSelected,
-  onClick
+  onClick,
 }: {
   name: string;
   count: number;
@@ -32,9 +32,9 @@ function CategoryListItem({
     <button
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-        isSelected 
-          ? 'bg-blue-100 text-blue-700' 
-          : 'hover:bg-gray-100 text-gray-700'
+        isSelected
+          ? "bg-blue-100 text-blue-700"
+          : "hover:bg-gray-100 text-gray-700"
       }`}
     >
       <span className="flex justify-between items-center">
@@ -49,7 +49,7 @@ export function CategoriesWidget({
   categories,
   selectedCategory,
   onCategorySelect,
-  totalDiscussions
+  totalDiscussions,
 }: CategoriesWidgetProps) {
   return (
     <div className="bg-white rounded-lg shadow p-6">
