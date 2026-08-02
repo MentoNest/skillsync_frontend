@@ -7,7 +7,6 @@ import ExpertiseFilter from "@/components/mentors/ExpertiseFilter";
 import DiscoveryMentorCard from "@/components/mentors/DiscoveryMentorCard";
 import EmptyState from "@/components/mentors/EmptyState";
 import MentorCardSkeleton from "@/components/mentor-card-skeleton";
-import MobileFilterDrawer from "./components/MobileFilterDrawer";
 import {
   EXPERTISE_OPTIONS,
   type Expertise,
@@ -50,7 +49,6 @@ export default function MentorDiscoveryView({
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const announceRef = useRef<HTMLParagraphElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
