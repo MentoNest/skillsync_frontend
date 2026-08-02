@@ -439,6 +439,87 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Skills Progress Section */}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Skills Development */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Target className="h-5 w-5 text-purple-600" />
+                Skills Development
+              </h2>
+              <Link
+                href="/learning-resources"
+                className="text-sm font-medium text-cyan-600 hover:text-cyan-700 flex items-center gap-1"
+              >
+                View all <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="space-y-5">
+              {skillsProgress.map((skill) => (
+                <div key={skill.name}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{skill.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{skill.progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div
+                      className={`${skill.color} h-2.5 rounded-full transition-all duration-500`}
+                      style={{ width: `${skill.progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recommended Mentors */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Zap className="h-5 w-5 text-amber-500" />
+                Recommended For You
+              </h2>
+              <Link
+                href="/discover-mentors"
+                className="text-sm font-medium text-cyan-600 hover:text-cyan-700 flex items-center gap-1"
+              >
+                View all <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="space-y-4">
+              {recommendedMentors.map((mentor) => (
+                <div
+                  key={mentor.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={mentor.avatar}
+                      alt={mentor.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">{mentor.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{mentor.role}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <MapPin className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{mentor.location}</span>
+                        <span className="text-xs text-gray-400">•</span>
+                        <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{mentor.rating} ({mentor.reviews})</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="text-xs px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors flex items-center gap-1">
+                    <MessageSquarePlus className="h-3 w-3" /> Connect
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
