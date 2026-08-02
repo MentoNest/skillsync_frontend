@@ -49,6 +49,7 @@ export default function MentorDiscoveryView({
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const announceRef = useRef<HTMLParagraphElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
