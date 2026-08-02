@@ -80,6 +80,5 @@ export default function SavedMentorsPage() {
           )}
         </main>
       </div>
-    </ProtectedRoute>
   );
 }
