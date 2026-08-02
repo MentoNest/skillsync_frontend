@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CATEGORIES } from "@/lib/filters";
 import RichTextEditor from "./RichTextEditor";
-import Toast from "@/components/ui/toast";
 import { X, Tag } from "lucide-react";
+import Toast from "@/components/ui/toast";
 
 const createDiscussionSchema = z.object({
   title: z

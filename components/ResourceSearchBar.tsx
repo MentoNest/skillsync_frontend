@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
@@ -14,19 +14,19 @@ export default function ResourceSearchBar({
   placeholder = "Search learning tracks, articles, tools, and templates...",
 }: ResourceSearchBarProps) {
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
+  const searchParamQ = searchParams?.get?.("q") ?? "";
+  const [prevSearchParamQ, setPrevSearchParamQ] = useState(searchParamQ);
+  const [query, setQuery] = useState(searchParamQ);
   const router = useRouter();
 
-  useEffect(() => {
-    const q = searchParams.get("q");
-    if (q !== null) {
-      void Promise.resolve().then(() => setQuery(q));
-    }
-  }, [searchParams]);
+  if (searchParamQ !== prevSearchParamQ) {
+    setPrevSearchParamQ(searchParamQ);
+    setQuery(searchParamQ);
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = query.trim();
+    const trimmed = (query || "").trim();
     if (!trimmed) return;
     onSearch?.(trimmed);
     router.push(`/resources?q=${encodeURIComponent(trimmed)}`);

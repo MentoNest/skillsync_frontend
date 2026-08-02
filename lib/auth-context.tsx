@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     }
   });
-  const loading = false;
+  const [loading] = useState(false);
 
   /**
    * login — authenticate the user and redirect to their role dashboard.

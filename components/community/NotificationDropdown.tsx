@@ -20,7 +20,7 @@ const mockNotifications: CommunityNotification[] = [
     title: "New reply",
     message: "Mike Chen replied to your discussion on UX transitions.",
     isRead: false,
-    createdAt: "2026-07-30T08:45:00Z",
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
     linkHref: "/community/1",
     actorName: "Mike Chen",
   },
@@ -30,7 +30,7 @@ const mockNotifications: CommunityNotification[] = [
     title: "You were mentioned",
     message: 'Emily Rodriguez mentioned you in "Tips for salary negotiation".',
     isRead: false,
-    createdAt: "2026-07-30T07:00:00Z",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
     linkHref: "/community/3",
     actorName: "Emily Rodriguez",
   },
@@ -40,7 +40,7 @@ const mockNotifications: CommunityNotification[] = [
     title: "New discussion",
     message: "A new discussion was posted in Career Advice.",
     isRead: true,
-    createdAt: "2026-07-30T04:00:00Z",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
     linkHref: "/community/4",
   },
   {
@@ -49,18 +49,9 @@ const mockNotifications: CommunityNotification[] = [
     title: "Event tomorrow",
     message: "Community AMA with Sarah Johnson starts tomorrow at 3 PM.",
     isRead: true,
-    createdAt: "2026-07-29T09:00:00Z",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
   },
 ];
-
-function timeAgo(date: string) {
-  const diff = Date.now() - new Date(date).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
-}
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -105,8 +96,17 @@ export default function NotificationDropdown() {
     }
   }, [isOpen]);
 
-  return (
+  function formatTimeAgo(date: string) {
+    // eslint-disable-next-line react-hooks/purity
+    const diff = Date.now() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
+  }
 
+  return (
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -187,7 +187,7 @@ export default function NotificationDropdown() {
                         {notification.message}
                       </p>
                       <p className="mt-1 text-xs text-gray-400">
-                        {timeAgo(notification.createdAt)}
+                        {formatTimeAgo(notification.createdAt)}
                       </p>
                     </div>
                     {!notification.isRead && (

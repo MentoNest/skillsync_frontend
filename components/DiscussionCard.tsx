@@ -199,54 +199,53 @@ export const DiscussionCard: React.FC<DiscussionCardProps> = ({
  * app you would just `import { DiscussionCard } from "./DiscussionCard"`.)
  * ─────────────────────────────────────────────────────────────────────────
  */
-const DEMO_THREADS: DiscussionCardProps[] = [
-  {
-    authorName: "Amara Chukwu",
-    title: "Is anyone else migrating off REST to tRPC for internal tools?",
-    timestamp: "2026-07-30T08:00:00Z",
-    category: "backend",
-    likeCount: 128,
-    replyCount: 34,
-    isTrending: true,
-    avatarUrl: "https://i.pravatar.cc/100?img=12",
-  },
-  {
-    authorName: "Tunde Bakare",
-    title: "Best practices for structuring a Next.js 15 app router monorepo?",
-    timestamp: "2026-07-30T04:00:00Z",
-    category: "frontend",
-    likeCount: 42,
-    replyCount: 9,
-    avatarUrl: "broken-url-will-fallback",
-  },
-  {
-    authorName: "Ifeoma Nwosu",
-    title: "Sharing a small win: cut our CI pipeline time in half this week",
-    timestamp: "2026-07-27T08:00:00Z",
-    category: "devops",
-    likeCount: 861,
-    replyCount: 152,
-    isTrending: true,
-  },
-  {
-    authorName: "Segun A.",
-    title: "What's your go-to approach for optimistic UI updates?",
-    timestamp: "2026-07-18T08:00:00Z",
-    category: "ux",
-    likeCount: 17,
-    replyCount: 3,
-  },
-];
-
 export default function DiscussionCardDemo() {
-  return (
+  const threads: DiscussionCardProps[] = [
+    {
+      authorName: "Amara Chukwu",
+      title: "Is anyone else migrating off REST to tRPC for internal tools?",
+      timestamp: new Date("2026-07-29T21:13:00Z"),
+      category: "backend",
+      likeCount: 128,
+      replyCount: 34,
+      isTrending: true,
+      avatarUrl: "https://i.pravatar.cc/100?img=12",
+    },
+    {
+      authorName: "Tunde Bakare",
+      title: "Best practices for structuring a Next.js 15 app router monorepo?",
+      timestamp: new Date("2026-07-29T17:00:00Z"),
+      category: "frontend",
+      likeCount: 42,
+      replyCount: 9,
+      avatarUrl: "broken-url-will-fallback",
+    },
+    {
+      authorName: "Ifeoma Nwosu",
+      title: "Sharing a small win: cut our CI pipeline time in half this week",
+      timestamp: new Date("2026-07-26T22:00:00Z"),
+      category: "devops",
+      likeCount: 861,
+      replyCount: 152,
+      isTrending: true,
+    },
+    {
+      authorName: "Segun A.",
+      title: "What's your go-to approach for optimistic UI updates?",
+      timestamp: new Date("2026-07-17T22:00:00Z"),
+      category: "ux",
+      likeCount: 17,
+      replyCount: 3,
+    },
+  ];
 
+  return (
     <div className="min-h-screen w-full bg-[#F5F6FA] px-4 py-10">
       <div className="mx-auto flex max-w-xl flex-col gap-4">
         <h1 className="mb-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-[#8A8EA3]">
           Recent discussions
         </h1>
-        {DEMO_THREADS.map((t, i) => (
+        {threads.map((t, i) => (
           <DiscussionCard
             key={i}
             {...t}

@@ -10,7 +10,7 @@ interface Props {
   disableInteractions?: boolean;
 }
 
-function timeAgo(date: string) {
+function formatTimeAgo(date: string) {
   const diffMs = Date.now() - new Date(date).getTime();
   const minutes = Math.floor(diffMs / 60000);
   if (minutes < 1) return "just now";
@@ -31,7 +31,6 @@ export default function DiscussionMetadata({
   onReport,
   disableInteractions = false,
 }: Props) {
-
   return (
     <div className="flex items-center gap-4 text-sm text-gray-500">
       <span className="flex items-center gap-1">
@@ -105,7 +104,7 @@ export default function DiscussionMetadata({
         {metadata.viewCount}
       </span>
 
-      <span className="text-xs">{timeAgo(metadata.createdAt)}</span>
+      <span className="text-xs">{formatTimeAgo(metadata.createdAt)}</span>
 
       <div className="ml-auto flex items-center gap-2">
         {onFollow && (

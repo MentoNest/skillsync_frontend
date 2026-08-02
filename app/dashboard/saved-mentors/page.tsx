@@ -9,7 +9,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function SavedMentorsPage() {
   const [mentors, setMentors] = useState<Mentor[]>(
-    MENTORS.filter((m) => m.isBookmarked),
+    (MENTORS as unknown as Mentor[]).filter((m) => m.isBookmarked),
   );
 
   const handleToggleBookmark = (mentorId: string) => {

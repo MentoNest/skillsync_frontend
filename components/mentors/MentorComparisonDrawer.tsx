@@ -100,11 +100,11 @@ export default function MentorComparisonDrawer({
                       <p className="text-xs text-cyan-600 dark:text-cyan-400">
                         {m.title}
                       </p>
-                      <StarRating rating={m.rating ?? 0} size="sm" />
+                      <StarRating rating={m.rating ?? 5} size="sm" />
                     </div>
                     <button
                       type="button"
-                      onClick={() => onRemove(m.id || m.mentorId || "")}
+                      onClick={() => onRemove((m.id || m.mentorId) ?? "")}
                       className="shrink-0 text-gray-400 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
                       aria-label={`Remove ${m.name} from comparison`}
                     >

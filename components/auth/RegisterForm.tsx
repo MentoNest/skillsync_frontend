@@ -1,18 +1,32 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { z } from "zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import PasswordInput from "./PasswordInput";
-import FormField from "./FormField";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
-import {
-  registerSchema,
-  type RegisterFormValues,
-} from "@/lib/validations/auth";
+import { authApi, ApiError } from "@/lib/api/auth";
+
+const registerSchema = z
+  .object({
+    name: z.string().min(1, "Full name is required"),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Enter a valid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -22,176 +36,163 @@ export default function RegisterForm() {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     mode: "onTouched",
-    reValidateMode: "onChange",
   });
 
-  const passwordValue = watch("password") ?? "";
+  const passwordValue = watch("password") || "";
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      // confirmPassword is a UI-only field — don't send it to the API
-      const credentials = {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      };
-      await registerUser(credentials);
+      const { confirmPassword, ...registerPayload } = data;
+      await registerUser(registerPayload);
       router.push("/dashboard");
-    } catch {
-      // Error surfaces via AuthContext `error` state
-    }
+    } catch {}
   };
 
-  const isDisabled = isLoading || isSubmitting || !isValid;
+  const fieldClass = (hasError: boolean) =>
+    `border rounded-lg px-3 py-2.5 text-sm w-full outline-none focus:ring-2 transition ${
+      hasError
+        ? "border-red-400 focus:ring-red-300 focus:border-red-400"
+        : "border-gray-300 focus:ring-cyan-500 focus:border-cyan-500"
+    }`;
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-        Create your account
-      </h2>
-
-      {/* API-level error (once, at the top) */}
-      {error && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="mb-5 flex items-start gap-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl text-sm"
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        Create an account
+      </h1>
+      <p className="text-gray-500 mb-8">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="text-cyan-600 hover:underline font-medium"
         >
-          <svg
-            aria-hidden="true"
-            className="w-4 h-4 mt-0.5 shrink-0"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span>{error}</span>
-        </div>
-      )}
+          Login
+        </Link>
+      </p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
         className="flex flex-col gap-5"
       >
+        {/* API Error Message */}
+        {error && (
+          <div
+            role="alert"
+            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+          >
+            {error}
+          </div>
+        )}
+
         {/* Full Name */}
-        <FormField label="Full Name" error={errors.name?.message}>
-          {({ id, className, ...inputProps }) => (
-            <input
-              id={id}
-              type="text"
-              placeholder="Jane Doe"
-              autoComplete="name"
-              {...inputProps}
-              {...register("name")}
-              className={className}
-            />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="name" className="text-sm font-medium text-gray-700">
+            Full Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            placeholder="Jane Doe"
+            {...register("name")}
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "name-error" : undefined}
+            className={fieldClass(!!errors.name)}
+          />
+          {errors.name && (
+            <p id="name-error" role="alert" className="text-xs text-red-500">
+              {errors.name.message}
+            </p>
           )}
-        </FormField>
+        </div>
 
         {/* Email */}
-        <FormField label="Email" error={errors.email?.message}>
-          {({ id, className, ...inputProps }) => (
-            <input
-              id={id}
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              {...inputProps}
-              {...register("email")}
-              className={className}
-            />
-          )}
-        </FormField>
-
-        {/* Password + Strength meter */}
         <div className="flex flex-col gap-1.5">
-          <FormField label="Password" error={errors.password?.message}>
-            {({ id, className, ...inputProps }) => (
-              <PasswordInput
-                id={id}
-                placeholder="••••••••"
-                autoComplete="new-password"
-                {...inputProps}
-                {...register("password")}
-                className={className}
-              />
-            )}
-          </FormField>
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            {...register("email")}
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
+            className={fieldClass(!!errors.email)}
+          />
+          {errors.email && (
+            <p id="email-error" role="alert" className="text-xs text-red-500">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
+
+        {/* Password */}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="password"
+            className="text-sm font-medium text-gray-700"
+          >
+            Password
+          </label>
+          <PasswordInput
+            id="password"
+            placeholder="••••••••"
+            {...register("password")}
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? "password-error" : undefined}
+            className={
+              errors.password
+                ? "border-red-400 focus:ring-red-300 focus:border-red-400"
+                : ""
+            }
+          />
           <PasswordStrengthMeter value={passwordValue} />
+          {errors.password && (
+            <p id="password-error" role="alert" className="text-xs text-red-500">
+              {errors.password.message}
+            </p>
+          )}
         </div>
 
         {/* Confirm Password */}
-        <FormField
-          label="Confirm Password"
-          error={errors.confirmPassword?.message}
-        >
-          {({ id, className, ...inputProps }) => (
-            <PasswordInput
-              id={id}
-              placeholder="••••••••"
-              autoComplete="new-password"
-              {...inputProps}
-              {...register("confirmPassword")}
-              className={className}
-            />
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="confirmPassword"
+            className="text-sm font-medium text-gray-700"
+          >
+            Confirm Password
+          </label>
+          <PasswordInput
+            id="confirmPassword"
+            placeholder="••••••••"
+            {...register("confirmPassword")}
+            aria-invalid={!!errors.confirmPassword}
+            aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
+            className={
+              errors.confirmPassword
+                ? "border-red-400 focus:ring-red-300 focus:border-red-400"
+                : ""
+            }
+          />
+          {errors.confirmPassword && (
+            <p id="confirmPassword-error" role="alert" className="text-xs text-red-500">
+              {errors.confirmPassword.message}
+            </p>
           )}
-        </FormField>
+        </div>
 
-        {/* Submit */}
         <button
           type="submit"
-          disabled={isDisabled}
-          aria-disabled={isDisabled}
-          className="relative w-full bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800 text-white py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+          disabled={!isValid || isLoading}
+          className="bg-cyan-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading || isSubmitting ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg
-                className="animate-spin w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
-              Creating account…
-            </span>
-          ) : (
-            "Create Account"
-          )}
+          {isLoading ? "Creating account..." : "Create Account"}
         </button>
-
-        {/* Login link */}
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-cyan-600 dark:text-cyan-400 hover:underline font-medium"
-          >
-            Sign in
-          </Link>
-        </p>
       </form>
     </div>
   );

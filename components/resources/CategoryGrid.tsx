@@ -1,4 +1,4 @@
-import { ChevronRightIcon } from "./icons";
+import { ChevronRight as ChevronRightIcon } from "@/components/icons";
 import { categories } from "./categories-data";
 
 export async function CategoryGrid() {

@@ -14,10 +14,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-interface RichTextEditorProps {
+interface Props {
   content: string;
   onChange: (content: string) => void;
-  placeholder?: string;
 }
 
 const ToolbarButton = ({
@@ -43,10 +42,7 @@ const ToolbarButton = ({
   </button>
 );
 
-export default function RichTextEditor({
-  content,
-  onChange,
-}: RichTextEditorProps) {
+export default function RichTextEditor({ content, onChange }: Props) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
 

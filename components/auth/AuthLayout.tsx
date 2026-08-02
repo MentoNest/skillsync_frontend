@@ -39,8 +39,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             ))}
           </div>
           <p className="text-purple-100 text-sm leading-relaxed">
-            &ldquo;Mentoring on SkillSync changed how I share expertise. The
-            platform makes it effortless to connect with driven learners.&rdquo;
+            &quot;Mentoring on SkillSync changed how I share expertise. The
+            platform makes it effortless to connect with driven learners.&quot;
           </p>
         </div>
 

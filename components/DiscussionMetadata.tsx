@@ -12,7 +12,7 @@ import React from "react";
  * - aria-labels for icon-only or ambiguous numeric content
  */
 
-function formatRelativeTime(dateInput: Date | string | number): string {
+function formatRelativeTime(dateInput: string | Date) {
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -33,13 +33,13 @@ function formatRelativeTime(dateInput: Date | string | number): string {
   });
 }
 
-function formatCount(count: number): string {
+function formatCount(count: number) {
   if (count >= 1000) return `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k`;
   return String(count);
 }
 
-interface DiscussionMetadataProps {
-  postedAt: Date | string | number;
+export interface DiscussionMetadataProps {
+  postedAt: string | Date;
   category?: string;
   likeCount?: number;
   replyCount?: number;

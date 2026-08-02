@@ -1,12 +1,21 @@
 "use client";
 export * from "lucide-react";
-export {
+import {
   Code as CodeIcon,
   Settings as GearIcon,
   Palette as PaletteIcon,
-  BarChart as ChartIcon,
+  BarChart2 as ChartIcon,
   Rocket as RocketIcon,
   Briefcase as BriefcaseIcon,
-  ChevronRight as ChevronRightIcon,
   Search as SearchIcon,
 } from "lucide-react";
+
+export {
+  CodeIcon,
+  GearIcon,
+  PaletteIcon,
+  ChartIcon,
+  RocketIcon,
+  BriefcaseIcon,
+  SearchIcon,
+};

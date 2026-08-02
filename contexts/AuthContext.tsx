@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [persisted.token]);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     dispatch({ type: "SET_LOADING", payload: true });

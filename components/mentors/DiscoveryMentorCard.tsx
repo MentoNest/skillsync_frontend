@@ -44,9 +44,7 @@ function slugFor(name: string): string {
 
 import MentorSkillTag from "./MentorSkillTag";
 
-export default function DiscoveryMentorCard({
-  mentor,
-}: DiscoveryMentorCardProps) {
+export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
   const initials = initialsFor(mentor.name);
   const gradient = gradientFor(mentor.name);
   const targetId = mentor.mentorId || mentor.id || slugFor(mentor.name);
@@ -120,18 +118,20 @@ export default function DiscoveryMentorCard({
             {mentor.title}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {mentor.company} · {mentor.experienceYears ?? mentor.yearsExperience ?? 0}+ yrs experience
+            {mentor.company} ·{" "}
+            {mentor.experienceYears ?? mentor.yearsExperience ?? 0}+ yrs
+            experience
           </p>
         </div>
 
         {/* Rating */}
         <div
           className="flex items-center gap-2 flex-wrap"
-          aria-label={`Rating: ${mentor.rating ?? 0} out of 5`}
+          aria-label={`Rating: ${mentor.rating ?? 5} out of 5`}
         >
-          <StarRating rating={mentor.rating ?? 0} size="sm" />
+          <StarRating rating={mentor.rating ?? 5} size="sm" />
           <span className="text-sm font-semibold text-gray-900 dark:text-white tabular-nums">
-            {(mentor.rating ?? 0).toFixed(1)}
+            {(mentor.rating ?? 5.0).toFixed(1)}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
             ({(mentor.reviewCount ?? 0).toLocaleString()} reviews)

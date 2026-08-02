@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SearchIcon } from "@/components/resources/icons";
+import { SearchIcon } from "@/components/icons";
 
 /**
  * HeroSearchBar — Functional search input styled for the hero section.
