@@ -123,6 +123,27 @@ const FeaturedArticles = dynamic(
   },
 );
 
+const FeaturedLearningTracks = dynamic(
+  () => import("@/components/FeaturedLearningTracks"),
+  {
+    loading: () => (
+      <div
+        className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4"
+        aria-hidden="true"
+      >
+        <div className="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-64 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    ),
+  },
+);
+
 const ToolsAndTemplates = dynamic(
   () => import("@/components/ToolsAndTemplates"),
   {
@@ -369,6 +390,27 @@ export default function Home() {
         }
       >
         <FeaturedArticles />
+      </Suspense>
+
+      {/* 10. Featured Learning Tracks */}
+      <Suspense
+        fallback={
+          <div
+            className="bg-gray-50 dark:bg-gray-800/40 py-12 px-4"
+            aria-hidden="true"
+          >
+            <div className="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-3 gap-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-64 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"
+                />
+              ))}
+            </div>
+          </div>
+        }
+      >
+        <FeaturedLearningTracks />
       </Suspense>
 
       {/* 10. Tools & Templates */}

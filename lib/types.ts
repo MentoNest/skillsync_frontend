@@ -36,6 +36,7 @@ export interface Mentor {
   availability?: AvailabilityStatus;
   yearsExperience?: number;
   experienceYears?: number;
+  image?: string;
   isFeatured?: boolean;
   profileHref?: string;
   onBook?: () => void;

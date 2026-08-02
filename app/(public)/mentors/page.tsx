@@ -124,7 +124,6 @@ export default function MentorsPage() {
   // Comparison state
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
-
   const toggleBookmark = (mentorId: string) => {
     setBookmarkedMentors((prev) => {
       const newSet = new Set(prev);
