@@ -69,6 +69,16 @@ export default function MentorDiscoveryView({
     return () => clearTimeout(timer);
   }, [initialMentors]);
 
+  useEffect(() => {
+    if (announceRef.current) {
+      const message =
+        filteredMentors.length > 0
+          ? `${filteredMentors.length} mentors found.`
+          : "No mentors found.";
+      announceRef.current.textContent = message;
+    }
+  }, [filteredMentors]);
+
   const toggleExpertise = useCallback((expertise: Expertise) => {
     setSelectedExpertise((prev) =>
       prev.includes(expertise)
