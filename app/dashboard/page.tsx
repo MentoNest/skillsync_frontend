@@ -101,6 +101,51 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      {/* Dashboard Navigation Header */}
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+        <div className="max-w-screen-xl mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-cyan-600 rounded-lg">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">SkillSync Dashboard</span>
+            </div>
+            <nav className="hidden md:flex items-center gap-1">
+              <Link
+                href="/dashboard"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/dashboard/sessions"
+                className="px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Sessions
+              </Link>
+              <Link
+                href="/dashboard/messages"
+                className="px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Messages
+              </Link>
+              <Link
+                href="/dashboard/saved-mentors"
+                className="px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Saved Mentors
+              </Link>
+              <Link
+                href="/dashboard/settings"
+                className="px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Settings
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
       <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
         {/* Welcome Section */}
         <div className="mb-10">
