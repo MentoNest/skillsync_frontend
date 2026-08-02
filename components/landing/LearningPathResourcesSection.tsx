@@ -9,7 +9,7 @@ const learningTracks = [
       "Develop the skills to lead technical teams, make stronger architectural decisions, and grow your impact as a senior engineer.",
     lessons: 18,
     duration: "6h 20m",
-    imageSrc: "/Image (Sarah Johnson).svg",
+    imageSrc: "/tony-adebanjo.jpg",
     href: "/resources/engineering-leadership",
   },
   {
