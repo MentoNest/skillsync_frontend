@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Calendar, Clock, Video, MessageSquare, X, Check, Filter } from "lucide-react";
 
 type Session = {
