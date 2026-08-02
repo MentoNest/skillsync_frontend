@@ -39,7 +39,7 @@ const learningTracks = [
       "Learn user-centred design, prototyping, and research methods to craft experiences that delight and retain users.",
     lessons: 12,
     duration: "4h 30m",
-    imageSrc: "/Image (Cole Hathans).svg",
+    imageSrc: "/tony-adebanjo.jpg",
     href: "/resources/design-ux",
   },
   {
