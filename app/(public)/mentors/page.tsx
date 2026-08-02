@@ -362,7 +362,7 @@ export default function MentorsPage() {
                           }`}
                         >
                           {isSelected
-                            ? "✓ Added to compare"
+                            ? "âœ“ Added to compare"
                             : `+ Compare${
                                 isDisabled ? " (limit reached)" : ""
                               }`}
@@ -414,7 +414,7 @@ export default function MentorsPage() {
                             }`}
                           >
                             {isSelected
-                              ? "✓ Added to compare"
+                              ? "âœ“ Added to compare"
                               : `+ Compare${
                                   isDisabled ? " (limit reached)" : ""
                                 }`}
