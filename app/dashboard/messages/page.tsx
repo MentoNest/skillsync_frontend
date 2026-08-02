@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Search, Send, Paperclip, MoreVertical, Check, CheckCheck } from "lucide-react";
 
 type Conversation = {
