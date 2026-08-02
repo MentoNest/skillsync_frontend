@@ -26,6 +26,12 @@ import {
   Briefcase,
   MessageSquarePlus,
   MapPin,
+  CheckCircle2,
+  Circle,
+  Flame,
+  Coffee,
+  PlayCircle,
+  FileText,
 } from "lucide-react";
 
 export default function DashboardPage() {
