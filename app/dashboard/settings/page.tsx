@@ -39,17 +39,16 @@ export default function SettingsPage() {
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-        <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
-          <div className="mb-10">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              Settings
-            </h1>
-            <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
-              Manage your account settings and preferences.
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            Settings
+          </h1>
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+            Manage your account settings and preferences.
+          </p>
+        </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Sidebar */}
@@ -366,6 +365,5 @@ export default function SettingsPage() {
           </div>
         </main>
       </div>
-    </ProtectedRoute>
   );
 }
