@@ -33,7 +33,6 @@ export const PROTECTED_PREFIXES: string[] = [
   "/mentor",
   "/mentee",
   "/admin",
-  "/dashboard",
 ];
 
 /**
