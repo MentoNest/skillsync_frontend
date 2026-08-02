@@ -7,6 +7,7 @@ import ExpertiseFilter from "@/components/mentors/ExpertiseFilter";
 import DiscoveryMentorCard from "@/components/mentors/DiscoveryMentorCard";
 import EmptyState from "@/components/mentors/EmptyState";
 import MentorCardSkeleton from "@/components/mentor-card-skeleton";
+import MobileFilterDrawer from "./components/MobileFilterDrawer";
 import {
   EXPERTISE_OPTIONS,
   type Expertise,
@@ -207,12 +208,35 @@ export default function MentorDiscoveryView({
                 ))}
               </select>
             </div>
+
+            {/* Mobile filter button */}
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen(true)}
+              className="lg:hidden inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-xs font-semibold text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="feather feather-filter"
+              >
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+              <span>Filter</span>
+            </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 pt-8">
           {/* Sidebar filters */}
-          <aside className="space-y-6">
+          <aside className="hidden lg:block space-y-6">
             <ExpertiseFilter
               selectedExpertise={selectedExpertise}
               onToggleExpertise={toggleExpertise}
@@ -421,6 +445,18 @@ export default function MentorDiscoveryView({
           onClearAll={clearCompare}
         />
       )}
+
+      {/* Mobile filter drawer */}
+      <MobileFilterDrawer
+        isOpen={mobileFiltersOpen}
+        onClose={() => setMobileFiltersOpen(false)}
+        selectedExpertise={selectedExpertise}
+        onToggleExpertise={toggleExpertise}
+        minPrice={minPrice}
+        onMinPriceChange={setMinPrice}
+        maxPrice={maxPrice}
+        onMaxPriceChange={setMaxPrice}
+      />
     </div>
   );
 }
