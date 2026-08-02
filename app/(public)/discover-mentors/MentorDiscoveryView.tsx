@@ -49,7 +49,6 @@ export default function MentorDiscoveryView({
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [showComparison, setShowComparison] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const announceRef = useRef<HTMLParagraphElement>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -415,7 +414,7 @@ export default function MentorDiscoveryView({
       </main>
 
       {/* Comparison Drawer */}
-      {comparedMentors.length > 0 && (
+      {compareIds.length > 0 && (
         <MentorComparisonDrawer
           selectedMentors={comparedMentors}
           onRemoveMentor={toggleCompare}
