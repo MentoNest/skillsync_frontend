@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { User, Bell, Shield, CreditCard, LogOut, Save, Upload } from "lucide-react";
 
 export default function SettingsPage() {
