@@ -5,7 +5,6 @@ import { MOCK_MENTORS } from "@/components/mentors/data";
 import MentorCard from "@/components/MentorCard";
 import { Mentor } from "@/lib/types";
 import Link from "next/link";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function SavedMentorsPage() {
   const [mentors, setMentors] = useState<Mentor[]>(() =>
@@ -19,18 +18,17 @@ export default function SavedMentorsPage() {
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-        <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              Saved Mentors
-            </h1>
-            <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-              Your bookmarked mentors are shown here. Review them anytime and
-              start a conversation.
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            Saved Mentors
+          </h1>
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+            Your bookmarked mentors are shown here. Review them anytime and
+            start a conversation.
+          </p>
+        </div>
 
           {mentors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
