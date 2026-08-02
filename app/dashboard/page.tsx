@@ -21,6 +21,11 @@ import {
   BookOpen,
   Compass,
   MessageCircle,
+  Target,
+  Zap,
+  Briefcase,
+  MessageSquarePlus,
+  MapPin,
 } from "lucide-react";
 
 export default function DashboardPage() {
