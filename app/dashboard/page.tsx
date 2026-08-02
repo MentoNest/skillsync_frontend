@@ -371,11 +371,12 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{session.date}</p>
-                      <button className="mt-1 text-xs px-3 py-1 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-colors">
-                        Join
-                      </button>
-                    </div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{session.date}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{session.duration}</p>
+                        <button className="mt-2 text-xs px-4 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors inline-flex items-center gap-1">
+                          <Video className="h-3 w-3" /> Join
+                        </button>
+                      </div>
                   </div>
                 ))}
               </div>
