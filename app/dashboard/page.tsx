@@ -170,7 +170,7 @@ export default function DashboardPage() {
   const weeklyGoals = [
     { id: "1", title: "Complete product management course", completed: true },
     { id: "2", title: "Schedule 2 new mentorship sessions", completed: true },
-    { id: "3", title: "Read "The Lean Startup" book", completed: false },
+    { id: "3", title: "Read 'The Lean Startup' book", completed: false },
     { id: "4", title: "Update LinkedIn profile with new skills", completed: false },
   ];
 
