@@ -121,19 +121,43 @@ export default function DashboardPage() {
       time: "3 days ago",
       icon: <Star className="h-4 w-4 text-amber-500" />,
     },
-    {
-      id: "4",
-      action: "New message from",
-      user: "Emma Thompson",
-      time: "5 hours ago",
-      icon: <MessageCircle className="h-4 w-4 text-purple-500" />,
-    },
+    { id: "4", action: "New message from", user: "Emma Thompson", time: "5 hours ago", icon: <MessageCircle className="h-4 w-4 text-purple-500" />, },
   ];
 
   const notifications = [
     { id: "1", message: "Sarah Johnson sent you a message", time: "10 min ago", read: false },
     { id: "2", message: "Your session with Michael is tomorrow", time: "1 hour ago", read: false },
     { id: "3", message: "New mentor matching available", time: "3 hours ago", read: true },
+  ];
+
+  // Skills progress data
+  const skillsProgress = [
+    { name: "Leadership", progress: 75, color: "bg-cyan-500" },
+    { name: "Product Management", progress: 60, color: "bg-green-500" },
+    { name: "Communication", progress: 85, color: "bg-purple-500" },
+    { name: "Technical Skills", progress: 45, color: "bg-amber-500" },
+  ];
+
+  // Recommended mentors
+  const recommendedMentors = [
+    {
+      id: "1",
+      name: "Alex Turner",
+      role: "VP of Engineering at Netflix",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100&h=100",
+      location: "San Francisco, CA",
+      rating: 4.9,
+      reviews: 24,
+    },
+    {
+      id: "2",
+      name: "Jessica Wong",
+      role: "Product Lead at Stripe",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100&h=100",
+      location: "New York, NY",
+      rating: 4.8,
+      reviews: 18,
+    },
   ];
 
   const quickActions = [
