@@ -137,17 +137,16 @@ export default function MessagesPage() {
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-        <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
-          <div className="mb-10">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              Messages
-            </h1>
-            <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
-              Communicate with your mentors and manage your conversations.
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <main className="max-w-screen-xl mx-auto px-4 py-12 sm:py-16">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            Messages
+          </h1>
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+            Communicate with your mentors and manage your conversations.
+          </p>
+        </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style={{ height: "calc(100vh - 280px)", minHeight: "500px" }}>
             <div className="flex h-full">
@@ -314,6 +313,5 @@ export default function MessagesPage() {
           </div>
         </main>
       </div>
-    </ProtectedRoute>
   );
 }
