@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import StarRating from "@/components/ui/StarRating";
 import MentorAvailabilityBadge from "@/components/MentorAvailabilityBadge";
-import { MENTORS } from "../data/mockMentors";
 import { MOCK_MENTORS } from "@/components/mentors/data";
 import type { Mentor } from "@/lib/types";
+
+const ALL_MENTORS: Mentor[] = MOCK_MENTORS;
 
 function slugify(text: string): string {
   return text
@@ -13,21 +14,6 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-function mentorSlug(mentor: { name: string }): string {
-  return slugify(mentor.name);
-}
-
-// Combine datasets ensuring all mentor IDs and slugs can be resolved
-const ALL_MENTORS: Mentor[] = (MENTORS as unknown as Mentor[]).concat(
-  (MOCK_MENTORS as unknown as Mentor[]).filter(
-    (m) =>
-      !(MENTORS as unknown as Mentor[]).some(
-        (existing) =>
-          (existing.id || existing.mentorId) === (m.id || m.mentorId),
-      ),
-  ),
-);
-
 interface MentorProfilePageProps {
   params: Promise<{ id: string }>;
 }
@@ -35,7 +21,7 @@ interface MentorProfilePageProps {
 export function generateStaticParams() {
   const paramsList: { id: string }[] = [];
   ALL_MENTORS.forEach((mentor) => {
-    const mainId = String(mentor.id || mentor.mentorId || "");
+    const mainId = mentor.id || mentor.mentorId;
     if (mainId) paramsList.push({ id: mainId });
     const nameSlug = slugify(mentor.name);
     if (nameSlug && nameSlug !== mainId) paramsList.push({ id: nameSlug });
@@ -46,15 +32,9 @@ export function generateStaticParams() {
 function findMentor(rawId: string): Mentor | undefined {
   const normalised = decodeURIComponent(rawId).toLowerCase();
   return ALL_MENTORS.find((mentor) => {
-    const canonicalId = String(
-      mentor.id || mentor.mentorId || "",
-    ).toLowerCase();
+    const canonicalId = (mentor.id || mentor.mentorId || "").toLowerCase();
     const nameSlug = slugify(mentor.name);
-    return (
-      canonicalId === normalised ||
-      nameSlug === normalised ||
-      (mentor.id && mentorSlug(mentor) === normalised)
-    );
+    return canonicalId === normalised || nameSlug === normalised;
   });
 }
 
@@ -65,9 +45,7 @@ export default async function MentorProfilePage({
   const mentor = findMentor(id);
   if (!mentor) notFound();
 
-  const profileSlug = String(
-    mentor.id || mentor.mentorId || slugify(mentor.name),
-  );
+  const profileSlug = mentor.id || mentor.mentorId || slugify(mentor.name);
   const headline = mentor.headline || mentor.title || mentor.role || "Mentor";
   const bio =
     mentor.bio ||
@@ -77,12 +55,8 @@ export default async function MentorProfilePage({
   const reviewCount = mentor.reviewCount ?? 0;
   const skills = mentor.skills ?? [];
   const industries = mentor.industries ?? mentor.expertise ?? [];
-  const experienceYears = String(
-    mentor.yearsExperience ??
-      (mentor as unknown as Record<string, unknown>).experienceYears ??
-      5,
-  );
-  const experienceLevel = String(mentor.experienceLevel ?? "Senior");
+  const experienceYears = mentor.experienceYears ?? mentor.yearsExperience ?? 5;
+  const experienceLevel = mentor.experienceLevel ?? "Senior";
   const isUnavailable = mentor.availability === "fully-booked";
 
   return (

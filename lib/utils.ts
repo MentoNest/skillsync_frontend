@@ -4,25 +4,23 @@ export type ClassValue =
   | boolean
   | undefined
   | null
-  | { [key: string]: boolean | undefined | null }
+  | { [key: string]: unknown }
   | ClassValue[];
 
 export function cn(...inputs: ClassValue[]): string {
   const classes: string[] = [];
-
-  const process = (val: ClassValue) => {
-    if (!val) return;
-    if (typeof val === "string" || typeof val === "number") {
-      classes.push(String(val));
-    } else if (Array.isArray(val)) {
-      val.forEach(process);
-    } else if (typeof val === "object") {
-      for (const key in val) {
-        if (val[key]) classes.push(key);
+  for (const input of inputs) {
+    if (!input) continue;
+    if (typeof input === "string" || typeof input === "number") {
+      classes.push(String(input));
+    } else if (Array.isArray(input)) {
+      const inner = cn(...input);
+      if (inner) classes.push(inner);
+    } else if (typeof input === "object") {
+      for (const key in input) {
+        if ((input as Record<string, unknown>)[key]) classes.push(key);
       }
     }
-  };
-
-  inputs.forEach(process);
+  }
   return classes.join(" ");
 }

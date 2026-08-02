@@ -3,11 +3,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import ResourceSearchBar from "@/components/ResourceSearchBar";
 
 const mockPush = jest.fn();
-const mockGet = jest.fn().mockReturnValue(null);
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
-  useSearchParams: () => ({ get: mockGet }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 describe("ResourceSearchBar", () => {

@@ -96,7 +96,7 @@ export default function NotificationDropdown() {
     }
   }, [isOpen]);
 
-  function formatTimeAgo(date: string) {
+  const timeAgo = (date: string) => {
     // eslint-disable-next-line react-hooks/purity
     const diff = Date.now() - new Date(date).getTime();
     const minutes = Math.floor(diff / 60000);
@@ -104,7 +104,7 @@ export default function NotificationDropdown() {
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;
     return `${Math.floor(hours / 24)}d ago`;
-  }
+  };
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -187,7 +187,7 @@ export default function NotificationDropdown() {
                         {notification.message}
                       </p>
                       <p className="mt-1 text-xs text-gray-400">
-                        {formatTimeAgo(notification.createdAt)}
+                        {timeAgo(notification.createdAt)}
                       </p>
                     </div>
                     {!notification.isRead && (

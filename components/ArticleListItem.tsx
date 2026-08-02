@@ -25,9 +25,9 @@ export default function ArticleListItem({
     <article className={className}>
       <Link
         href={targetHref}
-        className="flex items-center justify-between gap-4 py-4 px-2 hover:bg-slate-50 dark:hover:bg-gray-800/60 rounded-xl transition-all group focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-500 focus:ring-offset-2"
+        className="flex items-center justify-between gap-4 py-4 px-2 hover:bg-slate-50 dark:hover:bg-gray-800/60 rounded-xl transition-all group focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:focus:ring-cyan-500"
       >
-        <div>
+        <div className="min-w-0 flex-1">
           <header>
             <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide">
               {category}

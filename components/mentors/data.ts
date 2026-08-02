@@ -1,4 +1,5 @@
 import type { AvailabilityStatus } from "@/components/MentorAvailabilityBadge";
+export type { AvailabilityStatus };
 
 /**
  * High-level expertise areas used to group mentors on the discovery page.
@@ -34,8 +35,14 @@ export const EXPERTISE_OPTIONS = [
   "Engineering Leadership",
 ] as const satisfies readonly Expertise[];
 
-import { Mentor } from "@/lib/types";
-export type { Mentor };
+import { Mentor, ExperienceLevel } from "@/lib/types";
+export type { Mentor, ExperienceLevel };
+export const EXPERIENCE_LEVELS: ExperienceLevel[] = [
+  "Junior",
+  "Mid-Level",
+  "Senior",
+  "Executive",
+];
 
 export const MOCK_MENTORS: Mentor[] = [
   {

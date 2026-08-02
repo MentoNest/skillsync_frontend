@@ -50,8 +50,8 @@ describe("StarRating", () => {
     const { container } = render(<StarRating rating={3.7} />);
     const clipPaths = container.querySelectorAll("clipPath");
     expect(clipPaths.length).toBe(5);
-    const partialRect = clipPaths[3].querySelector("rect");
-    const width = parseFloat(partialRect?.getAttribute("width") || "0");
+    const fourthRect = clipPaths[3].querySelector("rect");
+    const width = parseFloat(fourthRect?.getAttribute("width") || "0");
     expect(width).toBeCloseTo(16.8, 1);
   });
 });

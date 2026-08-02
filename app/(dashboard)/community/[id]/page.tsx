@@ -6,8 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import CategoryBadge from "@/components/CategoryBadge";
 import DiscussionMetadata from "@/components/community/DiscussionMetadata";
-import CommentCard from "@/components/community/Comment";
-import type { Discussion, Comment as CommentType } from "@/lib/community-types";
+import CommentComponent from "@/components/community/Comment";
+import type { Discussion, Comment } from "@/lib/community-types";
 
 // Simulate current user role (in a real app this would come from auth context)
 const CURRENT_USER_IS_MODERATOR = true;
@@ -193,7 +193,6 @@ export default function DiscussionDetailsPage() {
   const [discussion, setDiscussion] = useState<Discussion | null>(
     mockDiscussions[id] || null,
   );
-  const [nowTimestamp] = useState(() => Date.now());
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
@@ -288,7 +287,6 @@ export default function DiscussionDetailsPage() {
     setEditCategory("");
     setEditTags("");
   };
-
   const handleTogglePin = () => {
     setDiscussion((prev) =>
       prev ? { ...prev, isPinned: !prev.isPinned } : null,
@@ -304,7 +302,7 @@ export default function DiscussionDetailsPage() {
   const handleAddComment = () => {
     if (!newComment.trim() || isLocked) return;
 
-    const comment: CommentType = {
+    const comment: Comment = {
       id: `c${Date.now()}`,
       author: {
         id: "current-user",
@@ -332,7 +330,7 @@ export default function DiscussionDetailsPage() {
   const handleReply = (commentId: string) => {
     if (!replyContent.trim() || isLocked) return;
 
-    const addReply = (comments: CommentType[]): CommentType[] => {
+    const addReply = (comments: Comment[]): Comment[] => {
       return comments.map((comment) => {
         if (comment.id === commentId) {
           return {
@@ -375,7 +373,7 @@ export default function DiscussionDetailsPage() {
   };
 
   const handleCommentLike = (commentId: string) => {
-    const toggleLike = (comments: CommentType[]): CommentType[] => {
+    const toggleLike = (comments: Comment[]): Comment[] => {
       return comments.map((comment) => {
         if (comment.id === commentId) {
           return {
@@ -404,8 +402,10 @@ export default function DiscussionDetailsPage() {
   };
 
   const timeAgo = (date: string) => {
+    // eslint-disable-next-line react-hooks/purity
+    const now = Date.now();
     const then = new Date(date).getTime();
-    const diffMs = nowTimestamp - then;
+    const diffMs = now - then;
     const minutes = Math.floor(diffMs / 60000);
     if (minutes < 1) return "just now";
     if (minutes < 60) return `${minutes}m ago`;
@@ -416,7 +416,7 @@ export default function DiscussionDetailsPage() {
     return new Date(date).toLocaleDateString();
   };
 
-  const renderComment = (comment: CommentType, isReply = false) => (
+  const renderComment = (comment: Comment, isReply = false) => (
     <div
       key={comment.id}
       className={`${isReply ? "ml-12 mt-3" : "mb-4"} bg-gray-50 rounded-lg p-4`}
@@ -750,15 +750,14 @@ export default function DiscussionDetailsPage() {
                 {discussion.content}
               </p>
             </div>
-
-            <DiscussionMetadata
-              metadata={discussion}
-              onLike={handleLike}
-              onBookmark={handleBookmark}
-              disableInteractions={isLocked}
-            />
           </>
         )}
+        <DiscussionMetadata
+          metadata={discussion}
+          onLike={handleLike}
+          onBookmark={handleBookmark}
+          disableInteractions={isLocked}
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">

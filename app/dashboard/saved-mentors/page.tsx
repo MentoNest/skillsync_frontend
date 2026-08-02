@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { MENTORS } from "@/app/(public)/mentors/data/mockMentors";
+import { MOCK_MENTORS } from "@/components/mentors/data";
 import MentorCard from "@/components/MentorCard";
 import { Mentor } from "@/lib/types";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function SavedMentorsPage() {
-  const [mentors, setMentors] = useState<Mentor[]>(
-    (MENTORS as unknown as Mentor[]).filter((m) => m.isBookmarked),
+  const [mentors, setMentors] = useState<Mentor[]>(() =>
+    MOCK_MENTORS.filter((m: Mentor) => m.isBookmarked),
   );
 
   const handleToggleBookmark = (mentorId: string) => {

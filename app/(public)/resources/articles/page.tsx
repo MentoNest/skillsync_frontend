@@ -5,7 +5,6 @@ import Link from "next/link";
 import ArticleListItem from "@/components/ArticleListItem";
 import { useDebounce } from "@/hooks/useDebounce";
 import { SearchIcon } from "@/components/icons";
-import Articles from "./Articles";
 
 const articles = [
   {

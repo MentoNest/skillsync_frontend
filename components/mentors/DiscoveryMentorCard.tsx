@@ -4,7 +4,7 @@ import StarRating from "@/components/ui/StarRating";
 import MentorAvailabilityBadge from "@/components/MentorAvailabilityBadge";
 import type { Mentor } from "@/lib/types";
 
-interface DiscoveryMentorCardProps {
+export interface DiscoveryMentorCardProps {
   mentor: Mentor;
 }
 
@@ -118,25 +118,30 @@ export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
             {mentor.title}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {mentor.company} ·{" "}
-            {mentor.experienceYears ?? mentor.yearsExperience ?? 0}+ yrs
-            experience
+            {mentor.company}
+            {mentor.experienceYears
+              ? ` · ${mentor.experienceYears}+ yrs experience`
+              : ""}
           </p>
         </div>
 
         {/* Rating */}
-        <div
-          className="flex items-center gap-2 flex-wrap"
-          aria-label={`Rating: ${mentor.rating ?? 5} out of 5`}
-        >
-          <StarRating rating={mentor.rating ?? 5} size="sm" />
-          <span className="text-sm font-semibold text-gray-900 dark:text-white tabular-nums">
-            {(mentor.rating ?? 5.0).toFixed(1)}
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            ({(mentor.reviewCount ?? 0).toLocaleString()} reviews)
-          </span>
-        </div>
+        {mentor.rating !== undefined && (
+          <div
+            className="flex items-center gap-2 flex-wrap"
+            aria-label={`Rating: ${mentor.rating} out of 5`}
+          >
+            <StarRating rating={mentor.rating} size="sm" />
+            <span className="text-sm font-semibold text-gray-900 dark:text-white tabular-nums">
+              {mentor.rating.toFixed(1)}
+            </span>
+            {mentor.reviewCount !== undefined && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                ({mentor.reviewCount.toLocaleString()} reviews)
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Bio */}
         <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">
@@ -144,12 +149,12 @@ export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
         </p>
 
         {/* Expertise chips (a compact view) */}
-        {(mentor.expertise ?? []).length > 0 && (
+        {mentor.expertise && mentor.expertise.length > 0 && (
           <div
             className="flex flex-wrap gap-1.5"
             aria-label="Areas of expertise"
           >
-            {(mentor.expertise ?? []).slice(0, 2).map((tag) => (
+            {mentor.expertise.slice(0, 2).map((tag) => (
               <span
                 key={tag}
                 className="inline-flex items-center rounded-full bg-cyan-50 dark:bg-cyan-900/30 px-2.5 py-0.5 text-xs font-medium text-cyan-700 dark:text-cyan-300"
@@ -157,18 +162,18 @@ export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
                 {tag}
               </span>
             ))}
-            {(mentor.expertise ?? []).length > 2 && (
+            {mentor.expertise.length > 2 && (
               <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400">
-                +{(mentor.expertise ?? []).length - 2} more
+                +{mentor.expertise.length - 2} more
               </span>
             )}
           </div>
         )}
 
         {/* Skills */}
-        {(mentor.skills ?? []).length > 0 && (
+        {mentor.skills && mentor.skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5" aria-label="Skills">
-            {(mentor.skills ?? []).map((skill) => (
+            {mentor.skills.map((skill) => (
               <MentorSkillTag key={skill} skill={skill} />
             ))}
           </div>

@@ -13,8 +13,6 @@ import React from "react";
  * pass a `color` prop matching one of the keys in COLOR_MAP (e.g. "teal").
  */
 
-// Curated set of accessible color combinations (bg + text).
-// Add more entries here if you need a larger palette.
 const COLOR_MAP = {
   purple: { bg: "#EEEDFE", text: "#3C3489", border: "#AFA9EC" },
   teal: { bg: "#E1F5EE", text: "#085041", border: "#5DCAA5" },
@@ -24,27 +22,24 @@ const COLOR_MAP = {
   green: { bg: "#EAF3DE", text: "#27500A", border: "#97C459" },
   amber: { bg: "#FAEEDA", text: "#633806", border: "#EF9F27" },
   gray: { bg: "#F1EFE8", text: "#444441", border: "#B4B2A9" },
-};
+} as const;
 
-export type BadgeColorKey = keyof typeof COLOR_MAP;
+type ColorKey = keyof typeof COLOR_MAP;
+const COLOR_KEYS = Object.keys(COLOR_MAP) as ColorKey[];
 
-const COLOR_KEYS = Object.keys(COLOR_MAP) as BadgeColorKey[];
-
-// Deterministically map a string to one of the palette colors,
-// so the same category name always gets the same color.
-function hashStringToColorKey(str: string): BadgeColorKey {
+function hashStringToColorKey(str: string): ColorKey {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    hash |= 0; // convert to 32-bit int
+    hash |= 0;
   }
   const index = Math.abs(hash) % COLOR_KEYS.length;
   return COLOR_KEYS[index];
 }
 
-export interface CategoryBadgeProps {
+interface CategoryBadgeProps {
   category: string;
-  color?: BadgeColorKey;
+  color?: ColorKey;
   className?: string;
 }
 
@@ -53,7 +48,7 @@ export default function CategoryBadge({
   color,
   className = "",
 }: CategoryBadgeProps) {
-  const colorKey: BadgeColorKey =
+  const colorKey: ColorKey =
     color && COLOR_MAP[color] ? color : hashStringToColorKey(category || "");
   const { bg, text, border } = COLOR_MAP[colorKey];
 
@@ -79,7 +74,6 @@ export default function CategoryBadge({
   );
 }
 
-// --- Demo (remove or replace with your own usage) ---
 export function CategoryBadgeDemo() {
   const categories = [
     "Career Growth",

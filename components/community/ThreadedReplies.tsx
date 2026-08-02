@@ -17,7 +17,7 @@ interface ThreadedRepliesProps {
 }
 
 export function ThreadedReplies({
-  commentId,
+  commentId: _commentId,
   initialReplies = [],
 }: ThreadedRepliesProps) {
   const [replies, setReplies] = useState<ReplyItem[]>(initialReplies);

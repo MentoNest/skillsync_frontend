@@ -5,9 +5,12 @@ import type { Mentor } from "@/lib/types";
 import StarRating from "@/components/ui/StarRating";
 
 interface MentorComparisonDrawerProps {
-  mentors: Mentor[];
-  onRemove: (id: string) => void;
-  onClose: () => void;
+  selectedMentors?: Mentor[];
+  mentors?: Mentor[];
+  onRemoveMentor?: (id: string) => void;
+  onRemove?: (id: string) => void;
+  onClearAll?: () => void;
+  onClose?: () => void;
 }
 
 const FIELDS: ReadonlyArray<{
@@ -25,7 +28,10 @@ const FIELDS: ReadonlyArray<{
   },
   {
     label: "Experience",
-    render: (m) => (m.yearsExperience ? `${m.yearsExperience}+ yrs` : "N/A"),
+    render: (m) =>
+      m.experienceYears || m.yearsExperience
+        ? `${m.experienceYears || m.yearsExperience}+ yrs`
+        : "N/A",
   },
   { label: "Company", render: (m) => m.company || "N/A" },
   { label: "Title", render: (m) => m.title || "N/A" },
@@ -35,18 +41,25 @@ const FIELDS: ReadonlyArray<{
 ];
 
 export default function MentorComparisonDrawer({
+  selectedMentors,
   mentors,
+  onRemoveMentor,
   onRemove,
+  onClearAll,
   onClose,
 }: MentorComparisonDrawerProps) {
+  const mentorList = selectedMentors ?? mentors ?? [];
+  const handleRemove = onRemoveMentor ?? onRemove ?? (() => {});
+  const handleClose = onClose ?? onClearAll ?? (() => {});
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
     },
-    [onClose],
+    [handleClose],
   );
 
-  if (mentors.length === 0) return null;
+  if (mentorList.length === 0) return null;
 
   return (
     <section
@@ -60,11 +73,11 @@ export default function MentorComparisonDrawer({
       {/* Header */}
       <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <h2 className="text-sm font-bold text-gray-900 dark:text-white">
-          Comparing {mentors.length} mentor{mentors.length > 1 ? "s" : ""}
+          Comparing {mentorList.length} mentor{mentorList.length > 1 ? "s" : ""}
         </h2>
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:underline"
           aria-label="Close comparison panel"
         >
@@ -86,9 +99,9 @@ export default function MentorComparisonDrawer({
               >
                 Field
               </th>
-              {mentors.map((m) => (
+              {mentorList.map((m) => (
                 <th
-                  key={m.id}
+                  key={m.id || m.mentorId}
                   scope="col"
                   className="text-left py-2 px-3 min-w-[160px]"
                 >
@@ -100,11 +113,11 @@ export default function MentorComparisonDrawer({
                       <p className="text-xs text-cyan-600 dark:text-cyan-400">
                         {m.title}
                       </p>
-                      <StarRating rating={m.rating ?? 5} size="sm" />
+                      <StarRating rating={m.rating ?? 0} size="sm" />
                     </div>
                     <button
                       type="button"
-                      onClick={() => onRemove((m.id || m.mentorId) ?? "")}
+                      onClick={() => handleRemove(m.id || m.mentorId || "")}
                       className="shrink-0 text-gray-400 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
                       aria-label={`Remove ${m.name} from comparison`}
                     >
@@ -137,9 +150,9 @@ export default function MentorComparisonDrawer({
                 <td className="py-2 pr-4 font-medium text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wide">
                   {field.label}
                 </td>
-                {mentors.map((m) => (
+                {mentorList.map((m) => (
                   <td
-                    key={m.id}
+                    key={m.id || m.mentorId}
                     className="py-2 px-3 text-gray-900 dark:text-white"
                   >
                     {field.render(m)}

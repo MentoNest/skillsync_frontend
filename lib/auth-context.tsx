@@ -11,7 +11,13 @@
  * implementation to drop in later.
  */
 
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import type { UserRole } from "@/lib/auth";
 import { getDashboardPath } from "@/lib/auth";
@@ -44,16 +50,23 @@ const STORAGE_KEY = "skillsync_user";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    if (typeof window === "undefined") return null;
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Rehydrate user from localStorage on first mount
+  useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? (JSON.parse(stored) as AuthUser) : null;
+      if (stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setUser(JSON.parse(stored) as AuthUser);
+      }
     } catch {
-      return null;
+      // Ignore parse errors — treat as logged out
+    } finally {
+      setLoading(false);
     }
-  });
-  const [loading] = useState(false);
+  }, []);
 
   /**
    * login — authenticate the user and redirect to their role dashboard.

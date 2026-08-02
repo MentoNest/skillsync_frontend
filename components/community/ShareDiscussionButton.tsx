@@ -21,7 +21,7 @@ export function ShareDiscussionButton({ title, url }: ShareButtonProps) {
           url: shareUrl,
         });
         return;
-      } catch (err) {
+      } catch (_err) {
         // Fallback to clipboard if share cancelled or unavailable
       }
     }

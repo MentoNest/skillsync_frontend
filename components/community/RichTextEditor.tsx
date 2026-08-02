@@ -12,14 +12,14 @@ import {
   Code,
   Quote,
 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface Props {
   content: string;
   onChange: (content: string) => void;
 }
 
-const ToolbarButton = ({
+function ToolbarButton({
   onClick,
   active,
   children,
@@ -29,18 +29,20 @@ const ToolbarButton = ({
   active?: boolean;
   children: React.ReactNode;
   title: string;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    title={title}
-    className={`p-2 rounded hover:bg-gray-100 transition-colors ${
-      active ? "bg-cyan-100 text-cyan-700" : "text-gray-600"
-    }`}
-  >
-    {children}
-  </button>
-);
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={`p-2 rounded hover:bg-gray-100 transition-colors ${
+        active ? "bg-cyan-100 text-cyan-700" : "text-gray-600"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function RichTextEditor({ content, onChange }: Props) {
   const [showLinkInput, setShowLinkInput] = useState(false);

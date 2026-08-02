@@ -213,7 +213,6 @@ export default function MentorsPage() {
       setInfiniteLimit((prev) => prev + PAGE_SIZE);
     }, 400);
   };
-
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Search Header */}
@@ -362,7 +361,7 @@ export default function MentorsPage() {
                           }`}
                         >
                           {isSelected
-                            ? "âœ“ Added to compare"
+                            ? "✓ Added to compare"
                             : `+ Compare${
                                 isDisabled ? " (limit reached)" : ""
                               }`}
@@ -414,7 +413,7 @@ export default function MentorsPage() {
                             }`}
                           >
                             {isSelected
-                              ? "âœ“ Added to compare"
+                              ? "✓ Added to compare"
                               : `+ Compare${
                                   isDisabled ? " (limit reached)" : ""
                                 }`}

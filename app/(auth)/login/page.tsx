@@ -150,6 +150,7 @@ export default function LoginPage() {
           </div>
         </div>
 
+        <LoginForm />
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           {/* Email */}

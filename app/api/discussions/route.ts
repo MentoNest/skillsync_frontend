@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     discussions.unshift(newDiscussion);
 
     return NextResponse.json(newDiscussion, { status: 201 });
-  } catch {
+  } catch (_error) {
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },

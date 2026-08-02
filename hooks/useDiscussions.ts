@@ -50,28 +50,9 @@ export function useDiscussions(
   }, [category, sort, page, limit]);
 
   useEffect(() => {
-    let ignore = false;
-    communityService
-      .fetchDiscussions({ page, limit, category: category ?? undefined, sort })
-      .then((result) => {
-        if (!ignore) {
-          setDiscussions(result.discussions);
-          setTotal(result.total);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!ignore) {
-          setError(
-            err instanceof Error ? err.message : "Failed to load discussions",
-          );
-          setLoading(false);
-        }
-      });
-    return () => {
-      ignore = true;
-    };
-  }, [category, sort, page, limit]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchDiscussions();
+  }, [fetchDiscussions]);
 
   return { discussions, total, loading, error, refetch: fetchDiscussions };
 }

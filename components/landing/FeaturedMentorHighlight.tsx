@@ -58,10 +58,10 @@ export default function FeaturedMentorHighlight() {
         <article className="relative overflow-hidden rounded-3xl border border-gray-100 dark:border-gray-700/80 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-0">
             {/* Avatar side */}
-            <div className="flex items-center justify-center p-8 lg:p-12 lg:col-span-2 bg-gradient-to-br from-cyan-50 to-purple-50 dark:from-gray-800 dark:to-gray-800/50">
+            <div className="flex items-center justify-center p-6 sm:p-8 lg:p-12 lg:col-span-2 bg-gradient-to-br from-cyan-50 to-purple-50 dark:from-gray-800 dark:to-gray-800/50">
               <div className="relative">
                 <div
-                  className={`w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-5xl sm:text-6xl font-bold shadow-2xl`}
+                  className={`w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-4xl sm:text-6xl font-bold shadow-2xl`}
                   aria-hidden="true"
                 >
                   {featuredMentor.initials}
@@ -73,7 +73,7 @@ export default function FeaturedMentorHighlight() {
             </div>
 
             {/* Info side */}
-            <div className="flex flex-col justify-center p-8 lg:p-12 lg:col-span-3 gap-5">
+            <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-12 lg:col-span-3 gap-5">
               <div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
                   {featuredMentor.name}
@@ -88,13 +88,13 @@ export default function FeaturedMentorHighlight() {
               </p>
 
               {/* Stats */}
-              <dl className="grid grid-cols-3 gap-4 mt-1">
+              <dl className="grid grid-cols-3 gap-2 sm:gap-4 mt-1">
                 {featuredMentor.stats.map((stat) => (
                   <div key={stat.label} className="text-center sm:text-left">
-                    <dt className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    <dt className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       {stat.label}
                     </dt>
-                    <dd className="mt-0.5 text-lg font-bold text-gray-900 dark:text-white">
+                    <dd className="mt-0.5 text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                       {stat.value}
                     </dd>
                   </div>
@@ -117,10 +117,10 @@ export default function FeaturedMentorHighlight() {
               </div>
 
               {/* CTA */}
-              <div className="flex flex-wrap gap-3 mt-1">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-1">
                 <Link
                   href="/mentors/sarah-doe"
-                  className="inline-flex items-center justify-center rounded-lg bg-cyan-600 px-6 py-3 text-sm font-semibold text-white hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-900 transition-colors"
+                  className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-cyan-600 px-6 py-3 text-sm font-semibold text-white hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-900 transition-colors"
                 >
                   View Profile
                   <svg
@@ -138,7 +138,7 @@ export default function FeaturedMentorHighlight() {
                 </Link>
                 <Link
                   href="/register"
-                  className="inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 transition-colors"
+                  className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 transition-colors"
                 >
                   Book a Session
                 </Link>
