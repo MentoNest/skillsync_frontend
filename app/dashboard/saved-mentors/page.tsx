@@ -1,4 +1,4 @@
-"use client";
+h"use client";
 
 import { useState } from "react";
 import { MOCK_MENTORS } from "@/components/mentors/data";

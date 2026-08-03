@@ -1,4 +1,4 @@
-"use client";
+t"use client";
 
 import React, { useState } from "react";
 import { User, Bell, Shield, CreditCard, LogOut, Save, Upload } from "lucide-react";
