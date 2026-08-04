@@ -1,67 +1,39 @@
-# SkillSync
+# SkillSync (by MentoNest)
+A platform to connect mentors and learners, synchronizing skill development with personalized guidance.
 
-A mentorship platform connecting mentees with industry-leading mentors. Built with Next.js (App Router), TypeScript, and Tailwind CSS.
+[![Build Status](https://github.com/MentoNest/skillsync_frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/MentoNest/skillsync_frontend/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Good First Issues](https://img.shields.io/github/issues/MentoNest/skillsync_frontend/good%20first%20issue)](https://github.com/MentoNest/skillsync_frontend/labels/good%20first%20issue)
 
-## Tech Stack
-
-- **Framework:** Next.js (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **Linting:** ESLint
-- **PostCSS**
-
-## Project Structure
-
-```
-app/
-├── (public)/              # Public-facing pages (landing, mentors, resources)
-│   ├── layout.tsx         # Public layout with Navbar + Footer
-│   └── page.tsx           # Landing page
-├── (mentor)/              # Mentor dashboard
-│   ├── layout.tsx         # Mentor role layout
-│   └── mentor/page.tsx
-├── (mentee)/              # Mentee dashboard
-│   ├── layout.tsx         # Mentee role layout
-│   └── mentee/page.tsx
-├── (admin)/               # Admin dashboard
-│   ├── layout.tsx         # Admin role layout
-│   └── admin/page.tsx
-├── (auth)/                # Authentication pages
-├── (dashboard)/           # Shared dashboard views
-├── api/                   # API routes
-├── layout.tsx             # Root layout
-└── globals.css            # Global styles + Tailwind config
-```
-
-## Shared Directories
-
-```
-components/
-├── landing/               # Landing page section components
-├── mentors/               # Mentor discovery & filtering
-├── community/             # Discussion & moderation features
-├── navigation/            # Navbar, Footer
-├── ui/                    # Reusable UI primitives (Button, StarRating, etc.)
-└── *.tsx                  # Feature-level components (MentorCard, Testimonials, etc.)
-
-lib/
-├── types.ts               # Shared TypeScript interfaces
-├── community-service.ts   # Community data layer
-├── filters.ts             # Filtering utilities
-└── realtime-discussion.ts # Real-time discussion support
-```
+## About
+SkillSync is MentoNest's flagship project, designed to bridge skill gaps by pairing experts (mentors) with those looking to learn (mentees). Features include:
+- User authentication & role-based dashboards
+- Session scheduling & tracking
+- Skill matching algorithm
+- Progress monitoring tools
 
 ## Getting Started
+### Prerequisites
+- Node.js 18+
+- npm/yarn
+- Backend API (see [skillsync_backend](https://github.com/MentoNest/skillsync_backend))
 
-```bash
-npm install
-npm run dev
-```
+### Installation
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/MentoNest/skillsync_frontend.git`
+3. Install dependencies: `npm install`
+4. Set up environment variables (copy `.env.example` to `.env.local`)
+5. Run the development server: `npm run dev`
 
-Open [http://localhost:3000](http://localhost:3000).
+## Contributing
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+- Reporting bugs
+- Submitting pull requests
+- Setting up your development environment
+- Our code of conduct
 
-## Path Aliases
+## Project Roadmap
+Check out our [public roadmap](https://github.com/orgs/MentoNest/projects/2) to see what we're working on next.
 
-- `@/components` — Component library
-- `@/lib` — Utilities and types
-- `@/styles` — Global styles
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
