@@ -1,13 +1,19 @@
-import { ChevronRightIcon } from './icons';
-import { categories } from './categories-data';
+import { ChevronRightIcon } from "@/components/icons";
+import { categories } from "./categories-data";
 
 export async function CategoryGrid() {
   const items = await categories;
 
   return (
-    <section className="max-w-screen-xl px-4 py-12 mx-auto lg:py-16" aria-labelledby="categories-heading">
+    <section
+      className="max-w-screen-xl px-4 py-12 mx-auto lg:py-16"
+      aria-labelledby="categories-heading"
+    >
       <div className="mb-10 text-center md:text-left">
-        <h2 id="categories-heading" className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+        <h2
+          id="categories-heading"
+          className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight"
+        >
           Browse by Topic
         </h2>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">

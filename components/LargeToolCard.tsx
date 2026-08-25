@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface LargeToolCardProps {
   /** Icon element rendered at the top of the card */
@@ -33,7 +33,7 @@ export default function LargeToolCard({
   title,
   description,
   buttonText,
-  gradient = 'from-cyan-500 to-blue-600',
+  gradient = "from-cyan-500 to-blue-600",
   onButtonClick,
 }: LargeToolCardProps) {
   return (

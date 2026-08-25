@@ -1,2 +1,28 @@
 {
+  // Editor settings - enforced for all contributors
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.requireConfig": true,
+  
+  // TypeScript settings
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  
+  // Files
+  "files.autoSave": "onFocusChange",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  
+  // Search exclusions
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/.git": true
+  }
 }

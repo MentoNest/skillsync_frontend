@@ -1,6 +1,6 @@
-import Image from 'next/image';
+import Image from "next/image";
 
-type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
+type AvatarSize = "sm" | "md" | "lg" | "xl";
 
 interface AvatarProps {
   src?: string | null;
@@ -9,26 +9,29 @@ interface AvatarProps {
   size?: AvatarSize;
   className?: string;
   priority?: boolean;
-  variant?: 'circle' | 'rounded';
+  variant?: "circle" | "rounded";
 }
 
-const sizeMap: Record<AvatarSize, { container: string; text: string; imgSize: number }> = {
-  sm: { container: 'w-10 h-10', text: 'text-sm', imgSize: 40 },
-  md: { container: 'w-16 h-16', text: 'text-xl', imgSize: 64 },
-  lg: { container: 'w-24 h-24', text: 'text-3xl', imgSize: 96 },
-  xl: { container: 'w-40 h-40', text: 'text-5xl', imgSize: 160 },
+const sizeMap: Record<
+  AvatarSize,
+  { container: string; text: string; imgSize: number }
+> = {
+  sm: { container: "w-10 h-10", text: "text-sm", imgSize: 40 },
+  md: { container: "w-16 h-16", text: "text-xl", imgSize: 64 },
+  lg: { container: "w-24 h-24", text: "text-3xl", imgSize: 96 },
+  xl: { container: "w-40 h-40", text: "text-5xl", imgSize: 160 },
 };
 
 const bgGradients = [
-  'from-cyan-500 to-blue-600',
-  'from-purple-500 to-indigo-600',
-  'from-emerald-500 to-teal-600',
-  'from-pink-500 to-rose-600',
+  "from-cyan-500 to-blue-600",
+  "from-purple-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-pink-500 to-rose-600",
 ];
 
-const variantRadii: Record<'circle' | 'rounded', string> = {
-  circle: 'rounded-full',
-  rounded: 'rounded-2xl',
+const variantRadii: Record<"circle" | "rounded", string> = {
+  circle: "rounded-full",
+  rounded: "rounded-2xl",
 };
 
 function getGradient(name: string): string {
@@ -37,9 +40,9 @@ function getGradient(name: string): string {
 
 function getInitials(name: string): string {
   return name
-    .split(' ')
+    .split(" ")
     .map((n) => n[0])
-    .join('')
+    .join("")
     .slice(0, 2)
     .toUpperCase();
 }
@@ -53,10 +56,10 @@ export default function Avatar({
   src,
   alt,
   name,
-  size = 'md',
-  className = '',
+  size = "md",
+  className = "",
   priority = false,
-  variant = 'rounded',
+  variant = "rounded",
 }: AvatarProps) {
   const { container: containerSize, text: textSize } = sizeMap[size];
   const radius = variantRadii[variant];
@@ -76,7 +79,7 @@ export default function Avatar({
           fill
           sizes={getSizes(size)}
           className={`object-cover ${radius}`}
-          loading={priority ? undefined : 'lazy'}
+          loading={priority ? undefined : "lazy"}
           priority={priority}
         />
       ) : (

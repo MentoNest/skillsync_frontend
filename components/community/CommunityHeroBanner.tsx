@@ -11,6 +11,7 @@ interface CommunityHeroBannerProps {
  * changes. Pair with useCallback at the call site to keep it fully stable.
  */
 const CommunityHeroBanner = memo(function CommunityHeroBanner({
+export default function CommunityHeroBanner({
   onStartDiscussion,
 }: CommunityHeroBannerProps) {
   return (
@@ -25,6 +26,8 @@ const CommunityHeroBanner = memo(function CommunityHeroBanner({
         <p className="text-purple-100/90 text-base sm:text-lg leading-relaxed mb-6">
           Connect with mentors and peers — ask questions, share wins, discover resources, and join
           live events.
+          Connect with mentors and peers — ask questions, share wins, discover
+          resources, and join live events.
         </p>
         <button
           onClick={onStartDiscussion}
@@ -38,7 +41,11 @@ const CommunityHeroBanner = memo(function CommunityHeroBanner({
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           Start a Discussion
         </button>
