@@ -1,23 +1,25 @@
+"use client";
+
 interface StarRatingProps {
   rating: number;
   maxRating?: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   showValue?: boolean;
   className?: string;
 }
 
 const sizeMap = {
-  sm: { star: 16, text: 'text-xs', gap: 'gap-0.5' },
-  md: { star: 20, text: 'text-sm', gap: 'gap-1' },
-  lg: { star: 28, text: 'text-lg', gap: 'gap-1' },
+  sm: { star: 16, text: "text-xs", gap: "gap-0.5" },
+  md: { star: 20, text: "text-sm", gap: "gap-1" },
+  lg: { star: 28, text: "text-lg", gap: "gap-1" },
 };
 
 export default function StarRating({
   rating,
   maxRating = 5,
-  size = 'md',
+  size = "md",
   showValue = false,
-  className = '',
+  className = "",
 }: StarRatingProps) {
   const { star: starSize, text: textSize, gap } = sizeMap[size];
   const stars = Array.from({ length: maxRating }, (_, i) => {
@@ -27,12 +29,13 @@ export default function StarRating({
 
   return (
     <div
+      key={rating}
       className={`inline-flex items-center ${gap} ${className}`}
       role="img"
       aria-label={`${rating} out of ${maxRating} stars`}
     >
       {stars.map((fill, i) => {
-        const clipId = `star-clip-${i}-${rating.toString().replace('.', '-')}`;
+        const clipId = `star-clip-${i}-${rating.toString().replace(".", "-")}`;
         return (
           <svg
             key={i}
@@ -60,7 +63,9 @@ export default function StarRating({
         );
       })}
       {showValue && (
-        <span className={`${textSize} font-semibold text-gray-700 dark:text-gray-300 ml-1`}>
+        <span
+          className={`${textSize} font-semibold text-gray-700 dark:text-gray-300 ml-1`}
+        >
           {rating.toFixed(1)}
         </span>
       )}

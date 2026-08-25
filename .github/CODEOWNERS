@@ -1,0 +1,20 @@
+# MentoNest SkillSync Code Owners
+# This file assigns reviewers for specific file paths in PRs
+
+# Core maintainers for all files
+*                       @mentonest/maintainers
+
+# Frontend specialists for React/Next.js specific code
+*.tsx                   @mentonest/frontend-engineers
+*.ts                    @mentonest/frontend-engineers
+next.config.js          @mentonest/frontend-engineers
+tailwind.config.js      @mentonest/frontend-engineers
+
+# Authentication logic - requires security review
+contexts/AuthContext.tsx    @mentonest/security-team @mentonest/frontend-engineers
+components/auth/**/*        @mentonest/security-team @mentonest/frontend-engineers
+lib/auth/**/*               @mentonest/security-team
+
+# API and environment configuration
+.env.example            @mentonest/devops-team
+.github/workflows/**/*  @mentonest/devops-team

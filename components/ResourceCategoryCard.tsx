@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ReactNode } from 'react';
+import Link from "next/link";
+import { ReactNode } from "react";
 
 interface ResourceCategoryCardProps {
   icon: ReactNode;
@@ -8,7 +8,12 @@ interface ResourceCategoryCardProps {
   link: string;
 }
 
-export default function ResourceCategoryCard({ icon, title, description, link }: ResourceCategoryCardProps) {
+export default function ResourceCategoryCard({
+  icon,
+  title,
+  description,
+  link,
+}: ResourceCategoryCardProps) {
   return (
     <Link href={link} className="group block" aria-label={`Explore ${title}`}>
       <article className="flex h-full flex-col items-start gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg">
@@ -20,7 +25,9 @@ export default function ResourceCategoryCard({ icon, title, description, link }:
         </div>
         <div className="space-y-2">
           <h4 className="text-lg font-semibold text-slate-900">{title}</h4>
-          <p className="text-sm leading-relaxed text-slate-600">{description}</p>
+          <p className="text-sm leading-relaxed text-slate-600">
+            {description}
+          </p>
         </div>
       </article>
     </Link>
