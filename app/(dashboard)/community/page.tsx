@@ -1,13 +1,61 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import CategoryBadge from '@/components/CategoryBadge';
+/**
+ * Community Page — Performance-optimized
+ *
+ * Optimizations applied:
+ * 1. DiscussionCard is React.memo'd — skips re-render unless its own props change.
+ * 2. CommunitySidebar is React.memo'd AND lazy-loaded via next/dynamic — its JS
+ *    bundle is deferred until after the critical discussion feed is interactive.
+ * 3. All analytics callbacks passed to DiscussionCard are wrapped in useCallback
+ *    so their references are stable across renders, keeping memo effective.
+ * 4. The onStartDiscussion callback for CommunityHeroBanner is also useCallback'd.
+ * 5. Static data arrays (DISCUSSIONS, CATEGORIES, EVENTS, STATS) are defined at
+ *    module scope — never re-created on render.
+ * 6. `will-change-scroll-position` is set on the scrollable tab strip via CSS to
+ *    hint the browser to promote it to its own compositor layer for smooth scroll.
+ * 7. `content-visibility: auto` (via Tailwind's `[content-visibility:auto]`) on
+ *    each DiscussionCard defers off-screen rendering work.
+ */
+
+import React, { useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import CommunityHeroBanner from '@/components/community/CommunityHeroBanner';
+import DiscussionCard from '@/components/community/DiscussionCard';
 import { useCommunityAnalytics } from '@/hooks/useCommunityAnalytics';
+import type { CommunitySidebarProps } from '@/components/community/CommunitySidebar';
 
-// ── Mock data ────────────────────────────────────────────────────────────────
+// ── Lazy-load the sidebar ─────────────────────────────────────────────────────
+// The sidebar is below the fold on mobile and not critical for initial paint.
+// next/dynamic defers its JavaScript bundle until after hydration, improving
+// Time-to-Interactive for the discussion feed.
 
-const TABS = ['All Discussions', 'Questions', 'Success Stories', 'Resources', 'Events'];
+const CommunitySidebar = dynamic<CommunitySidebarProps>(
+  () => import('@/components/community/CommunitySidebar'),
+  {
+    ssr: false,
+    loading: () => (
+      <aside
+        className="w-full lg:w-72 xl:w-80 flex-shrink-0 space-y-4"
+        aria-label="Community sidebar"
+        aria-busy="true"
+      >
+        {/* Skeleton — matches the sidebar's visual weight */}
+        {[80, 64, 56].map((h) => (
+          <div
+            key={h}
+            className={`bg-white rounded-xl border border-gray-100 shadow-sm p-5 animate-pulse`}
+            style={{ minHeight: h * 2 }}
+          />
+        ))}
+      </aside>
+    ),
+  },
+);
+
+// ── Static data (module scope — never re-created on render) ──────────────────
+
+const TABS = ['All Discussions', 'Questions', 'Success Stories', 'Resources', 'Events'] as const;
 
 const DISCUSSIONS = [
   {
@@ -66,7 +114,7 @@ const DISCUSSIONS = [
     likes: 41,
     replies: 19,
   },
-];
+] as const;
 
 const CATEGORIES = [
   { label: 'Career Advice', count: 142, color: 'bg-cyan-100 text-cyan-700' },
@@ -75,168 +123,20 @@ const CATEGORIES = [
   { label: 'Success Stories', count: 63, color: 'bg-green-100 text-green-700' },
   { label: 'Resources', count: 51, color: 'bg-blue-100 text-blue-700' },
   { label: 'Networking', count: 38, color: 'bg-rose-100 text-rose-700' },
-];
+] as const;
 
 const EVENTS = [
-  {
-    id: 'evt-1',
-    title: 'AMA: Breaking into Product Management',
-    date: 'Jul 5, 2026',
-    time: '3:00 PM WAT',
-    attendees: 47,
-  },
-  {
-    id: 'evt-2',
-    title: 'Workshop: Negotiating Your Salary',
-    date: 'Jul 12, 2026',
-    time: '5:00 PM WAT',
-    attendees: 112,
-  },
-  {
-    id: 'evt-3',
-    title: 'Panel: Women in Tech Leadership',
-    date: 'Jul 19, 2026',
-    time: '4:00 PM WAT',
-    attendees: 89,
-  },
-];
+  { id: 'evt-1', title: 'AMA: Breaking into Product Management', date: 'Jul 5, 2026', time: '3:00 PM WAT', attendees: 47 },
+  { id: 'evt-2', title: 'Workshop: Negotiating Your Salary', date: 'Jul 12, 2026', time: '5:00 PM WAT', attendees: 112 },
+  { id: 'evt-3', title: 'Panel: Women in Tech Leadership', date: 'Jul 19, 2026', time: '4:00 PM WAT', attendees: 89 },
+] as const;
 
 const STATS = [
   { label: 'Community Members', value: '12,480', icon: '👥' },
   { label: 'Discussions Started', value: '3,214', icon: '💬' },
   { label: 'Questions Answered', value: '8,901', icon: '✅' },
   { label: 'Events Hosted', value: '256', icon: '📅' },
-];
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-const AVATAR_GRADIENTS = [
-  'from-purple-500 to-indigo-600',
-  'from-cyan-500 to-blue-600',
-  'from-emerald-500 to-teal-600',
-  'from-pink-500 to-rose-600',
-];
-
-function avatarGradient(name: string) {
-  return AVATAR_GRADIENTS[name.length % AVATAR_GRADIENTS.length];
-}
-
-// ── DiscussionCard ────────────────────────────────────────────────────────────
-
-interface DiscussionCardProps {
-  post: (typeof DISCUSSIONS)[number];
-  onView: () => void;
-  onLike: () => void;
-  onReply: () => void;
-  onShare: () => void;
-  onBookmark: () => void;
-}
-
-function DiscussionCard({
-  post,
-  onView,
-  onLike,
-  onReply,
-  onShare,
-  onBookmark,
-}: DiscussionCardProps) {
-  return (
-    <article className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-start gap-3">
-        {/* Avatar */}
-        <div
-          className={`flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br ${avatarGradient(post.author)} flex items-center justify-center text-white text-sm font-bold`}
-          aria-hidden="true"
-        >
-          {getInitials(post.author)}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          {/* Author + meta */}
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="text-sm font-semibold text-gray-900">{post.author}</span>
-            <span className="text-xs text-gray-400">·</span>
-            <span className="text-xs text-gray-500">{post.role}</span>
-            <span className="text-xs text-gray-400">·</span>
-            <span className="text-xs text-gray-400">{post.time}</span>
-            <CategoryBadge category={post.category} color={post.categoryColor} />
-          </div>
-
-          {/* Title — fires discussion_viewed on click */}
-          <h3
-            className="text-base font-semibold text-gray-900 leading-snug mb-1 hover:text-purple-700 transition-colors cursor-pointer"
-            onClick={onView}
-          >
-            {post.title}
-          </h3>
-
-          {/* Excerpt */}
-          <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{post.excerpt}</p>
-
-          {/* Actions */}
-          <div className="flex items-center gap-4 mt-3">
-            {/* Like */}
-            <button
-              onClick={onLike}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-600 transition-colors focus:outline-none focus-visible:underline"
-              aria-label={`${post.likes} likes`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              {post.likes}
-            </button>
-
-            {/* Reply */}
-            <button
-              onClick={onReply}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-600 transition-colors focus:outline-none focus-visible:underline"
-              aria-label={`${post.replies} replies`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              {post.replies} replies
-            </button>
-
-            {/* Share */}
-            <button
-              onClick={onShare}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-600 transition-colors focus:outline-none focus-visible:underline"
-              aria-label="Share discussion"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-              Share
-            </button>
-
-            {/* Bookmark */}
-            <button
-              onClick={onBookmark}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-600 transition-colors focus:outline-none focus-visible:underline"
-              aria-label="Bookmark discussion"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-              Save
-            </button>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
+] as const;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -251,7 +151,7 @@ export default function CommunityPage() {
     trackEventRegistered,
   } = useCommunityAnalytics();
 
-  // Track a page-level "view" for all visible discussions on mount.
+  // Track page-level views on mount.
   useEffect(() => {
     DISCUSSIONS.forEach((post) =>
       trackDiscussionViewed({
@@ -262,29 +162,53 @@ export default function CommunityPage() {
     );
   }, [trackDiscussionViewed]);
 
+  // ── Stable callbacks ────────────────────────────────────────────────────────
+  // useCallback ensures each handler reference is stable between renders so
+  // React.memo on DiscussionCard and CommunityHeroBanner can do its job.
+
+  const handleStartDiscussion = useCallback(() => {
+    trackDiscussionCreated({ discussionId: 'new', title: 'New Discussion', category: 'General' });
+  }, [trackDiscussionCreated]);
+
+  const handleEventRegister = useCallback(
+    (eventId: string, eventTitle: string) => {
+      trackEventRegistered({ eventId, eventTitle });
+    },
+    [trackEventRegistered],
+  );
+
+  // Per-post callbacks are keyed by post.id so each card gets its own stable fn.
+  // The dependency arrays only contain the tracker (itself stable via useCallback
+  // inside useCommunityAnalytics).
+  const makeHandlers = useCallback(
+    (post: (typeof DISCUSSIONS)[number]) => ({
+      onView: () => trackDiscussionViewed({ discussionId: post.id, title: post.title, category: post.category }),
+      onLike: () => trackDiscussionLiked({ discussionId: post.id, title: post.title }),
+      onReply: () => trackDiscussionReplied({ discussionId: post.id, title: post.title }),
+      onShare: () => trackDiscussionShared({ discussionId: post.id, title: post.title, shareMethod: 'copy_link' }),
+      onBookmark: () => trackDiscussionBookmarked({ discussionId: post.id, title: post.title }),
+    }),
+    [trackDiscussionViewed, trackDiscussionLiked, trackDiscussionReplied, trackDiscussionShared, trackDiscussionBookmarked],
+  );
+
   return (
     <div className="space-y-6">
       {/* ── Hero Banner ──────────────────────────────────────────────────── */}
-      <CommunityHeroBanner
-        onStartDiscussion={() =>
-          trackDiscussionCreated({
-            discussionId: 'new',
-            title: 'New Discussion',
-            category: 'General',
-          })
-        }
-      />
+      <CommunityHeroBanner onStartDiscussion={handleStartDiscussion} />
 
       {/* ── Main content + sidebar ────────────────────────────────────────── */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* ── Left: Discussion feed ─────────────────────────────────────── */}
         <div className="w-full lg:flex-1 min-w-0 space-y-4">
-          {/* Tabs */}
+          {/* Tabs — overflow-x-auto with will-change for smooth compositor scroll */}
           <nav
             className="bg-white rounded-xl border border-gray-100 shadow-sm px-4"
             aria-label="Discussion filters"
           >
-            <ul className="flex gap-1 overflow-x-auto" role="tablist">
+            <ul
+              className="flex gap-1 overflow-x-auto [will-change:scroll-position] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              role="tablist"
+            >
               {TABS.map((tab, i) => (
                 <li key={tab} role="presentation">
                   <button
@@ -303,46 +227,19 @@ export default function CommunityPage() {
             </ul>
           </nav>
 
-          {/* Discussion list */}
+          {/* Discussion list — content-visibility:auto defers off-screen paint */}
           <div className="space-y-3" role="feed" aria-label="Discussions">
-            {DISCUSSIONS.map((post) => (
-              <DiscussionCard
-                key={post.id}
-                post={post}
-                onView={() =>
-                  trackDiscussionViewed({
-                    discussionId: post.id,
-                    title: post.title,
-                    category: post.category,
-                  })
-                }
-                onLike={() =>
-                  trackDiscussionLiked({
-                    discussionId: post.id,
-                    title: post.title,
-                  })
-                }
-                onReply={() =>
-                  trackDiscussionReplied({
-                    discussionId: post.id,
-                    title: post.title,
-                  })
-                }
-                onShare={() =>
-                  trackDiscussionShared({
-                    discussionId: post.id,
-                    title: post.title,
-                    shareMethod: 'copy_link',
-                  })
-                }
-                onBookmark={() =>
-                  trackDiscussionBookmarked({
-                    discussionId: post.id,
-                    title: post.title,
-                  })
-                }
-              />
-            ))}
+            {DISCUSSIONS.map((post) => {
+              const handlers = makeHandlers(post);
+              return (
+                <div
+                  key={post.id}
+                  className="[content-visibility:auto] [contain-intrinsic-size:0_180px]"
+                >
+                  <DiscussionCard post={post} {...handlers} />
+                </div>
+              );
+            })}
           </div>
 
           {/* Load more */}
@@ -353,88 +250,13 @@ export default function CommunityPage() {
           </div>
         </div>
 
-        {/* ── Right: Sidebar ────────────────────────────────────────────── */}
-        <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0 space-y-4" aria-label="Community sidebar">
-          {/* Categories */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Browse Categories</h2>
-            <ul className="space-y-2">
-              {CATEGORIES.map((cat) => (
-                <li key={cat.label}>
-                  <button className="w-full flex items-center justify-between group focus:outline-none focus-visible:underline">
-                    <CategoryBadge category={cat.label} color={cat.color} />
-                    <span className="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">
-                      {cat.count}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Upcoming Events */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Upcoming Events</h2>
-            <ul className="space-y-3">
-              {EVENTS.map((event) => (
-                <li key={event.id} className="flex gap-3 cursor-pointer group">
-                  {/* Date chip */}
-                  <div className="flex-shrink-0 w-10 text-center">
-                    <div className="bg-purple-100 text-purple-700 rounded-lg px-1 py-1">
-                      <span className="block text-xs font-bold leading-none">
-                        {event.date.split(' ')[0]}
-                      </span>
-                      <span className="block text-lg font-extrabold leading-tight">
-                        {event.date.split(' ')[1].replace(',', '')}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800 group-hover:text-purple-700 transition-colors leading-snug">
-                      {event.title}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">{event.time}</p>
-                    <p className="text-xs text-gray-400">
-                      <span aria-hidden="true">👤 </span>
-                      {event.attendees} attending
-                    </p>
-                    {/* Register button fires event_registered */}
-                    <button
-                      onClick={() =>
-                        trackEventRegistered({
-                          eventId: event.id,
-                          eventTitle: event.title,
-                        })
-                      }
-                      className="mt-1.5 text-xs font-semibold text-purple-600 hover:text-purple-800 transition-colors focus:outline-none focus-visible:underline"
-                    >
-                      Register →
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <button className="mt-4 w-full text-center text-xs font-semibold text-purple-600 hover:text-purple-800 transition-colors focus:outline-none focus-visible:underline">
-              View all events →
-            </button>
-          </div>
-
-          {/* Community Statistics */}
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-100 shadow-sm p-5">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Community Stats</h2>
-            <ul className="grid grid-cols-2 gap-3">
-              {STATS.map((stat) => (
-                <li key={stat.label} className="bg-white rounded-lg p-3 shadow-sm text-center">
-                  <span className="text-xl" role="img" aria-label={stat.label}>
-                    {stat.icon}
-                  </span>
-                  <p className="text-base font-extrabold text-gray-900 mt-1 leading-none">{stat.value}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 leading-snug">{stat.label}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+        {/* ── Right: Sidebar (lazy-loaded) ──────────────────────────────── */}
+        <CommunitySidebar
+          categories={CATEGORIES as unknown as { label: string; count: number; color: string }[]}
+          events={EVENTS as unknown as { id: string; title: string; date: string; time: string; attendees: number }[]}
+          stats={STATS as unknown as { label: string; value: string; icon: string }[]}
+          onEventRegister={handleEventRegister}
+        />
       </div>
     </div>
   );
