@@ -2,7 +2,9 @@ interface CommunityHeroBannerProps {
   onStartDiscussion?: () => void;
 }
 
-export default function CommunityHeroBanner({ onStartDiscussion }: CommunityHeroBannerProps) {
+export default function CommunityHeroBanner({
+  onStartDiscussion,
+}: CommunityHeroBannerProps) {
   return (
     <section
       className="bg-gradient-to-r from-purple-700 to-indigo-800 rounded-2xl px-6 py-10 sm:px-10 sm:py-14 text-white shadow-md"
@@ -13,7 +15,8 @@ export default function CommunityHeroBanner({ onStartDiscussion }: CommunityHero
           Welcome to the Community
         </h1>
         <p className="text-purple-100/90 text-base sm:text-lg leading-relaxed mb-6">
-          Connect with mentors and peers — ask questions, share wins, discover resources, and join live events.
+          Connect with mentors and peers — ask questions, share wins, discover
+          resources, and join live events.
         </p>
         <button
           onClick={onStartDiscussion}
@@ -27,7 +30,11 @@ export default function CommunityHeroBanner({ onStartDiscussion }: CommunityHero
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           Start a Discussion
         </button>

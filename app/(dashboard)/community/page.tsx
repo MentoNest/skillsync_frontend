@@ -4,10 +4,22 @@ import React, { useEffect } from 'react';
 import CategoryBadge from '@/components/CategoryBadge';
 import CommunityHeroBanner from '@/components/community/CommunityHeroBanner';
 import { useCommunityAnalytics } from '@/hooks/useCommunityAnalytics';
+"use client";
 
-// ── Mock data ────────────────────────────────────────────────────────────────
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useCommunity } from "./community-context";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import StartDiscussionModal from "@/components/community/StartDiscussionModal";
+import DiscussionFeed from "@/components/community/DiscussionFeed";
+import { Tabs, TabItem } from "@/components/ui/tabs";
+import { CategoriesWidget } from "@/components/ui/categories-widget";
+import { UpcomingEventsWidget } from "@/components/ui/upcoming-events-widget";
+import { StatisticCard } from "@/components/ui/statistic-card";
+import type { DiscussionMetadata } from "@/lib/community-types";
+import type { Discussion } from "./community-context";
 
-const TABS = ['All Discussions', 'Questions', 'Success Stories', 'Resources', 'Events'];
+type DiscussionView = "trending" | "latest" | "my-posts";
 
 const DISCUSSIONS = [
   {
@@ -66,16 +78,13 @@ const DISCUSSIONS = [
     likes: 41,
     replies: 19,
   },
+const VIEW_TABS: TabItem<DiscussionView>[] = [
+  { value: "trending", label: "Trending" },
+  { value: "latest", label: "Latest" },
+  { value: "my-posts", label: "My Posts" },
 ];
 
-const CATEGORIES = [
-  { label: 'Career Advice', count: 142, color: 'bg-cyan-100 text-cyan-700' },
-  { label: 'Technical Skills', count: 98, color: 'bg-purple-100 text-purple-700' },
-  { label: 'Interview Prep', count: 74, color: 'bg-amber-100 text-amber-700' },
-  { label: 'Success Stories', count: 63, color: 'bg-green-100 text-green-700' },
-  { label: 'Resources', count: 51, color: 'bg-blue-100 text-blue-700' },
-  { label: 'Networking', count: 38, color: 'bg-rose-100 text-rose-700' },
-];
+const CURRENT_USER = { id: "current-user", name: "Emily Rodriguez" };
 
 const EVENTS = [
   {
@@ -100,35 +109,93 @@ const EVENTS = [
     attendees: 89,
   },
 ];
-
-const STATS = [
-  { label: 'Community Members', value: '12,480', icon: '👥' },
-  { label: 'Discussions Started', value: '3,214', icon: '💬' },
-  { label: 'Questions Answered', value: '8,901', icon: '✅' },
-  { label: 'Events Hosted', value: '256', icon: '📅' },
-];
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+function toDiscussionMetadata(discussion: Discussion): DiscussionMetadata {
+  return {
+    id: discussion.id,
+    title: discussion.title,
+    author: {
+      id: discussion.authorId ?? discussion.id,
+      name: discussion.author,
+      role: "Community Member",
+    },
+    category: discussion.category,
+    createdAt: discussion.createdAt.toISOString(),
+    likeCount: discussion.likes,
+    commentCount: discussion.replies,
+    viewCount: discussion.trending,
+    isPinned: discussion.isPinned,
+    isLocked: discussion.isLocked,
+  };
 }
 
-const AVATAR_GRADIENTS = [
-  'from-purple-500 to-indigo-600',
-  'from-cyan-500 to-blue-600',
-  'from-emerald-500 to-teal-600',
-  'from-pink-500 to-rose-600',
-];
+const UsersIcon = () => (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+    />
+  </svg>
+);
 
-function avatarGradient(name: string) {
-  return AVATAR_GRADIENTS[name.length % AVATAR_GRADIENTS.length];
-}
+const MessageIcon = () => (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+    />
+  </svg>
+);
+
+const ActiveIcon = () => (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M13 10V3L4 14h7v7l9-11h-7z"
+    />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
+  </svg>
+);
+
+export default function CommunityPage() {
+  const [view, setView] = useState<DiscussionView>("trending");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
 // ── DiscussionCard ────────────────────────────────────────────────────────────
 
@@ -159,17 +226,21 @@ function DiscussionCard({
         >
           {getInitials(post.author)}
         </div>
+  const {
+    categories,
+    events,
+    statistics,
+    getFilteredDiscussions,
+    handleEventRegistration,
+  } = useCommunity();
 
-        <div className="flex-1 min-w-0">
-          {/* Author + meta */}
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="text-sm font-semibold text-gray-900">{post.author}</span>
-            <span className="text-xs text-gray-400">·</span>
-            <span className="text-xs text-gray-500">{post.role}</span>
-            <span className="text-xs text-gray-400">·</span>
-            <span className="text-xs text-gray-400">{post.time}</span>
-            <CategoryBadge category={post.category} color={post.categoryColor} />
-          </div>
+  const allDiscussions = useMemo(
+    () => getFilteredDiscussions().map(toDiscussionMetadata),
+    [getFilteredDiscussions],
+  );
+
+  const visibleDiscussions = useMemo(() => {
+    const list = [...allDiscussions];
 
           {/* Title — fires discussion_viewed on click */}
           <h3
@@ -178,9 +249,16 @@ function DiscussionCard({
           >
             {post.title}
           </h3>
+    if (view === "my-posts") {
+      return list.filter((d) => d.author.id === CURRENT_USER.id);
+    }
 
-          {/* Excerpt */}
-          <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{post.excerpt}</p>
+    list.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      if (view === "trending") return (b.viewCount || 0) - (a.viewCount || 0);
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
           {/* Actions */}
           <div className="flex items-center gap-4 mt-3">
@@ -237,8 +315,22 @@ function DiscussionCard({
     </article>
   );
 }
+    return list;
+  }, [allDiscussions, view]);
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+  const handleDiscussionClick = (id: string) => {
+    router.push(`/community/${id}`);
+  };
+
+  const handleLike = (id: string) => {
+    // Placeholder for future API integration (issue #676 follow-up)
+    console.log("Like discussion:", id);
+  };
+
+  const handleBookmark = (id: string) => {
+    // Placeholder for future API integration (issue #676 follow-up)
+    console.log("Bookmark discussion:", id);
+  };
 
 export default function CommunityPage() {
   const {
@@ -274,34 +366,34 @@ export default function CommunityPage() {
           })
         }
       />
+  return (
+    <div className="space-y-6">
+      {/* Issue #673: Community Hero Banner */}
+      <CommunityHeroBanner onStartDiscussion={() => setIsModalOpen(true)} />
 
-      {/* ── Main content + sidebar ────────────────────────────────────────── */}
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* ── Left: Discussion feed ─────────────────────────────────────── */}
-        <div className="w-full lg:flex-1 min-w-0 space-y-4">
-          {/* Tabs */}
-          <nav
-            className="bg-white rounded-xl border border-gray-100 shadow-sm px-4"
-            aria-label="Discussion filters"
-          >
-            <ul className="flex gap-1 overflow-x-auto" role="tablist">
-              {TABS.map((tab, i) => (
-                <li key={tab} role="presentation">
-                  <button
-                    role="tab"
-                    aria-selected={i === 0}
-                    className={`whitespace-nowrap px-4 py-3.5 text-sm font-medium border-b-2 transition-colors focus:outline-none focus-visible:underline ${
-                      i === 0
-                        ? 'border-purple-600 text-purple-700'
-                        : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+      {/* Community statistics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatisticCard
+          label="Total Members"
+          value={statistics.totalMembers}
+          icon={<UsersIcon />}
+        />
+        <StatisticCard
+          label="Active Discussions"
+          value={statistics.activeDiscussions}
+          icon={<ActiveIcon />}
+        />
+        <StatisticCard
+          label="Total Discussions"
+          value={statistics.totalDiscussions}
+          icon={<MessageIcon />}
+        />
+        <StatisticCard
+          label="Events This Month"
+          value={statistics.eventsThisMonth}
+          icon={<CalendarIcon />}
+        />
+      </div>
 
           {/* Discussion list */}
           <div className="space-y-3" role="feed" aria-label="Discussions">
@@ -344,33 +436,42 @@ export default function CommunityPage() {
               />
             ))}
           </div>
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        {/* Issue #676: Discussion Feed Container */}
+        <section
+          className="w-full lg:flex-1 min-w-0 space-y-4"
+          aria-label="Discussions"
+        >
+          <div className="bg-white rounded-lg shadow">
+            {/* Issue #675: Community Navigation Tabs */}
+            <Tabs
+              tabs={VIEW_TABS}
+              activeTab={view}
+              onChange={setView}
+              ariaLabel="Discussion views"
+            />
 
-          {/* Load more */}
-          <div className="text-center pt-2">
-            <button className="text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors focus:outline-none focus-visible:underline">
-              Load more discussions
-            </button>
+            <div className="p-4 sm:p-6">
+              <DiscussionFeed
+                discussions={visibleDiscussions}
+                onLike={handleLike}
+                onBookmark={handleBookmark}
+                onDiscussionClick={handleDiscussionClick}
+              />
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* ── Right: Sidebar ────────────────────────────────────────────── */}
-        <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0 space-y-4" aria-label="Community sidebar">
-          {/* Categories */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Browse Categories</h2>
-            <ul className="space-y-2">
-              {CATEGORIES.map((cat) => (
-                <li key={cat.label}>
-                  <button className="w-full flex items-center justify-between group focus:outline-none focus-visible:underline">
-                    <CategoryBadge category={cat.label} color={cat.color} />
-                    <span className="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">
-                      {cat.count}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <aside
+          className="w-full lg:w-72 xl:w-80 flex-shrink-0 space-y-6"
+          aria-label="Community sidebar"
+        >
+          <CategoriesWidget
+            categories={categories}
+            selectedCategory={null}
+            onCategorySelect={() => {}}
+            totalDiscussions={statistics.totalDiscussions}
+          />
 
           {/* Upcoming Events */}
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
@@ -418,24 +519,50 @@ export default function CommunityPage() {
               View all events →
             </button>
           </div>
+          <UpcomingEventsWidget
+            events={events}
+            onRegister={handleEventRegistration}
+          />
 
-          {/* Community Statistics */}
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-100 shadow-sm p-5">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Community Stats</h2>
-            <ul className="grid grid-cols-2 gap-3">
-              {STATS.map((stat) => (
-                <li key={stat.label} className="bg-white rounded-lg p-3 shadow-sm text-center">
-                  <span className="text-xl" role="img" aria-label={stat.label}>
-                    {stat.icon}
-                  </span>
-                  <p className="text-base font-extrabold text-gray-900 mt-1 leading-none">{stat.value}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 leading-snug">{stat.label}</p>
-                </li>
-              ))}
-            </ul>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Community Statistics
+            </h2>
+            <dl className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <dt className="text-xs text-gray-600">Total Members</dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {statistics.totalMembers.toLocaleString()}
+                </dd>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <dt className="text-xs text-gray-600">Active Discussions</dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {statistics.activeDiscussions}
+                </dd>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <dt className="text-xs text-gray-600">Total Discussions</dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {statistics.totalDiscussions}
+                </dd>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <dt className="text-xs text-gray-600">Events This Month</dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {statistics.eventsThisMonth}
+                </dd>
+              </div>
+            </dl>
           </div>
         </aside>
       </div>
+
+      {/* Issue #674: Start a Discussion CTA modal */}
+      <StartDiscussionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

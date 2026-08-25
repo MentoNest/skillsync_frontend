@@ -1,7 +1,10 @@
-import React, { Suspense } from 'react';
-import HeroSection from '@/components/resources/HeroSection';
-import ResourceSearchBarWrapper from '@/components/resources/ResourceSearchBarWrapper';
-import { CategoryGrid } from '@/components/resources/CategoryGrid';
+import React, { Suspense } from "react";
+import HeroSection from "@/components/resources/HeroSection";
+import ResourceSearchBarWrapper from "@/components/resources/ResourceSearchBarWrapper";
+import { CategoryGrid } from "@/components/resources/CategoryGrid";
+import ToolsTemplatesSection from "@/components/resources/ToolsTemplatesSection";
+import QuickAccessSection from "@/components/resources/QuickAccessSection";
+import CTASection from "@/components/resources/CTASection";
 
 function CategoryGridFallback() {
   return (
@@ -12,7 +15,10 @@ function CategoryGridFallback() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="p-6 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/80 rounded-2xl">
+          <div
+            key={i}
+            className="p-6 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/80 rounded-2xl"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-purple-100 dark:bg-purple-950/40 rounded-xl animate-pulse" />
               <div className="w-20 h-5 bg-purple-100 dark:bg-purple-950/40 rounded-full animate-pulse" />
@@ -27,18 +33,59 @@ function CategoryGridFallback() {
   );
 }
 
+function SectionFallback() {
+  return (
+    <section className="max-w-screen-xl px-4 py-16 mx-auto lg:py-20">
+      <div className="mb-12 text-center lg:text-left">
+        <div className="h-10 w-64 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse mx-auto lg:mx-0" />
+        <div className="mt-3 h-6 w-96 bg-gray-100 dark:bg-gray-800 rounded-md animate-pulse mx-auto lg:mx-0" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+        <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />
+        <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />
+      </div>
+    </section>
+  );
+}
+
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors">
+    <main className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors">
       <HeroSection />
 
-      <section className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 transition-colors" aria-label="Resources Search">
+      <section
+        className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 transition-colors"
+        aria-label="Resources Search"
+      >
         <ResourceSearchBarWrapper />
       </section>
 
       <Suspense fallback={<CategoryGridFallback />}>
         <CategoryGrid />
       </Suspense>
-    </div>
+
+      {/* Quick Access Section */}
+      <section
+        className="bg-slate-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors"
+        aria-labelledby="quick-access-heading"
+      >
+        <Suspense fallback={<SectionFallback />}>
+          <QuickAccessSection />
+        </Suspense>
+      </section>
+
+      {/* Tools & Templates Section */}
+      <section
+        className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors"
+        aria-labelledby="tools-templates-heading"
+      >
+        <Suspense fallback={<SectionFallback />}>
+          <ToolsTemplatesSection />
+        </Suspense>
+      </section>
+
+      {/* CTA Section */}
+      <CTASection />
+    </main>
   );
 }
