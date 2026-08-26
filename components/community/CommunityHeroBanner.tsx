@@ -1,7 +1,16 @@
+import { memo } from 'react';
+
 interface CommunityHeroBannerProps {
   onStartDiscussion?: () => void;
 }
 
+/**
+ * CommunityHeroBanner
+ *
+ * Wrapped in React.memo — re-renders only when onStartDiscussion reference
+ * changes. Pair with useCallback at the call site to keep it fully stable.
+ */
+const CommunityHeroBanner = memo(function CommunityHeroBanner({
 export default function CommunityHeroBanner({
   onStartDiscussion,
 }: CommunityHeroBannerProps) {
@@ -15,6 +24,8 @@ export default function CommunityHeroBanner({
           Welcome to the Community
         </h1>
         <p className="text-purple-100/90 text-base sm:text-lg leading-relaxed mb-6">
+          Connect with mentors and peers — ask questions, share wins, discover resources, and join
+          live events.
           Connect with mentors and peers — ask questions, share wins, discover
           resources, and join live events.
         </p>
@@ -41,4 +52,8 @@ export default function CommunityHeroBanner({
       </div>
     </section>
   );
-}
+});
+
+CommunityHeroBanner.displayName = 'CommunityHeroBanner';
+
+export default CommunityHeroBanner;
