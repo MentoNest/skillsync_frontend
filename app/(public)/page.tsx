@@ -1,3 +1,4 @@
+import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
 import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
 import Image from "next/image";
 
@@ -44,6 +45,7 @@ export default function Home() {
         </div>
       </section>
       <MentorDiscoverySection />
+      <FeaturedMentorHighlight />
     </main>
   );
 }
