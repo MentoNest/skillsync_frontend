@@ -2,6 +2,7 @@ import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighligh
 import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
 import BenefitsSection from "@/components/landing/BenefitsSection";
 import LearningPathSection from "@/components/landing/LearningPathSection";
+import PlatformStatisticsSection from "@/components/landing/PlatformStatisticsSection";
 import Image from "next/image";
 
 export default function Home() {
@@ -50,6 +51,7 @@ export default function Home() {
       <FeaturedMentorHighlight />
       <BenefitsSection />
       <LearningPathSection />
+      <PlatformStatisticsSection />
     </main>
   );
 }
