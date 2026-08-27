@@ -3,6 +3,7 @@ import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection"
 import BenefitsSection from "@/components/landing/BenefitsSection";
 import LearningPathSection from "@/components/landing/LearningPathSection";
 import PlatformStatisticsSection from "@/components/landing/PlatformStatisticsSection";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import Image from "next/image";
 
 export default function Home() {
@@ -52,6 +53,7 @@ export default function Home() {
       <BenefitsSection />
       <LearningPathSection />
       <PlatformStatisticsSection />
+      <TestimonialsSection />
     </main>
   );
 }
