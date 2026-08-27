@@ -13,10 +13,10 @@ const Header = () => {
               </span>
             </Link>
           </div>
-          <div>
+          <div className="flex items-center">
             <Link
               href="/login"
-              className="text-gray-500 dark:text-gray-400 hover:underline"
+              className="text-gray-500 dark:text-gray-400 hover:underline py-2 px-4"
             >
               Login
             </Link>
