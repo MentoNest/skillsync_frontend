@@ -28,6 +28,8 @@ const FeaturedMentorHighlight = () => {
               alt="Featured Mentor"
               width={300}
               height={300}
+              loading="lazy"
+              sizes="(max-width: 768px) 240px, 300px"
               className="rounded-full"
             />
           </div>

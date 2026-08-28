@@ -15,6 +15,12 @@ const Header = () => {
           </div>
           <div className="flex items-center">
             <Link
+              href="/resources"
+              className="text-gray-500 dark:text-gray-400 hover:underline py-2 px-4"
+            >
+              Resources
+            </Link>
+            <Link
               href="/login"
               className="text-gray-500 dark:text-gray-400 hover:underline py-2 px-4"
             >
