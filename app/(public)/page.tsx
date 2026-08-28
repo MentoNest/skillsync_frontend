@@ -2,6 +2,7 @@ import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighligh
 import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
 import ExpertiseFilterSection from "@/components/landing/ExpertiseFilterSection";
 import FeaturedArticlesSection from "@/components/landing/FeaturedArticlesSection";
+import FeaturedLearningTracksSection from "@/components/landing/FeaturedLearningTracksSection";
 import CTASection from "@/components/landing/CTASection";
 import LearningPathSection from "@/components/landing/LearningPathSection";
 import Image from "next/image";
@@ -56,6 +57,7 @@ export default function Home() {
       </section>
       <MentorDiscoverySection />
       <ExpertiseFilterSection />
+      <FeaturedLearningTracksSection />
       <FeaturedArticlesSection />
       <FeaturedMentorHighlight />
       <CTASection />
