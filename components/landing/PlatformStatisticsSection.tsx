@@ -1,74 +1,39 @@
-interface Stat {
-  value: string;
-  label: string;
-  description: string;
-}
+import React from "react";
 
-const stats: Stat[] = [
+const stats = [
   {
-    value: '500+',
-    label: 'Verified mentors',
-    description: 'Rigorously vetted professionals from leading companies',
+    value: "1,200+",
+    label: "Active Mentors",
   },
   {
-    value: '10k+',
-    label: 'Mentees guided',
-    description: 'Professionals accelerating their careers on SkillSync',
+    value: "5,000+",
+    label: "Enrolled Mentees",
   },
   {
-    value: '92%',
-    label: 'Return rate',
-    description: 'Mentees who book a second session after their first',
+    value: "10,000+",
+    label: "Completed Sessions",
   },
   {
-    value: '4.9/5',
-    label: 'Average rating',
-    description: 'Consistent quality across every mentoring session',
+    value: "98%",
+    label: "Positive Feedback",
   },
 ];
 
-export default function PlatformStatisticsSection() {
+const PlatformStatisticsSection = () => {
   return (
-    <section aria-labelledby="platform-stats-heading" className="bg-slate-950 py-20">
-      <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
-
-        {/* Section header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">
-            Our impact in numbers
-          </p>
-          <h2
-            id="platform-stats-heading"
-            className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
-          >
-            Trusted by professionals worldwide.
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-slate-400">
-            Real numbers from real people who have invested in their growth through SkillSync.
-          </p>
-        </div>
-
-        {/* Stats grid */}
-        <dl className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 px-6 py-8 text-center transition duration-300 hover:border-white/20 hover:bg-white/[0.08]"
-            >
-              <dt className="order-2 mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-                {stat.label}
-              </dt>
-              <dd className="order-1 text-5xl font-bold tracking-tight text-white">
-                {stat.value}
-              </dd>
-              <p className="order-3 mt-3 text-sm leading-6 text-slate-500">
-                {stat.description}
-              </p>
+    <section className="py-16 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {stats.map((stat, index) => (
+            <div key={index}>
+              <p className="text-4xl font-bold">{stat.value}</p>
+              <p className="text-gray-600">{stat.label}</p>
             </div>
           ))}
-        </dl>
-
+        </div>
       </div>
     </section>
   );
-}
+};
+
+export default PlatformStatisticsSection;

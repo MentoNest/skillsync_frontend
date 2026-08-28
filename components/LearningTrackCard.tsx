@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import CategoryBadge from './CategoryBadge';
 
 interface LearningTrackCardProps {
   imageUrl: string;
@@ -31,9 +32,9 @@ export default function LearningTrackCard({
         />
       </div>
       <div className="p-5 flex flex-col flex-1">
-        <span className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400 mb-2">
-          {category}
-        </span>
+        <div className="mb-2">
+          <CategoryBadge category={category} size="md" />
+        </div>
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{title}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-1">{description}</p>
         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">

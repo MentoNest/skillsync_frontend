@@ -1,19 +1,13 @@
+<<<<<<< HEAD
 import React from 'react';
 import Footer from '@/components/navigation/Footer';
+=======
+import type { ReactNode } from "react";
+>>>>>>> 6e1001ab8f0e870f53bea94574a2c7658bbeff52
 
-/**
- * Shared layout for the (auth) route group.
- *
- * Wraps both /login and /register with a centred, full-height container so
- * any auth page is always vertically and horizontally centred without each
- * page needing to repeat that boilerplate.
- */
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
+<<<<<<< HEAD
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Skip link for keyboard / screen-reader users */}
       <a
@@ -31,5 +25,10 @@ export default function AuthLayout({
       
       <Footer />
     </div>
+=======
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 dark:bg-gray-950">
+      {children}
+    </main>
+>>>>>>> 6e1001ab8f0e870f53bea94574a2c7658bbeff52
   );
 }

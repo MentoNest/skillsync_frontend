@@ -1,56 +1,122 @@
-import React, { Suspense } from 'react';
-import HeroSection from '@/components/resources/HeroSection';
-import ResourceSearchBarWrapper from '@/components/resources/ResourceSearchBarWrapper';
-import { CategoryGrid } from '@/components/resources/CategoryGrid';
-import ToolsTemplatesSection from '@/components/resources/ToolsTemplatesSection';
-import QuickAccessSection from '@/components/resources/QuickAccessSection';
+import dynamic from "next/dynamic";
+import React from "react";
+import LazySection from "@/components/LazySection";
 
-function CategoryGridFallback() {
-  return (
-    <section className="max-w-screen-xl px-4 py-12 mx-auto lg:py-16">
-      <div className="mb-10 text-center md:text-left">
-        <div className="h-9 w-48 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse mx-auto md:mx-0" />
-        <div className="mt-2 h-5 w-72 bg-gray-100 dark:bg-gray-800 rounded-md animate-pulse mx-auto md:mx-0" />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="p-6 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/80 rounded-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-950/40 rounded-xl animate-pulse" />
-              <div className="w-20 h-5 bg-purple-100 dark:bg-purple-950/40 rounded-full animate-pulse" />
-            </div>
-            <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse mb-2" />
-            <div className="h-4 w-full bg-gray-100 dark:bg-gray-800 rounded-md animate-pulse mb-1" />
-            <div className="h-4 w-2/3 bg-gray-100 dark:bg-gray-800 rounded-md animate-pulse" />
-          </div>
-        ))}
-      </div>
-    </section>
+const sectionSkeleton = (label: string) =>
+  React.createElement(
+    "div",
+    {
+      className: "py-16 container mx-auto px-4",
+      "aria-hidden": true,
+      "data-skeleton": label,
+    },
+    React.createElement("div", {
+      className: "h-8 w-1/3 mx-auto mb-8 rounded bg-gray-200 animate-pulse",
+    }),
+    React.createElement("div", {
+      className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8",
+    },
+      ...Array.from({ length: 4 }, (_, i) =>
+        React.createElement("div", {
+          key: i,
+          className: "h-40 rounded-lg bg-gray-100 animate-pulse",
+        }),
+      ),
+    ),
   );
-}
+
+const LearningPathSection = dynamic(
+  () => import("@/components/landing/LearningPathSection"),
+);
+const BenefitsSection = dynamic(
+  () => import("@/components/landing/BenefitsSection"),
+  { loading: () => sectionSkeleton("benefits") },
+);
+const PlatformStatisticsSection = dynamic(
+  () => import("@/components/landing/PlatformStatisticsSection"),
+  { loading: () => sectionSkeleton("stats") },
+);
+const TestimonialsSection = dynamic(
+  () => import("@/components/landing/TestimonialsSection"),
+  { loading: () => sectionSkeleton("testimonials") },
+);
+const CTASection = dynamic(() => import("@/components/landing/CTASection"), {
+  loading: () => sectionSkeleton("cta"),
+});
+
+export const metadata = {
+  title: "Resources | SkillSync",
+  description:
+    "Explore SkillSync learning paths, platform statistics, and stories from our community.",
+};
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 transition-colors">
-      <HeroSection />
+    <main>
+      <LearningPathSection />
+      <LazySection fallback={sectionSkeleton("benefits")}>
+        <BenefitsSection />
+      </LazySection>
+      <LazySection fallback={sectionSkeleton("stats")}>
+        <PlatformStatisticsSection />
+      </LazySection>
+      <LazySection fallback={sectionSkeleton("testimonials")}>
+        <TestimonialsSection />
+      </LazySection>
+      <LazySection fallback={sectionSkeleton("cta")}>
+        <CTASection />
+      </LazySection>
+    </main>
+  );
+}
+import Link from "next/link";
 
-      <section className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 transition-colors" aria-label="Resources Search">
-        <ResourceSearchBarWrapper />
+const resourceCategories = [
+  {
+    title: "Learning Tracks",
+    description: "Follow a focused path to build practical skills step by step.",
+    href: "/resources/tracks",
+  },
+  {
+    title: "Articles",
+    description: "Browse concise guidance and ideas to support your learning.",
+    href: "/resources/articles",
+  },
+];
+
+export default function ResourcesPage() {
+  return (
+    <main className="container mx-auto px-4 py-16">
+      <header className="mb-10 max-w-2xl">
+        <p className="mb-3 text-sm font-medium uppercase tracking-wide text-blue-500">
+          SkillSync resources
+        </p>
+        <h1 className="mb-4 text-4xl font-bold">Learning Resources</h1>
+        <p className="text-lg text-gray-600">
+          Explore learning paths and articles designed to help you make steady
+          progress with your goals.
+        </p>
+      </header>
+
+      <section aria-labelledby="resource-categories-heading">
+        <h2 id="resource-categories-heading" className="sr-only">
+          Resource categories
+        </h2>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          {resourceCategories.map((category) => (
+            <article
+              key={category.href}
+              className="rounded-lg bg-white p-6 shadow-md"
+            >
+              <h3 className="mb-2 text-2xl font-semibold">{category.title}</h3>
+              <p className="mb-5 text-gray-600">{category.description}</p>
+              <Link href={category.href} className="text-blue-500 hover:underline">
+                Explore {category.title}
+              </Link>
+            </article>
+          ))}
+        </div>
       </section>
-
-      <Suspense fallback={<CategoryGridFallback />}>
-        <CategoryGrid />
-      </Suspense>
-
-      {/* Quick Access Section */}
-      <section className="bg-slate-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors">
-        <QuickAccessSection />
-      </section>
-
-      {/* Tools & Templates Section */}
-      <section className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors">
-        <ToolsTemplatesSection />
-      </section>
-    </div>
+    </main>
   );
 }
