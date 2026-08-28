@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const resources = [
@@ -67,9 +68,17 @@ const LearningPathSection = () => {
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8">
-          Explore Our Learning Paths
-        </h2>
+        <div className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <h2 className="text-3xl font-bold">Explore Our Learning Paths</h2>
+          <div className="flex gap-4 text-sm font-medium">
+            <Link href="/resources/tracks" className="text-blue-500 hover:underline">
+              View All Tracks
+            </Link>
+            <Link href="/resources/articles" className="text-blue-500 hover:underline">
+              View All Articles
+            </Link>
+          </div>
+        </div>
         <label className="mx-auto mb-10 block max-w-xl">
           <span className="sr-only">Search learning resources</span>
           <input
