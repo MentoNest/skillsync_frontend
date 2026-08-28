@@ -42,6 +42,8 @@ const TestimonialsSection = () => {
                   alt={testimonial.name}
                   width={48}
                   height={48}
+                  loading="lazy"
+                  sizes="48px"
                   sizes="48px"
                   loading="lazy"
                   decoding="async"

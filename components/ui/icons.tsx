@@ -1,0 +1,88 @@
+import React from "react";
+
+type IconProps = React.SVGProps<SVGSVGElement>;
+
+const baseProps: IconProps = {
+  width: 24,
+  height: 24,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+};
+
+export const ArrowRightIcon = React.memo(function ArrowRightIcon(
+  props: IconProps,
+) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M5 12h14" />
+      <path d="M13 5l7 7-7 7" />
+    </svg>
+  );
+});
+
+export const ClockIcon = React.memo(function ClockIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+});
+
+export const MentorIcon = React.memo(function MentorIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+});
+
+export const ProjectIcon = React.memo(function ProjectIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+  );
+});
+
+export const CommunityIcon = React.memo(function CommunityIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+});
+
+export const PathIcon = React.memo(function PathIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="18" cy="18" r="3" />
+      <path d="M9 6h6a3 3 0 0 1 3 3v6" />
+    </svg>
+  );
+});
+
+export type IconName =
+  | "path"
+  | "mentor"
+  | "project"
+  | "community";
+
+export const benefitIcons: Record<IconName, React.ComponentType<IconProps>> = {
+  path: PathIcon,
+  mentor: MentorIcon,
+  project: ProjectIcon,
+  community: CommunityIcon,
+};

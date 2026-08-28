@@ -41,6 +41,8 @@ const MentorDiscoverySection = () => {
                 alt={mentor.name}
                 width={100}
                 height={100}
+                loading="lazy"
+                sizes="100px"
                 sizes="100px"
                 loading="lazy"
                 decoding="async"
