@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import ResourceCategoryCardSkeleton from "@/components/skeleton/ResourceCategoryCardSkeleton";
 
 export interface ResourceCategoryCardProps {
   icon: ReactNode;
   title: string;
   description: string;
   link: string;
+  loading?: boolean;
 }
 
 export default function ResourceCategoryCard({
@@ -13,7 +15,10 @@ export default function ResourceCategoryCard({
   title,
   description,
   link,
+  loading = false,
 }: ResourceCategoryCardProps) {
+  if (loading) return <ResourceCategoryCardSkeleton />;
+
   return (
     <article className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
       <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600">
