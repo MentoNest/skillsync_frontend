@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ResourceCategoryCard from "@/components/resources/ResourceCategoryCard";
 
 const resources = [
   {
@@ -92,19 +93,13 @@ const LearningPathSection = () => {
         {filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {filteredResources.map((resource) => (
-              <div
+              <ResourceCategoryCard
                 key={resource.title}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-              >
-                <p className="mb-2 text-sm font-medium uppercase tracking-wide text-blue-500">
-                  {resource.type}
-                </p>
-                <h3 className="text-xl font-semibold mb-2">{resource.title}</h3>
-                <p className="text-gray-600 mb-4">{resource.description}</p>
-                <a href={resource.link} className="text-blue-500 hover:underline">
-                  Learn More
-                </a>
-              </div>
+                icon={resource.type === "Article" ? "A" : "T"}
+                title={resource.title}
+                description={resource.description}
+                link={resource.link}
+              />
             ))}
           </div>
         ) : (
