@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import DiscussionFeedContainer from "@/components/community/DiscussionFeedContainer";
 
 export const metadata: Metadata = {
   title: "Community | SkillSync",
@@ -11,8 +12,8 @@ export default function CommunityPage() {
     <div className="container mx-auto px-4 py-10">
       <CommunityHeroBanner />
 
-      <div className="mt-10 rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
-        <p className="text-lg font-medium">More community content coming soon.</p>
+      <div className="mt-10">
+        <DiscussionFeedContainer />
       </div>
     </div>
   );
