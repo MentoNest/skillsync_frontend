@@ -28,6 +28,9 @@ const FeaturedMentorHighlight = () => {
               alt="Featured Mentor"
               width={300}
               height={300}
+              sizes="(min-width: 768px) 300px, 60vw"
+              loading="lazy"
+              decoding="async"
               className="rounded-full"
             />
           </div>
