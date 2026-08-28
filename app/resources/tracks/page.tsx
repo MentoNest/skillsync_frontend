@@ -31,7 +31,7 @@ export default function TracksPage() {
         Back to home
       </Link>
       <h1 className="mb-10 mt-4 text-4xl font-bold">Learning Tracks</h1>
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+      <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {tracks.map((track) => (
           <ResourceCategoryCard
             key={track.title}

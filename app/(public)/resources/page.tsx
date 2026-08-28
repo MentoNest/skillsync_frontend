@@ -22,7 +22,7 @@ export const metadata = {
 
 export default function ResourcesPage() {
   return (
-    <main>
+    <main className="overflow-hidden">
       {/* Page header + category cards */}
       <div className="container mx-auto px-4 py-16">
         <header className="mb-10 max-w-2xl">
@@ -40,7 +40,7 @@ export default function ResourcesPage() {
           <h2 id="resource-categories-heading" className="sr-only">
             Resource categories
           </h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2">
             {resourceCategories.map((category) => (
               <article
                 key={category.href}
