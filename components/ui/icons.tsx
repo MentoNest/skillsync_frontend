@@ -74,6 +74,15 @@ export const PathIcon = React.memo(function PathIcon(props: IconProps) {
   );
 });
 
+export const SearchIcon = React.memo(function SearchIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  );
+});
+
 export type IconName =
   | "path"
   | "mentor"
