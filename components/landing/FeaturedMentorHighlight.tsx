@@ -30,6 +30,9 @@ const FeaturedMentorHighlight = () => {
               height={300}
               loading="lazy"
               sizes="(max-width: 768px) 240px, 300px"
+              sizes="(min-width: 768px) 300px, 60vw"
+              loading="lazy"
+              decoding="async"
               className="rounded-full"
             />
           </div>

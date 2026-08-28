@@ -1,6 +1,8 @@
 import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
 import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
+import ExpertiseFilterSection from "@/components/landing/ExpertiseFilterSection";
 import CTASection from "@/components/landing/CTASection";
+import LearningPathSection from "@/components/landing/LearningPathSection";
 import Image from "next/image";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
@@ -34,10 +36,23 @@ export default function Home() {
               priority
               sizes="(max-width: 1024px) 0px, 362px"
             />
+            {/* Fixed aspect ratio reserves space and prevents layout shift */}
+            <div className="relative aspect-[362/724] w-full max-w-[280px]">
+              <Image
+                src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/phone-mockup.png"
+                alt="SkillSync product mockup on a phone"
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="h-auto w-auto object-contain"
+              />
+            </div>
           </div>
         </div>
       </section>
       <MentorDiscoverySection />
+      <ExpertiseFilterSection />
       <FeaturedMentorHighlight />
       <CTASection />
     </main>
