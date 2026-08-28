@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ResourceCategoryCard from "@/components/resources/ResourceCategoryCard";
 
 const articles = [
   {
@@ -22,10 +23,13 @@ export default function ArticlesPage() {
       <h1 className="mb-10 mt-4 text-4xl font-bold">Articles</h1>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         {articles.map((article) => (
-          <article key={article.title} className="rounded-lg bg-white p-6 shadow-md">
-            <h2 className="mb-2 text-2xl font-semibold">{article.title}</h2>
-            <p className="text-gray-600">{article.description}</p>
-          </article>
+          <ResourceCategoryCard
+            key={article.title}
+            icon="A"
+            title={article.title}
+            description={article.description}
+            link="#"
+          />
         ))}
       </div>
     </main>
