@@ -1,5 +1,6 @@
 import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
 import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
+import ExpertiseFilterSection from "@/components/landing/ExpertiseFilterSection";
 import CTASection from "@/components/landing/CTASection";
 import Image from "next/image";
 
@@ -46,6 +47,7 @@ export default function Home() {
         </div>
       </section>
       <MentorDiscoverySection />
+      <ExpertiseFilterSection />
       <FeaturedMentorHighlight />
       <CTASection />
     </main>
