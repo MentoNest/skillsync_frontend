@@ -27,6 +27,7 @@ export default function LearningTrackCard({
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover"
           loading="lazy"
+          decoding="async"
         />
       </div>
       <div className="p-5 flex flex-col flex-1">

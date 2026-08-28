@@ -76,8 +76,9 @@ export default function Avatar({
           fill
           sizes={getSizes(size)}
           className={`object-cover ${radius}`}
-          loading={priority ? undefined : 'lazy'}
+          loading={priority ? 'eager' : 'lazy'}
           priority={priority}
+          decoding="async"
         />
       ) : (
         <div

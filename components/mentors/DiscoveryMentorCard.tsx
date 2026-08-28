@@ -70,6 +70,7 @@ export default function DiscoveryMentorCard({ mentor }: { mentor: Mentor }) {
                   alt={`Photo of ${mentor.name}`}
                   width={56}
                   height={56}
+                  sizes="56px"
                   loading="lazy"
                   className="rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
                 />
