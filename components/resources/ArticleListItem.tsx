@@ -22,6 +22,7 @@ export default function ArticleListItem({
     <article>
       <Link
         href={href}
+        aria-label={`${title} by ${author}, ${readTime}${trending ? ", trending" : ""}`}
         className="group flex items-start justify-between gap-4 rounded-xl border border-gray-100
                    bg-white px-5 py-4 shadow-sm transition-all duration-200
                    hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md
@@ -55,11 +56,12 @@ export default function ArticleListItem({
         {trending && (
           <span
             aria-label="Trending"
+            role="img"
             className="mt-0.5 flex shrink-0 items-center justify-center rounded-full
                        bg-emerald-50 p-1.5 text-emerald-500 transition-colors duration-200
                        group-hover:bg-emerald-100"
           >
-            <TrendingUpIcon width={15} height={15} />
+            <TrendingUpIcon width={15} height={15} aria-hidden />
           </span>
         )}
       </Link>
