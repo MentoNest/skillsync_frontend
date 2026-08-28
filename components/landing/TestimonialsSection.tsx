@@ -35,13 +35,16 @@ const TestimonialsSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-md">
-              <p className="text-gray-600 italic mb-4">"{testimonial.quote}"</p>
+              <p className="text-gray-600 italic mb-4">&ldquo;{testimonial.quote}&rdquo;</p>
               <div className="flex items-center">
                 <Image
                   src={testimonial.avatar}
                   alt={testimonial.name}
                   width={48}
                   height={48}
+                  sizes="48px"
+                  loading="lazy"
+                  decoding="async"
                   className="rounded-full mr-4"
                 />
                 <div>

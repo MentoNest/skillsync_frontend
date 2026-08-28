@@ -36,12 +36,18 @@ export default function Home() {
             </a>
           </div>
           <div className="hidden lg:mt-0 lg:col-span-5 lg:flex">
-            <Image
-              src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/phone-mockup.png"
-              alt="mockup"
-              width={362}
-              height={724}
-            />
+            {/* Fixed aspect ratio reserves space and prevents layout shift */}
+            <div className="relative aspect-[362/724] w-full max-w-[280px]">
+              <Image
+                src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/phone-mockup.png"
+                alt="SkillSync product mockup on a phone"
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="h-auto w-auto object-contain"
+              />
+            </div>
           </div>
         </div>
       </section>

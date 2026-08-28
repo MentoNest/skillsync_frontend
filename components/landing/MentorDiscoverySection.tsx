@@ -41,6 +41,9 @@ const MentorDiscoverySection = () => {
                 alt={mentor.name}
                 width={100}
                 height={100}
+                sizes="100px"
+                loading="lazy"
+                decoding="async"
                 className="rounded-full mx-auto mb-4"
               />
               <h3 className="text-xl font-bold mb-2">{mentor.name}</h3>
