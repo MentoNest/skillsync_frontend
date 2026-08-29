@@ -95,13 +95,11 @@ export const PathIcon = React.memo(function PathIcon(props: IconProps) {
   );
 });
 
-export type IconComponent = React.ComponentType<IconProps>;
-
-export const TrendingUpIcon = React.memo(function TrendingUpIcon(props: IconProps) {
+export const SearchIcon = React.memo(function SearchIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props}>
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-      <polyline points="17 6 23 6 23 12" />
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
     </svg>
   );
 });
