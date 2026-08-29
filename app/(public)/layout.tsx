@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Footer from "@/components/landing/Footer";
-import Header from "@/components/landing/Header";
+import Navbar from "@/components/navigation/Navbar";
 
 export const metadata: Metadata = {
   title: "SkillSync",
@@ -13,10 +13,16 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <Header />
-      {children}
+    <div className="relative flex min-h-screen flex-col">
+      {/* The Global Navigation Bar requested in issue #813 */}
+      <Navbar />
+      
+      {/* Main content area expands to fill space, pushing footer down */}
+      <main className="flex-1">
+        {children}
+      </main>
+
       <Footer />
-    </>
+    </div>
   );
 }
