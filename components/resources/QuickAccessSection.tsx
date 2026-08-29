@@ -61,8 +61,8 @@ export default function QuickAccessSection() {
           </p>
         </div>
 
-        {/* responsive grid: 1 col → 2 col → 4 col */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* responsive grid: 1 col → 2 col → 4 col, overflow guard */}
+        <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {quickAccessItems.map((item) => (
             <QuickAccessCard
               key={item.href}
