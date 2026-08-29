@@ -1,13 +1,9 @@
-<<<<<<< HEAD
 import React from 'react';
 import Footer from '@/components/navigation/Footer';
-=======
-import type { ReactNode } from "react";
->>>>>>> 6e1001ab8f0e870f53bea94574a2c7658bbeff52
 
+import type { ReactNode } from "react";
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-<<<<<<< HEAD
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Skip link for keyboard / screen-reader users */}
       <a
@@ -24,11 +20,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </main>
       
       <Footer />
-    </div>
-=======
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 dark:bg-gray-950">
-      {children}
-    </main>
->>>>>>> 6e1001ab8f0e870f53bea94574a2c7658bbeff52
+    </di>
   );
 }
