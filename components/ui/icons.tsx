@@ -64,12 +64,42 @@ export const CommunityIcon = React.memo(function CommunityIcon(props: IconProps)
   );
 });
 
+export const ResumeIcon = React.memo(function ResumeIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M16 13H8" />
+      <path d="M16 17H8" />
+      <path d="M10 9H8" />
+    </svg>
+  );
+});
+
+export const CareerIcon = React.memo(function CareerIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  );
+});
+
 export const PathIcon = React.memo(function PathIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props}>
       <circle cx="6" cy="6" r="3" />
       <circle cx="18" cy="18" r="3" />
       <path d="M9 6h6a3 3 0 0 1 3 3v6" />
+    </svg>
+  );
+});
+
+export const SearchIcon = React.memo(function SearchIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m16 16 5 5" />
     </svg>
   );
 });

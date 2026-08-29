@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ResourceCategoryCard from "@/components/resources/ResourceCategoryCard";
+import ResourceSearchBar from "@/components/resources/ResourceSearchBar";
 
 const resources = [
   {
@@ -80,16 +81,12 @@ const LearningPathSection = () => {
             </Link>
           </div>
         </div>
-        <label className="mx-auto mb-10 block max-w-xl">
-          <span className="sr-only">Search learning resources</span>
-          <input
-            type="search"
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            placeholder="Search tracks and articles"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-          />
-        </label>
+        <ResourceSearchBar
+          value={searchInput}
+          onChange={setSearchInput}
+          placeholder="Search tracks and articles"
+          className="mx-auto mb-10"
+        />
         {filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {filteredResources.map((resource) => (

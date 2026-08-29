@@ -1,0 +1,50 @@
+import Image from 'next/image';
+import CategoryBadge from './CategoryBadge';
+
+interface LearningTrackCardProps {
+  imageUrl: string;
+  category: string;
+  title: string;
+  description: string;
+  lessonCount: number;
+  duration: string;
+}
+
+export default function LearningTrackCard({
+  imageUrl,
+  category,
+  title,
+  description,
+  lessonCount,
+  duration,
+}: LearningTrackCardProps) {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow overflow-hidden flex flex-col">
+      <div className="relative w-full aspect-video">
+        <Image
+          src={imageUrl}
+          alt={title}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div className="p-5 flex flex-col flex-1">
+        <div className="mb-2">
+          <CategoryBadge category={category} size="md" />
+        </div>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-1">{description}</p>
+        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <span>{lessonCount} lessons</span>
+          <span>{duration}</span>
+        </div>
+        <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors">
+          Start Learning
+        </button>
+      </div>
+    </div>
+  );
+}

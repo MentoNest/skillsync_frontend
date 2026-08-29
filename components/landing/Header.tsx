@@ -13,17 +13,22 @@ const Header = () => {
               </span>
             </Link>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/mentors"
+              className="px-4 py-2 text-gray-600 transition hover:text-gray-900 hover:underline dark:text-gray-300 dark:hover:text-white"
+            >
+              Mentors
+            </Link>
             <Link
               href="/resources"
-              className="text-gray-500 dark:text-gray-400 hover:underline py-2 px-4"
-              className="mr-4 py-2 px-4 text-gray-500 hover:underline dark:text-gray-400"
+              className="px-4 py-2 text-gray-600 transition hover:text-gray-900 hover:underline dark:text-gray-300 dark:hover:text-white"
             >
               Resources
             </Link>
             <Link
               href="/login"
-              className="text-gray-500 dark:text-gray-400 hover:underline py-2 px-4"
+              className="px-4 py-2 text-gray-600 transition hover:text-gray-900 hover:underline dark:text-gray-300 dark:hover:text-white"
             >
               Login
             </Link>
