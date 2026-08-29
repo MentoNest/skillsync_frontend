@@ -49,4 +49,4 @@ const MentorCard = ({ mentor, onViewProfile, actions }: MentorCardProps) => (
   </div>
 );
 
-export default MentorCard;
+export default React.memo(MentorCard);

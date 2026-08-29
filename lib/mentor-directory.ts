@@ -1,5 +1,4 @@
-// Static mentor directory served by the mentors API as a stand-in for the
-// live backend until it is wired up (#857).
+// Static mentor directory used as a stand-in for the live backend (#861/#863).
 import type { Mentor } from "@/types/mentor";
 
 export const MENTOR_DIRECTORY: Mentor[] = [

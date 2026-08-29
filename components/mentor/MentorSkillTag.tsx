@@ -11,4 +11,4 @@ const MentorSkillTag = ({ skill }: MentorSkillTagProps) => (
   </span>
 );
 
-export default MentorSkillTag;
+export default React.memo(MentorSkillTag);
