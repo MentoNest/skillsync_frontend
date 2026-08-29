@@ -8,6 +8,19 @@ export const EXPERTISE_CATEGORIES = [
 
 export type Expertise = (typeof EXPERTISE_CATEGORIES)[number];
 
+export const INDUSTRY_CATEGORIES = [
+  "Fintech",
+  "HealthTech",
+  "E-Commerce",
+  "EdTech",
+  "SaaS",
+  "AI / Machine Learning",
+  "Cybersecurity",
+] as const;
+
+export type Industry = (typeof INDUSTRY_CATEGORIES)[number];
+
+
 export interface Mentor {
   name: string;
   role: string;

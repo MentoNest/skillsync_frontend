@@ -8,6 +8,7 @@ import type { ExperienceLevel, SortOption } from "@/types/mentor";
 
 export interface MentorQueryFilters {
   expertise: string;
+  industry: string;
   experience: ExperienceLevel | "";
   minRate: number | "";
   maxRate: number | "";
@@ -17,6 +18,7 @@ export interface MentorQueryFilters {
 
 export const DEFAULT_MENTOR_FILTERS: MentorQueryFilters = {
   expertise: "",
+  industry: "",
   experience: "",
   minRate: "",
   maxRate: "",
@@ -46,6 +48,7 @@ export function useMentorQueryFilters(): UseMentorQueryFiltersResult {
 
     return {
       expertise: searchParams.get("expertise") ?? "",
+      industry: searchParams.get("industry") ?? "",
       experience:
         experience === "junior" || experience === "mid" || experience === "senior" || experience === "principal"
           ? experience
@@ -65,6 +68,7 @@ export function useMentorQueryFilters(): UseMentorQueryFiltersResult {
       const params = new URLSearchParams();
 
       if (next.expertise) params.set("expertise", next.expertise);
+      if (next.industry) params.set("industry", next.industry);
       if (next.experience) params.set("experience", next.experience);
       if (typeof next.minRate === "number") params.set("minRate", String(next.minRate));
       if (typeof next.maxRate === "number") params.set("maxRate", String(next.maxRate));
@@ -93,6 +97,7 @@ export function useMentorQueryFilters(): UseMentorQueryFiltersResult {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (filters.expertise) count += 1;
+    if (filters.industry) count += 1;
     if (filters.experience) count += 1;
     if (typeof filters.minRate === "number") count += 1;
     if (typeof filters.maxRate === "number") count += 1;

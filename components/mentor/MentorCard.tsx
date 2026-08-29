@@ -24,6 +24,13 @@ const MentorCard = ({ mentor, onViewProfile, actions }: MentorCardProps) => (
           <AvailabilityBadge status={mentor.availability} />
         </div>
         <p className="text-xs text-gray-500 truncate">{mentor.title}</p>
+        {mentor.industry && (
+          <div className="mt-0.5">
+            <span className="inline-block text-[11px] font-medium text-primary-700 bg-primary-50 px-1.5 py-0.5 rounded">
+              {mentor.industry}
+            </span>
+          </div>
+        )}
         <MentorRatingComponent rating={mentor.rating} reviewCount={mentor.reviewCount} />
       </div>
       {actions}

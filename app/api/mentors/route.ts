@@ -22,6 +22,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
 
   const expertise = searchParams.get("expertise")?.toLowerCase() ?? "";
+  const industryParam = searchParams.get("industry")?.toLowerCase() ?? "";
+  const selectedIndustries = industryParam
+    ? industryParam.split(",").map((item) => item.trim()).filter(Boolean)
+    : [];
   const experience = searchParams.get("experience") as ExperienceLevel | null;
   const minRate = Number(searchParams.get("minRate")) || 0;
   const maxRate = Number(searchParams.get("maxRate")) || Number.MAX_SAFE_INTEGER;
@@ -34,6 +38,12 @@ export async function GET(request: NextRequest) {
     if (expertise && !mentor.skills.some((skill) => skill.name.toLowerCase() === expertise)) {
       return false;
     }
+    if (selectedIndustries.length > 0) {
+      const mentorIndustry = mentor.industry?.toLowerCase() ?? "";
+      if (!mentorIndustry || !selectedIndustries.includes(mentorIndustry)) {
+        return false;
+      }
+    }
     if (experience && mentor.experienceLevel !== experience) {
       return false;
     }
@@ -41,10 +51,14 @@ export async function GET(request: NextRequest) {
       return false;
     }
     if (search) {
-      const haystack = `${mentor.name} ${mentor.title} ${mentor.bio} ${mentor.skills
-        .map((skill) => skill.name)
-        .join(" ")}`.toLowerCase();
-      if (!haystack.includes(search)) {
+      const searchLower = search.toLowerCase();
+      const nameMatch = mentor.name.toLowerCase().includes(searchLower);
+      const headlineMatch = mentor.title.toLowerCase().includes(searchLower);
+      const skillsMatch = mentor.skills.some((skill) =>
+        skill.name.toLowerCase().includes(searchLower),
+      );
+      const bioMatch = mentor.bio.toLowerCase().includes(searchLower);
+      if (!nameMatch && !headlineMatch && !skillsMatch && !bioMatch) {
         return false;
       }
     }

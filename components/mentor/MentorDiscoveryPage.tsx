@@ -10,9 +10,10 @@ import MentorCard from "./MentorCard";
 import MentorSort from "./MentorSort";
 import MentorEmptyState from "./MentorEmptyState";
 import MentorCompareToggle from "./MentorCompareToggle";
-import MentorFilterSidebar from "./MentorFilterSidebar";
+import FilterSidebar from "./FilterSidebar";
 import MentorFilterDrawer from "./MentorFilterDrawer";
 import MentorComparisonPanel from "./MentorComparisonPanel";
+import MentorSearchBar from "./MentorSearchBar";
 
 const MAX_COMPARE = 3;
 const MAX_RATE_BOUND = 200;
@@ -37,6 +38,7 @@ const MentorDiscoveryPage = () => {
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [expertise, setExpertise] = useState<string[]>([]);
+  const [industries, setIndustries] = useState<string[]>([]);
   const [experience, setExperience] = useState<ExperienceLevel | "">("");
   const [minRate, setMinRate] = useState<number>(0);
   const [maxRate, setMaxRate] = useState<number>(MAX_RATE_BOUND);
@@ -49,26 +51,37 @@ const MentorDiscoveryPage = () => {
 
   const filteredMentors = useMemo(() => {
     const term = deferredSearch.trim().toLowerCase();
-    let list = MENTOR_DIRECTORY.filter((mentor) => {
+    const list = MENTOR_DIRECTORY.filter((mentor) => {
       if (expertise.length > 0) {
         const expertiseMatches = mentor.skills.some((skill) =>
           expertise.includes(skill.name.toLowerCase()),
         );
         if (!expertiseMatches) return false;
       }
+      if (industries.length > 0) {
+        const mentorIndustry = mentor.industry?.toLowerCase() ?? "";
+        if (!mentorIndustry || !industries.includes(mentorIndustry)) {
+          return false;
+        }
+      }
       if (experience && mentor.experienceLevel !== experience) return false;
       if (mentor.hourlyRate < minRate || mentor.hourlyRate > maxRate) return false;
       if (term) {
-        const haystack = `${mentor.name} ${mentor.title} ${mentor.bio} ${mentor.skills
-          .map((skill) => skill.name)
-          .join(" ")}`.toLowerCase();
-        if (!haystack.includes(term)) return false;
+        const nameMatch = mentor.name.toLowerCase().includes(term);
+        const headlineMatch = mentor.title.toLowerCase().includes(term);
+        const skillsMatch = mentor.skills.some((skill) =>
+          skill.name.toLowerCase().includes(term),
+        );
+        const bioMatch = mentor.bio.toLowerCase().includes(term);
+        if (!nameMatch && !headlineMatch && !skillsMatch && !bioMatch) {
+          return false;
+        }
       }
       return true;
     });
     const sorter = SORTERS[sortBy];
-    return list.sort(sorter);
-  }, [deferredSearch, expertise, experience, minRate, maxRate, sortBy]);
+    return [...list].sort(sorter);
+  }, [deferredSearch, expertise, industries, experience, minRate, maxRate, sortBy]);
 
   const compareMentors = useMemo(
     () => MENTOR_DIRECTORY.filter((mentor) => compareIds.includes(mentor.id)),
@@ -77,6 +90,14 @@ const MentorDiscoveryPage = () => {
 
   const toggleExpertise = useCallback((value: string) => {
     setExpertise((previous) =>
+      previous.includes(value)
+        ? previous.filter((entry) => entry !== value)
+        : [...previous, value],
+    );
+  }, []);
+
+  const toggleIndustry = useCallback((value: string) => {
+    setIndustries((previous) =>
       previous.includes(value)
         ? previous.filter((entry) => entry !== value)
         : [...previous, value],
@@ -96,6 +117,7 @@ const MentorDiscoveryPage = () => {
   const clearAllFilters = useCallback(() => {
     setSearch("");
     setExpertise([]);
+    setIndustries([]);
     setExperience("");
     setMinRate(0);
     setMaxRate(MAX_RATE_BOUND);
@@ -115,6 +137,7 @@ const MentorDiscoveryPage = () => {
   const activeFilterCount =
     (search.trim() ? 1 : 0) +
     expertise.length +
+    industries.length +
     (experience ? 1 : 0) +
     (minRate > 0 ? 1 : 0) +
     (maxRate < MAX_RATE_BOUND ? 1 : 0);
@@ -172,11 +195,13 @@ const MentorDiscoveryPage = () => {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="hidden rounded-2xl border border-gray-200 bg-white p-5 lg:block lg:self-start">
-          <MentorFilterSidebar
+          <FilterSidebar
             search={search}
             onSearchChange={setSearch}
             expertise={expertise}
             onToggleExpertise={toggleExpertise}
+            industries={industries}
+            onToggleIndustry={toggleIndustry}
             experience={experience}
             onExperienceChange={setExperience}
             minRate={minRate}
@@ -187,6 +212,7 @@ const MentorDiscoveryPage = () => {
             }}
             activeFilterCount={activeFilterCount}
             onClearAll={clearAllFilters}
+            showHeader={true}
           />
         </aside>
 
@@ -194,9 +220,23 @@ const MentorDiscoveryPage = () => {
           <h2 id="mentor-results-heading" className="sr-only">
             Mentor results
           </h2>
+
+          <div className="mb-6">
+            <MentorSearchBar
+              value={search}
+              onChange={setSearch}
+              placeholder="Search mentors by name, skills, or headline..."
+            />
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-gray-500" aria-live="polite">
               {filteredMentors.length} {filteredMentors.length === 1 ? "mentor" : "mentors"} found
+              {search.trim() ? (
+                <span className="ml-1 text-gray-700">
+                  matching &ldquo;<span className="font-semibold">{search.trim()}</span>&rdquo;
+                </span>
+              ) : null}
             </p>
             <MentorSort value={sortBy} onChange={setSortBy} />
           </div>
@@ -256,11 +296,13 @@ const MentorDiscoveryPage = () => {
         onClose={closeDrawer}
         title="Filters"
       >
-        <MentorFilterSidebar
+        <FilterSidebar
           search={search}
           onSearchChange={setSearch}
           expertise={expertise}
           onToggleExpertise={toggleExpertise}
+          industries={industries}
+          onToggleIndustry={toggleIndustry}
           experience={experience}
           onExperienceChange={setExperience}
           minRate={minRate}

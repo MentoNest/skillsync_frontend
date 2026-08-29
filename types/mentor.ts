@@ -18,6 +18,7 @@ export interface Mentor {
   bio: string;
   avatarUrl: string;
   skills: MentorSkill[];
+  industry?: string;
   rating: number;
   reviewCount: number;
   hourlyRate: number;
@@ -28,9 +29,13 @@ export interface Mentor {
 }
 
 export interface MentorFilters {
+  search?: string;
   expertise?: string;
+  industry?: string;
+  industries?: string[];
   experienceLevel?: ExperienceLevel;
   minRate?: number;
   maxRate?: number;
   sortBy?: SortOption;
 }
+
