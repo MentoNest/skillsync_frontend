@@ -8,6 +8,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "Senior Full-Stack Engineer",
     bio: "Full-stack engineer passionate about teaching scalable system design.",
     avatarUrl: "/avatars/alex.svg",
+    industry: "Fintech",
     skills: [
       { id: "frontend", name: "Frontend" },
       { id: "backend", name: "Backend" },
@@ -29,6 +30,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "UX/UI Designer",
     bio: "Creates beautiful and intuitive user experiences.",
     avatarUrl: "/avatars/jane.svg",
+    industry: "E-Commerce",
     skills: [
       { id: "ui-ux", name: "UI/UX" },
       { id: "figma", name: "Figma" },
@@ -49,6 +51,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "Software Engineer",
     bio: "Specializes in frontend development and React.",
     avatarUrl: "/avatars/john.svg",
+    industry: "EdTech",
     skills: [
       { id: "frontend", name: "Frontend" },
       { id: "react", name: "React" },
@@ -69,6 +72,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "Data Scientist",
     bio: "Expert in machine learning and data visualization.",
     avatarUrl: "/avatars/sarah.svg",
+    industry: "AI / Machine Learning",
     skills: [
       { id: "backend", name: "Backend" },
       { id: "python", name: "Python" },
@@ -89,6 +93,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "Backend Engineer",
     bio: "Builds scalable APIs and resilient microservices.",
     avatarUrl: "/avatars/alex.svg",
+    industry: "SaaS",
     skills: [
       { id: "backend", name: "Backend" },
       { id: "devops", name: "DevOps" },
@@ -110,6 +115,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "Product Manager",
     bio: "Drives product strategy and cross-functional team alignment.",
     avatarUrl: "/avatars/jane.svg",
+    industry: "Fintech",
     skills: [
       { id: "product-management", name: "Product Management" },
       { id: "strategy", name: "Strategy" },
@@ -130,6 +136,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "DevOps Engineer",
     bio: "Automates cloud infrastructure and streamlines CI/CD pipelines.",
     avatarUrl: "/avatars/john.svg",
+    industry: "Cybersecurity",
     skills: [
       { id: "devops", name: "DevOps" },
       { id: "backend", name: "Backend" },
@@ -150,6 +157,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "Frontend Engineer",
     bio: "Loves crafting accessible, performant interfaces with React.",
     avatarUrl: "/avatars/alex.svg",
+    industry: "HealthTech",
     skills: [
       { id: "frontend", name: "Frontend" },
       { id: "react", name: "React" },
@@ -170,6 +178,7 @@ export const MENTOR_DIRECTORY: Mentor[] = [
     title: "UI/UX Designer",
     bio: "Designs product experiences that feel effortless.",
     avatarUrl: "/avatars/sarah.svg",
+    industry: "SaaS",
     skills: [
       { id: "ui-ux", name: "UI/UX" },
       { id: "figma", name: "Figma" },

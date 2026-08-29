@@ -55,7 +55,7 @@ const MentorDiscoverySection = () => {
           <MentorSearchBar
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder="Search mentors by name, skill, or expertise"
+            placeholder="Search mentors by name, skills, or headline..."
           />
         </div>
         {filteredMentors.length > 0 ? (

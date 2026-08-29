@@ -10,6 +10,8 @@ export interface MentorListingsResponse {
 
 export interface MentorListingFilters {
   expertise?: string;
+  industry?: string;
+  industries?: string[];
   experience?: ExperienceLevel | "";
   minRate?: number | "";
   maxRate?: number | "";
@@ -26,6 +28,11 @@ function toQueryString(filters: MentorListingFilters): string {
   const params = new URLSearchParams();
 
   if (filters.expertise) params.set("expertise", filters.expertise);
+  if (filters.industry) {
+    params.set("industry", filters.industry);
+  } else if (filters.industries && filters.industries.length > 0) {
+    params.set("industry", filters.industries.join(","));
+  }
   if (filters.experience) params.set("experience", filters.experience);
   if (typeof filters.minRate === "number" && !Number.isNaN(filters.minRate)) {
     params.set("minRate", String(filters.minRate));
