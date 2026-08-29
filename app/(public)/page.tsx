@@ -3,6 +3,7 @@ import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection"
 import ExpertiseFilterSection from "@/components/landing/ExpertiseFilterSection";
 import FeaturedArticlesSection from "@/components/landing/FeaturedArticlesSection";
 import CTASection from "@/components/landing/CTASection";
+import ToolsTemplatesSection from "@/components/landing/ToolsTemplatesSection";
 import LearningPathSection from "@/components/landing/LearningPathSection";
 import Image from "next/image";
 import { ArrowRightIcon } from "@/components/ui/icons";
@@ -56,6 +57,7 @@ export default function Home() {
       <ExpertiseFilterSection />
       <FeaturedArticlesSection />
       <FeaturedMentorHighlight />
+      <ToolsTemplatesSection />
       <CTASection />
     </main>
   );
