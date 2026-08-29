@@ -44,6 +44,11 @@ const tracks = [
   },
 ];
 
+export const metadata = {
+  title: "Learning Tracks | SkillSync",
+  description: "Follow a focused path to build practical skills step by step.",
+};
+
 export default function TracksPage() {
   return (
     <main className="container mx-auto px-4 py-16">
