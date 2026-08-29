@@ -1,24 +1,8 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import MentorCard from "@/components/mentor/MentorCard";
-import MentorEmptyState from "@/components/mentor/MentorEmptyState";
-import ExperienceLevelFilter from "@/components/mentor/ExperienceLevelFilter";
-import HourlyRateFilter from "@/components/mentor/HourlyRateFilter";
-import MentorSearchBar from "@/components/mentor/MentorSearchBar";
-import MentorSort from "@/components/mentor/MentorSort";
-import type { ExperienceLevel, Mentor, SortOption } from "@/types/mentor";
+import type { Mentor } from "@/types/mentor";
 
-const expertiseOptions = [
-  "All",
-  "Frontend",
-  "Backend",
-  "UI/UX",
-  "Product Management",
-  "DevOps",
-] as const;
-
-const mentorSeed: Mentor[] = [
+const mentors: Mentor[] = [
   {
     id: "mentor-1",
     name: "John Doe",
@@ -95,140 +79,61 @@ const mentorSeed: Mentor[] = [
     isFeatured: true,
     popularity: 99,
   },
-  {
-    id: "mentor-5",
-    name: "Emily Davis",
-    title: "Product Strategy Mentor",
-    bio: "Supports founders and PMs in making stronger product decisions and roadmaps.",
-    avatarUrl: "/avatars/emily.svg",
-    skills: [
-      { id: "product", name: "Product Strategy" },
-      { id: "roadmap", name: "Roadmapping" },
-      { id: "execution", name: "Execution" },
-    ],
-    rating: 4.6,
-    reviewCount: 96,
-    hourlyRate: 54,
-    experienceLevel: "mid",
-    availability: "available",
-    isFeatured: false,
-    popularity: 85,
-  },
-  {
-    id: "mentor-6",
-    name: "David Kim",
-    title: "Platform & DevOps Mentor",
-    bio: "Coaches teams on CI/CD, automation, observability, and platform reliability.",
-    avatarUrl: "/avatars/david.svg",
-    skills: [
-      { id: "aws", name: "AWS" },
-      { id: "cicd", name: "CI/CD" },
-      { id: "infra", name: "Infrastructure" },
-    ],
-    rating: 4.8,
-    reviewCount: 112,
-    hourlyRate: 70,
-    experienceLevel: "senior",
-    availability: "unavailable",
-    isFeatured: false,
-    popularity: 90,
-  },
 ];
 
-const rankExperience = (level: ExperienceLevel) => {
-  const order = {
-    junior: 1,
-    mid: 2,
-    senior: 3,
-    principal: 4,
-  } as const;
-
-  return order[level];
-};
+const filterGroups = [
+  "All",
+  "Frontend",
+  "Backend",
+  "UI/UX",
+  "Product Management",
+  "DevOps",
+];
 
 export default function MentorDiscoveryPage() {
-  const [search, setSearch] = useState("");
-  const [selectedExpertise, setSelectedExpertise] = useState<(typeof expertiseOptions)[number]>("All");
-  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | "">("");
-  const [minRate, setMinRate] = useState(0);
-  const [maxRate, setMaxRate] = useState(120);
-  const [sortBy, setSortBy] = useState<SortOption>("rating");
-
-  const filteredMentors = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
-    const matches = mentorSeed.filter((mentor) => {
-      const matchesQuery =
-        query.length === 0 ||
-        mentor.name.toLowerCase().includes(query) ||
-        mentor.title.toLowerCase().includes(query) ||
-        mentor.bio.toLowerCase().includes(query) ||
-        mentor.skills.some((skill) => skill.name.toLowerCase().includes(query));
-
-      const matchesExpertise =
-        selectedExpertise === "All" ||
-        mentor.skills.some((skill) => skill.name.toLowerCase().includes(selectedExpertise.toLowerCase()));
-
-      const matchesExperience =
-        !experienceLevel || mentor.experienceLevel === experienceLevel;
-
-      const matchesRate = mentor.hourlyRate >= minRate && mentor.hourlyRate <= maxRate;
-
-      return matchesQuery && matchesExpertise && matchesExperience && matchesRate;
-    });
-
-    return [...matches].sort((a, b) => {
-      switch (sortBy) {
-        case "price":
-          return a.hourlyRate - b.hourlyRate;
-        case "experience":
-          return rankExperience(b.experienceLevel) - rankExperience(a.experienceLevel);
-        case "popularity":
-          return b.popularity - a.popularity;
-        case "rating":
-        default:
-          return b.rating - a.rating;
-      }
-    });
-  }, [search, selectedExpertise, experienceLevel, minRate, maxRate, sortBy]);
-
-  const resetFilters = () => {
-    setSearch("");
-    setSelectedExpertise("All");
-    setExperienceLevel("");
-    setMinRate(0);
-    setMaxRate(120);
-    setSortBy("rating");
-  };
-
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <header className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-blue-600">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
             Find your mentor
           </p>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Mentor discovery
+            Mentor Discovery
           </h1>
         </div>
 
         <div className="w-full max-w-xl">
-          <MentorSearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Search mentors by name, skill, or expertise"
-          />
+          <label className="flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-5 w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 5 5" />
+            </svg>
+            <input
+              type="search"
+              placeholder="Search mentors by name, skill, or expertise"
+              aria-label="Search mentors"
+              className="w-full border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+            />
+          </label>
         </div>
       </header>
 
       <div className="flex flex-col gap-8 xl:flex-row">
         <aside className="w-full shrink-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm xl:max-w-xs">
-          <div className="mb-6 flex items-center justify-between gap-3 border-b border-gray-200 pb-4">
+          <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
             <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
             <button
               type="button"
-              onClick={resetFilters}
               className="text-sm font-medium text-blue-600 transition hover:text-blue-700"
             >
               Reset
@@ -239,56 +144,95 @@ export default function MentorDiscoveryPage() {
             <div>
               <p className="mb-3 text-sm font-medium text-gray-700">Expertise</p>
               <div className="flex flex-wrap gap-2">
-                {expertiseOptions.map((option) => {
-                  const isSelected = selectedExpertise === option;
-
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setSelectedExpertise(option)}
-                      className={[
-                        "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                        isSelected
-                          ? "border-blue-600 bg-blue-600 text-white"
-                          : "border-gray-200 bg-gray-50 text-gray-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700",
-                      ].join(" ")}
-                    >
-                      {option}
-                    </button>
-                  );
-                })}
+                {filterGroups.map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    className={[
+                      "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                      filter === "All"
+                        ? "border-blue-600 bg-blue-600 text-white"
+                        : "border-gray-200 bg-gray-50 text-gray-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700",
+                    ].join(" ")}
+                  >
+                    {filter}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <ExperienceLevelFilter value={experienceLevel} onChange={setExperienceLevel} />
-            <HourlyRateFilter min={minRate} max={maxRate} onChange={(nextMin, nextMax) => {
-              setMinRate(nextMin);
-              setMaxRate(nextMax);
-            }} />
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">Experience Level</p>
+              <div className="space-y-2 text-sm text-gray-600">
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="experience" defaultChecked className="accent-blue-600" />
+                  Any
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="experience" className="accent-blue-600" />
+                  Junior
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="experience" className="accent-blue-600" />
+                  Mid
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="experience" className="accent-blue-600" />
+                  Senior
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">Hourly rate</p>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="number"
+                  defaultValue={20}
+                  className="w-20 rounded-md border border-gray-300 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Minimum hourly rate"
+                />
+                <span>-</span>
+                <input
+                  type="number"
+                  defaultValue={100}
+                  className="w-20 rounded-md border border-gray-300 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Maximum hourly rate"
+                />
+              </div>
+            </div>
           </div>
         </aside>
 
         <section className="min-w-0 flex-1">
           <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">{filteredMentors.length}</span> mentors found
+              <span className="font-semibold text-gray-900">{mentors.length}</span> mentors found
             </p>
-            <MentorSort value={sortBy} onChange={setSortBy} />
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Sort by:</span>
+              <select
+                aria-label="Sort mentors"
+                className="rounded-md border border-gray-300 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                defaultValue="rating"
+              >
+                <option value="rating">Rating</option>
+                <option value="price">Price</option>
+                <option value="experience">Experience</option>
+              </select>
+            </div>
           </div>
 
-          {filteredMentors.length > 0 ? (
-            <div className="grid gap-5 md:grid-cols-2">
-              {filteredMentors.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} onViewProfile={(id) => id} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-              <MentorEmptyState onReset={resetFilters} />
-            </div>
-          )}
+          <div className="grid gap-5 md:grid-cols-2">
+            {mentors.map((mentor) => (
+              <MentorCard key={mentor.id} mentor={mentor} />
+            ))}
+          </div>
         </section>
+      </div>
+
+      <div className="mt-8 text-center text-sm text-gray-500">
+        Looking for a specific mentor? <Link href="/" className="font-medium text-blue-600 hover:underline">Go back home</Link>
       </div>
     </main>
   );
