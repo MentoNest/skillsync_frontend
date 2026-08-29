@@ -3,19 +3,32 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { EXPERTISE_CATEGORIES, mentors } from "@/lib/mentors";
+import { trackEvent } from "@/lib/analytics";
 
 const ExpertiseFilterSection = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggleCategory = (category: string) => {
-    setSelected((current) =>
-      current.includes(category)
+    setSelected((current) => {
+      const isCurrentlyActive = current.includes(category);
+      const next = isCurrentlyActive
         ? current.filter((item) => item !== category)
-        : [...current, category],
-    );
+        : [...current, category];
+
+      trackEvent("mentor_filter_used", {
+        category,
+        action: isCurrentlyActive ? "deselect" : "select",
+        activeFilters: next,
+      });
+
+      return next;
+    });
   };
 
-  const clearFilters = () => setSelected([]);
+  const clearFilters = () => {
+    trackEvent("mentor_filter_used", { action: "clear", activeFilters: [] });
+    setSelected([]);
+  };
 
   const filteredMentors = useMemo(() => {
     if (selected.length === 0) return mentors;
