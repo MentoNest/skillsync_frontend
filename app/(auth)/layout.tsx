@@ -2,10 +2,9 @@ import React from 'react';
 import Footer from '@/components/navigation/Footer';
 
 import type { ReactNode } from "react";
-
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-  <div className="min-h-screen flex flex-col items-center bg-slate-50 dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Skip link for keyboard / screen-reader users */}
       <a
         href="#auth-main"
@@ -14,13 +13,13 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         Skip to content
       </a>
 
-      <main id="auth-main" className="flex-1 flex items-center justify-center px-4 py-12 w-full">
+      <main id="auth-main" className="flex-1 flex items-center justify-center px-4 w-full">
         <div className="w-full max-w-md">
           {children}
         </div>
       </main>
       
       <Footer />
-    </div>
+    </di>
   );
 }
