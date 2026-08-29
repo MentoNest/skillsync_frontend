@@ -7,4 +7,4 @@ const FeaturedBadge = () => (
   </span>
 );
 
-export default FeaturedBadge;
+export default React.memo(FeaturedBadge);

@@ -22,4 +22,4 @@ const AvailabilityBadge = ({ status }: AvailabilityBadgeProps) => {
   );
 };
 
-export default AvailabilityBadge;
+export default React.memo(AvailabilityBadge);

@@ -6,9 +6,10 @@ interface MentorProfileImageProps {
   src?: string;
   name: string;
   size?: number;
+  priority?: boolean;
 }
 
-const MentorProfileImage = ({ src, name, size = 64 }: MentorProfileImageProps) => {
+const MentorProfileImage = ({ src, name, size = 64, priority = false }: MentorProfileImageProps) => {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -20,8 +21,9 @@ const MentorProfileImage = ({ src, name, size = 64 }: MentorProfileImageProps) =
     return (
       <div
         style={{ width: size, height: size }}
-        className="rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-sm flex-shrink-0"
+        role="img"
         aria-label={`${name} avatar`}
+        className="rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-sm flex-shrink-0"
       >
         {initials}
       </div>
@@ -34,6 +36,9 @@ const MentorProfileImage = ({ src, name, size = 64 }: MentorProfileImageProps) =
       alt={`${name} profile photo`}
       width={size}
       height={size}
+      sizes={`${size * 2}px`}
+      priority={priority}
+      loading={priority ? undefined : "lazy"}
       className="rounded-full object-cover flex-shrink-0"
     />
   );

@@ -10,9 +10,10 @@ import AvailabilityBadge from "./AvailabilityBadge";
 interface MentorCardProps {
   mentor: Mentor;
   onViewProfile?: (id: string) => void;
+  actions?: React.ReactNode;
 }
 
-const MentorCard = ({ mentor, onViewProfile }: MentorCardProps) => (
+const MentorCard = ({ mentor, onViewProfile, actions }: MentorCardProps) => (
   <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3">
     <div className="flex items-start gap-3">
       <MentorProfileImage src={mentor.avatarUrl} name={mentor.name} size={56} />
@@ -25,6 +26,7 @@ const MentorCard = ({ mentor, onViewProfile }: MentorCardProps) => (
         <p className="text-xs text-gray-500 truncate">{mentor.title}</p>
         <MentorRatingComponent rating={mentor.rating} reviewCount={mentor.reviewCount} />
       </div>
+      {actions}
     </div>
 
     <div className="flex flex-wrap gap-1">
@@ -47,4 +49,4 @@ const MentorCard = ({ mentor, onViewProfile }: MentorCardProps) => (
   </div>
 );
 
-export default MentorCard;
+export default React.memo(MentorCard);
