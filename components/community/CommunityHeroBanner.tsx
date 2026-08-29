@@ -1,3 +1,5 @@
+import StartDiscussionButton from "@/components/community/StartDiscussionButton";
+
 const CommunityHeroBanner = () => {
   return (
     <section className="rounded-2xl bg-gradient-to-r from-purple-600 to-purple-900 px-6 py-12 text-center text-white sm:px-10 sm:py-16">
@@ -8,12 +10,7 @@ const CommunityHeroBanner = () => {
         Ask questions, share experiences, and connect with mentors and
         mentees who are on the same journey as you.
       </p>
-      <button
-        type="button"
-        className="mt-8 inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-purple-700 transition-colors hover:bg-purple-50 focus:outline-none focus:ring-4 focus:ring-purple-300 sm:text-base"
-      >
-        Start a Discussion
-      </button>
+      <StartDiscussionButton />
     </section>
   );
 };
