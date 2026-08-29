@@ -22,6 +22,7 @@ export default function QuickAccessCard({
   return (
     <Link
       href={href}
+      aria-label={description ? `${title}: ${description}` : title}
       className="group flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-6 shadow-sm
                  transition-all duration-200 hover:-translate-y-1 hover:border-primary-200
                  hover:shadow-md focus-visible:outline-none focus-visible:ring-2
@@ -29,6 +30,7 @@ export default function QuickAccessCard({
     >
       {Icon && (
         <span
+          aria-hidden="true"
           className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50
                      text-primary-600 transition-colors duration-200 group-hover:bg-primary-100"
         >

@@ -27,7 +27,7 @@ export default function ResourcesPage() {
       <div className="container mx-auto px-4 py-16">
         <header className="mb-10 max-w-2xl">
           <p className="mb-3 text-sm font-medium uppercase tracking-wide text-blue-500">
-            SkillSync resources
+            <span aria-hidden="true">SkillSync resources</span>
           </p>
           <h1 className="mb-4 text-4xl font-bold">Learning Resources</h1>
           <p className="text-lg text-gray-600">
@@ -45,12 +45,14 @@ export default function ResourcesPage() {
               <article
                 key={category.href}
                 className="rounded-lg bg-white p-6 shadow-md"
+                aria-label={category.title}
               >
-                <h3 className="mb-2 text-2xl font-semibold">{category.title}</h3>
+                <h2 className="mb-2 text-2xl font-semibold">{category.title}</h2>
                 <p className="mb-5 text-gray-600">{category.description}</p>
                 <Link
                   href={category.href}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+                  aria-label={`Explore ${category.title}`}
                 >
                   Explore {category.title}
                 </Link>
