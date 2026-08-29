@@ -11,6 +11,8 @@ type Reply = {
   body: string;
   votes: number;
   color: string;
+  replies?: Reply[];
+  parentId?: number | null;
 };
 
 const initialReplies: Reply[] = [
@@ -23,6 +25,33 @@ const initialReplies: Reply[] = [
     body: "I treated every small project as a chance to tell a story. In interviews I focused less on the feature list and more on the decisions I made, what broke, and what I would improve next time.",
     votes: 18,
     color: "bg-rose-100 text-rose-700",
+    parentId: null,
+    replies: [
+      {
+        id: 4,
+        name: "Alex Lee",
+        initials: "AL",
+        role: "Junior developer",
+        time: "1 hour ago",
+        body: "This is really helpful advice! I've been focusing too much on listing features instead of telling the story behind them.",
+        votes: 3,
+        color: "bg-sky-100 text-sky-700",
+        parentId: 1,
+        replies: [
+          {
+            id: 5,
+            name: "Maya Chen",
+            initials: "MC",
+            role: "Frontend engineer",
+            time: "45 minutes ago",
+            body: "Glad it helps! Storytelling makes you memorable in interviews.",
+            votes: 2,
+            color: "bg-rose-100 text-rose-700",
+            parentId: 4,
+          }
+        ]
+      }
+    ]
   },
   {
     id: 2,
@@ -33,6 +62,7 @@ const initialReplies: Reply[] = [
     body: "The biggest unlock for me was asking for specific feedback. A mentor helped me turn “learn more JavaScript” into a weekly plan with a project at the end of every milestone.",
     votes: 11,
     color: "bg-amber-100 text-amber-700",
+    parentId: null,
   },
   {
     id: 3,
@@ -43,19 +73,211 @@ const initialReplies: Reply[] = [
     body: "I second this. Showing how you think is so much more memorable than trying to look perfect. My first role came from a case study I almost did not include because it had a messy beginning.",
     votes: 7,
     color: "bg-emerald-100 text-emerald-700",
+    parentId: null,
   },
 ];
 
-export default function DiscussionThread() {
-  const [replies, setReplies] = useState(initialReplies);
-  const [draft, setDraft] = useState("");
-  const [hasVoted, setHasVoted] = useState(false);
+function ReplyItem({ 
+  reply, 
+  depth = 0, 
+  onAddReply,
+  collapsedThreads,
+  toggleCollapse
+}: { 
+  reply: Reply; 
+  depth?: number;
+  onAddReply: (parentId: number, body: string) => void;
+  collapsedThreads: Set<number>;
+  toggleCollapse: (id: number) => void;
+}) {
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyDraft, setReplyDraft] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const body = draft.trim();
+  const isCollapsed = collapsedThreads.has(reply.id);
+  const hasNestedReplies = reply.replies && reply.replies.length > 0;
+  const totalNestedReplies = hasNestedReplies ? countAllReplies(reply.replies!) : 0;
+
+  function countAllReplies(replies: Reply[]): number {
+    return replies.reduce((count, r) => count + 1 + (r.replies ? countAllReplies(r.replies) : 0), 0);
+  }
+
+  function handleReplySubmit(e: FormEvent) {
+    e.preventDefault();
+    const body = replyDraft.trim();
     if (!body) return;
 
+    setIsSubmitting(true);
+    // Simulate API call with timeout
+    setTimeout(() => {
+      onAddReply(reply.id, body);
+      setReplyDraft("");
+      setShowReplyForm(false);
+      setIsSubmitting(false);
+    }, 500);
+  }
+
+  return (
+    <div className={depth > 0 ? "ml-6 mt-3 border-l-2 border-slate-100 pl-4" : ""}>
+      <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex gap-3">
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ${reply.color}`}>{reply.initials}</div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <p className="text-sm font-bold text-slate-800">{reply.name}</p>
+              <span className="text-xs text-slate-400">{reply.role} · {reply.time}</span>
+            </div>
+            <p className="mt-3 text-sm leading-7 text-slate-600">{reply.body}</p>
+            <div className="mt-4 flex items-center gap-4">
+              <button type="button" className="text-xs font-bold text-slate-500 hover:text-indigo-600">↑ {reply.votes} helpful</button>
+              <button 
+                type="button" 
+                onClick={() => setShowReplyForm(!showReplyForm)}
+                className="text-xs font-bold text-slate-500 hover:text-indigo-600"
+              >
+                Reply
+              </button>
+              {hasNestedReplies && (
+                <button 
+                  type="button" 
+                  onClick={() => toggleCollapse(reply.id)}
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
+                >
+                  {isCollapsed ? `↑ Show ${totalNestedReplies} nested repl${totalNestedReplies > 1 ? 'ies' : 'y'}` : `↓ Hide ${totalNestedReplies} nested repl${totalNestedReplies > 1 ? 'ies' : 'y'}`}
+                </button>
+              )}
+            </div>
+
+            {showReplyForm && (
+              <form onSubmit={handleReplySubmit} className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <label htmlFor={`reply-${reply.id}`} className="text-sm font-bold text-slate-950">
+                  Reply to {reply.name}
+                </label>
+                <textarea
+                  id={`reply-${reply.id}`}
+                  value={replyDraft}
+                  onChange={(event) => setReplyDraft(event.target.value)}
+                  placeholder="Write your reply..."
+                  rows={3}
+                  className="mt-3 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm leading-6 text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                />
+                <div className="mt-3 flex items-center justify-between gap-4">
+                  <span className="text-xs text-slate-400">Be kind. Be specific. Be useful.</span>
+                  <div className="flex gap-2">
+                    <button 
+                      type="button" 
+                      onClick={() => { setShowReplyForm(false); setReplyDraft(""); }}
+                      className="rounded-lg px-4 py-2 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={!replyDraft.trim() || isSubmitting} 
+                      className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300 flex items-center gap-2"
+                    >
+                      {isSubmitting && (
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                      )}
+                      Post Reply
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </article>
+      
+      {!isCollapsed && hasNestedReplies && reply.replies!.map((nestedReply) => (
+        <ReplyItem
+          key={nestedReply.id}
+          reply={nestedReply}
+          depth={depth + 1}
+          onAddReply={onAddReply}
+          collapsedThreads={collapsedThreads}
+          toggleCollapse={toggleCollapse}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function DiscussionThread() {
+  const [replies, setReplies] = useState<Reply[]>(initialReplies);
+  const [mainDraft, setMainDraft] = useState("");
+  const [hasVoted, setHasVoted] = useState(false);
+  const [isSubmittingMain, setIsSubmittingMain] = useState(false);
+  const [collapsedThreads, setCollapsedThreads] = useState<Set<number>>(new Set());
+  const [mainFormError, setMainFormError] = useState("");
+
+  function toggleCollapse(id: number) {
+    setCollapsedThreads(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  }
+
+  function addReplyToTree(repliesList: Reply[], parentId: number, newReply: Reply): Reply[] {
+    return repliesList.map(reply => {
+      if (reply.id === parentId) {
+        return {
+          ...reply,
+          replies: [...(reply.replies || []), newReply]
+        };
+      }
+      if (reply.replies) {
+        return {
+          ...reply,
+          replies: addReplyToTree(reply.replies, parentId, newReply)
+        };
+      }
+      return reply;
+    });
+  }
+
+  function handleAddReply(parentId: number, body: string) {
+    const newReply: Reply = {
+      id: Date.now(),
+      name: "You",
+      initials: "YO",
+      role: "SkillSync member",
+      time: "just now",
+      body,
+      votes: 0,
+      color: "bg-indigo-100 text-indigo-700",
+      parentId,
+    };
+    setReplies(current => addReplyToTree(current, parentId, newReply));
+  }
+
+  async function handleMainSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const body = mainDraft.trim();
+    setMainFormError("");
+    
+    if (!body) {
+      setMainFormError("Please enter a comment before posting.");
+      return;
+    }
+    
+    if (body.length < 10) {
+      setMainFormError("Comment must be at least 10 characters long.");
+      return;
+    }
+
+    setIsSubmittingMain(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
     setReplies((current) => [
       ...current,
       {
@@ -67,10 +289,16 @@ export default function DiscussionThread() {
         body,
         votes: 0,
         color: "bg-indigo-100 text-indigo-700",
+        parentId: null,
       },
     ]);
-    setDraft("");
+    setMainDraft("");
+    setIsSubmittingMain(false);
   }
+
+  const countTotalReplies = (repliesList: Reply[]): number => {
+    return repliesList.reduce((count, r) => count + 1 + (r.replies ? countTotalReplies(r.replies) : 0), 0);
+  };
 
   return (
     <div>
@@ -102,7 +330,7 @@ export default function DiscussionThread() {
           >
             {hasVoted ? "Upvoted" : "↑ Helpful"} · {hasVoted ? 43 : 42}
           </button>
-          <span className="text-sm text-slate-500">12 replies</span>
+          <span className="text-sm text-slate-500">{countTotalReplies(replies)} replies</span>
           <span className="text-sm text-slate-400">5 min read</span>
         </div>
       </article>
@@ -113,37 +341,46 @@ export default function DiscussionThread() {
           <button type="button" className="text-sm font-semibold text-slate-500 hover:text-indigo-600">Most helpful⌄</button>
         </div>
         <div className="mt-4 space-y-3">
-          {replies.map((reply) => (
-            <article key={reply.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex gap-3">
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ${reply.color}`}>{reply.initials}</div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                    <p className="text-sm font-bold text-slate-800">{reply.name}</p>
-                    <span className="text-xs text-slate-400">{reply.role} · {reply.time}</span>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">{reply.body}</p>
-                  <button type="button" className="mt-4 text-xs font-bold text-slate-500 hover:text-indigo-600">↑ {reply.votes} helpful</button>
-                </div>
-              </div>
-            </article>
+          {replies.filter(r => r.parentId === null).map((reply) => (
+            <ReplyItem
+              key={reply.id}
+              reply={reply}
+              onAddReply={handleAddReply}
+              collapsedThreads={collapsedThreads}
+              toggleCollapse={toggleCollapse}
+            />
           ))}
         </div>
       </section>
 
-      <form onSubmit={handleSubmit} className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <label htmlFor="reply" className="text-base font-bold text-slate-950">Add to the discussion</label>
+      <form onSubmit={handleMainSubmit} className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <label htmlFor="main-reply" className="text-base font-bold text-slate-950">Add to the discussion</label>
         <textarea
-          id="reply"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          id="main-reply"
+          value={mainDraft}
+          onChange={(event) => setMainDraft(event.target.value)}
           placeholder="Share what worked for you..."
           rows={4}
           className="mt-4 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
         />
+        {mainFormError && (
+          <p className="mt-2 text-sm text-red-600">{mainFormError}</p>
+        )}
         <div className="mt-3 flex items-center justify-between gap-4">
           <span className="text-xs text-slate-400">Be kind. Be specific. Be useful.</span>
-          <button type="submit" disabled={!draft.trim()} className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300">Post reply</button>
+          <button 
+            type="submit" 
+            disabled={!mainDraft.trim() || isSubmittingMain} 
+            className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300 flex items-center gap-2"
+          >
+            {isSubmittingMain && (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+            )}
+            {isSubmittingMain ? "Posting..." : "Post reply"}
+          </button>
         </div>
       </form>
     </div>
