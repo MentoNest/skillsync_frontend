@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
 import Footer from "@/components/landing/Footer";
 import Navbar from "@/components/navigation/Navbar";
+import { AuthProvider } from "@/context/AuthContext";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
 
 export const metadata: Metadata = {
   title: "SkillSync",
