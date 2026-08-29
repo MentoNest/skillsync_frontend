@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react"; // Assuming lucide-react is installed, common in Next.js
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, LayoutDashboard, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -15,6 +16,16 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  
+  // Get auth state and logout function from Context
+  const { isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    router.push("/");
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
@@ -46,20 +57,41 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Authentication Buttons (Desktop) */}
+          {/* Authentication Logic (Desktop) */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link 
-              href="/login" 
-              className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Register
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium transition-colors"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors font-medium"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -93,21 +125,44 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+            
             <div className="mt-4 space-y-2 border-t border-gray-100 pt-4">
-              <Link
-                href="/login"
-                onClick={() => setIsOpen(false)}
-                className="block w-full px-3 py-2 text-center font-medium text-gray-600 hover:bg-gray-50"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setIsOpen(false)}
-                className="block w-full px-3 py-2 text-center font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Register
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full px-3 py-2 text-center font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center gap-2 w-full px-3 py-2 text-center font-medium text-red-600 hover:bg-red-50 rounded-md"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full px-3 py-2 text-center font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full px-3 py-2 text-center font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
