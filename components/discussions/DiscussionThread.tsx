@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import LikeButton from "../common/LikeButton";
 
 type Reply = {
   id: number;
@@ -209,7 +210,6 @@ function ReplyItem({
 export default function DiscussionThread() {
   const [replies, setReplies] = useState<Reply[]>(initialReplies);
   const [mainDraft, setMainDraft] = useState("");
-  const [hasVoted, setHasVoted] = useState(false);
   const [isSubmittingMain, setIsSubmittingMain] = useState(false);
   const [collapsedThreads, setCollapsedThreads] = useState<Set<number>>(new Set());
   const [mainFormError, setMainFormError] = useState("");
@@ -322,14 +322,8 @@ export default function DiscussionThread() {
           I’m six months into my learning journey and starting to apply for junior roles. For those of you who have made the jump, what made the biggest difference in your search? I’d especially love to hear about the projects, habits, or conversations that helped you stand out.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setHasVoted((current) => !current)}
-            aria-pressed={hasVoted}
-            className={`rounded-lg border px-4 py-2 text-sm font-bold transition-colors ${hasVoted ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600"}`}
-          >
-            {hasVoted ? "Upvoted" : "↑ Helpful"} · {hasVoted ? 43 : 42}
-          </button>
+          {/* Use LikeButton with a stable id for this thread; initial count is the base shown in the UI */}
+          <LikeButton id="discussion-thread-1" initialCount={42} />
           <span className="text-sm text-slate-500">{countTotalReplies(replies)} replies</span>
           <span className="text-sm text-slate-400">5 min read</span>
         </div>
