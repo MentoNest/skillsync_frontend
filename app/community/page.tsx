@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import CommunityCategoriesSidebar from "@/components/community/CommunityCategoriesSidebar";
+"use client";
+
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
 import CommunityStatisticsWidget from "@/components/community/CommunityStatisticsWidget";
 import DiscussionFeedContainer from "@/components/community/DiscussionFeedContainer";
@@ -7,11 +9,6 @@ import UpcomingEventsWidget from "@/components/community/UpcomingEventsWidget";
 import DiscussionForm, {
   type DiscussionFormValues,
 } from "@/components/discussions/DiscussionForm";
-
-export const metadata: Metadata = {
-  title: "Community | SkillSync",
-  description: "Discuss, ask questions, and share experiences with mentors and mentees.",
-};
 
 export default function CommunityPage() {
   const handleSubmit = async (values: DiscussionFormValues) => {
