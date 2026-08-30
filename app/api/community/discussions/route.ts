@@ -10,11 +10,15 @@ export type CommunityDiscussion = {
   likeCount: number;
   postedAt: string;
   isLiked?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
 };
 
 type StoredDiscussion = CommunityDiscussion & {
   baseLikeCount: number;
   likedByUser: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
 };
 
 const seededDiscussions: StoredDiscussion[] = [
@@ -29,6 +33,7 @@ const seededDiscussions: StoredDiscussion[] = [
     postedAt: "2026-08-25T10:00:00.000Z",
     baseLikeCount: 5,
     likedByUser: false,
+    isPinned: true,
   },
   {
     id: "2",
@@ -53,6 +58,7 @@ const seededDiscussions: StoredDiscussion[] = [
     postedAt: "2026-08-23T14:45:00.000Z",
     baseLikeCount: 2,
     likedByUser: false,
+    isLocked: true,
   },
 ];
 
@@ -71,6 +77,8 @@ function serializeDiscussion(discussion: StoredDiscussion): CommunityDiscussion 
     likeCount: discussion.baseLikeCount + (discussion.likedByUser ? 1 : 0),
     postedAt: discussion.postedAt,
     isLiked: discussion.likedByUser,
+    isPinned: discussion.isPinned,
+    isLocked: discussion.isLocked,
   };
 }
 

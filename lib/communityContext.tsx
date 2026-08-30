@@ -12,8 +12,9 @@ export interface Discussion {
   replyCount: number;
   postedAt: string;
   isTrending?: boolean;
-  // Optional per-user liked flag — stored client-side for now
   isLiked?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
 }
 
 interface CommunityState {

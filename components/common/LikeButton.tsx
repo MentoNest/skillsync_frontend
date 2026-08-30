@@ -81,6 +81,7 @@ export default function LikeButton({ id, initialCount, className }: LikeButtonPr
     <button
       type="button"
       aria-pressed={liked}
+      aria-label={liked ? "Unlike discussion" : "Like discussion"}
       onClick={toggle}
       className={className}
       title={liked ? "Unlike discussion" : "Like discussion"}
