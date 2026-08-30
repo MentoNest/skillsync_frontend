@@ -14,6 +14,7 @@ import FilterSidebar from "./FilterSidebar";
 import MentorFilterDrawer from "./MentorFilterDrawer";
 import MentorComparisonPanel from "./MentorComparisonPanel";
 import MentorSearchBar from "./MentorSearchBar";
+import FollowButton from "@/components/common/FollowButton";
 
 const MAX_COMPARE = 3;
 const MAX_RATE_BOUND = 200;
@@ -254,12 +255,15 @@ const MentorDiscoveryPage = () => {
                         mentor={mentor}
                         onViewProfile={(id) => router.push(`/mentors/${id}`)}
                         actions={
-                          <MentorCompareToggle
-                            checked={compareIds.includes(mentor.id)}
-                            disabled={isCompareDisabled}
-                            disabledReason={`You can compare up to ${MAX_COMPARE} mentors`}
-                            onToggle={() => toggleCompare(mentor.id)}
-                          />
+                          <div className="flex items-center gap-2">
+                            <FollowButton userId={mentor.id} userName={mentor.name} />
+                            <MentorCompareToggle
+                              checked={compareIds.includes(mentor.id)}
+                              disabled={isCompareDisabled}
+                              disabledReason={`You can compare up to ${MAX_COMPARE} mentors`}
+                              onToggle={() => toggleCompare(mentor.id)}
+                            />
+                          </div>
                         }
                       />
                     </li>
