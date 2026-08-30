@@ -1,14 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
 import DiscussionFeedContainer from "@/components/community/DiscussionFeedContainer";
 import DiscussionForm, {
   type DiscussionFormValues,
 } from "@/components/discussions/DiscussionForm";
-
-export const metadata: Metadata = {
-  title: "Community | SkillSync",
-  description: "Discuss, ask questions, and share experiences with mentors and mentees.",
-};
 
 export default function CommunityPage() {
   const handleSubmit = async (values: DiscussionFormValues) => {
