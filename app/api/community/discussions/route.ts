@@ -96,3 +96,67 @@ export async function GET(request: NextRequest) {
     pageSize,
   });
 }
+
+export async function POST(request: NextRequest) {
+  const payload = (await request.json().catch(() => ({}))) as {
+    title?: string;
+    category?: string;
+    content?: string;
+    tags?: string[];
+    author?: string;
+    excerpt?: string;
+  };
+
+  const title = payload.title?.trim();
+  const category = payload.category?.trim() || "Career Growth";
+
+  if (!title) {
+    return NextResponse.json({ error: "Title is required." }, { status: 400 });
+  }
+
+  const nextDiscussion: StoredDiscussion = {
+    id: `discussion-${Date.now()}`,
+    title,
+    excerpt: payload.excerpt?.trim() || payload.content?.trim().slice(0, 160) || "New community discussion",
+    author: payload.author?.trim() || "You",
+    category,
+    replyCount: 0,
+    likeCount: 0,
+    postedAt: new Date().toISOString(),
+    baseLikeCount: 0,
+    likedByUser: false,
+  };
+
+  discussionStore.set(nextDiscussion.id, nextDiscussion);
+
+  return NextResponse.json(
+    {
+      discussion: serializeDiscussion(nextDiscussion),
+      ok: true,
+    },
+    { status: 201 }
+  );
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  const payload = (await request.json().catch(() => ({}))) as {
+    replyIncrement?: number;
+  };
+  const discussion = discussionStore.get(id);
+
+  if (!discussion) {
+    return NextResponse.json({ error: "Discussion not found" }, { status: 404 });
+  }
+
+  const replyIncrement = Number(payload.replyIncrement) || 0;
+  discussion.replyCount = Math.max(0, discussion.replyCount + replyIncrement);
+
+  return NextResponse.json({
+    replyCount: discussion.replyCount,
+    id: discussion.id,
+  });
+}

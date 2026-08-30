@@ -1,7 +1,15 @@
 // Hook to fetch community discussions from API (#885)
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import type { Discussion } from "./communityContext";
+
+interface Discussion {
+  id: string;
+  title: string;
+  excerpt: string;
+  author: string;
+  repliesCount: number;
+  likeCount: number;
+}
 
 interface UseDiscussionsOptions {
   category?: string;
@@ -17,6 +25,14 @@ interface UseDiscussionsResult {
   loadMore: () => void;
 }
 
+const COMMUNITY_UPDATE_EVENT = "community:updated";
+
+export const notifyCommunityUpdate = () => {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(COMMUNITY_UPDATE_EVENT));
+  }
+};
+
 export const useDiscussions = (
   options: UseDiscussionsOptions = {}
 ): UseDiscussionsResult => {
@@ -29,7 +45,7 @@ export const useDiscussions = (
   const [hasMore, setHasMore] = useState(true);
 
   const fetchDiscussions = useCallback(
-    async (pg: number) => {
+    async (pg: number, replace = false) => {
       setIsLoading(true);
       setError(null);
       try {
@@ -40,10 +56,30 @@ export const useDiscussions = (
         });
         const res = await fetch(`/api/community/discussions?${params}`);
         if (!res.ok) throw new Error(`Failed to fetch discussions: ${res.status}`);
-        const data: { discussions: Discussion[]; hasMore: boolean } =
-          await res.json();
+        const data: {
+          discussions: Array<{
+            id: string;
+            title: string;
+            excerpt: string;
+            author: string;
+            replyCount?: number;
+            repliesCount?: number;
+            likeCount?: number;
+          }>;
+          hasMore: boolean;
+        } = await res.json();
+
+        const nextDiscussions = (data.discussions ?? []).map((discussion) => ({
+          id: String(discussion.id),
+          title: discussion.title,
+          excerpt: discussion.excerpt,
+          author: discussion.author,
+          repliesCount: discussion.replyCount ?? discussion.repliesCount ?? 0,
+          likeCount: discussion.likeCount ?? 0,
+        }));
+
         setDiscussions((prev) =>
-          pg === 1 ? data.discussions : [...prev, ...data.discussions]
+          replace || pg === 1 ? nextDiscussions : [...prev, ...nextDiscussions]
         );
         setHasMore(data.hasMore);
       } catch (err) {
@@ -57,8 +93,25 @@ export const useDiscussions = (
 
   useEffect(() => {
     setCurrentPage(1);
-    fetchDiscussions(1);
+    fetchDiscussions(1, true);
   }, [category, fetchDiscussions]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setCurrentPage(1);
+      fetchDiscussions(1, true);
+    };
+
+    window.addEventListener(COMMUNITY_UPDATE_EVENT, handleUpdate);
+    const interval = window.setInterval(() => {
+      fetchDiscussions(1, true);
+    }, 5000);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener(COMMUNITY_UPDATE_EVENT, handleUpdate);
+    };
+  }, [fetchDiscussions]);
 
   const loadMore = useCallback(() => {
     const next = currentPage + 1;

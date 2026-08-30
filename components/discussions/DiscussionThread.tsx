@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { notifyCommunityUpdate } from "@/lib/useDiscussions";
 import LikeButton from "../common/LikeButton";
 
 type Reply = {
@@ -257,6 +258,7 @@ export default function DiscussionThread() {
       parentId,
     };
     setReplies(current => addReplyToTree(current, parentId, newReply));
+    notifyCommunityUpdate();
   }
 
   async function handleMainSubmit(event: FormEvent<HTMLFormElement>) {
@@ -292,6 +294,7 @@ export default function DiscussionThread() {
         parentId: null,
       },
     ]);
+    notifyCommunityUpdate();
     setMainDraft("");
     setIsSubmittingMain(false);
   }
