@@ -9,6 +9,7 @@ const placeholderDiscussions: Discussion[] = [
       "Looking for tips on setting expectations and goals in the first session with a new mentee.",
     author: "Jane Smith",
     repliesCount: 12,
+    likeCount: 5,
   },
   {
     id: "2",
@@ -17,6 +18,7 @@ const placeholderDiscussions: Discussion[] = [
       "Curious what articles, courses, or books have helped others prepare for system design interviews.",
     author: "John Doe",
     repliesCount: 8,
+    likeCount: 9,
   },
   {
     id: "3",
@@ -25,6 +27,7 @@ const placeholderDiscussions: Discussion[] = [
       "Would love to hear how other mentors manage their time and avoid burnout.",
     author: "Sarah Wilson",
     repliesCount: 5,
+    likeCount: 2,
   },
 ];
 

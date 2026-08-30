@@ -1,9 +1,12 @@
+import LikeButton from "../common/LikeButton";
+
 export interface Discussion {
   id: string;
   title: string;
   excerpt: string;
   author: string;
   repliesCount: number;
+  likeCount?: number;
 }
 
 interface DiscussionCardProps {
@@ -21,7 +24,10 @@ const DiscussionCard = ({ discussion }: DiscussionCardProps) => {
       </p>
       <div className="mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
         <span>Started by {discussion.author}</span>
-        <span>{discussion.repliesCount} replies</span>
+        <div className="flex items-center gap-3">
+          <LikeButton id={`discussion-${discussion.id}`} initialCount={discussion.likeCount ?? 0} />
+          <span>{discussion.repliesCount} replies</span>
+        </div>
       </div>
     </article>
   );
