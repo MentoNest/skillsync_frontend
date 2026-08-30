@@ -6,6 +6,7 @@ interface User {
   id: string;
   email: string;
   name: string;
+  role: string;
 }
 
 interface AuthContextType {
@@ -25,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load auth data from localStorage on startup
+    // Check if user is already logged in when the page loads
     const savedUser = localStorage.getItem("user");
     const savedToken = localStorage.getItem("auth-token");
 
@@ -41,8 +42,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(newToken);
     localStorage.setItem("user", JSON.stringify(newUser));
     localStorage.setItem("auth-token", newToken);
-    // Set a cookie so the Middleware can see it for route protection
+    
+    // Set cookies so Middleware can protect routes server-side
     document.cookie = `auth-token=${newToken}; path=/; max-age=86400; SameSite=Lax`;
+    document.cookie = `user-role=${newUser.role}; path=/; max-age=86400; SameSite=Lax`;
   };
 
   const logout = () => {
@@ -51,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user");
     localStorage.removeItem("auth-token");
     document.cookie = "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
   };
 
   return (
