@@ -1,4 +1,6 @@
 // Mentor card component composing profile image, badge, rating, skills (#843)
+"use client";
+
 import React from "react";
 import type { Mentor } from "@/types/mentor";
 import MentorProfileImage from "./MentorProfileImage";
