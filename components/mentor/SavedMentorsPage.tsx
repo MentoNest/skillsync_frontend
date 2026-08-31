@@ -9,6 +9,7 @@ import MentorCard from "./MentorCard";
 import { MentorCardSkeletonList } from "./MentorCardSkeleton";
 import MentorEmptyState from "./MentorEmptyState";
 import MentorBookmarkButton from "./MentorBookmarkButton";
+import FollowButton from "@/components/common/FollowButton";
 
 const SavedMentorsPage = () => {
   const { mentors, loading, error, refetch } = useMentorListings({});
@@ -68,11 +69,14 @@ const SavedMentorsPage = () => {
               <MentorCard
                 mentor={mentor}
                 actions={
-                  <MentorBookmarkButton
-                    mentorId={mentor.id}
-                    isBookmarked
-                    onToggle={toggleBookmark}
-                  />
+                  <div className="flex items-center gap-2">
+                    <FollowButton userId={mentor.id} userName={mentor.name} />
+                    <MentorBookmarkButton
+                      mentorId={mentor.id}
+                      isBookmarked
+                      onToggle={toggleBookmark}
+                    />
+                  </div>
                 }
               />
             </li>
