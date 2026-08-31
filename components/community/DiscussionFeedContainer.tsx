@@ -1,6 +1,5 @@
 import DiscussionCard, { type Discussion } from "./DiscussionCard";
 
-// Placeholder data until the real discussion feed and API integration land.
 const placeholderDiscussions: Discussion[] = [
   {
     id: "1",
@@ -33,39 +32,40 @@ const placeholderDiscussions: Discussion[] = [
   },
 ];
 
-const DiscussionFeedContainer = () => {
+interface DiscussionFeedContainerProps {
+  discussions?: Discussion[];
+  isLoading?: boolean;
+  error?: string | null;
+}
+
+const DiscussionFeedContainer = ({
+  discussions = placeholderDiscussions,
+  isLoading = false,
+  error = null,
+}: DiscussionFeedContainerProps) => {
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <DiscussionSearch onSearch={handleSearch} />
-        <DiscussionSort value={sortBy} onChange={handleSortChange} />
-      </div>
+    <div className="flex flex-col gap-4 sm:gap-6">
+      {error ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      ) : null}
 
-      <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
+      {isLoading && discussions.length === 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
+          Loading live community updates…
+        </div>
+      ) : null}
 
-      <p className="text-xs text-gray-400 dark:text-gray-500">
-        {totalCount} discussion{totalCount !== 1 ? "s" : ""}
-        {selectedCategory && ` in ${selectedCategory}`}
-        {searchQuery && ` matching "${searchQuery}"`}
-      </p>
+      {!isLoading && discussions.length === 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
+          No discussions yet. Start the first live thread.
+        </div>
+      ) : null}
 
-      <div className="flex flex-col gap-4 sm:gap-6">
-        {sortedDiscussions.map((discussion) => (
-          <DiscussionCardMemo
-            key={discussion.id}
-            discussion={{
-              id: discussion.id,
-              title: discussion.title,
-              excerpt: discussion.excerpt,
-              author: discussion.author,
-              repliesCount: discussion.replyCount,
-              likeCount: discussion.likeCount,
-            }}
-          />
-        ))}
-      </div>
-
-      {hasMore && <LoadMoreButton onClick={handleLoadMore} isLoading={isLoading} />}
+      {discussions.map((discussion) => (
+        <DiscussionCard key={discussion.id} discussion={discussion} />
+      ))}
     </div>
   );
 }

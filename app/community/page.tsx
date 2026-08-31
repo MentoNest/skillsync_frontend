@@ -1,9 +1,6 @@
 "use client";
 
-import type { Metadata } from "next";
 import CommunityCategoriesSidebar from "@/components/community/CommunityCategoriesSidebar";
-
-import { useCallback } from "react";
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
 import CommunityStatisticsWidget from "@/components/community/CommunityStatisticsWidget";
 import DiscussionFeedContainer from "@/components/community/DiscussionFeedContainer";
@@ -12,10 +9,31 @@ import CommunityCategoriesSidebar from "@/components/community/CommunityCategori
 import DiscussionForm, {
   type DiscussionFormValues,
 } from "@/components/discussions/DiscussionForm";
-import { useCommunityAnalytics } from "@/lib/useCommunityAnalytics";
+import { notifyCommunityUpdate, useDiscussions } from "@/lib/useDiscussions";
 
 export default function CommunityPage() {
-  const { trackPost } = useCommunityAnalytics();
+  const { discussions, isLoading, error } = useDiscussions();
+
+  const handleSubmit = async (values: DiscussionFormValues) => {
+    const response = await fetch("/api/community/discussions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: values.title,
+        category: values.category,
+        content: values.content,
+        tags: values.tags,
+        author: "You",
+      }),
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || "Unable to publish discussion.");
+    }
+
+    notifyCommunityUpdate();
+  };
 
   const handleSubmit = useCallback(
     async (values: DiscussionFormValues) => {
@@ -36,7 +54,11 @@ export default function CommunityPage() {
 
         <div className="mt-8 grid gap-6 md:gap-8 lg:grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
           <div className="order-1 min-w-0">
-            <DiscussionFeedContainer />
+            <DiscussionFeedContainer
+              discussions={discussions}
+              isLoading={isLoading}
+              error={error}
+            />
           </div>
 
           <aside className="order-2 space-y-5 xl:sticky xl:top-6 xl:pt-1">

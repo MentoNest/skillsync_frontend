@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState, useCallback, memo } from "react";
+import { FormEvent, useState } from "react";
+import { notifyCommunityUpdate } from "@/lib/useDiscussions";
 import LikeButton from "../common/LikeButton";
 import ShareButton from "../common/ShareButton";
 import PinButton from "./PinButton";
@@ -266,7 +267,56 @@ export default function DiscussionThread() {
       }
       return newSet;
     });
-  }, []);
+  }
+
+  function addReplyToTree(repliesList: Reply[], parentId: number, newReply: Reply): Reply[] {
+    return repliesList.map(reply => {
+      if (reply.id === parentId) {
+        return {
+          ...reply,
+          replies: [...(reply.replies || []), newReply]
+        };
+      }
+      if (reply.replies) {
+        return {
+          ...reply,
+          replies: addReplyToTree(reply.replies, parentId, newReply)
+        };
+      }
+      return reply;
+    });
+  }
+
+  function handleAddReply(parentId: number, body: string) {
+    const newReply: Reply = {
+      id: Date.now(),
+      name: "You",
+      initials: "YO",
+      role: "SkillSync member",
+      time: "just now",
+      body,
+      votes: 0,
+      color: "bg-indigo-100 text-indigo-700",
+      parentId,
+    };
+    setReplies(current => addReplyToTree(current, parentId, newReply));
+    notifyCommunityUpdate();
+  }
+
+  async function handleMainSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const body = mainDraft.trim();
+    setMainFormError("");
+    
+    if (!body) {
+      setMainFormError("Please enter a comment before posting.");
+      return;
+    }
+    
+    if (body.length < 10) {
+      setMainFormError("Comment must be at least 10 characters long.");
+      return;
+    }
 
   const handleAddReply = useCallback(
     (parentId: number, body: string) => {
@@ -282,6 +332,7 @@ export default function DiscussionThread() {
         parentId: null,
       },
     ]);
+    notifyCommunityUpdate();
     setMainDraft("");
     setIsSubmittingMain(false);
     notify("success", "Reply posted", "Your reply has been added to the discussion.");
