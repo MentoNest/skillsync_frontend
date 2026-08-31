@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback, memo } from "react";
+import { useEffect, useState } from "react";
+import { notifyCommunityUpdate } from "@/lib/useDiscussions";
 
 interface LikeButtonProps {
   id: string;
@@ -78,7 +79,9 @@ const LikeButton = memo(function LikeButton({
       setLiked(data.liked);
       setCount(data.likeCount);
       persistLikeState(data.liked);
-    } catch {
+      notifyCommunityUpdate();
+    } catch (error) {
+      console.error("Failed to sync discussion like state", error);
       setLiked(previousLiked);
       setCount(previousCount);
       persistLikeState(previousLiked);
