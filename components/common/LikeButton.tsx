@@ -15,8 +15,7 @@ function readLikedSet(): Record<string, boolean> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : {};
-  } catch (error) {
-    console.error("Failed to read likes from localStorage", error);
+  } catch {
     return {};
   }
 }
@@ -24,12 +23,16 @@ function readLikedSet(): Record<string, boolean> {
 function writeLikedSet(map: Record<string, boolean>) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-  } catch (error) {
-    console.error("Failed to write likes to localStorage", error);
+  } catch {
+    // Storage full or unavailable
   }
 }
 
-export default function LikeButton({ id, initialCount, className }: LikeButtonProps) {
+const LikeButton = memo(function LikeButton({
+  id,
+  initialCount,
+  className,
+}: LikeButtonProps) {
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(initialCount);
 
@@ -40,13 +43,16 @@ export default function LikeButton({ id, initialCount, className }: LikeButtonPr
     setCount(initialCount + (isLiked ? 1 : 0));
   }, [id, initialCount]);
 
-  const persistLikeState = (nextLiked: boolean) => {
-    const map = readLikedSet();
-    map[id] = nextLiked;
-    writeLikedSet(map);
-  };
+  const persistLikeState = useCallback(
+    (nextLiked: boolean) => {
+      const map = readLikedSet();
+      map[id] = nextLiked;
+      writeLikedSet(map);
+    },
+    [id]
+  );
 
-  async function toggle() {
+  const toggle = useCallback(async () => {
     const nextLiked = !liked;
     const previousLiked = liked;
     const previousCount = initialCount + (previousLiked ? 1 : 0);
@@ -56,11 +62,14 @@ export default function LikeButton({ id, initialCount, className }: LikeButtonPr
     persistLikeState(nextLiked);
 
     try {
-      const response = await fetch(`/api/community/discussions/${encodeURIComponent(id)}/like`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ liked: nextLiked }),
-      });
+      const response = await fetch(
+        `/api/community/discussions/${encodeURIComponent(id)}/like`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ liked: nextLiked }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to update like state: ${response.status}`);
@@ -77,12 +86,13 @@ export default function LikeButton({ id, initialCount, className }: LikeButtonPr
       setCount(previousCount);
       persistLikeState(previousLiked);
     }
-  }
+  }, [liked, initialCount, id, persistLikeState]);
 
   return (
     <button
       type="button"
       aria-pressed={liked}
+      aria-label={liked ? "Unlike discussion" : "Like discussion"}
       onClick={toggle}
       className={className}
       title={liked ? "Unlike discussion" : "Like discussion"}
@@ -113,4 +123,6 @@ export default function LikeButton({ id, initialCount, className }: LikeButtonPr
       </span>
     </button>
   );
-}
+});
+
+export default LikeButton;

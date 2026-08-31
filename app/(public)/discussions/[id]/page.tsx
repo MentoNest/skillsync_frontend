@@ -1,25 +1,30 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 import DiscussionThread from "@/components/discussions/DiscussionThread";
+import { useCommunityAnalytics } from "@/lib/useCommunityAnalytics";
 
-export const metadata: Metadata = {
-  title: "How did you land your first engineering role? | SkillSync",
-  description: "Join the conversation with the SkillSync community.",
-};
-
-export default async function DiscussionDetailsPage({
-  params,
-}: {
+interface DiscussionDetailsPageProps {
   params: Promise<{ id: string }>;
-}) {
-  await params;
+}
+
+export default function DiscussionDetailsPage({ params }: DiscussionDetailsPageProps) {
+  const { trackView } = useCommunityAnalytics();
+  const { id } = params as unknown as { id: string };
+
+  useEffect(() => {
+    if (id) {
+      trackView(id);
+    }
+  }, [id, trackView]);
 
   return (
     <main className="min-h-screen bg-[#f7f8fc] text-slate-900">
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-4 sm:px-8">
           <Link
-            href="/resources"
+            href="/community"
             className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition-colors hover:text-indigo-600"
           >
             <span aria-hidden="true">←</span> Back to community
