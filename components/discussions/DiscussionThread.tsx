@@ -2,8 +2,10 @@
 
 import { FormEvent, useState, useCallback, memo } from "react";
 import LikeButton from "../common/LikeButton";
-import ReportDialog from "../community/ReportDialog";
-import { useCommunityAnalytics } from "@/lib/useCommunityAnalytics";
+import ShareButton from "../common/ShareButton";
+import PinButton from "./PinButton";
+import LockButton from "./LockButton";
+import { useNotifications } from "@/lib/notificationContext";
 
 type Reply = {
   id: number;
@@ -80,53 +82,21 @@ const initialReplies: Reply[] = [
   },
 ];
 
-function countAllReplies(replies: Reply[]): number {
-  return replies.reduce(
-    (count, r) => count + 1 + (r.replies ? countAllReplies(r.replies) : 0),
-    0
-  );
-}
-
-function addReplyToTree(repliesList: Reply[], parentId: number, newReply: Reply): Reply[] {
-  return repliesList.map((reply) => {
-    if (reply.id === parentId) {
-      return {
-        ...reply,
-        replies: [...(reply.replies || []), newReply],
-      };
-    }
-    if (reply.replies) {
-      return {
-        ...reply,
-        replies: addReplyToTree(reply.replies, parentId, newReply),
-      };
-    }
-    return reply;
-  });
-}
-
-function countTotalReplies(repliesList: Reply[]): number {
-  return repliesList.reduce(
-    (count, r) => count + 1 + (r.replies ? countTotalReplies(r.replies) : 0),
-    0
-  );
-}
-
-interface ReplyItemProps {
-  reply: Reply;
+function ReplyItem({ 
+  reply, 
+  depth = 0, 
+  onAddReply,
+  collapsedThreads,
+  toggleCollapse,
+  isLocked = false,
+}: { 
+  reply: Reply; 
   depth?: number;
   onAddReply: (parentId: number, body: string) => void;
   collapsedThreads: Set<number>;
   toggleCollapse: (id: number) => void;
-}
-
-const ReplyItem = memo(function ReplyItem({
-  reply,
-  depth = 0,
-  onAddReply,
-  collapsedThreads,
-  toggleCollapse,
-}: ReplyItemProps) {
+  isLocked?: boolean;
+}) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyDraft, setReplyDraft] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -170,19 +140,16 @@ const ReplyItem = memo(function ReplyItem({
             </div>
             <p className="mt-3 text-sm leading-7 text-slate-600">{reply.body}</p>
             <div className="mt-4 flex items-center gap-4">
-              <button
-                type="button"
-                className="text-xs font-bold text-slate-500 hover:text-indigo-600"
-              >
-                ↑ {reply.votes} helpful
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowReplyForm(!showReplyForm)}
-                className="text-xs font-bold text-slate-500 hover:text-indigo-600"
-              >
-                Reply
-              </button>
+              <button type="button" className="text-xs font-bold text-slate-500 hover:text-indigo-600">↑ {reply.votes} helpful</button>
+              {!isLocked && (
+                <button 
+                  type="button" 
+                  onClick={() => setShowReplyForm(!showReplyForm)}
+                  className="text-xs font-bold text-slate-500 hover:text-indigo-600"
+                >
+                  Reply
+                </button>
+              )}
               {hasNestedReplies && (
                 <button
                   type="button"
@@ -262,19 +229,18 @@ const ReplyItem = memo(function ReplyItem({
           </div>
         </div>
       </article>
-
-      {!isCollapsed &&
-        hasNestedReplies &&
-        reply.replies!.map((nestedReply) => (
-          <ReplyItem
-            key={nestedReply.id}
-            reply={nestedReply}
-            depth={depth + 1}
-            onAddReply={onAddReply}
-            collapsedThreads={collapsedThreads}
-            toggleCollapse={toggleCollapse}
-          />
-        ))}
+      
+      {!isCollapsed && hasNestedReplies && reply.replies!.map((nestedReply) => (
+        <ReplyItem
+          key={nestedReply.id}
+          reply={nestedReply}
+          depth={depth + 1}
+          onAddReply={onAddReply}
+          collapsedThreads={collapsedThreads}
+          toggleCollapse={toggleCollapse}
+          isLocked={isLocked}
+        />
+      ))}
     </div>
   );
 });
@@ -286,7 +252,9 @@ export default function DiscussionThread() {
   const [isSubmittingMain, setIsSubmittingMain] = useState(false);
   const [collapsedThreads, setCollapsedThreads] = useState<Set<number>>(new Set());
   const [mainFormError, setMainFormError] = useState("");
-  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const { notify } = useNotifications();
 
   const toggleCollapse = useCallback((id: number) => {
     setCollapsedThreads((prev) => {
@@ -311,13 +279,13 @@ export default function DiscussionThread() {
         body,
         votes: 0,
         color: "bg-indigo-100 text-indigo-700",
-        parentId,
-      };
-      setReplies((current) => addReplyToTree(current, parentId, newReply));
-      trackReply("thread-1");
-    },
-    [trackReply]
-  );
+        parentId: null,
+      },
+    ]);
+    setMainDraft("");
+    setIsSubmittingMain(false);
+    notify("success", "Reply posted", "Your reply has been added to the discussion.");
+  }
 
   const handleMainSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -387,9 +355,36 @@ export default function DiscussionThread() {
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
           <LikeButton id="discussion-thread-1" initialCount={42} />
-          <span className="text-sm text-slate-500">
-            {countTotalReplies(replies)} replies
-          </span>
+          <ShareButton url="/discussions/1" title="How did you land your first engineering role?" text="Join the conversation with the SkillSync community." />
+          <PinButton
+            isPinned={isPinned}
+            onToggle={() => {
+              setIsPinned((p) => {
+                const next = !p;
+                notify(
+                  next ? "success" : "info",
+                  next ? "Discussion pinned" : "Discussion unpinned",
+                  next ? "This discussion is now at the top of the feed." : undefined
+                );
+                return next;
+              });
+            }}
+          />
+          <LockButton
+            isLocked={isLocked}
+            onToggle={() => {
+              setIsLocked((l) => {
+                const next = !l;
+                notify(
+                  next ? "warning" : "info",
+                  next ? "Discussion locked" : "Discussion unlocked",
+                  next ? "No new replies can be added to this discussion." : "Replies are now allowed again."
+                );
+                return next;
+              });
+            }}
+          />
+          <span className="text-sm text-slate-500">{countTotalReplies(replies)} replies</span>
           <span className="text-sm text-slate-400">5 min read</span>
           <button
             type="button"
@@ -428,68 +423,59 @@ export default function DiscussionThread() {
           </button>
         </div>
         <div className="mt-4 space-y-3">
-          {replies
-            .filter((r) => r.parentId === null)
-            .map((reply) => (
-              <ReplyItem
-                key={reply.id}
-                reply={reply}
-                onAddReply={handleAddReply}
-                collapsedThreads={collapsedThreads}
-                toggleCollapse={toggleCollapse}
-              />
-            ))}
+          {replies.filter(r => r.parentId === null).map((reply) => (
+            <ReplyItem
+              key={reply.id}
+              reply={reply}
+              onAddReply={handleAddReply}
+              collapsedThreads={collapsedThreads}
+              toggleCollapse={toggleCollapse}
+              isLocked={isLocked}
+            />
+          ))}
         </div>
       </section>
 
-      <form
-        onSubmit={handleMainSubmit}
-        className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-      >
-        <label htmlFor="main-reply" className="text-base font-bold text-slate-950">
-          Add to the discussion
-        </label>
-        <textarea
-          id="main-reply"
-          value={mainDraft}
-          onChange={(event) => setMainDraft(event.target.value)}
-          placeholder="Share what worked for you..."
-          rows={4}
-          className="mt-4 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
-        />
-        {mainFormError && (
-          <p className="mt-2 text-sm text-red-600">{mainFormError}</p>
-        )}
-        <div className="mt-3 flex items-center justify-between gap-4">
-          <span className="text-xs text-slate-400">
-            Be kind. Be specific. Be useful.
-          </span>
-          <button
-            type="submit"
-            disabled={!mainDraft.trim() || isSubmittingMain}
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-          >
-            {isSubmittingMain && (
-              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
+      <form onSubmit={handleMainSubmit} className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <label htmlFor="main-reply" className="text-base font-bold text-slate-950">Add to the discussion</label>
+        {isLocked ? (
+          <p className="mt-3 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 1C8.676 1 6 3.676 6 7v2H4v14h16V9h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4z" />
+            </svg>
+            This discussion is locked. No new replies can be added.
+          </p>
+        ) : (
+          <>
+            <textarea
+              id="main-reply"
+              value={mainDraft}
+              onChange={(event) => setMainDraft(event.target.value)}
+              placeholder="Share what worked for you..."
+              rows={4}
+              className="mt-4 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+            />
+            {mainFormError && (
+              <p className="mt-2 text-sm text-red-600">{mainFormError}</p>
             )}
-            {isSubmittingMain ? "Posting..." : "Post reply"}
-          </button>
-        </div>
+            <div className="mt-3 flex items-center justify-between gap-4">
+              <span className="text-xs text-slate-400">Be kind. Be specific. Be useful.</span>
+              <button 
+                type="submit" 
+                disabled={!mainDraft.trim() || isSubmittingMain} 
+                className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300 flex items-center gap-2"
+              >
+                {isSubmittingMain && (
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                  </svg>
+                )}
+                {isSubmittingMain ? "Posting..." : "Post reply"}
+              </button>
+            </div>
+          </>
+        )}
       </form>
 
       {showReportDialog && (

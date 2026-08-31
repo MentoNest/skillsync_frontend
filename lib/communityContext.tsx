@@ -21,6 +21,8 @@ export interface Discussion {
   postedAt: string;
   isTrending?: boolean;
   isLiked?: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
 }
 
 export type ModerationAction = "approve" | "dismiss" | "remove" | "warn";

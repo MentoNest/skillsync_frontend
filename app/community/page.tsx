@@ -1,5 +1,8 @@
 "use client";
 
+import type { Metadata } from "next";
+import CommunityCategoriesSidebar from "@/components/community/CommunityCategoriesSidebar";
+
 import { useCallback } from "react";
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
 import CommunityStatisticsWidget from "@/components/community/CommunityStatisticsWidget";

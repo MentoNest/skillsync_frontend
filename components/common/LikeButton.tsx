@@ -89,6 +89,7 @@ const LikeButton = memo(function LikeButton({
     <button
       type="button"
       aria-pressed={liked}
+      aria-label={liked ? "Unlike discussion" : "Like discussion"}
       onClick={toggle}
       className={className}
       title={liked ? "Unlike discussion" : "Like discussion"}
