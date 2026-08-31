@@ -35,12 +35,37 @@ const placeholderDiscussions: Discussion[] = [
 
 const DiscussionFeedContainer = () => {
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-      {placeholderDiscussions.map((discussion) => (
-        <DiscussionCard key={discussion.id} discussion={discussion} />
-      ))}
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <DiscussionSearch onSearch={handleSearch} />
+        <DiscussionSort value={sortBy} onChange={handleSortChange} />
+      </div>
+
+      <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
+
+      <p className="text-xs text-gray-400 dark:text-gray-500">
+        {totalCount} discussion{totalCount !== 1 ? "s" : ""}
+        {selectedCategory && ` in ${selectedCategory}`}
+        {searchQuery && ` matching "${searchQuery}"`}
+      </p>
+
+      <div className="flex flex-col gap-4 sm:gap-6">
+        {sortedDiscussions.map((discussion) => (
+          <DiscussionCardMemo
+            key={discussion.id}
+            discussion={{
+              id: discussion.id,
+              title: discussion.title,
+              excerpt: discussion.excerpt,
+              author: discussion.author,
+              repliesCount: discussion.replyCount,
+              likeCount: discussion.likeCount,
+            }}
+          />
+        ))}
+      </div>
+
+      {hasMore && <LoadMoreButton onClick={handleLoadMore} isLoading={isLoading} />}
     </div>
   );
-};
-
-export default DiscussionFeedContainer;
+}

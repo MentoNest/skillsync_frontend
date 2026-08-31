@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useCallback } from "react";
 import LikeButton from "../common/LikeButton";
 import ShareButton from "../common/ShareButton";
 
@@ -17,6 +20,18 @@ interface DiscussionCardProps {
 }
 
 const DiscussionCard = ({ discussion }: DiscussionCardProps) => {
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportConfirm, setReportConfirm] = useState(false);
+
+  const handleReportClick = useCallback(() => {
+    setShowReportDialog(true);
+    setReportConfirm(false);
+  }, []);
+
+  const handleReportClose = useCallback(() => {
+    setShowReportDialog(false);
+  }, []);
+
   return (
     <article className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="flex items-start justify-between gap-3">
@@ -58,8 +73,21 @@ const DiscussionCard = ({ discussion }: DiscussionCardProps) => {
           <LikeButton id={`discussion-${discussion.id}`} initialCount={discussion.likeCount ?? 0} />
           <span>{discussion.repliesCount} replies</span>
         </div>
-      </div>
-    </article>
+        {reportConfirm && (
+          <div className="mt-3 rounded-lg bg-green-50 px-3 py-2 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-400">
+            Report submitted. Our team will review this discussion.
+          </div>
+        )}
+      </article>
+
+      {showReportDialog && (
+        <ReportDialog
+          discussionId={discussion.id}
+          discussionTitle={discussion.title}
+          onClose={handleReportClose}
+        />
+      )}
+    </>
   );
 };
 
