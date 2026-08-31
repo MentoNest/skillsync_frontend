@@ -9,6 +9,7 @@ const placeholderDiscussions: Discussion[] = [
     author: "Jane Smith",
     repliesCount: 12,
     likeCount: 5,
+    isPinned: true,
   },
   {
     id: "2",
@@ -27,6 +28,7 @@ const placeholderDiscussions: Discussion[] = [
     author: "Sarah Wilson",
     repliesCount: 5,
     likeCount: 2,
+    isLocked: true,
   },
 ];
 
@@ -66,6 +68,4 @@ const DiscussionFeedContainer = ({
       ))}
     </div>
   );
-};
-
-export default DiscussionFeedContainer;
+}
