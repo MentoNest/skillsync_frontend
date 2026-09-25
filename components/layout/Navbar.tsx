@@ -29,10 +29,16 @@ export default function Navbar() {
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
             <Link
-              href="#mentors"
+              href="/#mentors"
               className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors"
             >
               Find Mentors
+            </Link>
+            <Link
+              href="/resources"
+              className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+            >
+              Resources
             </Link>
             <Link
               href="#how-it-works"
