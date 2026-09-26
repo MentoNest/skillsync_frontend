@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const stats = [
   { value: "2,400+", label: "Expert Mentors" },
@@ -15,11 +16,11 @@ export default function HeroSection() {
       {/* Background decorative blobs */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-indigo-100 opacity-50 blur-3xl"
+        className="pointer-events-none absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-indigo-100 opacity-50 blur-3xl lg:-top-40 lg:-right-40 lg:w-[600px] lg:h-[600px]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-cyan-100 opacity-40 blur-3xl"
+        className="pointer-events-none absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-cyan-100 opacity-40 blur-3xl lg:-bottom-40 lg:-left-40 lg:w-[500px] lg:h-[500px]"
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
@@ -27,7 +28,7 @@ export default function HeroSection() {
           {/* Left: copy */}
           <div>
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 mb-6" role="status" aria-live="polite">
               <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" aria-hidden="true" />
               <span className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">
                 Now live — join 18k+ learners
@@ -60,7 +61,7 @@ export default function HeroSection() {
               >
                 Start for free
                 <svg
-                  className="ml-2 w-5 h-5"
+                  className="ml-2 w-5 h-5 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -110,7 +111,7 @@ export default function HeroSection() {
               {/* Main card */}
               <div className="rounded-2xl bg-white shadow-2xl shadow-slate-200 p-6 border border-slate-100">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm" aria-hidden="true">
                     SS
                   </div>
                   <div>
@@ -122,7 +123,7 @@ export default function HeroSection() {
                   </span>
                 </div>
 
-                <div className="space-y-2 mb-5">
+                <div className="space-y-2 mb-5" aria-label="Skills">
                   {["UX Research", "Design Systems", "Career Strategy"].map((skill) => (
                     <span
                       key={skill}
@@ -133,10 +134,10 @@ export default function HeroSection() {
                   ))}
                 </div>
 
-                <p className="text-sm text-slate-600 leading-relaxed mb-5">
-                  &ldquo;I help designers transition into senior roles and build
-                  systems that scale. Let&rsquo;s map your next career move.&rdquo;
-                </p>
+                <blockquote className="text-sm text-slate-600 leading-relaxed mb-5">
+                  <p>&ldquo;I help designers transition into senior roles and build</p>
+                  <p>systems that scale. Let&rsquo;s map your next career move.&rdquo;</p>
+                </blockquote>
 
                 <Link
                   href="/register"
@@ -149,7 +150,7 @@ export default function HeroSection() {
               {/* Floating stat badge */}
               <div
                 aria-hidden="true"
-                className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg px-4 py-3 border border-slate-100 flex items-center gap-3"
+                className="absolute -top-4 -left-4 lg:-top-4 lg:-left-4 bg-white rounded-xl shadow-lg px-4 py-3 border border-slate-100 flex items-center gap-3"
               >
                 <span className="text-2xl" role="img" aria-label="star">⭐</span>
                 <div>
@@ -161,7 +162,7 @@ export default function HeroSection() {
               {/* Floating match badge */}
               <div
                 aria-hidden="true"
-                className="absolute -bottom-4 -right-4 bg-indigo-600 rounded-xl shadow-lg px-4 py-3 text-white"
+                className="absolute -bottom-4 -right-4 lg:-bottom-4 lg:-right-4 bg-indigo-600 rounded-xl shadow-lg px-4 py-3 text-white"
               >
                 <p className="text-xs font-medium opacity-80">Matched for you</p>
                 <p className="font-bold text-sm mt-0.5">98% fit</p>
@@ -171,10 +172,10 @@ export default function HeroSection() {
         </div>
 
         {/* Stats row */}
-        <div className="mt-20 grid grid-cols-3 gap-6 sm:gap-10 border-t border-slate-200 pt-10">
+        <div className="mt-20 grid grid-cols-3 gap-6 sm:gap-10 border-t border-slate-200 pt-10" role="list" aria-label="Platform statistics">
           {stats.map(({ value, label }) => (
-            <div key={label} className="text-center">
-              <p className="text-3xl sm:text-4xl font-extrabold text-indigo-600">{value}</p>
+            <div key={label} className="text-center" role="listitem">
+              <p className="text-3xl sm:text-4xl font-extrabold text-indigo-600" aria-label={`${value} ${label}`}>{value}</p>
               <p className="mt-1 text-sm text-slate-600">{label}</p>
             </div>
           ))}

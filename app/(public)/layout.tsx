@@ -8,8 +8,13 @@ export default function PublicLayout({
 }) {
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <Navbar />
-      {children}
+      <main id="main-content" className="pt-16">
+        {children}
+      </main>
       <Footer />
     </>
   );
