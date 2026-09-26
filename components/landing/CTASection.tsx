@@ -12,22 +12,22 @@ export default function CTASection() {
       {/* Decorative circles */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5"
+        className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5 lg:-top-24 lg:-right-24 lg:w-96 lg:h-96"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-white/5"
+        className="pointer-events-none absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-white/5 lg:-bottom-24 lg:-left-24 lg:w-80 lg:h-80"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-white/5"
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-white/5 lg:w-[600px] lg:h-[600px]"
       />
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Badge */}
-        <span className="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold uppercase tracking-widest mb-6">
+        <div className="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold uppercase tracking-widest mb-6" role="status" aria-live="polite">
           Get started today
-        </span>
+        </div>
 
         {/* Headline */}
         <h2
@@ -53,7 +53,7 @@ export default function CTASection() {
           >
             Create free account
             <svg
-              className="ml-2 w-5 h-5"
+              className="ml-2 w-5 h-5 flex-shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -76,10 +76,10 @@ export default function CTASection() {
         </div>
 
         {/* Trust signals */}
-        <div className="mt-12 flex flex-wrap justify-center gap-8 text-indigo-200">
-          <div className="flex items-center gap-2">
+        <div className="mt-12 flex flex-wrap justify-center gap-8 text-indigo-200" role="list" aria-label="Trust signals">
+          <div className="flex items-center gap-2" role="listitem">
             <svg
-              className="w-5 h-5 text-indigo-300"
+              className="w-5 h-5 text-indigo-300 flex-shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -94,9 +94,9 @@ export default function CTASection() {
             </svg>
             <span className="text-sm font-medium">No credit card required</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" role="listitem">
             <svg
-              className="w-5 h-5 text-indigo-300"
+              className="w-5 h-5 text-indigo-300 flex-shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -111,9 +111,9 @@ export default function CTASection() {
             </svg>
             <span className="text-sm font-medium">Cancel anytime</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" role="listitem">
             <svg
-              className="w-5 h-5 text-indigo-300"
+              className="w-5 h-5 text-indigo-300 flex-shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

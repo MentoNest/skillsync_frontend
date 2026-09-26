@@ -79,8 +79,8 @@ export default function MentorDiscoverySection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <div className="max-w-2xl mx-auto text-center mb-12 lg:mb-16">
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-indigo-600 mb-3">
+        <header className="max-w-2xl mx-auto text-center mb-12 lg:mb-16">
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-indigo-600 mb-3" aria-hidden="true">
             Mentor Discovery
           </span>
           <h2
@@ -93,12 +93,14 @@ export default function MentorDiscoverySection() {
             Every mentor on SkillSync is vetted, experienced, and genuinely invested
             in your success. Find the right fit for where you want to go.
           </p>
-        </div>
+        </header>
 
         {/* Mentor grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" role="list" aria-label="Featured mentors">
           {FEATURED_MENTORS.map((mentor) => (
-            <MentorCard key={mentor.name} {...mentor} />
+            <article key={mentor.name} role="listitem">
+              <MentorCard {...mentor} profileHref={`/mentors/${mentor.name.toLowerCase().replace(/\s+/g, "-")}`} />
+            </article>
           ))}
         </div>
 
@@ -114,7 +116,7 @@ export default function MentorDiscoverySection() {
           >
             Explore all mentors
             <svg
-              className="w-5 h-5"
+              className="w-5 h-5 flex-shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

@@ -160,91 +160,70 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-900 text-slate-400" aria-labelledby="footer-heading">
-      <h2 id="footer-heading" className="sr-only">
-        Site footer
-      </h2>
-
+    <footer className="bg-slate-900 text-slate-400" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Brand and social */}
-          <div className="sm:col-span-2">
-            <Brand tone="onDark" className="mb-4 w-fit" />
-            <p className="text-sm leading-relaxed max-w-xs">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <Link
+              href="/"
+              className="flex items-center gap-2 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-lg"
+              aria-label="SkillSync home"
+            >
+              <span className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center" aria-hidden="true">
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </span>
+              <span className="text-lg font-bold text-white">SkillSync</span>
+            </Link>
+            <p className="text-sm leading-relaxed">
               Connecting learners with expert mentors to accelerate career growth.
             </p>
 
-            <ul className="mt-6 flex items-center gap-3">
-              {SOCIAL_LINKS.map((social) => (
-                <li key={social.label}>
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-300 transition-colors hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
-                  >
-                    {social.icon}
-                  </a>
-                </li>
-              ))}
+          {/* Platform */}
+          <nav aria-label="Platform links">
+            <h3 className="text-sm font-semibold text-white mb-4">Platform</h3>
+            <ul className="space-y-3 text-sm">
+              <li><Link href="#mentors" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Find Mentors</Link></li>
+              <li><Link href="#how-it-works" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">How It Works</Link></li>
+              <li><Link href="#pricing" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Pricing</Link></li>
             </ul>
-          </div>
+          </nav>
 
-          {/* Link columns */}
-          {LINK_GROUPS.map((group) => {
-            const headingId = `footer-nav-${group.heading
-              .toLowerCase()
-              .replace(/\s+/g, "-")}`;
+          {/* Company */}
+          <nav aria-label="Company links">
+            <h3 className="text-sm font-semibold text-white mb-4">Company</h3>
+            <ul className="space-y-3 text-sm">
+              <li><Link href="/about" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">About</Link></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Blog</Link></li>
+              <li><Link href="/careers" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Careers</Link></li>
+            </ul>
+          </nav>
 
-            return (
-              <nav key={group.heading} aria-labelledby={headingId} className="lg:col-span-1">
-                <h2
-                  id={headingId}
-                  className="text-sm font-semibold text-white mb-4"
-                >
-                  {group.heading}
-                </h2>
-                <ul className="space-y-3 text-sm">
-                  {group.links.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="transition-colors hover:text-white focus:outline-none focus-visible:underline"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            );
-          })}
+          {/* Legal */}
+          <nav aria-label="Legal links">
+            <h3 className="text-sm font-semibold text-white mb-4">Legal</h3>
+            <ul className="space-y-3 text-sm">
+              <li><Link href="/privacy" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Terms of Service</Link></li>
+            </ul>
+          </nav>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
-          <p>&copy; {year} SkillSync. All rights reserved.</p>
-
-          {/* The two legal destinations repeated inline, because "All rights
-              reserved" with the terms two rows up and three columns across is
-              not where anyone looks. Duplication here is deliberate. */}
-          <p className="flex items-center gap-4">
-            <Link
-              href="/privacy"
-              className="transition-colors hover:text-white focus:outline-none focus-visible:underline"
-            >
-              Privacy
-            </Link>
-            <span aria-hidden="true" className="text-slate-700">
-              &middot;
-            </span>
-            <Link
-              href="/terms"
-              className="transition-colors hover:text-white focus:outline-none focus-visible:underline"
-            >
-              Terms
-            </Link>
-          </p>
+        <div className="mt-12 pt-8 border-t border-slate-800 text-sm text-center">
+          <p>&copy; {new Date().getFullYear()} SkillSync. All rights reserved.</p>
         </div>
       </div>
     </footer>

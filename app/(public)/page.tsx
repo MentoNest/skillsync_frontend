@@ -4,6 +4,9 @@ import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection"
 import StatsSection from "@/components/landing/StatsSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import CTASection from "@/components/landing/CTASection";
+import WhyChooseUsSection from "@/components/landing/WhyChooseUsSection";
+import LearningPathsSection from "@/components/landing/LearningPathsSection";
+import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
 
 /**
  * The landing page.
@@ -23,8 +26,9 @@ export default function HomePage() {
       <HeroSection />
       <StatsSection />
       <MentorDiscoverySection />
-      <StatsSection />
-      <TestimonialsSection />
+      <WhyChooseUsSection />
+      <LearningPathsSection />
+      <FeaturedMentorHighlight />
       <CTASection />
     </main>
   );
