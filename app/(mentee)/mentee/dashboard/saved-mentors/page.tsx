@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Mentor } from "@/lib/mentor-types";
-import MentorCard from "@/components/landing/MentorCard";
+import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
 
 const MOCK_SAVED_MENTORS: Mentor[] = [
   {
@@ -87,8 +87,21 @@ export default function SavedMentorsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent" />
+      <div className="min-h-screen bg-slate-50">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <h1 className="text-2xl font-bold text-slate-900">Saved Mentors</h1>
+            </div>
+          </div>
+        </header>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {[...Array(3)].map((_, i) => (
+              <MentorCardSkeleton key={i} />
+            ))}
+          </div>
+        </main>
       </div>
     );
   }

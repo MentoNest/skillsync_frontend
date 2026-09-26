@@ -4,6 +4,7 @@ import { memo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MentorCardProps } from "@/components/landing/MentorCard";
+export { default as MentorCardSkeleton } from "@/components/landing/MentorCardSkeleton";
 
 interface OptimizedMentorCardProps extends MentorCardProps {
   onBookmark?: (mentorId: string) => void;
