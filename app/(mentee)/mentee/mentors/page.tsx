@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
-import MentorCard from "@/components/landing/MentorCard";
+import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
 import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
@@ -262,16 +262,7 @@ export default function MentorsPage() {
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 animate-pulse">
-                    <div className="h-14 w-14 rounded-2xl bg-slate-200 mb-4" />
-                    <div className="h-4 w-3/4 bg-slate-200 rounded mb-2" />
-                    <div className="h-3 w-1/2 bg-slate-200 rounded mb-4" />
-                    <div className="space-y-2">
-                      <div className="h-4 w-full bg-slate-200 rounded" />
-                      <div className="h-4 w-2/3 bg-slate-200 rounded" />
-                      <div className="h-4 w-1/2 bg-slate-200 rounded" />
-                    </div>
-                  </div>
+                  <MentorCardSkeleton key={i} />
                 ))}
               </div>
             ) : mentors.length === 0 ? (

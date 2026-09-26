@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
 
 export interface MentorCardProps {
   name: string;
