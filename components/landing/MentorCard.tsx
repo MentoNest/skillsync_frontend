@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReactNode } from "react";
 
 export interface MentorCardProps {
   name: string;
@@ -10,6 +11,7 @@ export interface MentorCardProps {
   rating: number;
   sessions: number;
   profileHref?: string;
+  children?: ReactNode;
 }
 
 export default function MentorCard({
@@ -22,6 +24,7 @@ export default function MentorCard({
   rating,
   sessions,
   profileHref = "/register",
+  children,
 }: MentorCardProps) {
   return (
     <article className="group flex flex-col bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 overflow-hidden">
@@ -84,13 +87,26 @@ export default function MentorCard({
 
       {/* CTA */}
       <div className="mt-auto px-6 pb-6">
-        <Link
-          href={profileHref}
-          className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          aria-label={`View ${name}'s profile`}
-        >
-          View profile
-        </Link>
+        {children ? (
+          <>
+            {children}
+            <Link
+              href={profileHref}
+              className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-3"
+              aria-label={`View ${name}'s profile`}
+            >
+              View profile
+            </Link>
+          </>
+        ) : (
+          <Link
+            href={profileHref}
+            className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            aria-label={`View ${name}'s profile`}
+          >
+            View profile
+          </Link>
+        )}
       </div>
     </article>
   );
