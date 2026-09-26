@@ -1,4 +1,5 @@
 import HeroSection from "@/components/landing/HeroSection";
+import StatsSection from "@/components/landing/StatsSection";
 import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
 import StatsSection from "@/components/landing/StatsSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
@@ -20,6 +21,7 @@ export default function HomePage() {
   return (
     <main>
       <HeroSection />
+      <StatsSection />
       <MentorDiscoverySection />
       <StatsSection />
       <TestimonialsSection />

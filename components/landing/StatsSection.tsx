@@ -19,6 +19,18 @@ const PLATFORM_STATS: (StatCardProps & { icon: ReactNode })[] = [
   {
     value: "2,400+",
     label: "Vetted expert mentors",
+import StatCard, { StatCardProps } from "./StatCard";
+
+interface PlatformStat extends StatCardProps {
+  /** Accent colour applied to the value text */
+  valueClassName?: string;
+}
+
+const PLATFORM_STATS: PlatformStat[] = [
+  {
+    value: "2,400+",
+    label: "Vetted expert mentors",
+    description: "Engineers, designers, PMs and founders across 14 industries.",
     icon: (
       <svg
         className="w-6 h-6"
@@ -38,6 +50,7 @@ const PLATFORM_STATS: (StatCardProps & { icon: ReactNode })[] = [
   {
     value: "18k+",
     label: "Learners matched",
+    description: "Mentorship pairings created since the platform launched.",
     icon: (
       <svg
         className="w-6 h-6"
