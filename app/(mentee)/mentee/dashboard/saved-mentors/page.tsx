@@ -61,7 +61,7 @@ export default function SavedMentorsPage() {
       try {
         setIsLoading(true);
         await new Promise((resolve) => setTimeout(resolve, 500));
-        const stored = localStorage.getItem("savedMentors");
+        const stored = localStorage.getItem("bookmarkedMentors");
         if (stored) {
           const ids = JSON.parse(stored);
           const mentors = MOCK_SAVED_MENTORS.filter((m) => ids.includes(m.id));
@@ -82,7 +82,7 @@ export default function SavedMentorsPage() {
   const handleRemoveBookmark = (mentorId: string) => {
     const updated = savedMentors.filter((m) => m.id !== mentorId);
     setSavedMentors(updated);
-    localStorage.setItem("savedMentors", JSON.stringify(updated.map((m) => m.id)));
+    localStorage.setItem("bookmarkedMentors", JSON.stringify(updated.map((m) => m.id)));
   };
 
   if (isLoading) {
@@ -128,7 +128,7 @@ export default function SavedMentorsPage() {
               Start exploring mentors and bookmark your favorites to see them here.
             </p>
             <a
-              href="/register"
+              href="/mentee/mentors"
               className="mt-6 inline-flex items-center px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors"
             >
               Explore mentors

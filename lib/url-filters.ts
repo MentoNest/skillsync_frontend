@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { MentorFilters } from "@/lib/mentor-types";
+import { MentorFilters } from "./mentor-types";
 
 const FILTER_PARAMS: (keyof MentorFilters)[] = [
   "expertise",

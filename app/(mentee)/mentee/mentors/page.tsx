@@ -3,23 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
 import MentorCard from "@/components/landing/MentorCard";
-import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
-import MentorComparison from "@/components/mentor-discovery/MentorComparison";
 import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
-import {
-  trackSearch,
-  trackFilterUsage,
-  trackSortChange,
-  trackMentorProfileClick,
-  trackBookmarkAction,
-  trackComparisonAction,
-  trackFilterDrawerOpen,
-  trackFilterDrawerClose,
-  trackFilterClear,
-  trackFilterApply,
-} from "@/lib/analytics";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   junior: "Junior",
@@ -32,9 +18,6 @@ const EXPERIENCE_LABELS: Record<string, string> = {
 export default function MentorsPage() {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
   const [mentors, setMentors] = useState<Mentor[]>([]);
-  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([]);
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [selectedForComparison, setSelectedForComparison] = useState<Mentor[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +38,6 @@ export default function MentorsPage() {
       try {
         const response = await mentorApi.getMentors(filters, currentPage);
         setMentors(response.mentors);
-        setFilteredMentors(response.mentors);
         setTotalPages(response.totalPages);
       } catch (err) {
         setError("Failed to load mentors. Please try again.");
@@ -69,103 +51,24 @@ export default function MentorsPage() {
   }, [filters, currentPage]);
 
   const handleFiltersChange = (newFilters: MentorFilters) => {
-    const prevExpertise = filters.expertise || [];
-    const newExpertise = newFilters.expertise || [];
-    const addedExpertise = newExpertise.filter((e) => !prevExpertise.includes(e));
-    const removedExpertise = prevExpertise.filter((e) => !newExpertise.includes(e));
-    
-    addedExpertise.forEach((e) => trackFilterUsage("expertise", e, "add"));
-    removedExpertise.forEach((e) => trackFilterUsage("expertise", e, "remove"));
-
-    const prevExperience = filters.experience || [];
-    const newExperience = newFilters.experience || [];
-    const addedExperience = newExperience.filter((e) => !prevExperience.includes(e));
-    const removedExperience = prevExperience.filter((e) => !newExperience.includes(e));
-    
-    addedExperience.forEach((e) => trackFilterUsage("experience", e, "add"));
-    removedExperience.forEach((e) => trackFilterUsage("experience", e, "remove"));
-
-    const prevIndustry = filters.industry || [];
-    const newIndustry = newFilters.industry || [];
-    const addedIndustry = newIndustry.filter((e) => !prevIndustry.includes(e));
-    const removedIndustry = prevIndustry.filter((e) => !newIndustry.includes(e));
-    
-    addedIndustry.forEach((e) => trackFilterUsage("industry", e, "add"));
-    removedIndustry.forEach((e) => trackFilterUsage("industry", e, "remove"));
-
-    if (newFilters.minRating !== filters.minRating) {
-      trackFilterUsage("minRating", String(newFilters.minRating || ""), newFilters.minRating ? "add" : "remove");
-    }
-    if (newFilters.maxHourlyRate !== filters.maxHourlyRate) {
-      trackFilterUsage("maxHourlyRate", String(newFilters.maxHourlyRate || ""), newFilters.maxHourlyRate ? "add" : "remove");
-    }
-    if (newFilters.sortBy !== filters.sortBy) {
-      trackSortChange(newFilters.sortBy || "relevance", newFilters.sortOrder || "asc");
-    }
-
     updateFilters(newFilters, { replace: true });
     setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
-    trackFilterClear();
     clearFilters();
     setCurrentPage(1);
   };
 
-  const handleApplyFilters = () => {
-    trackFilterApply(
-      Object.values(filters).flat().filter(Boolean).length +
-      (filters.minRating ? 1 : 0) +
-      (filters.maxHourlyRate ? 1 : 0)
-    );
-    setIsFilterDrawerOpen(false);
-  };
-
   const toggleBookmark = (mentorId: string) => {
-    const mentor = mentors.find((m) => m.id === mentorId);
     setBookmarkedIds((prev) => {
       const updated = prev.includes(mentorId)
         ? prev.filter((id) => id !== mentorId)
         : [...prev, mentorId];
       localStorage.setItem("bookmarkedMentors", JSON.stringify(updated));
-      trackBookmarkAction(mentorId, mentor?.name || "", prev.includes(mentorId) ? "remove" : "add");
       return updated;
     });
   };
-
-  const toggleComparison = (mentor: Mentor) => {
-    setSelectedForComparison((prev) => {
-      if (prev.some((m) => m.id === mentor.id)) {
-        trackComparisonAction("remove", prev.length - 1, prev.filter((m) => m.id !== mentor.id).map((m) => m.id));
-        return prev.filter((m) => m.id !== mentor.id);
-      }
-      if (prev.length >= 3) {
-        trackComparisonAction("add", 3, [...prev.slice(1), mentor].map((m) => m.id));
-        return [...prev.slice(1), mentor];
-      }
-      trackComparisonAction("add", prev.length + 1, [...prev, mentor].map((m) => m.id));
-      return [...prev, mentor];
-    });
-  };
-
-  const removeFromComparison = (mentorId: string) => {
-    setSelectedForComparison((prev) => {
-      trackComparisonAction("remove", prev.length - 1, prev.filter((m) => m.id !== mentorId).map((m) => m.id));
-      return prev.filter((m) => m.id !== mentorId);
-    });
-  };
-
-  const closeComparison = () => {
-    trackComparisonAction("close", selectedForComparison.length, selectedForComparison.map((m) => m.id));
-    setSelectedForComparison([]);
-  };
-
-  useEffect(() => {
-    if (selectedForComparison.length > 0) {
-      trackComparisonAction("open", selectedForComparison.length, selectedForComparison.map((m) => m.id));
-    }
-  }, [selectedForComparison.length]);
 
   const activeFilterCount = Object.values(filters).flat().filter(Boolean).length +
     (filters.minRating ? 1 : 0) +
@@ -199,38 +102,16 @@ export default function MentorsPage() {
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-slate-900">Find Mentors</h1>
               <span className="px-2 py-0.5 text-sm font-medium bg-indigo-50 text-indigo-700 rounded-full">
-                {filteredMentors.length} mentor{filteredMentors.length !== 1 ? "s" : ""}
+                {mentors.length} mentor{mentors.length !== 1 ? "s" : ""}
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  trackFilterDrawerOpen();
-                  setIsFilterDrawerOpen(true);
-                }}
-                className="lg:hidden inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                aria-label="Open filters"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 18a1 1 0 001-1v-2.586a1 1 0 01.293-.707l6.414-6.414a1 1 0 00.293-.707V5l-4-4v6.586a1 1 0 01-.293.707L14.707 13.293A1 1 0 0015 14v2.586a1 1 0 001 1" />
-                </svg>
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className="px-2 py-0.5 text-xs font-semibold bg-indigo-100 text-indigo-700 rounded-full">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
-              {selectedForComparison.length > 0 && (
+              {hasActiveFilters && (
                 <button
-                  onClick={() => {}}
-                  className="hidden lg:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  onClick={handleClearFilters}
+                  className="hidden sm:inline-flex text-sm text-indigo-600 hover:text-indigo-700 font-medium"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  Compare ({selectedForComparison.length})
+                  Clear filters
                 </button>
               )}
             </div>
@@ -393,7 +274,7 @@ export default function MentorsPage() {
                   </div>
                 ))}
               </div>
-            ) : filteredMentors.length === 0 ? (
+            ) : mentors.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="mx-auto h-16 w-16 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -407,9 +288,8 @@ export default function MentorsPage() {
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {filteredMentors.map((mentor) => {
+                  {mentors.map((mentor) => {
                     const isBookmarked = bookmarkedIds.includes(mentor.id);
-                    const isSelectedForComparison = selectedForComparison.some((m) => m.id === mentor.id);
 
                     return (
                       <MentorCard
@@ -441,26 +321,9 @@ export default function MentorsPage() {
                               </svg>
                               {isBookmarked ? "Saved" : "Save"}
                             </button>
-                            <button
-                              onClick={() => toggleComparison(mentor)}
-                              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                                isSelectedForComparison
-                                  ? "bg-indigo-600 text-white border-indigo-600 focus:ring-indigo-500"
-                                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:ring-slate-500"
-                              }`}
-                              aria-label={isSelectedForComparison ? `Remove ${mentor.name} from comparison` : `Add ${mentor.name} to comparison`}
-                              aria-pressed={isSelectedForComparison}
-                              disabled={!isSelectedForComparison && selectedForComparison.length >= 3}
-                            >
-                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                              </svg>
-                              Compare
-                            </button>
                           </div>
                           <Link
                             href={mentor.profileHref || `/mentors/${mentor.id}`}
-                            onClick={() => trackMentorProfileClick(mentor.id, mentor.name, "mentor_card")}
                             className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                           >
                             View profile
@@ -499,30 +362,6 @@ export default function MentorsPage() {
           </div>
         </div>
       </main>
-
-      <MobileFilterDrawer
-        isOpen={isFilterDrawerOpen}
-        onClose={() => {
-          trackFilterDrawerClose();
-          setIsFilterDrawerOpen(false);
-        }}
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        onClearFilters={handleClearFilters}
-        onApplyFilters={handleApplyFilters}
-      />
-
-      <MentorComparison
-        selectedMentors={selectedForComparison}
-        onClose={() => {
-          trackComparisonAction("close", selectedForComparison.length, selectedForComparison.map((m) => m.id));
-          closeComparison();
-        }}
-        onRemoveMentor={(mentorId) => {
-          trackComparisonAction("remove", selectedForComparison.length - 1, selectedForComparison.filter((m) => m.id !== mentorId).map((m) => m.id));
-          removeFromComparison(mentorId);
-        }}
-      />
     </div>
   );
 }
