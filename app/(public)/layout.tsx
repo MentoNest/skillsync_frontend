@@ -1,11 +1,5 @@
-import type { Metadata } from "next";
-import Footer from "@/components/landing/Footer";
-import Header from "@/components/landing/Header";
-
-export const metadata: Metadata = {
-  title: "SkillSync",
-  description: "A mentorship platform",
-};
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 export default function PublicLayout({
   children,
@@ -14,8 +8,13 @@ export default function PublicLayout({
 }) {
   return (
     <>
-      <Header />
-      {children}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <Navbar />
+      <main id="main-content" className="pt-16">
+        {children}
+      </main>
       <Footer />
     </>
   );
