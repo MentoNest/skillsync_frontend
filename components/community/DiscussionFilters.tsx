@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { DiscussionSort } from "@/lib/community-types";
 
 interface DiscussionFiltersProps {
   selectedCategory: string | null;
   searchQuery: string;
-  sortBy: "latest" | "popular" | "trending";
+  sortBy: DiscussionSort;
   onCategoryChange: (category: string | null) => void;
   onSearchChange: (query: string) => void;
-  onSortChange: (sort: "latest" | "popular" | "trending") => void;
+  onSortChange: (sort: DiscussionSort) => void;
 }
 
 const categories = [
@@ -69,13 +70,14 @@ export function DiscussionFilters({
 
         <select
           value={sortBy}
-          onChange={(e) => onSortChange(e.target.value as "latest" | "popular" | "trending")}
+          onChange={(e) => onSortChange(e.target.value as DiscussionSort)}
           className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           aria-label="Sort discussions"
         >
-          <option value="latest">Latest</option>
-          <option value="popular">Popular</option>
           <option value="trending">Trending</option>
+          <option value="latest">Latest</option>
+          <option value="most-replies">Most Replies</option>
+          <option value="most-liked">Most Liked</option>
         </select>
       </div>
 

@@ -48,13 +48,29 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Sort
-  if (sort === "popular") {
+  // Sort (#994): latest | most-liked | most-replies | trending
+  // - latest: newest createdAt first
+  // - most-liked: highest likeCount first
+  // - most-replies: highest replyCount first
+  // - trending: weighted engagement score (likes, replies, views) with recency tie-break
+  // Legacy aliases: "popular" -> "most-liked" for backward compatibility.
+  const getTrendingScore = (d: (typeof filtered)[number]) =>
+    d.likeCount * 2 + d.replyCount * 3 + d.viewCount * 0.5;
+
+  if (sort === "most-liked" || sort === "popular") {
     filtered.sort((a, b) => b.likeCount - a.likeCount);
-  } else if (sort === "trending") {
+  } else if (sort === "most-replies") {
     filtered.sort((a, b) => b.replyCount - a.replyCount);
+  } else if (sort === "trending") {
+    filtered.sort((a, b) => {
+      const scoreDiff = getTrendingScore(b) - getTrendingScore(a);
+      if (scoreDiff !== 0) return scoreDiff;
+      return (
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+    });
   } else {
-    // latest
+    // latest (default)
     filtered.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

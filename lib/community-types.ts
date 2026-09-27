@@ -1,3 +1,5 @@
+export type DiscussionSort = "trending" | "latest" | "most-replies" | "most-liked";
+
 export interface Discussion {
   id: string;
   title: string;
