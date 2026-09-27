@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
 import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
 import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
+import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   junior: "Junior",
@@ -15,14 +18,20 @@ const EXPERIENCE_LABELS: Record<string, string> = {
   principal: "Principal",
 };
 
-export default function MentorsPage() {
+function MentorsPageContent() {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("bookmarkedMentors");
@@ -31,33 +40,76 @@ export default function MentorsPage() {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchMentors = async () => {
-      setIsLoading(true);
-      setError(null);
+  const fetchMentors = useCallback(
+    async (pageNumber = 1, append = false) => {
+      if (append) {
+        setIsLoadingMore(true);
+        setLoadMoreError(null);
+      } else {
+        setIsLoading(true);
+        setError(null);
+      }
+
       try {
-        const response = await mentorApi.getMentors(filters, currentPage);
-        setMentors(response.mentors);
+        const response = await mentorApi.getMentors(filters, pageNumber);
+
+        if (append) {
+          setMentors((prev) => {
+            // Prevent duplicate mentors
+            const existingIds = new Set(prev.map((m) => m.id));
+            const newMentors = response.mentors.filter((m) => !existingIds.has(m.id));
+            return [...prev, ...newMentors];
+          });
+        } else {
+          setMentors(response.mentors);
+        }
+
+        setCurrentPage(pageNumber);
         setTotalPages(response.totalPages);
+        setHasMore(response.hasMore ?? (pageNumber < response.totalPages));
       } catch (err) {
-        setError("Failed to load mentors. Please try again.");
+        const message = "Failed to load mentors. Please try again.";
+        if (append) {
+          setLoadMoreError(message);
+        } else {
+          setError(message);
+        }
         console.error("Error fetching mentors:", err);
       } finally {
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
-    };
+    },
+    [filters]
+  );
 
-    fetchMentors();
-  }, [filters, currentPage]);
+  useEffect(() => {
+    fetchMentors(1, false);
+  }, [fetchMentors]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!isLoading && !isLoadingMore && hasMore) {
+      fetchMentors(currentPage + 1, true);
+    }
+  }, [isLoading, isLoadingMore, hasMore, currentPage, fetchMentors]);
+
+  const { resetInfiniteScroll } = useInfiniteScroll({
+    isLoading: isLoadingMore,
+    hasMore,
+    onLoadMore: handleLoadMore,
+    loadMoreRef,
+  });
+
+  useEffect(() => {
+    resetInfiniteScroll();
+  }, [filters, resetInfiniteScroll]);
 
   const handleFiltersChange = (newFilters: MentorFilters) => {
     updateFilters(newFilters, { replace: true });
-    setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
     clearFilters();
-    setCurrentPage(1);
   };
 
   const toggleBookmark = (mentorId: string) => {
@@ -106,6 +158,21 @@ export default function MentorsPage() {
               </span>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsMobileFiltersOpen(true)}
+                className="lg:hidden inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                aria-label="Open filter drawer"
+              >
+                <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filters
+                {activeFilterCount > 0 && (
+                  <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
               {hasActiveFilters && (
                 <button
                   onClick={handleClearFilters}
@@ -206,29 +273,18 @@ export default function MentorsPage() {
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Industry</h3>
-                <div className="space-y-2">
-                  {["Technology", "Finance", "Healthcare", "E-commerce", "Education", "Gaming", "Media", "Non-profit"].map((ind) => (
-                    <label key={ind} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.industry?.includes(ind) || false}
-                        onChange={(e) => {
-                          const newInd = filters.industry || [];
-                          if (e.target.checked) {
-                            updateFilters({ ...filters, industry: [...newInd, ind] }, { replace: true });
-                          } else {
-                            updateFilters({ ...filters, industry: newInd.filter((i) => i !== ind) }, { replace: true });
-                          }
-                        }}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-slate-700">{ind}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+              <IndustryFilter
+                selectedIndustries={filters.industry || []}
+                onChange={(newIndustries) => {
+                  updateFilters(
+                    {
+                      ...filters,
+                      industry: newIndustries.length > 0 ? newIndustries : undefined,
+                    },
+                    { replace: true }
+                  );
+                }}
+              />
 
               <div>
                 <h3 className="text-sm font-semibold text-slate-900 mb-3">Minimum Rating</h3>
@@ -259,6 +315,39 @@ export default function MentorsPage() {
           </aside>
 
           <div className="lg:col-span-3">
+            {/* Active industry filter badges */}
+            {filters.industry && filters.industry.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active industry filters">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Industry:
+                </span>
+                {filters.industry.map((ind) => (
+                  <button
+                    key={ind}
+                    onClick={() => {
+                      const newInd = filters.industry?.filter((i) => i !== ind) || [];
+                      updateFilters(
+                        { ...filters, industry: newInd.length > 0 ? newInd : undefined },
+                        { replace: true }
+                      );
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors group"
+                    aria-label={`Remove ${ind} industry filter`}
+                  >
+                    <span>{ind}</span>
+                    <svg className="w-3.5 h-3.5 text-indigo-500 group-hover:text-indigo-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                ))}
+                <button
+                  onClick={() => updateFilters({ ...filters, industry: undefined }, { replace: true })}
+                  className="text-xs text-slate-500 hover:text-indigo-600 underline font-medium ml-1"
+                >
+                  Clear all industries
+                </button>
+              </div>
+            )}
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 {[...Array(6)].map((_, i) => (
@@ -285,14 +374,18 @@ export default function MentorsPage() {
                     return (
                       <MentorCard
                         key={mentor.id}
+                        id={mentor.id}
                         name={mentor.name}
                         title={mentor.headline}
                         description={mentor.bio}
                         skills={mentor.skills}
+                        avatar={mentor.avatar}
                         avatarInitials={mentor.name.split(" ").map((n) => n[0]).join("")}
                         avatarColor="bg-gradient-to-br from-indigo-500 to-cyan-500"
                         rating={mentor.rating}
                         sessions={mentor.sessions}
+                        hourlyRate={mentor.hourlyRate}
+                        availability={mentor.availability}
                         profileHref={mentor.profileHref || `/mentors/${mentor.id}`}
                       >
                         <div className="mt-auto px-6 pb-6 space-y-3">
@@ -325,34 +418,74 @@ export default function MentorsPage() {
                   })}
                 </div>
 
-                {totalPages > 1 && (
-                  <div className="mt-8 flex items-center justify-center gap-2">
+                {/* Loading state when fetching additional mentors */}
+                {isLoadingMore && (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    aria-label="Loading more mentors"
+                    className="mt-8 flex flex-col items-center justify-center py-6 gap-3"
+                  >
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+                    <span className="text-sm font-medium text-slate-500">Loading more mentors...</span>
+                  </div>
+                )}
+
+                {/* Error retry when loading more fails */}
+                {loadMoreError && (
+                  <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-center">
+                    <p className="text-sm text-red-600 mb-2">{loadMoreError}</p>
                     <button
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-                      aria-label="Previous page"
+                      onClick={() => fetchMentors(currentPage + 1, true)}
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors"
                     >
-                      Previous
-                    </button>
-                    <span className="px-4 py-2 text-sm font-medium text-slate-700">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-                      aria-label="Next page"
-                    >
-                      Next
+                      Retry loading more
                     </button>
                   </div>
                 )}
+
+                {/* End of results message */}
+                {!hasMore && !isLoading && !isLoadingMore && mentors.length > 0 && (
+                  <div className="mt-10 py-6 border-t border-slate-200 text-center">
+                    <p className="text-sm font-medium text-slate-500">
+                      You&apos;ve reached the end of the mentors list ({mentors.length} mentor{mentors.length !== 1 ? "s" : ""} loaded)
+                    </p>
+                  </div>
+                )}
+
+                {/* Sentinel element for infinite scroll */}
+                <div ref={loadMoreRef} className="h-4 w-full" aria-hidden="true" />
               </>
             )}
           </div>
         </div>
       </main>
+
+      <MobileFilterDrawer
+        isOpen={isMobileFiltersOpen}
+        onClose={() => setIsMobileFiltersOpen(false)}
+        filters={filters}
+        onFiltersChange={(f) => updateFilters(f, { replace: true })}
+        onClearFilters={handleClearFilters}
+        onApplyFilters={() => setIsMobileFiltersOpen(false)}
+      />
     </div>
+  );
+}
+
+export default function MentorsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+          <div className="flex items-center gap-3 text-slate-500 font-medium">
+            <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+            Loading mentors...
+          </div>
+        </div>
+      }
+    >
+      <MentorsPageContent />
+    </Suspense>
   );
 }

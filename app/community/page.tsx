@@ -22,17 +22,19 @@ export default function CommunityPage() {
   // Real-time updates
   const { isConnected, lastEvent } = useCommunityRealtime({
     onNewDiscussion: (discussion) => {
+      const newDisc = discussion as Discussion;
+      if (!newDisc?.id) return;
       setDiscussions((prev) => {
         // Prevent duplicates
-        if (prev.some((d) => d.id === discussion.id)) return prev;
-        return [discussion, ...prev];
+        if (prev.some((d) => d.id === newDisc.id)) return prev;
+        return [newDisc, ...prev];
       });
     },
     onNewReply: (discussionId, reply) => {
       setDiscussions((prev) =>
         prev.map((d) =>
           d.id === discussionId
-            ? { ...d, replyCount: d.replyCount + 1, lastReply: reply }
+            ? { ...d, replyCount: d.replyCount + 1, lastReply: reply as Discussion["lastReply"] }
             : d
         )
       );

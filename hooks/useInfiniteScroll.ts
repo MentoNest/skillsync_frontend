@@ -6,7 +6,7 @@ interface UseInfiniteScrollOptions {
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
-  observerRef: React.MutableRefObject<IntersectionObserver | null>;
+  observerRef?: React.RefObject<IntersectionObserver | null> | React.MutableRefObject<IntersectionObserver | null>;
   loadMoreRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -14,9 +14,11 @@ export function useInfiniteScroll({
   isLoading,
   hasMore,
   onLoadMore,
-  observerRef,
+  observerRef: externalObserverRef,
   loadMoreRef,
 }: UseInfiniteScrollOptions) {
+  const internalObserverRef = useRef<IntersectionObserver | null>(null);
+  const observerRef = externalObserverRef ?? internalObserverRef;
   const resetInfiniteScroll = useCallback(() => {
     if (observerRef.current) {
       observerRef.current.disconnect();

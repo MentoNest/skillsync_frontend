@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Mentor, MentorComparison, ComparisonCriteria } from "@/lib/mentor-types";
+import { Mentor, type MentorComparison as MentorComparisonType, ComparisonCriteria } from "@/lib/mentor-types";
 import { createPortal } from "react-dom";
 
 const COMPARISON_CRITERIA: ComparisonCriteria[] = [
@@ -82,7 +82,7 @@ export default function MentorComparison({ selectedMentors, onClose, onRemoveMen
       return (value as string[]).join(", ");
     }
     if (criterion.type === "number") {
-      return value === "hourlyRate" ? `$${(value as number)}/hr` : String(value);
+      return criterion.key === "hourlyRate" ? `$${value}/hr` : String(value);
     }
     return String(value);
   };

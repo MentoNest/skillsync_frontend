@@ -1,114 +1,228 @@
+"use client";
+
+import React, { useState, ReactNode } from "react";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import MentorRating from "@/components/mentor-discovery/MentorRating";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
+export { MentorRating };
 
 export interface MentorCardProps {
+  id?: string;
   name: string;
-  title: string;
-  description: string;
-  skills: string[];
-  avatarInitials: string;
-  avatarColor: string;
-  rating: number;
-  sessions: number;
+  title?: string;
+  headline?: string;
+  bio?: string;
+  description?: string;
+  avatar?: string;
+  avatarUrl?: string;
+  avatarInitials?: string;
+  avatarColor?: string;
+  rating?: number;
+  sessions?: number;
+  ratingCount?: number;
+  hourlyRate?: number;
+  price?: number | string;
+  skills?: string[];
+  availability?: "available" | "busy" | "unavailable";
   profileHref?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  onCtaClick?: () => void;
   children?: ReactNode;
+  className?: string;
 }
 
 export default function MentorCard({
+  id,
   name,
   title,
+  headline,
+  bio,
   description,
-  skills,
+  avatar,
+  avatarUrl,
   avatarInitials,
-  avatarColor,
+  avatarColor = "bg-gradient-to-br from-indigo-500 to-cyan-500",
   rating,
   sessions,
-  profileHref = "/register",
+  ratingCount,
+  hourlyRate,
+  price,
+  skills = [],
+  availability,
+  profileHref,
+  ctaText = "View profile",
+  ctaHref,
+  onCtaClick,
   children,
+  className,
 }: MentorCardProps) {
+  const [imageError, setImageError] = useState(false);
+
+  const displayTitle = title || headline;
+  const displayBio = bio || description;
+  const imageUrl = avatarUrl || avatar;
+  const hasValidImage = Boolean(imageUrl && !imageError);
+
+  const initials =
+    avatarInitials ||
+    name
+      .split(" ")
+      .filter(Boolean)
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+
+  const formattedPrice =
+    hourlyRate !== undefined
+      ? typeof hourlyRate === "number"
+        ? `$${hourlyRate}/hr`
+        : hourlyRate
+      : price !== undefined
+      ? typeof price === "number"
+        ? `$${price}/hr`
+        : price
+      : null;
+
+  const targetHref =
+    ctaHref ||
+    profileHref ||
+    (id ? `/mentors/${id}` : `/mentors/${name.toLowerCase().replace(/\s+/g, "-")}`);
+
   return (
-    <article className="group flex flex-col bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 overflow-hidden">
-      {/* Card header */}
+    <article
+      className={cn(
+        "group flex flex-col h-full bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 overflow-hidden",
+        className
+      )}
+      aria-label={`Mentor profile for ${name}`}
+    >
+      {/* Card Header & Profile Info */}
       <div className="p-6 pb-4">
-        <div className="flex items-start gap-4">
-          {/* Avatar */}
-          <div
-            className={`shrink-0 w-14 h-14 rounded-2xl ${avatarColor} flex items-center justify-center text-white font-bold text-lg shadow-sm`}
-            aria-hidden="true"
-          >
-            {avatarInitials}
-          </div>
-
-          {/* Name & title */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 truncate">{name}</h3>
-            <p className="text-sm text-indigo-600 font-medium truncate">{title}</p>
-
-            {/* Rating */}
-            <div className="flex items-center gap-1.5 mt-1">
-              <svg
-                className="w-4 h-4 text-amber-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4 min-w-0 flex-1">
+            {/* Profile Image or Monogram */}
+            {hasValidImage ? (
+              <img
+                src={imageUrl}
+                alt={`${name}'s profile`}
+                onError={() => setImageError(true)}
+                className="shrink-0 w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-100"
+              />
+            ) : (
+              <div
+                className={cn(
+                  "shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-sm",
+                  avatarColor
+                )}
                 aria-hidden="true"
               >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span className="text-sm font-semibold text-slate-800">
-                {rating.toFixed(1)}
-              </span>
-              <span className="text-xs text-slate-500">· {sessions} sessions</span>
+                {initials}
+              </div>
+            )}
+
+            {/* Name, Professional Title & Rating */}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-slate-900 truncate text-base">
+                {name}
+              </h3>
+              {displayTitle && (
+                <p className="text-sm text-indigo-600 font-medium truncate mt-0.5">
+                  {displayTitle}
+                </p>
+              )}
+
+              {rating !== undefined && (
+                <div className="mt-1">
+                  <MentorRating
+                    rating={rating}
+                    ratingCount={sessions ?? ratingCount}
+                    countLabel="sessions"
+                    formatCount={(count) => `· ${count} sessions`}
+                    size="sm"
+                  />
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Price Badge */}
+          {formattedPrice && (
+            <div className="shrink-0 text-right">
+              <span className="inline-block px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-sm tracking-tight">
+                {formattedPrice}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Description */}
-        <p className="mt-4 text-sm text-slate-600 leading-relaxed line-clamp-3">
-          {description}
-        </p>
-      </div>
+        {/* Availability indicator if present */}
+        {availability && (
+          <div className="mt-3 flex items-center gap-1.5">
+            <span
+              className={cn(
+                "w-2 h-2 rounded-full",
+                availability === "available"
+                  ? "bg-emerald-500"
+                  : availability === "busy"
+                  ? "bg-amber-500"
+                  : "bg-slate-400"
+              )}
+              aria-hidden="true"
+            />
+            <span className="text-xs font-medium text-slate-600 capitalize">
+              {availability}
+            </span>
+          </div>
+        )}
 
-      {/* Skills */}
-      <div className="px-6 pb-4 flex flex-wrap gap-2" aria-label={`${name}'s skills`}>
-        {skills.slice(0, 4).map((skill) => (
-          <span
-            key={skill}
-            className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium"
-          >
-            {skill}
-          </span>
-        ))}
-        {skills.length > 4 && (
-          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 font-medium">
-            +{skills.length - 4} more
-          </span>
+        {/* Short Bio */}
+        {displayBio && (
+          <p className="mt-4 text-sm text-slate-600 leading-relaxed line-clamp-3">
+            {displayBio}
+          </p>
         )}
       </div>
 
-      {/* CTA */}
-      <div className="mt-auto px-6 pb-6">
-        {children ? (
-          <>
-            {children}
-            <Link
-              href={profileHref}
-              className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-3"
-              aria-label={`View ${name}'s profile`}
+      {/* Skills Badges */}
+      {skills && skills.length > 0 && (
+        <div
+          className="px-6 pb-4 flex flex-wrap gap-2"
+          aria-label={`${name}'s skills`}
+        >
+          {skills.slice(0, 4).map((skill) => (
+            <span
+              key={skill}
+              className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium"
             >
-              View profile
-            </Link>
-          </>
-        ) : (
+              {skill}
+            </span>
+          ))}
+          {skills.length > 4 && (
+            <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 font-medium">
+              +{skills.length - 4} more
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Call to Action */}
+      {children ? (
+        children
+      ) : (
+        <div className="mt-auto px-6 pb-6">
           <Link
-            href={profileHref}
+            href={targetHref}
+            onClick={onCtaClick}
             className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             aria-label={`View ${name}'s profile`}
           >
-            View profile
+            {ctaText}
           </Link>
-        )}
-      </div>
+        </div>
+      )}
     </article>
   );
 }

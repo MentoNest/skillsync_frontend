@@ -191,6 +191,7 @@ export default function Footer() {
             <p className="text-sm leading-relaxed">
               Connecting learners with expert mentors to accelerate career growth.
             </p>
+          </div>
 
           {/* Platform */}
           <nav aria-label="Platform links">

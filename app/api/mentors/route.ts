@@ -128,6 +128,90 @@ const MOCK_MENTORS: Mentor[] = [
     availability: "available",
     sessions: 98,
   },
+  {
+    id: "10",
+    name: "Dr. Elena Rostova",
+    avatar: "",
+    headline: "Director of Health Informatics · Mayo Clinic",
+    bio: "Pioneering clinical AI and data systems. I mentor professionals transitioning into digital health, clinical data science, and biomedical software engineering.",
+    skills: ["Healthcare IT", "Health Informatics", "Python", "Data Strategy", "Clinical Systems"],
+    industry: "Healthcare",
+    experienceLevel: "principal",
+    rating: 4.9,
+    hourlyRate: 260,
+    availability: "available",
+    sessions: 110,
+  },
+  {
+    id: "11",
+    name: "Lucas Vance",
+    avatar: "",
+    headline: "VP of Supply Chain Engineering · Wayfair",
+    bio: "Scaling logistics and high-volume e-commerce infrastructure. I help engineers master marketplace architecture, cart checkouts, and fulfillment services.",
+    skills: ["E-commerce", "Distributed Systems", "Architecture", "Logistics", "Java"],
+    industry: "E-commerce",
+    experienceLevel: "lead",
+    rating: 4.8,
+    hourlyRate: 240,
+    availability: "available",
+    sessions: 185,
+  },
+  {
+    id: "12",
+    name: "Amara Diallo",
+    avatar: "",
+    headline: "EdTech Curriculum Director · Coursera",
+    bio: "Designing pedagogy-driven learning tools and interactive coursework. I mentor curriculum developers, instructional designers, and educational technologists.",
+    skills: ["EdTech", "Curriculum Design", "Learning Analytics", "Instructional Design"],
+    industry: "Education",
+    experienceLevel: "senior",
+    rating: 4.9,
+    hourlyRate: 190,
+    availability: "available",
+    sessions: 130,
+  },
+  {
+    id: "13",
+    name: "Kenji Sato",
+    avatar: "",
+    headline: "Principal Graphics Engine Programmer · Epic Games",
+    bio: "20 years in real-time rendering and game physics. I coach game developers on low-level optimization, Vulkan/DirectX, and engine architecture.",
+    skills: ["Game Development", "C++", "Unreal Engine", "Graphics Programming", "Shaders"],
+    industry: "Gaming",
+    experienceLevel: "principal",
+    rating: 4.9,
+    sessions: 215,
+    hourlyRate: 270,
+    availability: "busy",
+  },
+  {
+    id: "14",
+    name: "Maya Lin",
+    avatar: "",
+    headline: "Digital Content Strategy Lead · Spotify",
+    bio: "Creator economy and multimedia streaming strategist. I help content teams scale podcast networks, licensing workflows, and editorial algorithms.",
+    skills: ["Media Strategy", "Streaming Tech", "Audio Production", "Audience Growth"],
+    industry: "Media",
+    experienceLevel: "lead",
+    rating: 4.8,
+    sessions: 160,
+    hourlyRate: 210,
+    availability: "available",
+  },
+  {
+    id: "15",
+    name: "Samuel Green",
+    avatar: "",
+    headline: "Technology Director · Code for America",
+    bio: "Civic technology advocate building public-benefit systems. I mentor software engineers and product managers wanting to make an impact in the social sector.",
+    skills: ["Civic Tech", "Open Source", "Grant Strategy", "Community Tech", "Product Strategy"],
+    industry: "Non-profit",
+    experienceLevel: "senior",
+    rating: 4.9,
+    sessions: 140,
+    hourlyRate: 175,
+    availability: "available",
+  },
 ];
 
 function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
@@ -144,7 +228,9 @@ function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
   }
 
   if (filters.industry && filters.industry.length > 0) {
-    result = result.filter((m) => filters.industry!.includes(m.industry));
+    result = result.filter((m) =>
+      filters.industry!.some((ind) => ind.toLowerCase() === m.industry.toLowerCase())
+    );
   }
 
   if (filters.minRating) {
@@ -181,12 +267,33 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "12", 10);
 
     const filters: MentorFilters = {};
-    
+    const arrayFilterKeys: (keyof MentorFilters)[] = [
+      "expertise",
+      "experience",
+      "industry",
+      "availability",
+    ];
+
+    arrayFilterKeys.forEach((key) => {
+      const allValues = searchParams.getAll(key);
+      if (allValues.length > 0) {
+        const flattened = allValues
+          .flatMap((val) => val.split(","))
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (flattened.length > 0) {
+          (filters as Record<string, unknown>)[key] = Array.from(new Set(flattened));
+        }
+      }
+    });
+
     searchParams.forEach((value, key) => {
-      if (key !== "page" && key !== "limit") {
-        if (["expertise", "experience", "industry", "availability"].includes(key)) {
-          (filters as Record<string, unknown>)[key] = value.split(",").filter(Boolean);
-        } else if (key === "minRating" || key === "maxHourlyRate") {
+      if (
+        key !== "page" &&
+        key !== "limit" &&
+        !arrayFilterKeys.includes(key as keyof MentorFilters)
+      ) {
+        if (key === "minRating" || key === "maxHourlyRate") {
           (filters as Record<string, unknown>)[key] = Number(value);
         } else {
           (filters as Record<string, unknown>)[key] = value;
