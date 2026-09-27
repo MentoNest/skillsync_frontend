@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MentorFilters } from "@/lib/mentor-types";
+import HourlyRateFilter from "./HourlyRateFilter";
 import { createPortal } from "react-dom";
 
 interface MobileFilterDrawerProps {
@@ -240,17 +241,17 @@ export default function MobileFilterDrawer({
               </select>
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Maximum Hourly Rate</h3>
-              <input
-                type="number"
-                value={filters.maxHourlyRate || ""}
-                onChange={(e) => onFiltersChange({ ...filters, maxHourlyRate: Number(e.target.value) || undefined })}
-                placeholder="e.g., 200"
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                aria-label="Maximum hourly rate"
-              />
-            </div>
+            <HourlyRateFilter
+              minHourlyRate={filters.minHourlyRate}
+              maxHourlyRate={filters.maxHourlyRate}
+              onChange={({ min, max }) =>
+                onFiltersChange({
+                  ...filters,
+                  minHourlyRate: min,
+                  maxHourlyRate: max,
+                })
+              }
+            />
 
             <div>
               <h3 className="text-sm font-medium text-slate-900 mb-3">Sort By</h3>

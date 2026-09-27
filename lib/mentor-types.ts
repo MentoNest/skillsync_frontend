@@ -19,6 +19,7 @@ export interface MentorFilters {
   experience?: string[];
   industry?: string[];
   minRating?: number;
+  minHourlyRate?: number;
   maxHourlyRate?: number;
   availability?: string[];
   sortBy?: "rating" | "sessions" | "hourlyRate" | "relevance";

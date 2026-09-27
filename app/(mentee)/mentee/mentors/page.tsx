@@ -9,6 +9,8 @@ import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
+import HourlyRateFilter from "@/components/mentor-discovery/HourlyRateFilter";
+import { hasHourlyRateRange } from "@/lib/hourly-rate";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   junior: "Junior",
@@ -122,9 +124,23 @@ function MentorsPageContent() {
     });
   };
 
-  const activeFilterCount = Object.values(filters).flat().filter(Boolean).length +
-    (filters.minRating ? 1 : 0) +
-    (filters.maxHourlyRate ? 1 : 0);
+  // Counted explicitly: the previous Object.values().flat() form already
+  // included the numeric bounds and then added them again.
+  let activeFilterCount = 0;
+  if (filters.expertise?.length) activeFilterCount++;
+  if (filters.experience?.length) activeFilterCount++;
+  if (filters.industry?.length) activeFilterCount++;
+  if (filters.availability?.length) activeFilterCount++;
+  if (filters.minRating !== undefined) activeFilterCount++;
+  if (
+    hasHourlyRateRange({
+      min: filters.minHourlyRate,
+      max: filters.maxHourlyRate,
+    })
+  ) {
+    activeFilterCount++;
+  }
+  if (filters.sortBy && filters.sortBy !== "relevance") activeFilterCount++;
 
   if (error) {
     return (
@@ -301,16 +317,20 @@ function MentorsPageContent() {
                 </select>
               </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Max Hourly Rate</h3>
-                <input
-                  type="number"
-                  value={filters.maxHourlyRate || ""}
-                  onChange={(e) => updateFilters({ ...filters, maxHourlyRate: Number(e.target.value) || undefined }, { replace: true })}
-                  placeholder="e.g., 200"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
+              <HourlyRateFilter
+                minHourlyRate={filters.minHourlyRate}
+                maxHourlyRate={filters.maxHourlyRate}
+                onChange={({ min, max }) =>
+                  updateFilters(
+                    {
+                      ...filters,
+                      minHourlyRate: min,
+                      maxHourlyRate: max,
+                    },
+                    { replace: true }
+                  )
+                }
+              />
             </div>
           </aside>
 
