@@ -3,6 +3,7 @@
 import React, { useState, ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { mentorProfileHref } from "@/lib/mentor-types";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
 export { MentorRating };
@@ -86,10 +87,15 @@ export default function MentorCard({
         : price
       : null;
 
+  // #59: an explicit ctaHref wins, then profileHref, then the mentor's own
+  // id. The id is what the `/mentors/[mentorId]` route resolves against, so
+  // it is preferred over a name-derived slug.
   const targetHref =
     ctaHref ||
     profileHref ||
-    (id ? `/mentors/${id}` : `/mentors/${name.toLowerCase().replace(/\s+/g, "-")}`);
+    (id
+      ? mentorProfileHref(id)
+      : `/mentors/${name.toLowerCase().replace(/\s+/g, "-")}`);
 
   return (
     <article
@@ -216,6 +222,7 @@ export default function MentorCard({
           <Link
             href={targetHref}
             onClick={onCtaClick}
+            data-mentor-id={id}
             className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             aria-label={`View ${name}'s profile`}
           >

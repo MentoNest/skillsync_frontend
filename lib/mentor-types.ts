@@ -42,6 +42,15 @@ export interface BookmarkState {
   timestamp: number;
 }
 
+/**
+ * Single source of truth for mentor profile links (#59).
+ * Every "View profile" CTA resolves through here so the route
+ * `/mentors/[mentorId]` and the id it receives never drift apart.
+ */
+export function mentorProfileHref(mentorId: string): string {
+  return `/mentors/${encodeURIComponent(mentorId)}`;
+}
+
 export interface AnalyticsEvent {
   event: string;
   properties: Record<string, unknown>;
