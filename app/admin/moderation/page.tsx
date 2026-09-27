@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { ReportQueue } from "@/components/community/ReportQueue";
+import { RoleGuard } from "@/components/auth/AuthProvider";
 import type { Report } from "@/lib/community-types";
 
-export default function ModerationDashboard() {
+function ModerationDashboardContent() {
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,5 +103,13 @@ export default function ModerationDashboard() {
         />
       </div>
     </div>
+  );
+}
+
+export default function ModerationDashboard() {
+  return (
+    <RoleGuard role="admin">
+      <ModerationDashboardContent />
+    </RoleGuard>
   );
 }

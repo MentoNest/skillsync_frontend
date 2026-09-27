@@ -203,23 +203,18 @@ export default function ResourcesPage() {
     // landmarks is invalid HTML.
     <div>
       {/* Hero */}
-      <section className="relative pt-16 pb-16 lg:pt-24 lg:pb-20 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-indigo-100 opacity-50 blur-3xl"
-        />
-
+      <section className="overflow-hidden bg-gradient-to-br from-violet-800 via-purple-700 to-fuchsia-700 py-16 text-white sm:py-20 lg:py-24">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold uppercase tracking-widest mb-5">
+            <span className="mb-5 inline-block rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white">
               Learning resources
             </span>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight">
-              Learn from people who have already done it
+            <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
+              Learning Resources
             </h1>
 
-            <p className="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl">
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
               Guides, articles, and recorded sessions from the mentors on
               SkillSync. Everything here is free and needs no account — if it is
               useful, take it, and book a session when you want the part a page

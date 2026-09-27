@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getAuthUser, getDashboardPath } from "@/lib/auth";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { signIn } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,13 +40,12 @@ export default function RegisterPage() {
         body: JSON.stringify({ fullName, email, password }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Registration failed");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Registration failed");
 
-      // Redirect to community on success
-      window.location.href = "/community";
+      const user = getAuthUser(data, email) ?? { email, role: "mentee" as const };
+      signIn(user);
+      router.replace(getDashboardPath(user.role));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {

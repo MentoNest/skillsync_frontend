@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getAuthUser, getDashboardPath } from "@/lib/auth";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -21,13 +26,14 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Login failed");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Login failed");
 
-      // Redirect to dashboard on success
-      window.location.href = "/community";
+      const user = getAuthUser(data, email);
+      if (!user) throw new Error("Login response did not include a valid role");
+
+      signIn(user);
+      router.replace(getDashboardPath(user.role));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
