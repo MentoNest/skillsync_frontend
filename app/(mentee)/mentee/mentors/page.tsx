@@ -7,8 +7,13 @@ import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
+import MentorSearchBar from "@/components/mentor-discovery/MentorSearchBar";
+import { hasSearchTerm, normalizeSearchTerm } from "@/lib/mentor-search";
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   junior: "Junior",
@@ -30,8 +35,28 @@ function MentorsPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState(filters.search ?? "");
+  const debouncedSearch = useDebouncedValue(searchInput, SEARCH_DEBOUNCE_MS);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const latestFilters = useRef(filters);
+
+  useEffect(() => {
+    latestFilters.current = filters;
+  }, [filters]);
+
+  useEffect(() => {
+    const normalized = normalizeSearchTerm(debouncedSearch);
+    if (normalized === (latestFilters.current.search ?? "")) return;
+    updateFilters(
+      { ...latestFilters.current, search: normalized || undefined },
+      { replace: true }
+    );
+  }, [debouncedSearch, updateFilters]);
+
+  useEffect(() => {
+    setSearchInput(filters.search ?? "");
+  }, [filters.search]);
 
   useEffect(() => {
     const stored = localStorage.getItem("bookmarkedMentors");
@@ -109,6 +134,7 @@ function MentorsPageContent() {
   };
 
   const handleClearFilters = () => {
+    setSearchInput("");
     clearFilters();
   };
 
@@ -188,12 +214,14 @@ function MentorsPageContent() {
         <div className="hidden lg:block px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-100 bg-slate-50">
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
-              <label htmlFor="search" className="sr-only">Search mentors</label>
-              <input
-                type="search"
-                id="search"
-                placeholder="Search mentors by name, skill, or company..."
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              <MentorSearchBar
+                value={searchInput}
+                onChange={setSearchInput}
+                status={
+                  hasSearchTerm(filters)
+                    ? `${mentors.length} mentor${mentors.length === 1 ? "" : "s"} matching "${filters.search}"`
+                    : undefined
+                }
               />
             </div>
             <div className="flex items-center gap-4">
@@ -359,11 +387,28 @@ function MentorsPageContent() {
                 <svg className="mx-auto h-16 w-16 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h2 className="mt-4 text-xl font-semibold text-slate-900">No mentors found</h2>
-                <p className="mt-2 text-slate-600">Try adjusting your filters to find more mentors.</p>
-                <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
-                  Clear all filters
-                </button>
+                <h2 className="mt-4 text-xl font-semibold text-slate-900">
+                  {hasSearchTerm(filters)
+                    ? `No mentors match "${filters.search}"`
+                    : "No mentors found"}
+                </h2>
+                <p className="mt-2 text-slate-600">
+                  {hasSearchTerm(filters)
+                    ? "Try a different name, skill, or headline."
+                    : "Try adjusting your filters to find more mentors."}
+                </p>
+                {hasSearchTerm(filters) ? (
+                  <button
+                    onClick={() => setSearchInput("")}
+                    className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
+                  >
+                    Clear search
+                  </button>
+                ) : (
+                  <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
+                    Clear all filters
+                  </button>
+                )}
               </div>
             ) : (
               <>

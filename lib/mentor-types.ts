@@ -15,6 +15,7 @@ export interface Mentor {
 }
 
 export interface MentorFilters {
+  search?: string;
   expertise?: string[];
   experience?: string[];
   industry?: string[];

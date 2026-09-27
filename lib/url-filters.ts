@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { MentorFilters } from "./mentor-types";
+import { normalizeSearchTerm } from "./mentor-search";
 
 const FILTER_PARAMS: (keyof MentorFilters)[] = [
+  "search",
   "expertise",
   "experience",
   "industry",
@@ -28,7 +30,12 @@ export function useUrlFilters() {
     FILTER_PARAMS.forEach((param) => {
       const value = searchParams.get(param);
       if (value) {
-        if (ARRAY_PARAMS.includes(param)) {
+        if (param === "search") {
+          const normalized = normalizeSearchTerm(value);
+          if (normalized) {
+            (initialFilters as Record<string, unknown>)[param] = normalized;
+          }
+        } else if (ARRAY_PARAMS.includes(param)) {
           (initialFilters as Record<string, unknown>)[param] = value.split(",").filter(Boolean);
         } else if (param === "minRating" || param === "maxHourlyRate") {
           (initialFilters as Record<string, unknown>)[param] = Number(value);
@@ -101,7 +108,12 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams): Mento
   FILTER_PARAMS.forEach((param) => {
     const value = searchParams.get(param);
     if (value) {
-      if (ARRAY_PARAMS.includes(param)) {
+      if (param === "search") {
+        const normalized = normalizeSearchTerm(value);
+        if (normalized) {
+          (filters as Record<string, unknown>)[param] = normalized;
+        }
+      } else if (ARRAY_PARAMS.includes(param)) {
         (filters as Record<string, unknown>)[param] = value.split(",").filter(Boolean);
       } else if (param === "minRating" || param === "maxHourlyRate") {
         (filters as Record<string, unknown>)[param] = Number(value);
