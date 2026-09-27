@@ -6,7 +6,7 @@ import type { ResourceListItem } from "@/components/resources/ResourceSearchList
 
 export interface FeaturedLearningTracksProps {
   tracks: ResourceListItem[];
-  /** How many tracks to show. Defaults to 4, one row on desktop. */
+  /** How many tracks to show. Defaults to 3, one row on desktop. */
   limit?: number;
   viewAllHref?: string;
 }
@@ -22,12 +22,12 @@ const LEVEL_VARIANTS: Record<string, CategoryBadgeVariant> = {
 /**
  * "Featured Learning Tracks" block for the `/resources` landing page.
  *
- * 1 column on mobile, 2 on tablet, 4 on desktop. Cards are equal height so a
+ * 3 columns from `md` up, a single stacked column below it. Cards are equal height so a
  * long summary in one does not stagger the row.
  */
 export default function FeaturedLearningTracks({
   tracks,
-  limit = 4,
+  limit = 3,
   viewAllHref = "/resources/tracks",
 }: FeaturedLearningTracksProps) {
   const featured = tracks.slice(0, limit);
@@ -49,9 +49,9 @@ export default function FeaturedLearningTracks({
           viewAllHref={viewAllHref}
         />
 
-        <ul className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
           {featured.map((track, index) => (
-            <li key={track.title} className="flex">
+            <li key={track.title} className="flex min-w-0">
               <article className="group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-indigo-50/60 to-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50">
                 <div className="mb-5 flex items-center justify-between gap-3">
                   <span

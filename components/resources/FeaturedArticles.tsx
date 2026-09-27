@@ -44,7 +44,7 @@ export default function FeaturedArticles({
 
         <ul className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {featured.map((article) => (
-            <li key={article.title} className="flex">
+            <li key={article.title} className="flex min-w-0">
               <article className="group flex w-full items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-100/50 sm:gap-5 sm:p-6">
                 <div
                   aria-hidden="true"

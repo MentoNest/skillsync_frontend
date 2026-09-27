@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
-import Link from "next/link";
 import Brand from "./Brand";
+import FooterLinkGroup, { FooterLink } from "./FooterLinkGroup";
+import SocialLinks, { SocialLink } from "./SocialLinks";
 
 /**
  * One column of footer links.
@@ -14,7 +14,7 @@ import Brand from "./Brand";
 interface LinkGroup {
   /** `id` is derived from the heading, so the two cannot drift apart. */
   heading: string;
-  links: { label: string; href: string }[];
+  links: FooterLink[];
 }
 
 /**
@@ -77,13 +77,13 @@ const LINK_GROUPS: LinkGroup[] = [
  * up with a "follow us" link to somebody else's account.
  *
  * `icon` is a ReactNode rather than a name so the markup stays in JSX where
- * TypeScript can check it, but the `label` is the load-bearing field: these are
+ * TypeScript can check it, but the `name` is the load-bearing field: these are
  * icon-only links, and without it each one is announced as "link" with no
  * destination. See the note on the render below.
  */
-const SOCIAL_LINKS: { label: string; href: string; icon: ReactNode }[] = [
+const SOCIAL_LINKS: SocialLink[] = [
   {
-    label: "SkillSync on X",
+    name: "X",
     href: "https://x.com/skillsync",
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -92,7 +92,7 @@ const SOCIAL_LINKS: { label: string; href: string; icon: ReactNode }[] = [
     ),
   },
   {
-    label: "SkillSync on LinkedIn",
+    name: "LinkedIn",
     href: "https://www.linkedin.com/company/skillsync",
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -101,7 +101,7 @@ const SOCIAL_LINKS: { label: string; href: string; icon: ReactNode }[] = [
     ),
   },
   {
-    label: "SkillSync on GitHub",
+    name: "GitHub",
     href: "https://github.com/MentoNest/skillsync_frontend",
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -110,7 +110,7 @@ const SOCIAL_LINKS: { label: string; href: string; icon: ReactNode }[] = [
     ),
   },
   {
-    label: "SkillSync on YouTube",
+    name: "YouTube",
     href: "https://www.youtube.com/@skillsync",
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -155,76 +155,40 @@ const SOCIAL_LINKS: { label: string; href: string; icon: ReactNode }[] = [
  */
 export default function Footer() {
   // Rendered on the server, so this is the server's clock and never a
-  // hydration mismatch. A hardcoded year would need editing annually; a
-  // `new Date()` in a client component would flash or mismatch.
+  // hydration mismatch.
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-900 text-slate-400" role="contentinfo">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div className="md:col-span-1">
-            <Link
-              href="/"
-              className="flex items-center gap-2 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-lg"
-              aria-label="SkillSync home"
-            >
-              <span className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center" aria-hidden="true">
-                <svg
-                  className="w-5 h-5 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              </span>
-              <span className="text-lg font-bold text-white">SkillSync</span>
-            </Link>
-            <p className="text-sm leading-relaxed">
+    // `<footer>` outside any `<article>`/`<section>` is already the
+    // `contentinfo` landmark; no explicit role needed.
+    <footer className="bg-slate-900 text-slate-400">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-6 lg:gap-8">
+          {/* Brand + socials: full row on mobile/tablet, two columns on desktop */}
+          <div className="col-span-2 md:col-span-3 lg:col-span-2">
+            <Brand
+              tone="onDark"
+              className="mb-4 w-fit rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            />
+            <p className="max-w-xs text-sm leading-relaxed">
               Connecting learners with expert mentors to accelerate career growth.
             </p>
+            <SocialLinks links={SOCIAL_LINKS} className="mt-6" />
           </div>
 
-          {/* Platform */}
-          <nav aria-label="Platform links">
-            <h3 className="text-sm font-semibold text-white mb-4">Platform</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="#mentors" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Find Mentors</Link></li>
-              <li><Link href="#how-it-works" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">How It Works</Link></li>
-              <li><Link href="#pricing" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Pricing</Link></li>
-            </ul>
-          </nav>
-
-          {/* Company */}
-          <nav aria-label="Company links">
-            <h3 className="text-sm font-semibold text-white mb-4">Company</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/about" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">About</Link></li>
-              <li><Link href="/blog" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Blog</Link></li>
-              <li><Link href="/careers" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Careers</Link></li>
-            </ul>
-          </nav>
-
-          {/* Legal */}
-          <nav aria-label="Legal links">
-            <h3 className="text-sm font-semibold text-white mb-4">Legal</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/privacy" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">Terms of Service</Link></li>
-            </ul>
-          </nav>
+          {LINK_GROUPS.map((group) => (
+            <FooterLinkGroup
+              key={group.heading}
+              title={group.heading}
+              links={group.links}
+              idPrefix={`footer-${group.heading.toLowerCase().replace(/\s+/g, "-")}`}
+            />
+          ))}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-slate-800 text-sm text-center">
-          <p>&copy; {new Date().getFullYear()} SkillSync. All rights reserved.</p>
+        <div className="mt-12 flex flex-col gap-2 border-t border-slate-800 pt-8 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <p>&copy; {year} SkillSync. All rights reserved.</p>
+          <p>Built for learners, by mentors.</p>
         </div>
       </div>
     </footer>
