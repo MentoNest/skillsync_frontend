@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useState, ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
-import MentorAvailabilityBadge, {
-  type MentorAvailability,
-} from "@/components/mentor-discovery/MentorAvailabilityBadge";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
-export { MentorRating, MentorAvailabilityBadge };
+export { MentorRating };
 
 export interface MentorCardProps {
   id?: string;
@@ -27,7 +25,7 @@ export interface MentorCardProps {
   hourlyRate?: number;
   price?: number | string;
   skills?: string[];
-  availability?: MentorAvailability;
+  availability?: "available" | "busy" | "unavailable";
   profileHref?: string;
   ctaText?: string;
   ctaHref?: string;
@@ -108,16 +106,20 @@ export default function MentorCard({
           <div className="flex items-start gap-4 min-w-0 flex-1">
             {/* Profile Image or Monogram */}
             {hasValidImage ? (
-              <img
-                src={imageUrl}
-                alt={`${name}'s profile`}
-                onError={() => setImageError(true)}
-                className="shrink-0 w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-100"
-              />
+              <div className="relative shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden shadow-sm bg-slate-100">
+                <Image
+                  src={imageUrl as string}
+                  alt={`${name}'s profile`}
+                  fill
+                  sizes="(min-width: 640px) 56px, 48px"
+                  onError={() => setImageError(true)}
+                  className="object-cover"
+                />
+              </div>
             ) : (
               <div
                 className={cn(
-                  "shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-sm",
+                  "shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-sm",
                   avatarColor
                 )}
                 aria-hidden="true"
@@ -163,7 +165,22 @@ export default function MentorCard({
 
         {/* Availability indicator if present */}
         {availability && (
-          <MentorAvailabilityBadge availability={availability} className="mt-3" />
+          <div className="mt-3 flex items-center gap-1.5">
+            <span
+              className={cn(
+                "w-2 h-2 rounded-full",
+                availability === "available"
+                  ? "bg-emerald-500"
+                  : availability === "busy"
+                  ? "bg-amber-500"
+                  : "bg-slate-400"
+              )}
+              aria-hidden="true"
+            />
+            <span className="text-xs font-medium text-slate-600 capitalize">
+              {availability}
+            </span>
+          </div>
         )}
 
         {/* Short Bio */}
