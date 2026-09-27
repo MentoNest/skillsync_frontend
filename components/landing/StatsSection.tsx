@@ -15,12 +15,6 @@ import StatCard, { StatCardProps } from "./StatCard";
  * `lib/` for one duplication is not worth the indirection. If a fifth section
  * needs them, extract then — see the note in the PR.
  */
-const PLATFORM_STATS: (StatCardProps & { icon: ReactNode })[] = [
-  {
-    value: "2,400+",
-    label: "Vetted expert mentors",
-import StatCard, { StatCardProps } from "./StatCard";
-
 interface PlatformStat extends StatCardProps {
   /** Accent colour applied to the value text */
   valueClassName?: string;

@@ -53,15 +53,14 @@ export function useUrlFilters() {
 
       FILTER_PARAMS.forEach((param) => {
         const value = newFilters[param];
-        if (value !== undefined && value !== null && value !== "") {
-          if (ARRAY_PARAMS.includes(param)) {
-            const arr = value as string[];
-            if (arr.length > 0) {
-              params.set(param, arr.join(","));
+        if (value !== undefined && value !== null && (value as unknown) !== "") {
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              params.set(param, value.join(","));
             }
           } else if (typeof value === "number") {
             params.set(param, value.toString());
-          } else {
+          } else if (typeof value === "string") {
             params.set(param, value);
           }
         }
@@ -120,15 +119,14 @@ export function createFilterUrl(basePath: string, filters: MentorFilters): strin
 
   FILTER_PARAMS.forEach((param) => {
     const value = filters[param];
-    if (value !== undefined && value !== null && value !== "") {
-      if (ARRAY_PARAMS.includes(param)) {
-        const arr = value as string[];
-        if (arr.length > 0) {
-          params.set(param, arr.join(","));
+    if (value !== undefined && value !== null && (value as unknown) !== "") {
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          params.set(param, value.join(","));
         }
       } else if (typeof value === "number") {
         params.set(param, value.toString());
-      } else {
+      } else if (typeof value === "string") {
         params.set(param, value);
       }
     }

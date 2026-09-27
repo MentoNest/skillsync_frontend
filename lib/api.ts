@@ -31,6 +31,7 @@ export const mentorApi = {
     total: number;
     page: number;
     totalPages: number;
+    hasMore: boolean;
   }> {
     const params = new URLSearchParams();
     
