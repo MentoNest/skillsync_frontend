@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MentorCardProps } from "@/components/landing/MentorCard";
 import MentorRating from "./MentorRating";
+import MentorSkillTags from "./MentorSkillTags";
 export { default as MentorCardSkeleton } from "@/components/landing/MentorCardSkeleton";
 export { MentorRating };
 
@@ -69,17 +70,8 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
         <p className="mt-4 text-sm text-slate-600 leading-relaxed line-clamp-3">{description}</p>
       </div>
 
-      <div className="px-6 pb-4 flex flex-wrap gap-2" aria-label={`${name}'s skills`}>
-        {(skills || []).slice(0, 4).map((skill) => (
-          <span key={skill} className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">
-            {skill}
-          </span>
-        ))}
-        {(skills?.length ?? 0) > 4 && (
-          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 font-medium">
-            +{(skills?.length ?? 0) - 4} more
-          </span>
-        )}
+      <div className="px-6 pb-4">
+        <MentorSkillTags skills={skills} mentorName={name} />
       </div>
 
       <div className="mt-auto px-6 pb-6">

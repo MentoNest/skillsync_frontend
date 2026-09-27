@@ -4,6 +4,7 @@ import React, { useState, ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
+import MentorSkillTags from "@/components/mentor-discovery/MentorSkillTags";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
 export { MentorRating };
 
@@ -188,23 +189,8 @@ export default function MentorCard({
 
       {/* Skills Badges */}
       {skills && skills.length > 0 && (
-        <div
-          className="px-6 pb-4 flex flex-wrap gap-2"
-          aria-label={`${name}'s skills`}
-        >
-          {skills.slice(0, 4).map((skill) => (
-            <span
-              key={skill}
-              className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium"
-            >
-              {skill}
-            </span>
-          ))}
-          {skills.length > 4 && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 font-medium">
-              +{skills.length - 4} more
-            </span>
-          )}
+        <div className="px-6 pb-4">
+          <MentorSkillTags skills={skills} mentorName={name} />
         </div>
       )}
 
