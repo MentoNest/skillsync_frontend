@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
+import { CommunityHeroBanner } from "@/components/community/CommunityHeroBanner";
 import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { Discussion } from "@/lib/community-types";
@@ -143,7 +144,9 @@ export default function CommunityPage() {
           )}
         </div>
 
-        <div className="flex flex-col gap-8 lg:flex-row">
+        <CommunityHeroBanner />
+
+        <div className="mt-8 flex flex-col gap-8 lg:flex-row">
           <main className="flex-1 min-w-0">
             {error && (
               <div
