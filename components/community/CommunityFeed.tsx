@@ -2,7 +2,7 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
-import type { Discussion } from "@/lib/community-types";
+import type { Discussion, DiscussionSort } from "@/lib/community-types";
 
 interface CommunityFeedProps {
   discussions: Discussion[];
@@ -11,10 +11,10 @@ interface CommunityFeedProps {
   hasMore: boolean;
   selectedCategory: string | null;
   searchQuery: string;
-  sortBy: "latest" | "popular" | "trending";
+  sortBy: DiscussionSort;
   onCategoryChange: (category: string | null) => void;
   onSearchChange: (query: string) => void;
-  onSortChange: (sort: "latest" | "popular" | "trending") => void;
+  onSortChange: (sort: DiscussionSort) => void;
   loadMoreRef: React.RefObject<HTMLDivElement | null>;
 }
 

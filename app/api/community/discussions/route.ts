@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseCategoryParam } from "@/lib/community-types";
 
 // Mock data for now - will be replaced with actual database
 const mockDiscussions = Array.from({ length: 25 }, (_, i) => ({
@@ -26,14 +27,17 @@ export async function GET(request: NextRequest) {
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "10");
   const sort = searchParams.get("sort") || "latest";
-  const category = searchParams.get("category");
+  // #993: accept single (?category=technical), comma-separated
+  // (?category=career,technical), and repeated (?category=a&category=b)
+  // params. Single-select UI sends one value; multi-select can reuse this.
+  const categories = parseCategoryParam(searchParams.getAll("category"));
   const search = searchParams.get("q");
 
   let filtered = [...mockDiscussions];
 
-  // Filter by category
-  if (category) {
-    filtered = filtered.filter((d) => d.category === category);
+  // Filter by category (selected category changes feed results)
+  if (categories.length > 0) {
+    filtered = filtered.filter((d) => categories.includes(d.category));
   }
 
   // Filter by search query (title, content, author, category; case-insensitive) (#992)
@@ -48,13 +52,29 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Sort
-  if (sort === "popular") {
+  // Sort (#994): latest | most-liked | most-replies | trending
+  // - latest: newest createdAt first
+  // - most-liked: highest likeCount first
+  // - most-replies: highest replyCount first
+  // - trending: weighted engagement score (likes, replies, views) with recency tie-break
+  // Legacy aliases: "popular" -> "most-liked" for backward compatibility.
+  const getTrendingScore = (d: (typeof filtered)[number]) =>
+    d.likeCount * 2 + d.replyCount * 3 + d.viewCount * 0.5;
+
+  if (sort === "most-liked" || sort === "popular") {
     filtered.sort((a, b) => b.likeCount - a.likeCount);
-  } else if (sort === "trending") {
+  } else if (sort === "most-replies") {
     filtered.sort((a, b) => b.replyCount - a.replyCount);
+  } else if (sort === "trending") {
+    filtered.sort((a, b) => {
+      const scoreDiff = getTrendingScore(b) - getTrendingScore(a);
+      if (scoreDiff !== 0) return scoreDiff;
+      return (
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+    });
   } else {
-    // latest
+    // latest (default)
     filtered.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

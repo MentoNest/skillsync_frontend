@@ -6,7 +6,7 @@ import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 import { CommunityHeroBanner } from "@/components/community/CommunityHeroBanner";
 import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import type { Discussion } from "@/lib/community-types";
+import type { Discussion, DiscussionSort } from "@/lib/community-types";
 
 export default function CommunityPage() {
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
@@ -16,7 +16,7 @@ export default function CommunityPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"latest" | "popular" | "trending">("latest");
+  const [sortBy, setSortBy] = useState<DiscussionSort>("latest");
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -124,7 +124,7 @@ export default function CommunityPage() {
     setSearchQuery(query);
   };
 
-  const handleSortChange = (sort: "latest" | "popular" | "trending") => {
+  const handleSortChange = (sort: DiscussionSort) => {
     setSortBy(sort);
   };
 
