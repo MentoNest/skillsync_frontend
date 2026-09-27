@@ -1,9 +1,10 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import ResourceSearchList, {
+	ResourceListItem,
+} from "@/components/resources/ResourceSearchList";
 
-const RESOURCE_TRACKS = [
+const RESOURCE_TRACKS: ResourceListItem[] = [
 	{
 		title: "Career Growth Foundations",
 		summary: "Build momentum with the habits, systems, and conversations that compound across your first few roles.",
@@ -34,35 +35,14 @@ const RESOURCE_TRACKS = [
 	},
 ];
 
-const debounceDelayMs = 250;
+export const metadata: Metadata = {
+	title: "Learning Tracks · Learning Resources · SkillSync",
+	description: "Structured learning tracks for career growth, interviews and leadership in tech.",
+};
 
 export default function ResourceTracksPage() {
-	const [query, setQuery] = useState("");
-	const [debouncedQuery, setDebouncedQuery] = useState("");
-
-	useEffect(() => {
-		const timer = window.setTimeout(() => {
-			setDebouncedQuery(query.trim());
-		}, debounceDelayMs);
-
-		return () => window.clearTimeout(timer);
-	}, [query]);
-
-	const filteredTracks = useMemo(() => {
-		const value = debouncedQuery.toLowerCase();
-
-		if (!value) return RESOURCE_TRACKS;
-
-		return RESOURCE_TRACKS.filter(
-			({ title, summary, tag }) =>
-				title.toLowerCase().includes(value) ||
-				summary.toLowerCase().includes(value) ||
-				tag.toLowerCase().includes(value),
-		);
-	}, [debouncedQuery]);
-
 	return (
-		<main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+		<div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
 			<div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">
@@ -81,66 +61,14 @@ export default function ResourceTracksPage() {
 				</Link>
 			</div>
 
-			<label className="mb-8 block">
-				<span className="mb-2 block text-sm font-medium text-slate-700">
-					Search tracks
-				</span>
-				<input
-					value={query}
-					onChange={(event) => setQuery(event.target.value)}
-					placeholder="Search by title, summary, or tag"
-					className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-					aria-label="Search learning tracks"
-				/>
-			</label>
-
-			{filteredTracks.length === 0 ? (
-				<div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-					<p className="text-lg font-semibold text-slate-900">
-						No tracks match your search.
-					</p>
-					<p className="mt-2 text-slate-600">
-						Try a broader keyword or clear the filter.
-					</p>
-				</div>
-			) : (
-				<ul className="grid gap-6 md:grid-cols-2">
-					{filteredTracks.map((track) => (
-						<li
-							key={track.title}
-							className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
-						>
-							<div className="mb-3 flex items-center justify-between gap-3">
-								<span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
-									{track.type}
-								</span>
-								<span className="text-xs text-slate-500">
-									{track.readMinutes} min read
-								</span>
-							</div>
-
-							<h2 className="text-xl font-bold text-slate-900">
-								{track.title}
-							</h2>
-							<p className="mt-3 text-sm leading-relaxed text-slate-600">
-								{track.summary}
-							</p>
-
-							<div className="mt-5 flex items-center justify-between gap-3">
-								<span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-									{track.tag}
-								</span>
-								<Link
-									href="/resources"
-									className="text-sm font-semibold text-indigo-700 hover:text-indigo-800"
-								>
-									Explore track →
-								</Link>
-							</div>
-						</li>
-					))}
-				</ul>
-			)}
-		</main>
+			<ResourceSearchList
+				items={RESOURCE_TRACKS}
+				searchLabel="Search tracks"
+				placeholder="Search by title, summary, or tag"
+				emptyTitle="No tracks match your search."
+				emptyHint="Try a broader keyword or clear the filter."
+				ctaLabel="Explore track"
+			/>
+		</div>
 	);
 }
