@@ -10,6 +10,8 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
 import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
+import MentorPagination from "@/components/mentor/MentorPagination";
+import PageSizeSelector from "@/components/mentor/PageSizeSelector";
 
 interface MentorDiscoveryProps {
   /**
@@ -17,6 +19,16 @@ interface MentorDiscoveryProps {
    * `/mentors` route has one; the mentee dashboard does not.
    */
   belowFixedNavbar?: boolean;
+  /**
+   * Enable pagination mode instead of infinite scroll.
+   * Default: false (infinite scroll)
+   */
+  usePagination?: boolean;
+  /**
+   * Number of mentors to display per page when pagination is enabled.
+   * Default: 12
+   */
+  pageSize?: number;
 }
 
 const EXPERIENCE_LABELS: Record<string, string> = {
@@ -27,7 +39,7 @@ const EXPERIENCE_LABELS: Record<string, string> = {
   principal: "Principal",
 };
 
-function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) {
+function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, pageSize: initialPageSize = 12 }: MentorDiscoveryProps) {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -39,8 +51,11 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [totalMentors, setTotalMentors] = useState(0);
+  const [pageSize, setPageSize] = useState(initialPageSize);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const mentorListRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("bookmarkedMentors");
@@ -60,7 +75,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
       }
 
       try {
-        const response = await mentorApi.getMentors(filters, pageNumber);
+        const response = await mentorApi.getMentors(filters, pageNumber, pageSize);
 
         if (append) {
           setMentors((prev) => {
@@ -71,10 +86,15 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
           });
         } else {
           setMentors(response.mentors);
+          // Scroll to top of mentor list when page changes (pagination mode only)
+          if (usePagination && mentorListRef.current && pageNumber !== currentPage) {
+            mentorListRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         }
 
         setCurrentPage(pageNumber);
         setTotalPages(response.totalPages);
+        setTotalMentors(response.total);
         setHasMore(response.hasMore ?? (pageNumber < response.totalPages));
       } catch (err) {
         const message = "Failed to load mentors. Please try again.";
@@ -89,18 +109,32 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
         setIsLoadingMore(false);
       }
     },
-    [filters]
+    [filters, pageSize, usePagination, currentPage]
   );
 
   useEffect(() => {
+    // Reset to page 1 when filters change
+    setCurrentPage(1);
     fetchMentors(1, false);
   }, [fetchMentors]);
 
   const handleLoadMore = useCallback(() => {
-    if (!isLoading && !isLoadingMore && hasMore) {
+    if (!isLoading && !isLoadingMore && hasMore && !usePagination) {
       fetchMentors(currentPage + 1, true);
     }
-  }, [isLoading, isLoadingMore, hasMore, currentPage, fetchMentors]);
+  }, [isLoading, isLoadingMore, hasMore, currentPage, fetchMentors, usePagination]);
+
+  const handlePageChange = useCallback((newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+      fetchMentors(newPage, false);
+    }
+  }, [totalPages, currentPage, fetchMentors]);
+
+  const handlePageSizeChange = useCallback((newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1);
+    // fetchMentors will be called automatically via useEffect when pageSize changes
+  }, []);
 
   const { resetInfiniteScroll } = useInfiniteScroll({
     isLoading: isLoadingMore,
@@ -163,7 +197,20 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-slate-900">Find Mentors</h1>
               <span className="px-2 py-0.5 text-sm font-medium bg-indigo-50 text-indigo-700 rounded-full">
-                {mentors.length} mentor{mentors.length !== 1 ? "s" : ""}
+                {usePagination ? (
+                  <>
+                    {totalMentors} mentor{totalMentors !== 1 ? "s" : ""}
+                    {totalPages > 1 && (
+                      <span className="ml-1 text-indigo-500">
+                        · Page {currentPage} of {totalPages}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {mentors.length} mentor{mentors.length !== 1 ? "s" : ""}
+                  </>
+                )}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -206,6 +253,13 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
               />
             </div>
             <div className="flex items-center gap-4">
+              {usePagination && (
+                <PageSizeSelector
+                  pageSize={pageSize}
+                  onPageSizeChange={handlePageSizeChange}
+                  totalResults={totalMentors}
+                />
+              )}
               <select
                 value={filters.sortBy || "relevance"}
                 onChange={(e) => updateFilters({ ...filters, sortBy: e.target.value as MentorFilters["sortBy"] }, { replace: true })}
@@ -323,7 +377,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
             </>
         }
       >
-          <div>
+          <div ref={mentorListRef}>
             {/* Active industry filter badges */}
             {filters.industry && filters.industry.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active industry filters">
@@ -427,8 +481,17 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                   })}
                 </div>
 
-                {/* Loading state when fetching additional mentors */}
-                {isLoadingMore && (
+                {/* Pagination controls (only in pagination mode) */}
+                {usePagination && (
+                  <MentorPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+
+                {/* Loading state when fetching additional mentors (infinite scroll only) */}
+                {!usePagination && isLoadingMore && (
                   <div
                     role="status"
                     aria-live="polite"
@@ -440,8 +503,8 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                   </div>
                 )}
 
-                {/* Error retry when loading more fails */}
-                {loadMoreError && (
+                {/* Error retry when loading more fails (infinite scroll only) */}
+                {!usePagination && loadMoreError && (
                   <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-center">
                     <p className="text-sm text-red-600 mb-2">{loadMoreError}</p>
                     <button
@@ -453,8 +516,8 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                   </div>
                 )}
 
-                {/* End of results message */}
-                {!hasMore && !isLoading && !isLoadingMore && mentors.length > 0 && (
+                {/* End of results message (infinite scroll only) */}
+                {!usePagination && !hasMore && !isLoading && !isLoadingMore && mentors.length > 0 && (
                   <div className="mt-10 py-6 border-t border-slate-200 text-center">
                     <p className="text-sm font-medium text-slate-500">
                       You&apos;ve reached the end of the mentors list ({mentors.length} mentor{mentors.length !== 1 ? "s" : ""} loaded)
@@ -462,8 +525,10 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                   </div>
                 )}
 
-                {/* Sentinel element for infinite scroll */}
-                <div ref={loadMoreRef} className="h-4 w-full" aria-hidden="true" />
+                {/* Sentinel element for infinite scroll (infinite scroll only) */}
+                {!usePagination && (
+                  <div ref={loadMoreRef} className="h-4 w-full" aria-hidden="true" />
+                )}
               </>
             )}
           </div>
