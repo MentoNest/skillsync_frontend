@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export interface ResourceCardProps {
   title: string;
   summary: string;
@@ -5,6 +7,12 @@ export interface ResourceCardProps {
   type: string;
   /** Shown next to the type, e.g. "12 min read". */
   readMinutes: number;
+  image?: {
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+  };
   /**
    * Where the card links to. Omit it while the entry is unwritten.
    *
@@ -42,10 +50,24 @@ export default function ResourceCard({
   summary,
   type,
   readMinutes,
+  image,
   href,
 }: ResourceCardProps) {
   const body = (
     <>
+      {image ? (
+        <div className="relative mb-4 h-36 w-full overflow-hidden rounded-xl bg-slate-100">
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover"
+            priority={false}
+          />
+        </div>
+      ) : null}
+
       <div className="flex items-center gap-2 mb-3">
         <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
           {type}
@@ -66,7 +88,7 @@ export default function ResourceCard({
   );
 
   const shell =
-    "group flex h-full w-full flex-col rounded-2xl border border-slate-200 bg-white p-6 text-left transition-all duration-300 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50";
+    "group flex h-full w-full flex-col rounded-2xl border border-slate-200 bg-white p-6 text-left transition-all duration-300 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 overflow-hidden";
 
   // No destination yet. Rendered as a non-interactive article rather than an
   // `href="#"`, which would be focusable, announce as a link, and go nowhere.

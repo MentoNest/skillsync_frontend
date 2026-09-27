@@ -16,6 +16,7 @@ const RESOURCE_CATEGORIES: {
   id: string;
   title: string;
   blurb: string;
+  viewAllHref?: string;
   items: ResourceCardProps[];
 }[] = [
   {
@@ -23,6 +24,7 @@ const RESOURCE_CATEGORIES: {
     title: "Guides",
     blurb:
       "Long-form, end to end. Start here if the problem is that you do not yet know what to be doing.",
+    viewAllHref: "/resources/tracks",
     items: [
       {
         title: "How to write the first line of your CV",
@@ -30,6 +32,13 @@ const RESOURCE_CATEGORIES: {
           "Most CVs fail in the first third of the first page. What to cut, what order to put things in, and the one question a hiring manager is actually answering.",
         type: "Guide",
         readMinutes: 12,
+        href: "/resources/tracks",
+        image: {
+          src: "/resources/learning-track.svg",
+          alt: "Illustration for learning tracks",
+          width: 800,
+          height: 500,
+        },
       },
       {
         title: "Getting a first tech job with no experience",
@@ -37,6 +46,13 @@ const RESOURCE_CATEGORIES: {
           "The routes that work for people without a degree or a bootcamp, and the ones that are sold to you and do not.",
         type: "Guide",
         readMinutes: 18,
+        href: "/resources/tracks",
+        image: {
+          src: "/resources/learning-track.svg",
+          alt: "Illustration for learning track content",
+          width: 800,
+          height: 500,
+        },
       },
       {
         title: "Preparing for a system design interview",
@@ -44,6 +60,13 @@ const RESOURCE_CATEGORIES: {
           "What is actually being assessed, how to run a 45-minute conversation, and how to say 'I don't know' without losing the room.",
         type: "Guide",
         readMinutes: 22,
+        href: "/resources/tracks",
+        image: {
+          src: "/resources/learning-track.svg",
+          alt: "System design learning track illustration",
+          width: 800,
+          height: 500,
+        },
       },
     ],
   },
@@ -52,6 +75,7 @@ const RESOURCE_CATEGORIES: {
     title: "Articles",
     blurb:
       "Shorter reads on one specific thing. Useful when you already know the shape of the problem.",
+    viewAllHref: "/resources/articles",
     items: [
       {
         title: "What mentorship is actually for",
@@ -59,6 +83,13 @@ const RESOURCE_CATEGORIES: {
           "A mentor is not a cheaper course. The difference matters, and it is the difference the platform is built on.",
         type: "Article",
         readMinutes: 6,
+        href: "/resources/articles",
+        image: {
+          src: "/resources/article.svg",
+          alt: "Article illustration",
+          width: 800,
+          height: 500,
+        },
       },
       {
         title: "How to ask a question a mentor can answer",
@@ -66,6 +97,13 @@ const RESOURCE_CATEGORIES: {
           "'Can you help me with my career?' is the least answerable question you can ask. Four sentences that fix it.",
         type: "Article",
         readMinutes: 5,
+        href: "/resources/articles",
+        image: {
+          src: "/resources/article.svg",
+          alt: "Article resource illustration",
+          width: 800,
+          height: 500,
+        },
       },
       {
         title: "When to change jobs, and when to stay",
@@ -73,6 +111,13 @@ const RESOURCE_CATEGORIES: {
           "The two questions that settle it, and why 'am I happy' is not one of them.",
         type: "Article",
         readMinutes: 9,
+        href: "/resources/articles",
+        image: {
+          src: "/resources/article.svg",
+          alt: "Career article illustration",
+          width: 800,
+          height: 500,
+        },
       },
     ],
   },
@@ -88,6 +133,12 @@ const RESOURCE_CATEGORIES: {
           "A mentor walks through three real offer emails and the reasoning behind each counter.",
         type: "Video",
         readMinutes: 34,
+        image: {
+          src: "/resources/tool.svg",
+          alt: "Video session illustration",
+          width: 800,
+          height: 500,
+        },
       },
       {
         title: "Reading a system design diagram",
@@ -95,6 +146,12 @@ const RESOURCE_CATEGORIES: {
           "How to spot the two problems in a diagram before the interview starts asking about them.",
         type: "Video",
         readMinutes: 27,
+        image: {
+          src: "/resources/tool.svg",
+          alt: "Recorded session illustration",
+          width: 800,
+          height: 500,
+        },
       },
       {
         title: "Saying no to a promotion you do not want",
@@ -102,6 +159,12 @@ const RESOURCE_CATEGORIES: {
           "The conversation most people have never had, and the script for having it.",
         type: "Video",
         readMinutes: 19,
+        image: {
+          src: "/resources/tool.svg",
+          alt: "Mentor session illustration",
+          width: 800,
+          height: 500,
+        },
       },
     ],
   },
@@ -201,16 +264,28 @@ export default function ResourcesPage() {
           className="scroll-mt-16 py-16 lg:py-20 border-b border-slate-200 last:border-b-0"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-2xl">
-              <h2
-                id={`${category.id}-heading`}
-                className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight"
-              >
-                {category.title}
-              </h2>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                {category.blurb}
-              </p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="max-w-2xl">
+                <h2
+                  id={`${category.id}-heading`}
+                  className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight"
+                >
+                  {category.title}
+                </h2>
+                <p className="mt-3 text-slate-600 leading-relaxed">
+                  {category.blurb}
+                </p>
+              </div>
+
+              {category.viewAllHref ? (
+                <Link
+                  href={category.viewAllHref}
+                  className="inline-flex items-center gap-2 self-start rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-sm font-semibold text-indigo-700 transition-colors hover:border-indigo-300 hover:bg-indigo-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                >
+                  View all
+                  <span aria-hidden="true">→</span>
+                </Link>
+              ) : null}
             </div>
 
             <ul className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
