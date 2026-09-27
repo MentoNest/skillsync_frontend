@@ -1,4 +1,4 @@
-import MentorDiscovery from "@/components/mentor-discovery/MentorDiscovery";
+"use client";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
@@ -9,8 +9,15 @@ import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
-import HourlyRateFilter from "@/components/mentor-discovery/HourlyRateFilter";
-import { hasHourlyRateRange } from "@/lib/hourly-rate";
+import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
+
+interface MentorDiscoveryProps {
+  /**
+   * Whether a fixed site navbar (h-16) sits above the page. The public
+   * `/mentors` route has one; the mentee dashboard does not.
+   */
+  belowFixedNavbar?: boolean;
+}
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   junior: "Junior",
@@ -20,7 +27,7 @@ const EXPERIENCE_LABELS: Record<string, string> = {
   principal: "Principal",
 };
 
-function MentorsPageContent() {
+function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -124,23 +131,9 @@ function MentorsPageContent() {
     });
   };
 
-  // Counted explicitly: the previous Object.values().flat() form already
-  // included the numeric bounds and then added them again.
-  let activeFilterCount = 0;
-  if (filters.expertise?.length) activeFilterCount++;
-  if (filters.experience?.length) activeFilterCount++;
-  if (filters.industry?.length) activeFilterCount++;
-  if (filters.availability?.length) activeFilterCount++;
-  if (filters.minRating !== undefined) activeFilterCount++;
-  if (
-    hasHourlyRateRange({
-      min: filters.minHourlyRate,
-      max: filters.maxHourlyRate,
-    })
-  ) {
-    activeFilterCount++;
-  }
-  if (filters.sortBy && filters.sortBy !== "relevance") activeFilterCount++;
+  const activeFilterCount = Object.values(filters).flat().filter(Boolean).length +
+    (filters.minRating ? 1 : 0) +
+    (filters.maxHourlyRate ? 1 : 0);
 
   if (error) {
     return (
@@ -164,7 +157,7 @@ function MentorsPageContent() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+      <header className={`bg-white border-b border-slate-200 sticky z-40 ${belowFixedNavbar ? "top-16" : "top-0"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
@@ -237,10 +230,10 @@ function MentorsPageContent() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <aside className="lg:col-span-1 hidden lg:block">
-            <div className="sticky top-24 space-y-6">
+      <MentorDiscoveryLayout
+        sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
+        sidebar={
+            <>
               <div>
                 <h3 className="text-sm font-semibold text-slate-900 mb-3">Expertise</h3>
                 <div className="space-y-2">
@@ -317,24 +310,20 @@ function MentorsPageContent() {
                 </select>
               </div>
 
-              <HourlyRateFilter
-                minHourlyRate={filters.minHourlyRate}
-                maxHourlyRate={filters.maxHourlyRate}
-                onChange={({ min, max }) =>
-                  updateFilters(
-                    {
-                      ...filters,
-                      minHourlyRate: min,
-                      maxHourlyRate: max,
-                    },
-                    { replace: true }
-                  )
-                }
-              />
-            </div>
-          </aside>
-
-          <div className="lg:col-span-3">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 mb-3">Max Hourly Rate</h3>
+                <input
+                  type="number"
+                  value={filters.maxHourlyRate || ""}
+                  onChange={(e) => updateFilters({ ...filters, maxHourlyRate: Number(e.target.value) || undefined }, { replace: true })}
+                  placeholder="e.g., 200"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </>
+        }
+      >
+          <div>
             {/* Active industry filter badges */}
             {filters.industry && filters.industry.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active industry filters">
@@ -478,8 +467,7 @@ function MentorsPageContent() {
               </>
             )}
           </div>
-        </div>
-      </main>
+      </MentorDiscoveryLayout>
 
       <MobileFilterDrawer
         isOpen={isMobileFiltersOpen}
@@ -491,6 +479,21 @@ function MentorsPageContent() {
       />
     </div>
   );
-export default function MenteeMentorsPage() {
-  return <MentorDiscovery />;
+}
+
+export default function MentorDiscovery(props: MentorDiscoveryProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+          <div className="flex items-center gap-3 text-slate-500 font-medium">
+            <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+            Loading mentors...
+          </div>
+        </div>
+      }
+    >
+      <MentorsPageContent {...props} />
+    </Suspense>
+  );
 }

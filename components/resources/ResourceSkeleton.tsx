@@ -36,7 +36,7 @@ export function ResourceCardSkeleton() {
 
 export function ResourcePageSkeleton({ itemCount = 6 }: { itemCount?: number }) {
   return (
-    <main className="bg-slate-50">
+    <div className="bg-slate-50" aria-busy="true">
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-6 h-4 w-32 animate-pulse rounded-full bg-slate-200" />
@@ -53,13 +53,13 @@ export function ResourcePageSkeleton({ itemCount = 6 }: { itemCount?: number }) 
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
 export default function ResourceLoadingSkeleton() {
   return (
-    <main className="bg-slate-50">
+    <div className="bg-slate-50" aria-busy="true">
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-6 h-4 w-32 animate-pulse rounded-full bg-slate-200" />
@@ -81,6 +81,6 @@ export default function ResourceLoadingSkeleton() {
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
