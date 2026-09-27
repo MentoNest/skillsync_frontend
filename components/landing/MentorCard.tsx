@@ -4,8 +4,11 @@ import React, { useState, ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
+import MentorAvailabilityBadge, {
+  type MentorAvailability,
+} from "@/components/mentor-discovery/MentorAvailabilityBadge";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
-export { MentorRating };
+export { MentorRating, MentorAvailabilityBadge };
 
 export interface MentorCardProps {
   id?: string;
@@ -24,7 +27,7 @@ export interface MentorCardProps {
   hourlyRate?: number;
   price?: number | string;
   skills?: string[];
-  availability?: "available" | "busy" | "unavailable";
+  availability?: MentorAvailability;
   profileHref?: string;
   ctaText?: string;
   ctaHref?: string;
@@ -160,22 +163,7 @@ export default function MentorCard({
 
         {/* Availability indicator if present */}
         {availability && (
-          <div className="mt-3 flex items-center gap-1.5">
-            <span
-              className={cn(
-                "w-2 h-2 rounded-full",
-                availability === "available"
-                  ? "bg-emerald-500"
-                  : availability === "busy"
-                  ? "bg-amber-500"
-                  : "bg-slate-400"
-              )}
-              aria-hidden="true"
-            />
-            <span className="text-xs font-medium text-slate-600 capitalize">
-              {availability}
-            </span>
-          </div>
+          <MentorAvailabilityBadge availability={availability} className="mt-3" />
         )}
 
         {/* Short Bio */}
