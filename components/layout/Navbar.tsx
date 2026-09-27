@@ -51,6 +51,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "#mentors", label: "Find Mentors" },
+    { href: "/community", label: "Community" },
     { href: "#how-it-works", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
   ];
