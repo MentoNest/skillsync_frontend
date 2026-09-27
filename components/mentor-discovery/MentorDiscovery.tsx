@@ -8,6 +8,7 @@ import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
+import ExperienceLevelFilter from "@/components/mentor-discovery/ExperienceLevelFilter";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
 import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
 import MentorPagination from "@/components/mentor/MentorPagination";
@@ -30,14 +31,6 @@ interface MentorDiscoveryProps {
    */
   pageSize?: number;
 }
-
-const EXPERIENCE_LABELS: Record<string, string> = {
-  junior: "Junior",
-  mid: "Mid-level",
-  senior: "Senior",
-  lead: "Lead",
-  principal: "Principal",
-};
 
 function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, pageSize: initialPageSize = 12 }: MentorDiscoveryProps) {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
@@ -312,29 +305,18 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Experience Level</h3>
-                <div className="space-y-2">
-                  {["junior", "mid", "senior", "lead", "principal"].map((exp) => (
-                    <label key={exp} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.experience?.includes(exp) || false}
-                        onChange={(e) => {
-                          const newExp = filters.experience || [];
-                          if (e.target.checked) {
-                            updateFilters({ ...filters, experience: [...newExp, exp] }, { replace: true });
-                          } else {
-                            updateFilters({ ...filters, experience: newExp.filter((e) => e !== exp) }, { replace: true });
-                          }
-                        }}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-slate-700 capitalize">{exp}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+              <ExperienceLevelFilter
+                selectedLevels={filters.experience || []}
+                onChange={(newLevels) => {
+                  updateFilters(
+                    {
+                      ...filters,
+                      experience: newLevels.length > 0 ? newLevels : undefined,
+                    },
+                    { replace: true }
+                  );
+                }}
+              />
 
               <IndustryFilter
                 selectedIndustries={filters.industry || []}

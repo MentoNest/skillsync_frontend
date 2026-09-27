@@ -6,7 +6,7 @@ export interface Mentor {
   bio: string;
   skills: string[];
   industry: string;
-  experienceLevel: "junior" | "mid" | "senior" | "lead" | "principal";
+  experienceLevel: "junior" | "mid-level" | "senior" | "executive";
   rating: number;
   hourlyRate: number;
   availability: "available" | "busy" | "unavailable";

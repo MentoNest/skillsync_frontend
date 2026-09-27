@@ -26,7 +26,14 @@ const EXPERTISE_OPTIONS = [
   "QA Engineering",
 ];
 
-const EXPERIENCE_OPTIONS = ["junior", "mid", "senior", "lead", "principal"];
+const EXPERIENCE_OPTIONS = ["junior", "mid-level", "senior", "executive"];
+
+const EXPERIENCE_LABELS: Record<string, string> = {
+  junior: "Junior",
+  "mid-level": "Mid-Level",
+  senior: "Senior",
+  executive: "Executive",
+};
 
 const INDUSTRY_OPTIONS = [
   "Technology",
@@ -188,7 +195,7 @@ export default function MobileFilterDrawer({
                       }}
                       className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
                     />
-                    {exp.charAt(0).toUpperCase() + exp.slice(1)}
+                    {EXPERIENCE_LABELS[exp]}
                   </label>
                 ))}
               </div>
