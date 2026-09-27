@@ -3,6 +3,9 @@ import Link from "next/link";
 import ResourceCard, {
   ResourceCardProps,
 } from "@/components/resources/ResourceCard";
+import FeaturedLearningTracks from "@/components/resources/FeaturedLearningTracks";
+import FeaturedArticles from "@/components/resources/FeaturedArticles";
+import { RESOURCE_ARTICLES, RESOURCE_TRACKS } from "@/lib/resources-data";
 
 /**
  * Per-category resource entries.
@@ -256,6 +259,10 @@ export default function ResourcesPage() {
           </ul>
         </div>
       </nav>
+
+      <FeaturedLearningTracks tracks={RESOURCE_TRACKS} />
+
+      <FeaturedArticles articles={RESOURCE_ARTICLES} />
 
       {/* Categories */}
       {RESOURCE_CATEGORIES.map((category) => (
