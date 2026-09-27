@@ -2,45 +2,43 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { authApi } from "@/lib/api";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
+    if (!fullName.trim()) {
+      setError("Enter your full name");
       return;
     }
-
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Enter a valid email address");
+      return;
+    }
     if (password.length < 8) {
       setError("Password must be at least 8 characters");
-      setIsLoading(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, email, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Registration failed");
-      }
-
-      // Redirect to community on success
+      await authApi.register(fullName.trim(), email.trim(), password);
       window.location.href = "/community";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
@@ -50,7 +48,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--background)] p-8 shadow-sm">
+    <div>
       <h1 className="text-2xl font-bold text-[var(--foreground)]">Create your account</h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
         Join SkillSync and start your learning journey
@@ -76,7 +74,7 @@ export default function RegisterPage() {
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            className="mt-1 w-full rounded-md border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
             placeholder="John Doe"
           />
         </div>
@@ -91,7 +89,7 @@ export default function RegisterPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            className="mt-1 w-full rounded-md border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
             placeholder="you@example.com"
           />
         </div>
@@ -100,36 +98,60 @@ export default function RegisterPage() {
           <label htmlFor="reg-password" className="block text-sm font-medium text-[var(--foreground)]">
             Password
           </label>
-          <input
-            id="reg-password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-            placeholder="At least 8 characters"
-          />
+          <div className="relative mt-1">
+            <input
+              id="reg-password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-md border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 pr-16 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+              placeholder="At least 8 characters"
+            />
+            <button
+              type="button"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-3 text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)]"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
 
         <div>
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--foreground)]">
             Confirm password
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-            placeholder="Confirm your password"
-          />
+          <div className="relative mt-1">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              required
+              minLength={8}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full rounded-md border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 pr-16 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+              placeholder="Confirm your password"
+            />
+            <button
+              type="button"
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              aria-pressed={showConfirmPassword}
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute inset-y-0 right-3 text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)]"
+            >
+              {showConfirmPassword ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-lg bg-[var(--primary)] px-4 py-2.5 font-medium text-white transition-colors hover:bg-[var(--primary-dark)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:opacity-50"
+          className="w-full rounded-md bg-[var(--primary)] px-4 py-2.5 font-medium text-white transition-colors hover:bg-[var(--primary-dark)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:opacity-50"
         >
           {isLoading ? "Creating account..." : "Create Account"}
         </button>

@@ -106,4 +106,33 @@ export const mentorApi = {
   },
 };
 
+async function postAuth<T>(path: string, body: Record<string, string>): Promise<T> {
+  const response = await fetch(`${API_BASE.replace(/\/$/, "")}/auth/${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const errorData = data as { message?: string; error?: string; code?: string };
+    throw new ApiError(
+      errorData.message || errorData.error || `HTTP error! status: ${response.status}`,
+      response.status,
+      errorData.code
+    );
+  }
+  return data as T;
+}
+
+export const authApi = {
+  login(email: string, password: string): Promise<unknown> {
+    return postAuth("login", { email, password });
+  },
+  register(fullName: string, email: string, password: string): Promise<unknown> {
+    return postAuth("register", { fullName, email, password });
+  },
+};
+
 export { ApiError };
