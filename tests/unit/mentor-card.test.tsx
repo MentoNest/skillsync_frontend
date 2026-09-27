@@ -116,6 +116,22 @@ describe("MentorCard Component", () => {
 
   it("renders availability indicator when provided", () => {
     render(<MentorCard {...defaultProps} availability="available" />);
-    expect(screen.getByText("available")).toBeInTheDocument();
+    expect(screen.getByText("Available")).toBeInTheDocument();
+  });
+
+  it("renders busy availability with an accessible label", () => {
+    render(<MentorCard {...defaultProps} availability="busy" />);
+    expect(screen.getByText("Busy")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Mentor availability: Busy" })
+    ).toBeInTheDocument();
+  });
+
+  it("renders the fully booked state for unavailable mentors", () => {
+    render(<MentorCard {...defaultProps} availability="unavailable" />);
+    expect(screen.getByText("Fully Booked")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Mentor availability: Fully Booked" })
+    ).toBeInTheDocument();
   });
 });
