@@ -50,7 +50,8 @@ export default function Navbar() {
   }, [isMobileMenuOpen]);
 
   const navLinks = [
-    { href: "#mentors", label: "Find Mentors" },
+    { href: "/mentors", label: "Find Mentors" },
+    { href: "/resources", label: "Resources" },
     { href: "/community", label: "Community" },
     { href: "#how-it-works", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },

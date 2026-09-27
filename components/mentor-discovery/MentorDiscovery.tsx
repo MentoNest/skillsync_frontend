@@ -1,4 +1,4 @@
-import MentorDiscovery from "@/components/mentor-discovery/MentorDiscovery";
+"use client";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
@@ -7,13 +7,17 @@ import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
-import MentorSearchBar from "@/components/mentor-discovery/MentorSearchBar";
-import { hasSearchTerm, normalizeSearchTerm } from "@/lib/mentor-search";
+import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
 
-const SEARCH_DEBOUNCE_MS = 300;
+interface MentorDiscoveryProps {
+  /**
+   * Whether a fixed site navbar (h-16) sits above the page. The public
+   * `/mentors` route has one; the mentee dashboard does not.
+   */
+  belowFixedNavbar?: boolean;
+}
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   junior: "Junior",
@@ -23,7 +27,7 @@ const EXPERIENCE_LABELS: Record<string, string> = {
   principal: "Principal",
 };
 
-function MentorsPageContent() {
+function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -35,28 +39,8 @@ function MentorsPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState(filters.search ?? "");
-  const debouncedSearch = useDebouncedValue(searchInput, SEARCH_DEBOUNCE_MS);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const latestFilters = useRef(filters);
-
-  useEffect(() => {
-    latestFilters.current = filters;
-  }, [filters]);
-
-  useEffect(() => {
-    const normalized = normalizeSearchTerm(debouncedSearch);
-    if (normalized === (latestFilters.current.search ?? "")) return;
-    updateFilters(
-      { ...latestFilters.current, search: normalized || undefined },
-      { replace: true }
-    );
-  }, [debouncedSearch, updateFilters]);
-
-  useEffect(() => {
-    setSearchInput(filters.search ?? "");
-  }, [filters.search]);
 
   useEffect(() => {
     const stored = localStorage.getItem("bookmarkedMentors");
@@ -134,7 +118,6 @@ function MentorsPageContent() {
   };
 
   const handleClearFilters = () => {
-    setSearchInput("");
     clearFilters();
   };
 
@@ -174,7 +157,7 @@ function MentorsPageContent() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+      <header className={`bg-white border-b border-slate-200 sticky z-40 ${belowFixedNavbar ? "top-16" : "top-0"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
@@ -214,14 +197,12 @@ function MentorsPageContent() {
         <div className="hidden lg:block px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-100 bg-slate-50">
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
-              <MentorSearchBar
-                value={searchInput}
-                onChange={setSearchInput}
-                status={
-                  hasSearchTerm(filters)
-                    ? `${mentors.length} mentor${mentors.length === 1 ? "" : "s"} matching "${filters.search}"`
-                    : undefined
-                }
+              <label htmlFor="search" className="sr-only">Search mentors</label>
+              <input
+                type="search"
+                id="search"
+                placeholder="Search mentors by name, skill, or company..."
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
             <div className="flex items-center gap-4">
@@ -249,10 +230,10 @@ function MentorsPageContent() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <aside className="lg:col-span-1 hidden lg:block">
-            <div className="sticky top-24 space-y-6">
+      <MentorDiscoveryLayout
+        sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
+        sidebar={
+            <>
               <div>
                 <h3 className="text-sm font-semibold text-slate-900 mb-3">Expertise</h3>
                 <div className="space-y-2">
@@ -339,10 +320,10 @@ function MentorsPageContent() {
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
-            </div>
-          </aside>
-
-          <div className="lg:col-span-3">
+            </>
+        }
+      >
+          <div>
             {/* Active industry filter badges */}
             {filters.industry && filters.industry.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active industry filters">
@@ -387,28 +368,11 @@ function MentorsPageContent() {
                 <svg className="mx-auto h-16 w-16 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h2 className="mt-4 text-xl font-semibold text-slate-900">
-                  {hasSearchTerm(filters)
-                    ? `No mentors match "${filters.search}"`
-                    : "No mentors found"}
-                </h2>
-                <p className="mt-2 text-slate-600">
-                  {hasSearchTerm(filters)
-                    ? "Try a different name, skill, or headline."
-                    : "Try adjusting your filters to find more mentors."}
-                </p>
-                {hasSearchTerm(filters) ? (
-                  <button
-                    onClick={() => setSearchInput("")}
-                    className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
-                  >
-                    Clear search
-                  </button>
-                ) : (
-                  <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
-                    Clear all filters
-                  </button>
-                )}
+                <h2 className="mt-4 text-xl font-semibold text-slate-900">No mentors found</h2>
+                <p className="mt-2 text-slate-600">Try adjusting your filters to find more mentors.</p>
+                <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
+                  Clear all filters
+                </button>
               </div>
             ) : (
               <>
@@ -503,8 +467,7 @@ function MentorsPageContent() {
               </>
             )}
           </div>
-        </div>
-      </main>
+      </MentorDiscoveryLayout>
 
       <MobileFilterDrawer
         isOpen={isMobileFiltersOpen}
@@ -516,6 +479,21 @@ function MentorsPageContent() {
       />
     </div>
   );
-export default function MenteeMentorsPage() {
-  return <MentorDiscovery />;
+}
+
+export default function MentorDiscovery(props: MentorDiscoveryProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+          <div className="flex items-center gap-3 text-slate-500 font-medium">
+            <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+            Loading mentors...
+          </div>
+        </div>
+      }
+    >
+      <MentorsPageContent {...props} />
+    </Suspense>
+  );
 }
