@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { DiscussionSort } from "@/lib/community-types";
+import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
 
 interface DiscussionFiltersProps {
   selectedCategory: string | null;
@@ -12,13 +13,9 @@ interface DiscussionFiltersProps {
   onSortChange: (sort: DiscussionSort) => void;
 }
 
-const categories = [
+const categories: { id: string | null; name: string }[] = [
   { id: null, name: "All" },
-  { id: "general", name: "General" },
-  { id: "career", name: "Career" },
-  { id: "technical", name: "Technical" },
-  { id: "mentoring", name: "Mentoring" },
-  { id: "announcements", name: "Announcements" },
+  ...COMMUNITY_CATEGORIES.map((c) => ({ id: c.id as string, name: c.name })),
 ];
 
 export function DiscussionFilters({
