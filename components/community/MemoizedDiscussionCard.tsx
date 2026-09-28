@@ -2,13 +2,19 @@
 
 import { memo } from "react";
 import type { Discussion } from "@/lib/community-types";
+import { DiscussionActions } from "./DiscussionActions";
 
 interface MemoizedDiscussionCardProps {
   discussion: Discussion;
+  /** Passed through to `DiscussionActions` for the saved page (#1013). */
+  onRemoveBookmark?: (discussionId: string) => void;
+  isRemovingBookmark?: boolean;
 }
 
 export const MemoizedDiscussionCard = memo(function MemoizedDiscussionCard({
   discussion,
+  onRemoveBookmark,
+  isRemovingBookmark,
 }: MemoizedDiscussionCardProps) {
   return (
     <article
@@ -77,6 +83,12 @@ export const MemoizedDiscussionCard = memo(function MemoizedDiscussionCard({
               {discussion.category}
             </span>
           </div>
+
+          <DiscussionActions
+            discussion={discussion}
+            onRemoveBookmark={onRemoveBookmark}
+            isRemovingBookmark={isRemovingBookmark}
+          />
         </div>
       </div>
     </article>

@@ -1,12 +1,20 @@
 "use client";
 
 import type { Discussion } from "@/lib/community-types";
+import { DiscussionActions } from "./DiscussionActions";
 
 interface DiscussionCardProps {
   discussion: Discussion;
+  /** Passed through to `DiscussionActions` for the saved page (#1013). */
+  onRemoveBookmark?: (discussionId: string) => void;
+  isRemovingBookmark?: boolean;
 }
 
-export function DiscussionCard({ discussion }: DiscussionCardProps) {
+export function DiscussionCard({
+  discussion,
+  onRemoveBookmark,
+  isRemovingBookmark,
+}: DiscussionCardProps) {
   return (
     <article
       className="rounded-lg border border-[var(--border)] bg-[var(--background)] p-4 transition-shadow hover:shadow-md focus-within:shadow-md"
@@ -70,6 +78,12 @@ export function DiscussionCard({ discussion }: DiscussionCardProps) {
               {discussion.category}
             </span>
           </div>
+
+          <DiscussionActions
+            discussion={discussion}
+            onRemoveBookmark={onRemoveBookmark}
+            isRemovingBookmark={isRemovingBookmark}
+          />
         </div>
       </div>
     </article>
