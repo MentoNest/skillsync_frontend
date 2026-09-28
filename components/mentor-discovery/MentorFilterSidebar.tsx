@@ -246,3 +246,6 @@ export default function MentorFilterSidebar({
 }
 
 export { MentorFilterSidebar };
+export { default, MentorFilterSidebar } from "@/components/mentor-discovery/MentorFilterSidebar";
+export type { MentorFilterSidebarProps } from "@/components/mentor-discovery/MentorFilterSidebar";
+export { IndustryFilter } from "@/components/mentor-discovery/IndustryFilter";    
