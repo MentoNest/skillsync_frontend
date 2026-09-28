@@ -242,8 +242,19 @@ function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
     result = result.filter((m) => m.rating >= filters.minRating!);
   }
 
-  if (filters.maxHourlyRate) {
-    result = result.filter((m) => m.hourlyRate <= filters.maxHourlyRate!);
+  // #53: both bounds come from the shared normalizer, so a malformed or
+  // inverted range is corrected here exactly as the UI corrects it.
+  const rateRange = normalizeHourlyRateRange({
+    min: filters.minHourlyRate,
+    max: filters.maxHourlyRate,
+  });
+
+  if (rateRange.min !== undefined) {
+    result = result.filter((m) => m.hourlyRate >= rateRange.min!);
+  }
+
+  if (rateRange.max !== undefined) {
+    result = result.filter((m) => m.hourlyRate <= rateRange.max!);
   }
 
   if (filters.availability && filters.availability.length > 0) {

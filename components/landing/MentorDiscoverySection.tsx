@@ -3,6 +3,7 @@ import MentorCard, { MentorCardProps } from "./MentorCard";
 
 const FEATURED_MENTORS: MentorCardProps[] = [
   {
+    id: "1",
     name: "James Okafor",
     title: "Staff Software Engineer · Meta",
     description:
@@ -14,6 +15,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     sessions: 320,
   },
   {
+    id: "2",
     name: "Aisha Nwosu",
     title: "Principal Product Manager · Stripe",
     description:
@@ -25,6 +27,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     sessions: 210,
   },
   {
+    id: "3",
     name: "Marcus Liu",
     title: "Lead UX Designer · Figma",
     description:
@@ -36,6 +39,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     sessions: 175,
   },
   {
+    id: "4",
     name: "Priya Sharma",
     title: "Senior Data Scientist · Netflix",
     description:
@@ -47,6 +51,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     sessions: 142,
   },
   {
+    id: "5",
     name: "David Torres",
     title: "Engineering Manager · Shopify",
     description:
@@ -58,6 +63,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     sessions: 198,
   },
   {
+    id: "6",
     name: "Fatima Al-Rashid",
     title: "Startup Founder & Angel Investor",
     description:
@@ -98,8 +104,10 @@ export default function MentorDiscoverySection() {
         {/* Mentor grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" role="list" aria-label="Featured mentors">
           {FEATURED_MENTORS.map((mentor) => (
-            <article key={mentor.name} role="listitem">
-              <MentorCard {...mentor} profileHref={`/mentors/${mentor.name.toLowerCase().replace(/\s+/g, "-")}`} />
+            <article key={mentor.id ?? mentor.name} role="listitem">
+              {/* #59: no explicit profileHref — MentorCard resolves
+                  /mentors/[mentorId] from the mentor's id. */}
+              <MentorCard {...mentor} />
             </article>
           ))}
         </div>

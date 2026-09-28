@@ -11,6 +11,7 @@ const FILTER_PARAMS: (keyof MentorFilters)[] = [
   "experience",
   "industry",
   "minRating",
+  "minHourlyRate",
   "maxHourlyRate",
   "availability",
   "sortBy",
@@ -19,6 +20,25 @@ const FILTER_PARAMS: (keyof MentorFilters)[] = [
 
 const ARRAY_PARAMS: (keyof MentorFilters)[] = ["expertise", "experience", "industry", "availability"];
 
+const NUMERIC_PARAMS: (keyof MentorFilters)[] = [
+  "minRating",
+  "minHourlyRate",
+  "maxHourlyRate",
+];
+
+function readFilterParam(param: keyof MentorFilters, value: string): unknown {
+  if (ARRAY_PARAMS.includes(param)) {
+    return value.split(",").filter(Boolean);
+  }
+  if (NUMERIC_PARAMS.includes(param)) {
+    const parsed = Number(value);
+    // Drop malformed values rather than storing NaN, which would render as an
+    // invalid slider value and count as an active filter.
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return value;
+}
+
 export function useUrlFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -26,7 +46,7 @@ export function useUrlFilters() {
 
   const [filters, setFilters] = useState<MentorFilters>(() => {
     const initialFilters: MentorFilters = {};
-    
+
     FILTER_PARAMS.forEach((param) => {
       const value = searchParams.get(param);
       if (value) {
