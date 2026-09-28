@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import CategoryBadge from "@/components/resources/CategoryBadge";
 import { memo, useDeferredValue, useMemo, useState } from "react";
 
 export interface ResourceListItem {
@@ -90,9 +91,7 @@ const ResourceListCard = memo(function ResourceListCard({
 	return (
 		<li className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-indigo-200 hover:shadow-md">
 			<div className="mb-3 flex items-center justify-between gap-3">
-				<span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
-					{item.type}
-				</span>
+				<CategoryBadge label={item.type} />
 				<span className="text-xs text-slate-500">{item.readMinutes} min read</span>
 			</div>
 
@@ -100,9 +99,7 @@ const ResourceListCard = memo(function ResourceListCard({
 			<p className="mt-3 text-sm leading-relaxed text-slate-600">{item.summary}</p>
 
 			<div className="mt-5 flex items-center justify-between gap-3">
-				<span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-					{item.tag}
-				</span>
+				<CategoryBadge label={item.tag} variant="slate" />
 				<Link
 					href="/resources"
 					prefetch={false}
