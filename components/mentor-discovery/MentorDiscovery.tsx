@@ -7,8 +7,7 @@ import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
-import ExpertiseFilter from "@/components/mentor-discovery/ExpertiseFilter";
+import MentorFilterSidebar from "@/components/mentor-discovery/MentorFilterSidebar";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
 import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
 import MentorPagination from "@/components/mentor/MentorPagination";
@@ -280,72 +279,11 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
       <MentorDiscoveryLayout
         sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
         sidebar={
-            <>
-              <ExpertiseFilter
-                selectedExpertise={filters.expertise || []}
-                onChange={(newExpertise) => {
-                  updateFilters(
-                    {
-                      ...filters,
-                      expertise: newExpertise.length > 0 ? newExpertise : undefined,
-                    },
-                    { replace: true }
-                  );
-                }}
-              />
-
-              <ExperienceLevelFilter
-                selectedLevels={filters.experience || []}
-                onChange={(newLevels) => {
-                  updateFilters(
-                    {
-                      ...filters,
-                      experience: newLevels.length > 0 ? newLevels : undefined,
-                    },
-                    { replace: true }
-                  );
-                }}
-              />
-
-              <IndustryFilter
-                selectedIndustries={filters.industry || []}
-                onChange={(newIndustries) => {
-                  updateFilters(
-                    {
-                      ...filters,
-                      industry: newIndustries.length > 0 ? newIndustries : undefined,
-                    },
-                    { replace: true }
-                  );
-                }}
-              />
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Minimum Rating</h3>
-                <select
-                  value={filters.minRating || ""}
-                  onChange={(e) => updateFilters({ ...filters, minRating: Number(e.target.value) || undefined }, { replace: true })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">Any rating</option>
-                  <option value={4.5}>4.5+</option>
-                  <option value={4.0}>4.0+</option>
-                  <option value={3.5}>3.5+</option>
-                  <option value={3.0}>3.0+</option>
-                </select>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Max Hourly Rate</h3>
-                <input
-                  type="number"
-                  value={filters.maxHourlyRate || ""}
-                  onChange={(e) => updateFilters({ ...filters, maxHourlyRate: Number(e.target.value) || undefined }, { replace: true })}
-                  placeholder="e.g., 200"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </>
+          <MentorFilterSidebar
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onClearFilters={handleClearFilters}
+          />
         }
       >
           <div>

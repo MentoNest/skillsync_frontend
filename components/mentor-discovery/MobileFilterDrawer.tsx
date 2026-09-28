@@ -1,47 +1,36 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { Mentor, MentorFilters } from "@/lib/mentor-types";
-import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
-import Link from "next/link";
-import { useUrlFilters } from "@/lib/url-filters";
-import { mentorApi } from "@/lib/api";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
-import ExpertiseFilter from "@/components/mentor-discovery/ExpertiseFilter";
-import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
-import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
+import { useEffect, useRef } from "react";
+import { MentorFilters } from "@/lib/mentor-types";
+import { createPortal } from "react-dom";
+import MentorFilterSidebar from "@/components/mentor-discovery/MentorFilterSidebar";
 
-interface MentorDiscoveryProps {
-  /**
-   * Whether a fixed site navbar (h-16) sits above the page. The public
-   * `/mentors` route has one; the mentee dashboard does not.
-   */
-  belowFixedNavbar?: boolean;
+interface MobileFilterDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  filters: MentorFilters;
+  onFiltersChange: (filters: MentorFilters) => void;
+  onClearFilters: () => void;
+  onApplyFilters: () => void;
 }
 
-const EXPERIENCE_LABELS: Record<string, string> = {
-  junior: "Junior",
-  mid: "Mid-level",
-  senior: "Senior",
-  lead: "Lead",
-  principal: "Principal",
-};
+const SORT_OPTIONS = [
+  { value: "rating", label: "Highest Rated" },
+  { value: "sessions", label: "Most Sessions" },
+  { value: "hourlyRate", label: "Price: Low to High" },
+  { value: "relevance", label: "Relevance" },
+];
 
-function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) {
-  const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
-  const [mentors, setMentors] = useState<Mentor[]>([]);
-  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+export default function MobileFilterDrawer({
+  isOpen,
+  onClose,
+  filters,
+  onFiltersChange,
+  onClearFilters,
+  onApplyFilters,
+}: MobileFilterDrawerProps) {
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("bookmarkedMentors");
@@ -93,120 +82,17 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
     [filters]
   );
 
-  useEffect(() => {
-    fetchMentors(1, false);
-  }, [fetchMentors]);
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            <MentorFilterSidebar
+              filters={filters}
+              onFiltersChange={onFiltersChange}
+              onClearFilters={onClearFilters}
+              variant="pills"
+              showHeader={false}
+            />
 
-  const handleLoadMore = useCallback(() => {
-    if (!isLoading && !isLoadingMore && hasMore) {
-      fetchMentors(currentPage + 1, true);
-    }
-  }, [isLoading, isLoadingMore, hasMore, currentPage, fetchMentors]);
-
-  const { resetInfiniteScroll } = useInfiniteScroll({
-    isLoading: isLoadingMore,
-    hasMore,
-    onLoadMore: handleLoadMore,
-    loadMoreRef,
-  });
-
-  useEffect(() => {
-    resetInfiniteScroll();
-  }, [filters, resetInfiniteScroll]);
-
-  const handleFiltersChange = (newFilters: MentorFilters) => {
-    updateFilters(newFilters, { replace: true });
-  };
-
-  const handleClearFilters = () => {
-    clearFilters();
-  };
-
-  const toggleBookmark = (mentorId: string) => {
-    setBookmarkedIds((prev) => {
-      const updated = prev.includes(mentorId)
-        ? prev.filter((id) => id !== mentorId)
-        : [...prev, mentorId];
-      localStorage.setItem("bookmarkedMentors", JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  const activeFilterCount = Object.values(filters).flat().filter(Boolean).length +
-    (filters.minRating ? 1 : 0) +
-    (filters.maxHourlyRate ? 1 : 0);
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="text-center">
-          <svg className="mx-auto h-16 w-16 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          <h2 className="mt-4 text-xl font-semibold text-slate-900">Something went wrong</h2>
-          <p className="mt-2 text-slate-600">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
-          >
-            Try again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <header className={`bg-white border-b border-slate-200 sticky z-40 ${belowFixedNavbar ? "top-16" : "top-0"}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-slate-900">Find Mentors</h1>
-              <span className="px-2 py-0.5 text-sm font-medium bg-indigo-50 text-indigo-700 rounded-full">
-                {mentors.length} mentor{mentors.length !== 1 ? "s" : ""}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsMobileFiltersOpen(true)}
-                className="lg:hidden inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-                aria-label="Open filter drawer"
-              >
-                <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
-              {hasActiveFilters && (
-                <button
-                  onClick={handleClearFilters}
-                  className="hidden sm:inline-flex text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-                >
-                  Clear filters
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="hidden lg:block px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-100 bg-slate-50">
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <label htmlFor="search" className="sr-only">Search mentors</label>
-              <input
-                type="search"
-                id="search"
-                placeholder="Search mentors by name, skill, or company..."
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-            <div className="flex items-center gap-4">
+            <div>
+              <h3 className="text-sm font-medium text-slate-900 mb-3">Sort By</h3>
               <select
                 value={filters.sortBy || "relevance"}
                 onChange={(e) => updateFilters({ ...filters, sortBy: e.target.value as MentorFilters["sortBy"] }, { replace: true })}
@@ -504,19 +390,5 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
   );
 }
 
-export default function MentorDiscovery(props: MentorDiscoveryProps) {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
-          <div className="flex items-center gap-3 text-slate-500 font-medium">
-            <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-            Loading mentors...
-          </div>
-        </div>
-      }
-    >
-      <MentorsPageContent {...props} />
-    </Suspense>
-  );
+  return createPortal(drawerContent, document.body);
 }
