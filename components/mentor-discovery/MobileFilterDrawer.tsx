@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MentorFilters } from "@/lib/mentor-types";
 import { createPortal } from "react-dom";
+import SearchInput from "./SearchInput";
 
 interface MobileFilterDrawerProps {
   isOpen: boolean;
@@ -141,6 +142,17 @@ export default function MobileFilterDrawer({
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            {/* Search Input */}
+            <div>
+              <h3 className="text-sm font-medium text-slate-900 mb-3">Search</h3>
+              <SearchInput
+                value={filters.search || ""}
+                onChange={(value) => onFiltersChange({ ...filters, search: value || undefined })}
+                placeholder="Search mentors..."
+                debounceMs={300}
+              />
+            </div>
+
             <div>
               <h3 className="text-sm font-medium text-slate-900 mb-3">Expertise</h3>
               <div className="flex flex-wrap gap-2">
