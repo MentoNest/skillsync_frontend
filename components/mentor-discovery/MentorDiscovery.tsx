@@ -8,7 +8,7 @@ import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
-import ExperienceLevelFilter from "@/components/mentor-discovery/ExperienceLevelFilter";
+import ExpertiseFilter from "@/components/mentor-discovery/ExpertiseFilter";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
 import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
 import MentorPagination from "@/components/mentor/MentorPagination";
@@ -281,29 +281,18 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
         sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
         sidebar={
             <>
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Expertise</h3>
-                <div className="space-y-2">
-                  {["Frontend", "Backend", "Full Stack", "Mobile", "DevOps", "Data Science", "Machine Learning", "Product Management", "UX Design", "QA Engineering"].map((exp) => (
-                    <label key={exp} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.expertise?.includes(exp) || false}
-                        onChange={(e) => {
-                          const newExp = filters.expertise || [];
-                          if (e.target.checked) {
-                            updateFilters({ ...filters, expertise: [...newExp, exp] }, { replace: true });
-                          } else {
-                            updateFilters({ ...filters, expertise: newExp.filter((e) => e !== exp) }, { replace: true });
-                          }
-                        }}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-slate-700">{exp}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+              <ExpertiseFilter
+                selectedExpertise={filters.expertise || []}
+                onChange={(newExpertise) => {
+                  updateFilters(
+                    {
+                      ...filters,
+                      expertise: newExpertise.length > 0 ? newExpertise : undefined,
+                    },
+                    { replace: true }
+                  );
+                }}
+              />
 
               <ExperienceLevelFilter
                 selectedLevels={filters.experience || []}
@@ -359,7 +348,40 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
             </>
         }
       >
-          <div ref={mentorListRef}>
+          <div>
+            {/* Active expertise filter badges */}
+            {filters.expertise && filters.expertise.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active expertise filters">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Expertise:
+                </span>
+                {filters.expertise.map((exp) => (
+                  <button
+                    key={exp}
+                    onClick={() => {
+                      const newExp = filters.expertise?.filter((e) => e !== exp) || [];
+                      updateFilters(
+                        { ...filters, expertise: newExp.length > 0 ? newExp : undefined },
+                        { replace: true }
+                      );
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors group"
+                    aria-label={`Remove ${exp} expertise filter`}
+                  >
+                    <span>{exp}</span>
+                    <svg className="w-3.5 h-3.5 text-indigo-500 group-hover:text-indigo-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                ))}
+                <button
+                  onClick={() => updateFilters({ ...filters, expertise: undefined }, { replace: true })}
+                  className="text-xs text-slate-500 hover:text-indigo-600 underline font-medium ml-1"
+                >
+                  Clear all expertise
+                </button>
+              </div>
+            )}
             {/* Active industry filter badges */}
             {filters.industry && filters.industry.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active industry filters">
