@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
-import { CommunityHeroBanner } from "@/components/community/CommunityHeroBanner";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
 import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
@@ -21,7 +22,7 @@ export default function CommunityPage() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Real-time updates
-  const { isConnected, lastEvent } = useCommunityRealtime({
+  const { isConnected } = useCommunityRealtime({
     onNewDiscussion: (discussion) => {
       const newDisc = discussion as Discussion;
       if (!newDisc?.id) return;
@@ -132,18 +133,42 @@ export default function CommunityPage() {
     <div className="min-h-screen bg-[var(--background)]">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">
-            Community
-          </h1>
-          <p className="mt-2 text-[var(--muted)]">
-            Connect, share, and learn with fellow mentees and mentors
-          </p>
-          {isConnected && (
-            <span className="mt-2 inline-flex items-center gap-1 text-sm text-green-600">
-              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              Live updates enabled
-            </span>
-          )}
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-[var(--foreground)]">
+                Community
+              </h1>
+              <p className="mt-2 text-[var(--muted)]">
+                Connect, share, and learn with fellow mentees and mentors
+              </p>
+              {isConnected && (
+                <span className="mt-2 inline-flex items-center gap-1 text-sm text-green-600">
+                  <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  Live updates enabled
+                </span>
+              )}
+            </div>
+            <Link
+              href="/community/saved"
+              className="inline-flex items-center gap-1 rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+              Saved discussions
+            </Link>
+          </div>
         </div>
 
         <CommunityHeroBanner />
