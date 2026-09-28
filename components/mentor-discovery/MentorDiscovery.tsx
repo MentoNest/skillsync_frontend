@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import IndustryFilter from "@/components/mentor-discovery/IndustryFilter";
+import MentorFilterSidebar from "@/components/mentor-discovery/MentorFilterSidebar";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
 import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
 
@@ -233,94 +233,11 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
       <MentorDiscoveryLayout
         sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
         sidebar={
-            <>
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Expertise</h3>
-                <div className="space-y-2">
-                  {["Frontend", "Backend", "Full Stack", "Mobile", "DevOps", "Data Science", "Machine Learning", "Product Management", "UX Design", "QA Engineering"].map((exp) => (
-                    <label key={exp} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.expertise?.includes(exp) || false}
-                        onChange={(e) => {
-                          const newExp = filters.expertise || [];
-                          if (e.target.checked) {
-                            updateFilters({ ...filters, expertise: [...newExp, exp] }, { replace: true });
-                          } else {
-                            updateFilters({ ...filters, expertise: newExp.filter((e) => e !== exp) }, { replace: true });
-                          }
-                        }}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-slate-700">{exp}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Experience Level</h3>
-                <div className="space-y-2">
-                  {["junior", "mid", "senior", "lead", "principal"].map((exp) => (
-                    <label key={exp} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.experience?.includes(exp) || false}
-                        onChange={(e) => {
-                          const newExp = filters.experience || [];
-                          if (e.target.checked) {
-                            updateFilters({ ...filters, experience: [...newExp, exp] }, { replace: true });
-                          } else {
-                            updateFilters({ ...filters, experience: newExp.filter((e) => e !== exp) }, { replace: true });
-                          }
-                        }}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-slate-700 capitalize">{exp}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <IndustryFilter
-                selectedIndustries={filters.industry || []}
-                onChange={(newIndustries) => {
-                  updateFilters(
-                    {
-                      ...filters,
-                      industry: newIndustries.length > 0 ? newIndustries : undefined,
-                    },
-                    { replace: true }
-                  );
-                }}
-              />
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Minimum Rating</h3>
-                <select
-                  value={filters.minRating || ""}
-                  onChange={(e) => updateFilters({ ...filters, minRating: Number(e.target.value) || undefined }, { replace: true })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">Any rating</option>
-                  <option value={4.5}>4.5+</option>
-                  <option value={4.0}>4.0+</option>
-                  <option value={3.5}>3.5+</option>
-                  <option value={3.0}>3.0+</option>
-                </select>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Max Hourly Rate</h3>
-                <input
-                  type="number"
-                  value={filters.maxHourlyRate || ""}
-                  onChange={(e) => updateFilters({ ...filters, maxHourlyRate: Number(e.target.value) || undefined }, { replace: true })}
-                  placeholder="e.g., 200"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </>
+          <MentorFilterSidebar
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onClearFilters={handleClearFilters}
+          />
         }
       >
           <div>
