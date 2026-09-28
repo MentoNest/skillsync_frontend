@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
+import { normalizeHourlyRateRange } from "@/lib/hourly-rate";
+
+const NUMERIC_QUERY_KEYS = ["minRating", "minHourlyRate", "maxHourlyRate"];
 
 const MOCK_MENTORS: Mentor[] = [
   {
@@ -237,8 +240,19 @@ function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
     result = result.filter((m) => m.rating >= filters.minRating!);
   }
 
-  if (filters.maxHourlyRate) {
-    result = result.filter((m) => m.hourlyRate <= filters.maxHourlyRate!);
+  // #53: both bounds come from the shared normalizer, so a malformed or
+  // inverted range is corrected here exactly as the UI corrects it.
+  const rateRange = normalizeHourlyRateRange({
+    min: filters.minHourlyRate,
+    max: filters.maxHourlyRate,
+  });
+
+  if (rateRange.min !== undefined) {
+    result = result.filter((m) => m.hourlyRate >= rateRange.min!);
+  }
+
+  if (rateRange.max !== undefined) {
+    result = result.filter((m) => m.hourlyRate <= rateRange.max!);
   }
 
   if (filters.availability && filters.availability.length > 0) {
@@ -293,7 +307,11 @@ export async function GET(request: NextRequest) {
         key !== "limit" &&
         !arrayFilterKeys.includes(key as keyof MentorFilters)
       ) {
-        if (key === "minRating" || key === "maxHourlyRate") {
+        if (NUMERIC_QUERY_KEYS.includes(key)) {
+          // An empty numeric param means "no filter". Coercing it with
+          // Number() first would turn "" into 0, which is a real bound and
+          // would exclude every mentor.
+          if (value.trim() === "") return;
           (filters as Record<string, unknown>)[key] = Number(value);
         } else {
           (filters as Record<string, unknown>)[key] = value;

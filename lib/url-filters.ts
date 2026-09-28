@@ -9,6 +9,7 @@ const FILTER_PARAMS: (keyof MentorFilters)[] = [
   "experience",
   "industry",
   "minRating",
+  "minHourlyRate",
   "maxHourlyRate",
   "availability",
   "sortBy",
@@ -17,6 +18,25 @@ const FILTER_PARAMS: (keyof MentorFilters)[] = [
 
 const ARRAY_PARAMS: (keyof MentorFilters)[] = ["expertise", "experience", "industry", "availability"];
 
+const NUMERIC_PARAMS: (keyof MentorFilters)[] = [
+  "minRating",
+  "minHourlyRate",
+  "maxHourlyRate",
+];
+
+function readFilterParam(param: keyof MentorFilters, value: string): unknown {
+  if (ARRAY_PARAMS.includes(param)) {
+    return value.split(",").filter(Boolean);
+  }
+  if (NUMERIC_PARAMS.includes(param)) {
+    const parsed = Number(value);
+    // Drop malformed values rather than storing NaN, which would render as an
+    // invalid slider value and count as an active filter.
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return value;
+}
+
 export function useUrlFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -24,16 +44,13 @@ export function useUrlFilters() {
 
   const [filters, setFilters] = useState<MentorFilters>(() => {
     const initialFilters: MentorFilters = {};
-    
+
     FILTER_PARAMS.forEach((param) => {
       const value = searchParams.get(param);
       if (value) {
-        if (ARRAY_PARAMS.includes(param)) {
-          (initialFilters as Record<string, unknown>)[param] = value.split(",").filter(Boolean);
-        } else if (param === "minRating" || param === "maxHourlyRate") {
-          (initialFilters as Record<string, unknown>)[param] = Number(value);
-        } else {
-          (initialFilters as Record<string, unknown>)[param] = value;
+        const parsed = readFilterParam(param, value);
+        if (parsed !== undefined) {
+          (initialFilters as Record<string, unknown>)[param] = parsed;
         }
       }
     });
@@ -101,12 +118,9 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams): Mento
   FILTER_PARAMS.forEach((param) => {
     const value = searchParams.get(param);
     if (value) {
-      if (ARRAY_PARAMS.includes(param)) {
-        (filters as Record<string, unknown>)[param] = value.split(",").filter(Boolean);
-      } else if (param === "minRating" || param === "maxHourlyRate") {
-        (filters as Record<string, unknown>)[param] = Number(value);
-      } else {
-        (filters as Record<string, unknown>)[param] = value;
+      const parsed = readFilterParam(param, value);
+      if (parsed !== undefined) {
+        (filters as Record<string, unknown>)[param] = parsed;
       }
     }
   });

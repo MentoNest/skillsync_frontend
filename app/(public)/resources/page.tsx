@@ -3,6 +3,7 @@ import Link from "next/link";
 import ResourceCard, {
   ResourceCardProps,
 } from "@/components/resources/ResourceCard";
+import ResourcesExplorer from "@/components/resources/ResourcesExplorer";
 
 /**
  * Per-category resource entries.
@@ -256,6 +257,9 @@ export default function ResourcesPage() {
           </ul>
         </div>
       </nav>
+
+      {/* Search, Quick Access and learning tracks */}
+      <ResourcesExplorer />
 
       {/* Categories */}
       {RESOURCE_CATEGORIES.map((category) => (
