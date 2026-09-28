@@ -5,6 +5,7 @@ import ResourceCard, {
 } from "@/components/resources/ResourceCard";
 import FeaturedLearningTracks from "@/components/resources/FeaturedLearningTracks";
 import FeaturedArticles from "@/components/resources/FeaturedArticles";
+import ResourceTools from "@/components/resources/ResourceTools";
 import { RESOURCE_ARTICLES, RESOURCE_TRACKS } from "@/lib/resources-data";
 
 /**
@@ -173,6 +174,30 @@ const RESOURCE_CATEGORIES: {
   },
 ];
 
+/** Quick Access tiles: one per major section, linking to its in-page anchor. */
+const QUICK_ACCESS: { href: string; title: string; description: string }[] = [
+  {
+    href: "#featured-tracks",
+    title: "Learning tracks",
+    description: "Structured, step-by-step paths.",
+  },
+  {
+    href: "#featured-articles",
+    title: "Articles",
+    description: "Short reads on one specific thing.",
+  },
+  {
+    href: "#sessions",
+    title: "Recorded sessions",
+    description: "Mentor sessions, edited down.",
+  },
+  {
+    href: "#tools",
+    title: "Tools & templates",
+    description: "Resume builder and career planner.",
+  },
+];
+
 export const metadata: Metadata = {
   title: "Learning Resources · SkillSync",
   description:
@@ -218,7 +243,7 @@ export default function ResourcesPage() {
               Learning resources
             </span>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight break-words">
               Learn from people who have already done it
             </h1>
 
@@ -232,27 +257,40 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      {/* Category jump list */}
+      {/* Quick Access: 4 columns on desktop, 2 on tablet, 1 on mobile */}
       <nav
-        aria-labelledby="resources-categories-heading"
+        aria-labelledby="resources-quick-access-heading"
         className="border-y border-slate-200 bg-white"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h2
-            id="resources-categories-heading"
+            id="resources-quick-access-heading"
             className="text-sm font-semibold text-slate-900 mb-4"
           >
-            Browse by category
+            Quick access
           </h2>
 
-          <ul className="flex flex-wrap gap-3">
-            {RESOURCE_CATEGORIES.map((category) => (
-              <li key={category.id}>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {QUICK_ACCESS.map((item) => (
+              <li key={item.href} className="flex min-w-0">
                 <a
-                  href={`#${category.id}`}
-                  className="inline-flex items-center px-4 py-2 rounded-full border border-slate-300 text-sm font-medium text-slate-700 transition-colors hover:border-indigo-400 hover:text-indigo-700 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  href={item.href}
+                  className="group flex w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 transition-colors hover:border-indigo-300 hover:bg-indigo-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                 >
-                  {category.title}
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-slate-900 group-hover:text-indigo-700">
+                      {item.title}
+                    </span>
+                    <span className="mt-0.5 block text-sm text-slate-600 break-words">
+                      {item.description}
+                    </span>
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-indigo-600"
+                  >
+                    →
+                  </span>
                 </a>
               </li>
             ))}
@@ -307,6 +345,8 @@ export default function ResourcesPage() {
           </div>
         </section>
       ))}
+
+      <ResourceTools />
 
       {/* Closing CTA */}
       <section className="py-16 lg:py-20 bg-slate-50">
