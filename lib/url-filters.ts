@@ -3,12 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { MentorFilters } from "./mentor-types";
+import { normalizeSearchTerm } from "./mentor-search";
 
 const FILTER_PARAMS: (keyof MentorFilters)[] = [
+  "search",
   "expertise",
   "experience",
   "industry",
   "minRating",
+  "minHourlyRate",
   "maxHourlyRate",
   "availability",
   "sortBy",
@@ -17,6 +20,25 @@ const FILTER_PARAMS: (keyof MentorFilters)[] = [
 
 const ARRAY_PARAMS: (keyof MentorFilters)[] = ["expertise", "experience", "industry", "availability"];
 
+const NUMERIC_PARAMS: (keyof MentorFilters)[] = [
+  "minRating",
+  "minHourlyRate",
+  "maxHourlyRate",
+];
+
+function readFilterParam(param: keyof MentorFilters, value: string): unknown {
+  if (ARRAY_PARAMS.includes(param)) {
+    return value.split(",").filter(Boolean);
+  }
+  if (NUMERIC_PARAMS.includes(param)) {
+    const parsed = Number(value);
+    // Drop malformed values rather than storing NaN, which would render as an
+    // invalid slider value and count as an active filter.
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return value;
+}
+
 export function useUrlFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -24,11 +46,16 @@ export function useUrlFilters() {
 
   const [filters, setFilters] = useState<MentorFilters>(() => {
     const initialFilters: MentorFilters = {};
-    
+
     FILTER_PARAMS.forEach((param) => {
       const value = searchParams.get(param);
       if (value) {
-        if (ARRAY_PARAMS.includes(param)) {
+        if (param === "search") {
+          const normalized = normalizeSearchTerm(value);
+          if (normalized) {
+            (initialFilters as Record<string, unknown>)[param] = normalized;
+          }
+        } else if (ARRAY_PARAMS.includes(param)) {
           (initialFilters as Record<string, unknown>)[param] = value.split(",").filter(Boolean);
         } else if (param === "minRating" || param === "maxHourlyRate") {
           (initialFilters as Record<string, unknown>)[param] = Number(value);
@@ -101,7 +128,12 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams): Mento
   FILTER_PARAMS.forEach((param) => {
     const value = searchParams.get(param);
     if (value) {
-      if (ARRAY_PARAMS.includes(param)) {
+      if (param === "search") {
+        const normalized = normalizeSearchTerm(value);
+        if (normalized) {
+          (filters as Record<string, unknown>)[param] = normalized;
+        }
+      } else if (ARRAY_PARAMS.includes(param)) {
         (filters as Record<string, unknown>)[param] = value.split(",").filter(Boolean);
       } else if (param === "minRating" || param === "maxHourlyRate") {
         (filters as Record<string, unknown>)[param] = Number(value);
