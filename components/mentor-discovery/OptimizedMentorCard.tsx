@@ -4,6 +4,7 @@ import { memo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MentorCardProps } from "@/components/landing/MentorCard";
+import { mentorProfileHref } from "@/lib/mentor-types";
 import MentorRating from "./MentorRating";
 export { default as MentorCardSkeleton } from "@/components/landing/MentorCardSkeleton";
 export { MentorRating };
@@ -16,6 +17,7 @@ interface OptimizedMentorCardProps extends MentorCardProps {
 }
 
 const OptimizedMentorCard = memo(function OptimizedMentorCard({
+  id,
   name,
   title,
   description,
@@ -24,20 +26,28 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
   avatarColor,
   rating,
   sessions,
-  profileHref = "/register",
+  profileHref,
   children,
   onBookmark,
   onCompare,
   isBookmarked = false,
   isSelectedForComparison = false,
 }: OptimizedMentorCardProps) {
+  // #59: default the CTA to this mentor's own profile route rather than
+  // /register, so the link always carries the correct mentor id.
+  const resolvedHref =
+    profileHref ||
+    (id
+      ? mentorProfileHref(id)
+      : `/mentors/${name.toLowerCase().replace(/\s+/g, "-")}`);
+
   const handleBookmark = useCallback(() => {
     onBookmark?.(name);
   }, [onBookmark, name]);
 
   const handleCompare = useCallback(() => {
-    onCompare?.({ name, title, description, skills, avatarInitials, avatarColor, rating, sessions, profileHref });
-  }, [onCompare, name, title, description, skills, avatarInitials, avatarColor, rating, sessions, profileHref]);
+    onCompare?.({ name, title, description, skills, avatarInitials, avatarColor, rating, sessions, profileHref: resolvedHref });
+  }, [onCompare, name, title, description, skills, avatarInitials, avatarColor, rating, sessions, resolvedHref]);
 
   return (
     <article className="group flex flex-col bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 overflow-hidden">
@@ -87,7 +97,8 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
           <>
             {children}
             <Link
-              href={profileHref}
+              href={resolvedHref}
+              data-mentor-id={id}
               className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-3"
               aria-label={`View ${name}'s profile`}
             >
@@ -96,7 +107,8 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
           </>
         ) : (
           <Link
-            href={profileHref}
+            href={resolvedHref}
+            data-mentor-id={id}
             className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             aria-label={`View ${name}'s profile`}
           >
