@@ -1,43 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { MOCK_MENTORS } from "@/lib/mock-mentors";
 
-const bookmarkedMentors = new Set<string>();
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { id } = await params;
-    bookmarkedMentors.add(id);
+    const searchParams = request.nextUrl.searchParams;
+    const ids = searchParams.get("ids")?.split(",").filter(Boolean) || [];
 
-    return NextResponse.json({
-      success: true,
-      isBookmarked: true,
-    });
+    const mentors = MOCK_MENTORS.filter((m) => ids.includes(m.id));
+
+    return NextResponse.json(mentors);
   } catch (error) {
-    console.error("Error bookmarking mentor:", error);
+    console.error("Error fetching bookmarked mentors:", error);
     return NextResponse.json(
-      { error: "Failed to bookmark mentor" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    bookmarkedMentors.delete(id);
-
-    return NextResponse.json({
-      success: true,
-    });
-  } catch (error) {
-    console.error("Error removing bookmark:", error);
-    return NextResponse.json(
-      { error: "Failed to remove bookmark" },
+      { error: "Failed to fetch bookmarked mentors" },
       { status: 500 }
     );
   }
