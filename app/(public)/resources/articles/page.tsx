@@ -1,39 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import ResourceSearchList, {
-	ResourceListItem,
-} from "@/components/resources/ResourceSearchList";
-
-const RESOURCE_ARTICLES: ResourceListItem[] = [
-	{
-		title: "What mentorship is actually for",
-		summary: "A mentor makes a difficult path legible. Learn how to use support without outsourcing your thinking.",
-		type: "Article",
-		readMinutes: 6,
-		tag: "Career",
-	},
-	{
-		title: "How to ask a question a mentor can answer",
-		summary: "Specific questions produce useful advice. Here is a framework that gets you answers worth acting on.",
-		type: "Article",
-		readMinutes: 5,
-		tag: "Communication",
-	},
-	{
-		title: "When to change jobs, and when to stay",
-		summary: "Make a decision based on the right signal, not just the loudest story in the room.",
-		type: "Article",
-		readMinutes: 9,
-		tag: "Career",
-	},
-	{
-		title: "The weekly review that keeps momentum",
-		summary: "A simple reflection habit helps you notice progress and spot drag before it becomes a crisis.",
-		type: "Article",
-		readMinutes: 7,
-		tag: "Growth",
-	},
-];
+import ResourceSearchList from "@/components/resources/ResourceSearchList";
+import { RESOURCE_ARTICLES } from "@/lib/resources-data";
 
 export const metadata: Metadata = {
 	title: "Articles · Learning Resources · SkillSync",
