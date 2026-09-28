@@ -15,5 +15,5 @@ export const metadata: Metadata = {
  * server component so it can export metadata.
  */
 export default function MentorsPage() {
-  return <MentorDiscovery belowFixedNavbar />;
+  return <MentorDiscovery belowFixedNavbar usePagination pageSize={12} />;
 }
