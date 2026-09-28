@@ -199,7 +199,9 @@ export const metadata: Metadata = {
  */
 export default function ResourcesPage() {
   return (
-    <main>
+    // Not a `<main>`: the (public) layout already renders one, and nesting
+    // landmarks is invalid HTML.
+    <div>
       {/* Hero */}
       <section className="relative pt-16 pb-16 lg:pt-24 lg:pb-20 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50">
         <div
@@ -325,6 +327,6 @@ export default function ResourcesPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
