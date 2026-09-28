@@ -11,6 +11,7 @@ The Community module provides a discussion platform for SkillSync users to conne
 | `/community` | Main community feed with discussions |
 | `/community/[category]` | Category-filtered discussions |
 | `/community/[category]/[id]` | Individual discussion detail |
+| `/community/saved` | Discussions bookmarked by the signed-in user (#1013) |
 | `/admin/moderation` | Moderation dashboard (moderators only) |
 
 ## Component Hierarchy
@@ -23,10 +24,14 @@ CommunityPage
 │   └── Search input
 ├── CommunityFeed
 │   ├── DiscussionCard (or MemoizedDiscussionCard)
+│   │   ├── DiscussionActions
+│   │   │   ├── FollowButton (follow author)      #1015
+│   │   │   ├── Bookmark toggle                   #1013
+│   │   │   └── ShareDiscussionButton (copy/native share) #1016
 │   │   └── DiscussionModeration (moderator only)
 │   └── Infinite scroll trigger
 ├── CommunitySidebar
-│   ├── Category list
+│   ├── Category list with FollowButton per category #1014
 │   └── Community guidelines
 └── NotificationDropdown
     └── Notification list
@@ -40,6 +45,32 @@ CommunityPage
 - `POST /api/community/discussions` - Create a new discussion
 - `PATCH /api/community/discussions/[id]/pin` - Pin/unpin a discussion
 - `PATCH /api/community/discussions/[id]/lock` - Lock/unlock a discussion
+- `POST /api/community/discussions/[id]/share` - Record a share, returns the canonical URL and share count (#1016)
+
+### Bookmarks (#1013)
+
+- `GET /api/community/discussions/saved` - Discussions bookmarked by the viewer, newest first
+- `GET /api/community/discussions/[id]/bookmark` - Current bookmark state
+- `POST /api/community/discussions/[id]/bookmark` - Bookmark a discussion
+- `DELETE /api/community/discussions/[id]/bookmark` - Remove a bookmark
+
+### User follows (#1015)
+
+- `GET /api/community/users/following` - Members the viewer follows
+- `GET /api/community/users/[id]/follow` - Current follow state for one member
+- `POST /api/community/users/[id]/follow` - Follow a member
+- `DELETE /api/community/users/[id]/follow` - Unfollow a member
+
+### Category follows (#1014)
+
+- `GET /api/community/categories/following` - Followed category ids in display order
+- `GET /api/community/categories/[id]/follow` - Current follow state for one category
+- `POST /api/community/categories/[id]/follow` - Follow a category
+- `DELETE /api/community/categories/[id]/follow` - Unfollow a category
+
+All social endpoints scope their state to the viewer, resolved from the
+`x-user-id` request header (sent by `lib/community-api.ts`), the
+`skillsync-user-id` cookie, or the shared demo viewer.
 
 ### Notifications
 
@@ -65,6 +96,13 @@ The module uses React hooks for state management:
 
 - `useCommunityRealtime` - Manages SSE connection and real-time updates
 - `useInfiniteScroll` - Handles infinite scroll with IntersectionObserver
+- `useDiscussionBookmark` - Bookmark state for a discussion (#1013)
+- `useUserFollow` - Follow state for a community member (#1015)
+- `useCategoryFollows` - Followed categories for the sidebar (#1014)
+
+Server-side social state (bookmarks, follows, share counts) lives in
+`lib/community-store.ts`, so it stays consistent between the feed, the saved
+page and the sidebar.
 
 Local component state is used for:
 - Discussion list and pagination
@@ -76,7 +114,7 @@ Local component state is used for:
 
 | Role | Permissions |
 |------|-------------|
-| User | View discussions, create discussions, like, reply, bookmark |
+| User | View discussions, create discussions, like, reply, bookmark, share, follow members, follow categories |
 | Moderator | All user permissions + pin, lock, resolve reports |
 | Admin | All moderator permissions + access moderation dashboard |
 

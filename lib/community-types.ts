@@ -17,6 +17,30 @@ export interface Discussion {
   createdAt: string;
   updatedAt: string;
   lastReply?: Reply;
+  /** Number of times the discussion has been shared (#1016). */
+  shareCount?: number;
+  /** Whether the signed-in user has bookmarked the discussion (#1013). */
+  isBookmarked?: boolean;
+  /** Whether the signed-in user follows the author (#1015). */
+  isAuthorFollowed?: boolean;
+  /** When the signed-in user bookmarked the discussion (#1013). */
+  savedAt?: string;
+}
+
+/** A discussion enriched with viewer-specific state (bookmark/follow). */
+export interface SavedDiscussion extends Discussion {
+  savedAt: string;
+}
+
+/** A community member that can be followed (#1015). */
+export interface CommunityMember {
+  id: string;
+  name: string;
+  avatar?: string;
+  headline?: string;
+  followerCount: number;
+  discussionCount: number;
+  isFollowing: boolean;
 }
 
 export interface Reply {
@@ -78,6 +102,38 @@ export function serializeCategoryParam(
 ): string | null {
   const parsed = parseCategoryParam(categories);
   return parsed.length > 0 ? parsed.join(",") : null;
+}
+
+/** Canonical list of category ids (single source of truth for #993/#1014). */
+export const COMMUNITY_CATEGORY_IDS = COMMUNITY_CATEGORIES.map(
+  (category) => category.id
+) as unknown as readonly CommunityCategoryId[];
+
+/**
+ * Narrowing helper for category ids used by the follow endpoints (#1014).
+ * Unknown ids are rejected so the API can answer with 404 instead of
+ * creating follow state for a category that does not exist.
+ */
+export function isCommunityCategoryId(
+  value: unknown
+): value is CommunityCategoryId {
+  return (
+    typeof value === "string" &&
+    (COMMUNITY_CATEGORY_IDS as readonly string[]).includes(value)
+  );
+}
+
+/**
+ * Canonical in-app path of a discussion, used to build share links (#1016)
+ * and notification deep links. Falls back to the id-only path when the
+ * discussion has no category.
+ */
+export function buildDiscussionPath(
+  discussion: Pick<Discussion, "id" | "category">
+): string {
+  return discussion.category
+    ? `/community/${discussion.category}/${discussion.id}`
+    : `/community/${discussion.id}`;
 }
 
 export interface CommunityNotification {
