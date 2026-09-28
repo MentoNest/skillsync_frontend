@@ -5,6 +5,8 @@ export interface Mentor {
   headline: string;
   bio: string;
   skills: string[];
+  /** Broad expertise categories this mentor covers (e.g. "Frontend", "DevOps") — distinct from `skills`, which lists specific tools/topics. Used by the expertise filter. */
+  expertise?: string[];
   industry: string;
   experienceLevel: "junior" | "mid" | "senior" | "lead" | "principal";
   rating: number;
