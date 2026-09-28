@@ -5,6 +5,8 @@ import Link from "next/link";
 import { authApi } from "@/lib/api";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { signIn } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

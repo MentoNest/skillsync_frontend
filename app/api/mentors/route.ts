@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
+import { mentorMatchesSearch, normalizeSearchTerm } from "@/lib/mentor-search";
 
 const MOCK_MENTORS: Mentor[] = [
   {
@@ -217,6 +218,10 @@ const MOCK_MENTORS: Mentor[] = [
 function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
   let result = [...mentors];
 
+  if (filters.search) {
+    result = result.filter((m) => mentorMatchesSearch(m, filters.search));
+  }
+
   if (filters.expertise && filters.expertise.length > 0) {
     result = result.filter((m) =>
       filters.expertise!.some((e) => m.skills.some((s) => s.toLowerCase().includes(e.toLowerCase())))
@@ -237,8 +242,19 @@ function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
     result = result.filter((m) => m.rating >= filters.minRating!);
   }
 
-  if (filters.maxHourlyRate) {
-    result = result.filter((m) => m.hourlyRate <= filters.maxHourlyRate!);
+  // #53: both bounds come from the shared normalizer, so a malformed or
+  // inverted range is corrected here exactly as the UI corrects it.
+  const rateRange = normalizeHourlyRateRange({
+    min: filters.minHourlyRate,
+    max: filters.maxHourlyRate,
+  });
+
+  if (rateRange.min !== undefined) {
+    result = result.filter((m) => m.hourlyRate >= rateRange.min!);
+  }
+
+  if (rateRange.max !== undefined) {
+    result = result.filter((m) => m.hourlyRate <= rateRange.max!);
   }
 
   if (filters.availability && filters.availability.length > 0) {
@@ -293,7 +309,12 @@ export async function GET(request: NextRequest) {
         key !== "limit" &&
         !arrayFilterKeys.includes(key as keyof MentorFilters)
       ) {
-        if (key === "minRating" || key === "maxHourlyRate") {
+        if (key === "search") {
+          const normalized = normalizeSearchTerm(value);
+          if (normalized) {
+            (filters as Record<string, unknown>)[key] = normalized;
+          }
+        } else if (key === "minRating" || key === "maxHourlyRate") {
           (filters as Record<string, unknown>)[key] = Number(value);
         } else {
           (filters as Record<string, unknown>)[key] = value;
