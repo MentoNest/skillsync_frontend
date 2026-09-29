@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { MentorFilters } from "@/lib/mentor-types";
 import { createPortal } from "react-dom";
+import SearchInput from "./SearchInput";
 import MentorFilterSidebar from "@/components/mentor-discovery/MentorFilterSidebar";
 
 interface MobileFilterDrawerProps {
@@ -117,6 +118,45 @@ export default function MobileFilterDrawer({
         </div>
       </header>
 
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            {/* Search Input */}
+            <div>
+              <h3 className="text-sm font-medium text-slate-900 mb-3">Search</h3>
+              <SearchInput
+                value={filters.search || ""}
+                onChange={(value) => onFiltersChange({ ...filters, search: value || undefined })}
+                placeholder="Search mentors..."
+                debounceMs={300}
+              />
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-slate-900 mb-3">Expertise</h3>
+              <div className="flex flex-wrap gap-2">
+                {EXPERTISE_OPTIONS.map((expertise) => (
+                  <label
+                    key={expertise}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-700 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.expertise?.includes(expertise) || false}
+                      onChange={(e) => {
+                        const newExpertise = filters.expertise || [];
+                        if (e.target.checked) {
+                          onFiltersChange({ ...filters, expertise: [...newExpertise, expertise] });
+                        } else {
+                          onFiltersChange({
+                            ...filters,
+                            expertise: newExpertise.filter((e) => e !== expertise),
+                          });
+                        }
+                      }}
+                      className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                    />
+                    {expertise}
+                  </label>
+                ))}
       <MentorDiscoveryLayout
         sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
         sidebar={
