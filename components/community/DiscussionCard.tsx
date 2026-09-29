@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import type { Discussion } from "@/lib/community-types";
 import { DiscussionActions } from "./DiscussionActions";
+import { DiscussionComments } from "./DiscussionComments";
 
 interface DiscussionCardProps {
   discussion: Discussion;
@@ -16,6 +17,7 @@ export function DiscussionCard({
   onRemoveBookmark,
   isRemovingBookmark,
 }: DiscussionCardProps) {
+  const [showComments, setShowComments] = useState(false);
   return (
     <article
       className="rounded-lg border border-[var(--border)] bg-[var(--background)] p-4 transition-shadow hover:shadow-md focus-within:shadow-md"
@@ -92,6 +94,24 @@ export function DiscussionCard({
           />
         </div>
       </div>
+          <div className="mt-3 flex items-center gap-3 border-t border-[var(--border)] pt-3">
+        <button
+          type="button"
+          onClick={() => setShowComments((v) => !v)}
+          aria-expanded={showComments}
+          className="text-xs font-medium text-[var(--primary)] hover:underline"
+        >
+          {showComments
+            ? "Hide comments"
+            : `Comments${discussion.replyCount ? ` (${discussion.replyCount})` : ""}`}
+        </button>
+      </div>
+      {showComments && (
+        <DiscussionComments
+          discussionId={discussion.id}
+          locked={discussion.isLocked}
+        />
+      )}
     </article>
   );
 }

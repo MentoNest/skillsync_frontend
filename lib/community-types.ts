@@ -23,6 +23,8 @@ export interface Discussion {
   isBookmarked?: boolean;
   /** Whether the signed-in user follows the author (#1015). */
   isAuthorFollowed?: boolean;
+  /** Whether the signed-in user has liked the discussion (#1011). */
+  isLiked?: boolean;
   /** When the signed-in user bookmarked the discussion (#1013). */
   savedAt?: string;
 }
@@ -52,6 +54,24 @@ export interface Reply {
   authorAvatar?: string;
   likeCount: number;
   createdAt: string;
+  /** Parent comment id when this is a threaded reply (#1010). */
+  parentId?: string | null;
+}
+
+/** Comment on a discussion; supports nested replies (#1008–#1010). */
+export interface Comment {
+  id: string;
+  discussionId: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  likeCount: number;
+  createdAt: string;
+  /** Null for top-level comments. */
+  parentId: string | null;
+  /** Nested replies (populated by API when building the tree). */
+  replies?: Comment[];
 }
 
 export interface Category {

@@ -1,6 +1,7 @@
 import {
   COMMUNITY_CATEGORY_IDS,
   buildDiscussionPath,
+  type Comment,
   type CommunityCategoryId,
   type CommunityMember,
   type Discussion,
@@ -109,8 +110,10 @@ interface CommunityStore {
   followingCategories: Map<string, Set<CommunityCategoryId>>;
   /** Reports: id -> Report */
   reports: Map<string, Report>;
-  /** discussionId -> replies */
-  replies: Map<string, Reply[]>;
+  /** userId -> set of liked discussion ids (#1011) */
+  likes: Map<string, Set<string>>;
+  /** discussionId -> flat comments (#1008–#1010) */
+  comments: Map<string, Comment[]>;
 }
 
 function createStore(): CommunityStore {
@@ -124,7 +127,8 @@ function createStore(): CommunityStore {
     followingUsers: new Map(),
     followingCategories: new Map(),
     reports: new Map(),
-    replies: new Map(),
+    likes: new Map(),
+    comments: new Map(),
   };
 }
 
@@ -417,120 +421,156 @@ export function resolveReport(
 }
 
 /* -------------------------------------------------------------------------- */
-/* Discussion update / delete / replies (#1005, #1006, #1007)                 */
+/* Likes (#1011)                                                              */
 /* -------------------------------------------------------------------------- */
 
-export function updateDiscussion(
-  id: string,
-  authorId: string,
-  input: Partial<Pick<Discussion, "title" | "content" | "category" | "tags">>
-): Discussion | null {
-  const discussion = getDiscussion(id);
-  if (!discussion) return null;
-  if (discussion.authorId !== authorId) {
-    throw new Error("FORBIDDEN");
+function likesFor(userId: string): Set<string> {
+  let set = store.likes.get(userId);
+  if (!set) {
+    set = new Set();
+    store.likes.set(userId, set);
   }
-  if (input.title !== undefined) discussion.title = input.title.trim();
-  if (input.content !== undefined) discussion.content = input.content;
-  if (input.category !== undefined) discussion.category = input.category;
-  if (input.tags !== undefined) discussion.tags = input.tags;
-  discussion.updatedAt = new Date().toISOString();
-  return discussion;
+  return set;
 }
 
-export function deleteDiscussion(id: string, authorId: string): boolean {
-  const discussion = getDiscussion(id);
-  if (!discussion) return false;
-  if (discussion.authorId !== authorId) {
-    throw new Error("FORBIDDEN");
-  }
-  const idx = store.discussions.findIndex((d) => d.id === id);
-  if (idx === -1) return false;
-  store.discussions.splice(idx, 1);
-  store.replies.delete(id);
-  // Drop bookmarks pointing at this discussion
-  for (const bookmarks of store.bookmarks.values()) {
-    bookmarks.delete(id);
-  }
-  const author = store.members.get(discussion.authorId);
-  if (author && author.discussionCount > 0) author.discussionCount -= 1;
-  return true;
+export function isDiscussionLiked(userId: string, discussionId: string): boolean {
+  return likesFor(userId).has(discussionId);
 }
 
-export function listReplies(discussionId: string): Reply[] {
-  let list = store.replies.get(discussionId);
+/** Toggle like. Returns the new liked state and updated likeCount. */
+export function toggleDiscussionLike(
+  userId: string,
+  discussionId: string
+): { isLiked: boolean; likeCount: number } {
+  const discussion = getDiscussion(discussionId);
+  if (!discussion) {
+    throw new Error("Discussion not found");
+  }
+  const set = likesFor(userId);
+  if (set.has(discussionId)) {
+    set.delete(discussionId);
+    discussion.likeCount = Math.max(0, discussion.likeCount - 1);
+    return { isLiked: false, likeCount: discussion.likeCount };
+  }
+  set.add(discussionId);
+  discussion.likeCount += 1;
+  return { isLiked: true, likeCount: discussion.likeCount };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Comments (#1008–#1010)                                                     */
+/* -------------------------------------------------------------------------- */
+
+function commentsFor(discussionId: string): Comment[] {
+  let list = store.comments.get(discussionId);
   if (!list) {
-    // Seed a couple of sample comments for demo detail pages
-    const discussion = getDiscussion(discussionId);
-    if (discussion && discussion.replyCount > 0) {
-      list = [
-        {
-          id: `reply-${discussionId}-1`,
-          discussionId,
-          content: "Thanks for sharing this — really helpful perspective.",
-          authorId: "user-2",
-          authorName: "Bob Smith",
-          authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=1",
-          likeCount: 2,
-          createdAt: discussion.createdAt,
-        },
-      ];
-      if (discussion.replyCount > 1) {
-        list.push({
-          id: `reply-${discussionId}-2`,
-          discussionId,
-          content: "Agree with the points above. Would love to hear more about practical next steps.",
-          authorId: "user-3",
-          authorName: "Carol Williams",
-          authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=2",
-          likeCount: 1,
-          createdAt: discussion.updatedAt,
-        });
-      }
-      store.replies.set(discussionId, list);
-    } else {
-      list = [];
-      store.replies.set(discussionId, list);
-    }
+    list = [];
+    store.comments.set(discussionId, list);
   }
   return list;
 }
 
-export function addReply(
-  discussionId: string,
-  input: { content: string; authorId: string; authorName: string; authorAvatar?: string }
-): Reply | null {
-  const discussion = getDiscussion(discussionId);
-  if (!discussion) return null;
-  if (discussion.isLocked) throw new Error("LOCKED");
-  const reply: Reply = {
-    id: `reply-${Date.now()}`,
-    discussionId,
-    content: input.content,
+/** Build nested tree from flat comments. */
+export function buildCommentTree(flat: Comment[]): Comment[] {
+  const byId = new Map<string, Comment>();
+  for (const c of flat) {
+    byId.set(c.id, { ...c, replies: [] });
+  }
+  const roots: Comment[] = [];
+  for (const c of byId.values()) {
+    if (c.parentId && byId.has(c.parentId)) {
+      byId.get(c.parentId)!.replies!.push(c);
+    } else {
+      roots.push(c);
+    }
+  }
+  // Stable chronological order
+  const sortFn = (a: Comment, b: Comment) =>
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  const sortTree = (nodes: Comment[]) => {
+    nodes.sort(sortFn);
+    for (const n of nodes) {
+      if (n.replies?.length) sortTree(n.replies);
+    }
+  };
+  sortTree(roots);
+  return roots;
+}
+
+export function listComments(discussionId: string): Comment[] {
+  return buildCommentTree([...commentsFor(discussionId)]);
+}
+
+export function listCommentsFlat(discussionId: string): Comment[] {
+  return [...commentsFor(discussionId)];
+}
+
+export function addComment(input: {
+  discussionId: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  parentId?: string | null;
+}): Comment {
+  const discussion = getDiscussion(input.discussionId);
+  if (!discussion) {
+    throw new Error("Discussion not found");
+  }
+  if (discussion.isLocked) {
+    throw new Error("Discussion is locked");
+  }
+  const content = input.content.trim();
+  if (!content) {
+    throw new Error("Comment cannot be empty");
+  }
+  if (content.length > 5000) {
+    throw new Error("Comment is too long");
+  }
+  if (input.parentId) {
+    const parent = commentsFor(input.discussionId).find((c) => c.id === input.parentId);
+    if (!parent) {
+      throw new Error("Parent comment not found");
+    }
+  }
+
+  const comment: Comment = {
+    id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    discussionId: input.discussionId,
+    content,
     authorId: input.authorId,
     authorName: input.authorName,
     authorAvatar: input.authorAvatar,
     likeCount: 0,
     createdAt: new Date().toISOString(),
+    parentId: input.parentId ?? null,
   };
-  const list = listReplies(discussionId);
-  list.push(reply);
-  discussion.replyCount = list.length;
-  discussion.updatedAt = reply.createdAt;
-  discussion.lastReply = reply;
-  return reply;
+  commentsFor(input.discussionId).push(comment);
+  discussion.replyCount += 1;
+  discussion.updatedAt = comment.createdAt;
+  return comment;
 }
 
-/** Related discussions: same category, excluding self, capped. */
-export function listRelatedDiscussions(id: string, limit = 5): Discussion[] {
-  const current = getDiscussion(id);
-  if (!current) return [];
-  return store.discussions
-    .filter((d) => d.id !== id && d.category === current.category)
-    .slice(0, limit);
-}
+// Seed demo comments for the first discussion so empty-state demos still work
+(function seedComments() {
+  if (store.discussions.length === 0) return;
+  const firstId = store.discussions[0]!.id;
+  if (commentsFor(firstId).length > 0) return;
+  const seedAuthor = store.members.values().next().value;
+  addComment({
+    discussionId: firstId,
+    content: "Great discussion — thanks for sharing!",
+    authorId: seedAuthor?.id ?? "user-seed",
+    authorName: seedAuthor?.name ?? "Community Member",
+    authorAvatar: seedAuthor?.avatar,
+  });
+  const parent = commentsFor(firstId)[0]!;
+  addComment({
+    discussionId: firstId,
+    content: "Agreed — following along.",
+    authorId: "user-reply",
+    authorName: "Alex Rivera",
+    parentId: parent.id,
+  });
+})();
 
-export function incrementViewCount(id: string): void {
-  const d = getDiscussion(id);
-  if (d) d.viewCount += 1;
-}
