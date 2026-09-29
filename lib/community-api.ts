@@ -1,6 +1,7 @@
 import type {
   CommunityCategoryId,
   CommunityMember,
+  Report,
   SavedDiscussion,
 } from "./community-types";
 import type { ShareMethod } from "./share";
@@ -168,6 +169,17 @@ export const communityApi = {
   ): Promise<{ categoryId: string; isFollowing: boolean }> {
     return request(`/categories/${encodeURIComponent(categoryId)}/follow`, {
       method: "DELETE",
+    });
+  },
+
+  /* Reports */
+  async reportDiscussion(
+    discussionId: string,
+    reason: string
+  ): Promise<Report> {
+    return request("/reports", {
+      method: "POST",
+      body: JSON.stringify({ discussionId, reason }),
     });
   },
 };

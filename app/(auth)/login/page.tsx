@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { authApi } from "@/lib/api";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -95,6 +97,14 @@ export default function LoginPage() {
               {showPassword ? "Hide" : "Show"}
             </button>
           </div>
+          <p className="mt-1 text-right">
+            <Link
+              href="/forgot-password"
+              className="text-sm font-medium text-[var(--primary)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            >
+              Forgot password?
+            </Link>
+          </p>
         </div>
 
         <button

@@ -4,6 +4,7 @@ import {
   type CommunityCategoryId,
   type CommunityMember,
   type Discussion,
+  type Report,
   type SavedDiscussion,
 } from "./community-types";
 
@@ -105,6 +106,8 @@ interface CommunityStore {
   followingUsers: Map<string, Set<string>>;
   /** userId -> set of followed category ids */
   followingCategories: Map<string, Set<CommunityCategoryId>>;
+  /** Reports: id -> Report */
+  reports: Map<string, Report>;
 }
 
 function createStore(): CommunityStore {
@@ -117,6 +120,7 @@ function createStore(): CommunityStore {
     bookmarks: new Map(),
     followingUsers: new Map(),
     followingCategories: new Map(),
+    reports: new Map(),
   };
 }
 
@@ -336,4 +340,74 @@ export function buildShareUrl(
   request: { url: string }
 ): string {
   return new URL(buildDiscussionPath(discussion), request.url).toString();
+}
+
+/* -------------------------------------------------------------------------- */
+/* Reports                                                                    */
+/* -------------------------------------------------------------------------- */
+
+const VALID_REPORT_REASONS = [
+  "spam",
+  "harassment",
+  "offensive_content",
+  "misinformation",
+  "other",
+] as const;
+
+export type ReportReason = (typeof VALID_REPORT_REASONS)[number];
+
+function isValidReportReason(reason: string): reason is ReportReason {
+  return VALID_REPORT_REASONS.includes(reason as ReportReason);
+}
+
+export function createReport(
+  input: {
+    discussionId: string;
+    reporterId: string;
+    reason: string;
+  }
+): Report {
+  if (!getDiscussion(input.discussionId)) {
+    throw new Error("Discussion not found");
+  }
+
+  if (!isValidReportReason(input.reason)) {
+    throw new Error("Invalid report reason");
+  }
+
+  const report: Report = {
+    id: `report-${Date.now()}`,
+    discussionId: input.discussionId,
+    reporterId: input.reporterId,
+    reason: input.reason,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  };
+
+  store.reports.set(report.id, report);
+  return report;
+}
+
+export function listReports(): Report[] {
+  return [...store.reports.values()].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+export function getReport(id: string): Report | undefined {
+  return store.reports.get(id);
+}
+
+export function resolveReport(
+  id: string,
+  action: "dismiss" | "remove_content" | "warn_user",
+  resolvedBy: string
+): Report | undefined {
+  const report = store.reports.get(id);
+  if (!report) return undefined;
+
+  report.status = "resolved";
+  report.resolvedAt = new Date().toISOString();
+  report.resolvedBy = resolvedBy;
+  return report;
 }

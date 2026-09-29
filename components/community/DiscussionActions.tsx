@@ -4,6 +4,7 @@ import { useDiscussionBookmark } from "@/hooks/useDiscussionBookmark";
 import { useUserFollow } from "@/hooks/useUserFollow";
 import { FollowButton } from "./FollowButton";
 import { ShareDiscussionButton } from "./ShareDiscussionButton";
+import { ReportDiscussionButton } from "./ReportDiscussionButton";
 import type { Discussion } from "@/lib/community-types";
 
 interface DiscussionActionsProps {
@@ -121,6 +122,11 @@ export function DiscussionActions({
           className="ml-auto"
         />
       )}
+
+      <ReportDiscussionButton
+        discussionId={discussion.id}
+        discussionTitle={discussion.title}
+      />
 
       {(followError || bookmarkError) && (
         <span role="alert" className="text-xs text-red-600">
