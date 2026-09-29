@@ -5,6 +5,7 @@ import {
   type CommunityCategoryId,
   type CommunityMember,
   type Discussion,
+  type Reply,
   type Report,
   type SavedDiscussion,
 } from "./community-types";

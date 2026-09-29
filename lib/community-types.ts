@@ -151,9 +151,8 @@ export function isCommunityCategoryId(
 export function buildDiscussionPath(
   discussion: Pick<Discussion, "id" | "category">
 ): string {
-  return discussion.category
-    ? `/community/${discussion.category}/${discussion.id}`
-    : `/community/${discussion.id}`;
+  // Canonical detail route (#1007)
+  return `/community/discussions/${discussion.id}`;
 }
 
 export interface CommunityNotification {
