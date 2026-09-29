@@ -1,6 +1,7 @@
 import {
   COMMUNITY_CATEGORY_IDS,
   buildDiscussionPath,
+  type Comment,
   type CommunityCategoryId,
   type CommunityMember,
   type Discussion,
@@ -108,6 +109,10 @@ interface CommunityStore {
   followingCategories: Map<string, Set<CommunityCategoryId>>;
   /** Reports: id -> Report */
   reports: Map<string, Report>;
+  /** userId -> set of liked discussion ids (#1011) */
+  likes: Map<string, Set<string>>;
+  /** discussionId -> flat comments (#1008–#1010) */
+  comments: Map<string, Comment[]>;
 }
 
 function createStore(): CommunityStore {
@@ -121,6 +126,8 @@ function createStore(): CommunityStore {
     followingUsers: new Map(),
     followingCategories: new Map(),
     reports: new Map(),
+    likes: new Map(),
+    comments: new Map(),
   };
 }
 
@@ -411,3 +418,158 @@ export function resolveReport(
   report.resolvedBy = resolvedBy;
   return report;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Likes (#1011)                                                              */
+/* -------------------------------------------------------------------------- */
+
+function likesFor(userId: string): Set<string> {
+  let set = store.likes.get(userId);
+  if (!set) {
+    set = new Set();
+    store.likes.set(userId, set);
+  }
+  return set;
+}
+
+export function isDiscussionLiked(userId: string, discussionId: string): boolean {
+  return likesFor(userId).has(discussionId);
+}
+
+/** Toggle like. Returns the new liked state and updated likeCount. */
+export function toggleDiscussionLike(
+  userId: string,
+  discussionId: string
+): { isLiked: boolean; likeCount: number } {
+  const discussion = getDiscussion(discussionId);
+  if (!discussion) {
+    throw new Error("Discussion not found");
+  }
+  const set = likesFor(userId);
+  if (set.has(discussionId)) {
+    set.delete(discussionId);
+    discussion.likeCount = Math.max(0, discussion.likeCount - 1);
+    return { isLiked: false, likeCount: discussion.likeCount };
+  }
+  set.add(discussionId);
+  discussion.likeCount += 1;
+  return { isLiked: true, likeCount: discussion.likeCount };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Comments (#1008–#1010)                                                     */
+/* -------------------------------------------------------------------------- */
+
+function commentsFor(discussionId: string): Comment[] {
+  let list = store.comments.get(discussionId);
+  if (!list) {
+    list = [];
+    store.comments.set(discussionId, list);
+  }
+  return list;
+}
+
+/** Build nested tree from flat comments. */
+export function buildCommentTree(flat: Comment[]): Comment[] {
+  const byId = new Map<string, Comment>();
+  for (const c of flat) {
+    byId.set(c.id, { ...c, replies: [] });
+  }
+  const roots: Comment[] = [];
+  for (const c of byId.values()) {
+    if (c.parentId && byId.has(c.parentId)) {
+      byId.get(c.parentId)!.replies!.push(c);
+    } else {
+      roots.push(c);
+    }
+  }
+  // Stable chronological order
+  const sortFn = (a: Comment, b: Comment) =>
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  const sortTree = (nodes: Comment[]) => {
+    nodes.sort(sortFn);
+    for (const n of nodes) {
+      if (n.replies?.length) sortTree(n.replies);
+    }
+  };
+  sortTree(roots);
+  return roots;
+}
+
+export function listComments(discussionId: string): Comment[] {
+  return buildCommentTree([...commentsFor(discussionId)]);
+}
+
+export function listCommentsFlat(discussionId: string): Comment[] {
+  return [...commentsFor(discussionId)];
+}
+
+export function addComment(input: {
+  discussionId: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  parentId?: string | null;
+}): Comment {
+  const discussion = getDiscussion(input.discussionId);
+  if (!discussion) {
+    throw new Error("Discussion not found");
+  }
+  if (discussion.isLocked) {
+    throw new Error("Discussion is locked");
+  }
+  const content = input.content.trim();
+  if (!content) {
+    throw new Error("Comment cannot be empty");
+  }
+  if (content.length > 5000) {
+    throw new Error("Comment is too long");
+  }
+  if (input.parentId) {
+    const parent = commentsFor(input.discussionId).find((c) => c.id === input.parentId);
+    if (!parent) {
+      throw new Error("Parent comment not found");
+    }
+  }
+
+  const comment: Comment = {
+    id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    discussionId: input.discussionId,
+    content,
+    authorId: input.authorId,
+    authorName: input.authorName,
+    authorAvatar: input.authorAvatar,
+    likeCount: 0,
+    createdAt: new Date().toISOString(),
+    parentId: input.parentId ?? null,
+  };
+  commentsFor(input.discussionId).push(comment);
+  discussion.replyCount += 1;
+  discussion.updatedAt = comment.createdAt;
+  return comment;
+}
+
+// Seed demo comments for the first discussion so empty-state demos still work
+(function seedComments() {
+  if (store.discussions.length === 0) return;
+  const firstId = store.discussions[0]!.id;
+  if (commentsFor(firstId).length > 0) return;
+  const seedAuthor = store.members.values().next().value;
+  addComment({
+    discussionId: firstId,
+    content: "Great discussion — thanks for sharing!",
+    authorId: seedAuthor?.id ?? "user-seed",
+    authorName: seedAuthor?.name ?? "Community Member",
+    authorAvatar: seedAuthor?.avatar,
+  });
+  const parent = commentsFor(firstId)[0]!;
+  addComment({
+    discussionId: firstId,
+    content: "Agreed — following along.",
+    authorId: "user-reply",
+    authorName: "Alex Rivera",
+    parentId: parent.id,
+  });
+})();
+

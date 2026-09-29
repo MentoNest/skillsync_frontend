@@ -1,4 +1,5 @@
 import type {
+  Comment,
   CommunityCategoryId,
   CommunityMember,
   Report,
@@ -180,6 +181,43 @@ export const communityApi = {
     return request("/reports", {
       method: "POST",
       body: JSON.stringify({ discussionId, reason }),
+    });
+  },
+
+  /* Likes (#1011) */
+  async getLikeState(
+    discussionId: string
+  ): Promise<{ discussionId: string; isLiked: boolean; likeCount: number }> {
+    return request(`/discussions/${encodeURIComponent(discussionId)}/like`);
+  },
+
+  async toggleDiscussionLike(
+    discussionId: string
+  ): Promise<{ discussionId: string; isLiked: boolean; likeCount: number }> {
+    return request(`/discussions/${encodeURIComponent(discussionId)}/like`, {
+      method: "POST",
+    });
+  },
+
+  /* Comments (#1008–#1010) */
+  async getComments(
+    discussionId: string
+  ): Promise<{ discussionId: string; comments: Comment[]; total: number }> {
+    return request(`/discussions/${encodeURIComponent(discussionId)}/comments`);
+  },
+
+  async addComment(
+    discussionId: string,
+    content: string,
+    options?: { parentId?: string | null; authorName?: string }
+  ): Promise<{ comment: Comment }> {
+    return request(`/discussions/${encodeURIComponent(discussionId)}/comments`, {
+      method: "POST",
+      body: JSON.stringify({
+        content,
+        parentId: options?.parentId ?? null,
+        authorName: options?.authorName,
+      }),
     });
   },
 };

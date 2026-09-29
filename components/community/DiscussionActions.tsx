@@ -3,6 +3,7 @@
 import { useDiscussionBookmark } from "@/hooks/useDiscussionBookmark";
 import { useUserFollow } from "@/hooks/useUserFollow";
 import { FollowButton } from "./FollowButton";
+import { LikeDiscussionButton } from "./LikeDiscussionButton";
 import { ShareDiscussionButton } from "./ShareDiscussionButton";
 import { ReportDiscussionButton } from "./ReportDiscussionButton";
 import type { Discussion } from "@/lib/community-types";
@@ -113,6 +114,12 @@ export function DiscussionActions({
           <span>{isRemovingBookmark ? "Removing…" : "Remove bookmark"}</span>
         </button>
       )}
+
+      <LikeDiscussionButton
+        discussionId={discussion.id}
+        initialLiked={discussion.isLiked ?? false}
+        initialCount={discussion.likeCount}
+      />
 
       {showShare && (
         <ShareDiscussionButton
