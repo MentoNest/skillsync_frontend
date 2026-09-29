@@ -133,6 +133,9 @@ export const authApi = {
   register(fullName: string, email: string, password: string): Promise<unknown> {
     return postAuth("register", { fullName, email, password });
   },
+  forgotPassword(email: string): Promise<unknown> {
+    return postAuth("forgot-password", { email });
+  },
 };
 
 export { ApiError };
