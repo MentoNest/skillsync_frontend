@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { Discussion } from "@/lib/community-types";
 import { DiscussionActions } from "./DiscussionActions";
 
@@ -49,7 +50,12 @@ export function DiscussionCard({
             id={`discussion-title-${discussion.id}`}
             className="mt-1 text-base font-semibold text-[var(--foreground)]"
           >
-            {discussion.title}
+            <Link
+              href={`/community/discussions/${discussion.id}`}
+              className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            >
+              {discussion.title}
+            </Link>
           </h3>
           <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">
             {discussion.content}

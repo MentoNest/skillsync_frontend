@@ -4,6 +4,7 @@ import {
   type CommunityCategoryId,
   type CommunityMember,
   type Discussion,
+  type Reply,
   type Report,
   type SavedDiscussion,
 } from "./community-types";
@@ -108,6 +109,8 @@ interface CommunityStore {
   followingCategories: Map<string, Set<CommunityCategoryId>>;
   /** Reports: id -> Report */
   reports: Map<string, Report>;
+  /** discussionId -> replies */
+  replies: Map<string, Reply[]>;
 }
 
 function createStore(): CommunityStore {
@@ -121,6 +124,7 @@ function createStore(): CommunityStore {
     followingUsers: new Map(),
     followingCategories: new Map(),
     reports: new Map(),
+    replies: new Map(),
   };
 }
 
@@ -410,4 +414,123 @@ export function resolveReport(
   report.resolvedAt = new Date().toISOString();
   report.resolvedBy = resolvedBy;
   return report;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Discussion update / delete / replies (#1005, #1006, #1007)                 */
+/* -------------------------------------------------------------------------- */
+
+export function updateDiscussion(
+  id: string,
+  authorId: string,
+  input: Partial<Pick<Discussion, "title" | "content" | "category" | "tags">>
+): Discussion | null {
+  const discussion = getDiscussion(id);
+  if (!discussion) return null;
+  if (discussion.authorId !== authorId) {
+    throw new Error("FORBIDDEN");
+  }
+  if (input.title !== undefined) discussion.title = input.title.trim();
+  if (input.content !== undefined) discussion.content = input.content;
+  if (input.category !== undefined) discussion.category = input.category;
+  if (input.tags !== undefined) discussion.tags = input.tags;
+  discussion.updatedAt = new Date().toISOString();
+  return discussion;
+}
+
+export function deleteDiscussion(id: string, authorId: string): boolean {
+  const discussion = getDiscussion(id);
+  if (!discussion) return false;
+  if (discussion.authorId !== authorId) {
+    throw new Error("FORBIDDEN");
+  }
+  const idx = store.discussions.findIndex((d) => d.id === id);
+  if (idx === -1) return false;
+  store.discussions.splice(idx, 1);
+  store.replies.delete(id);
+  // Drop bookmarks pointing at this discussion
+  for (const bookmarks of store.bookmarks.values()) {
+    bookmarks.delete(id);
+  }
+  const author = store.members.get(discussion.authorId);
+  if (author && author.discussionCount > 0) author.discussionCount -= 1;
+  return true;
+}
+
+export function listReplies(discussionId: string): Reply[] {
+  let list = store.replies.get(discussionId);
+  if (!list) {
+    // Seed a couple of sample comments for demo detail pages
+    const discussion = getDiscussion(discussionId);
+    if (discussion && discussion.replyCount > 0) {
+      list = [
+        {
+          id: `reply-${discussionId}-1`,
+          discussionId,
+          content: "Thanks for sharing this — really helpful perspective.",
+          authorId: "user-2",
+          authorName: "Bob Smith",
+          authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=1",
+          likeCount: 2,
+          createdAt: discussion.createdAt,
+        },
+      ];
+      if (discussion.replyCount > 1) {
+        list.push({
+          id: `reply-${discussionId}-2`,
+          discussionId,
+          content: "Agree with the points above. Would love to hear more about practical next steps.",
+          authorId: "user-3",
+          authorName: "Carol Williams",
+          authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=2",
+          likeCount: 1,
+          createdAt: discussion.updatedAt,
+        });
+      }
+      store.replies.set(discussionId, list);
+    } else {
+      list = [];
+      store.replies.set(discussionId, list);
+    }
+  }
+  return list;
+}
+
+export function addReply(
+  discussionId: string,
+  input: { content: string; authorId: string; authorName: string; authorAvatar?: string }
+): Reply | null {
+  const discussion = getDiscussion(discussionId);
+  if (!discussion) return null;
+  if (discussion.isLocked) throw new Error("LOCKED");
+  const reply: Reply = {
+    id: `reply-${Date.now()}`,
+    discussionId,
+    content: input.content,
+    authorId: input.authorId,
+    authorName: input.authorName,
+    authorAvatar: input.authorAvatar,
+    likeCount: 0,
+    createdAt: new Date().toISOString(),
+  };
+  const list = listReplies(discussionId);
+  list.push(reply);
+  discussion.replyCount = list.length;
+  discussion.updatedAt = reply.createdAt;
+  discussion.lastReply = reply;
+  return reply;
+}
+
+/** Related discussions: same category, excluding self, capped. */
+export function listRelatedDiscussions(id: string, limit = 5): Discussion[] {
+  const current = getDiscussion(id);
+  if (!current) return [];
+  return store.discussions
+    .filter((d) => d.id !== id && d.category === current.category)
+    .slice(0, limit);
+}
+
+export function incrementViewCount(id: string): void {
+  const d = getDiscussion(id);
+  if (d) d.viewCount += 1;
 }
