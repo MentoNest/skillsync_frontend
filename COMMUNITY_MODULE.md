@@ -23,7 +23,10 @@ CommunityPage
 │   ├── Sort dropdown
 │   └── Search input
 ├── CommunityFeed
+│   ├── DiscussionListSkeleton (initial load)      #997
 │   ├── DiscussionCard (or MemoizedDiscussionCard)
+│   │   ├── DiscussionCategoryBadge                #984
+│   │   ├── TrendingBadgeForDiscussion             #985
 │   │   ├── DiscussionActions
 │   │   │   ├── FollowButton (follow author)      #1015
 │   │   │   ├── Bookmark toggle                   #1013
@@ -36,6 +39,29 @@ CommunityPage
 └── NotificationDropdown
     └── Notification list
 ```
+
+### Reusable components
+
+| Component | Purpose |
+|-----------|---------|
+| `DiscussionForm` | Reusable create-discussion form (#1002). Owns field state and validation; `onSubmit` receives `{ title, category, content, tags }`. |
+| `DiscussionCategoryBadge` | Dynamic category pill (#984) with a stable colour per known category and a neutral fallback. |
+| `TrendingBadge` / `TrendingBadgeForDiscussion` | Optional, accessible trending indicator (#985). Renders nothing when a discussion is not trending. |
+| `CommunitySkeletons` | Hero, discussion-card, category, event and statistic placeholders (#997) sized to match the real components so the layout does not shift. |
+
+### Discussion form validation (#1002)
+
+Title, category and content are required; the title is capped at 200
+characters. Invalid submissions are blocked, the first invalid field receives
+focus, and every message is rendered as a `role="alert"` referenced by the
+field's `aria-describedby`, with `aria-invalid` set on the control.
+`validateDiscussionForm` and `parseTags` are exported for reuse and testing.
+
+### Trending score (#985)
+
+`lib/community-trending.ts` exposes `getEngagementScore` (likes ×2, replies
+×3, views ×0.5) and `isTrendingDiscussion` (threshold `TRENDING_SCORE_THRESHOLD`),
+the same weighting the `trending` sort uses in the discussions API.
 
 ## API Endpoints
 

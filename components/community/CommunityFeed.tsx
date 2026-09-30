@@ -2,6 +2,7 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
+import { DiscussionListSkeleton } from "./CommunitySkeletons";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
 
 interface CommunityFeedProps {
@@ -43,9 +44,7 @@ export function CommunityFeed({
       />
 
       {isLoading ? (
-        <div className="flex justify-center py-12" role="status" aria-label="Loading discussions">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--primary)] border-t-transparent" />
-        </div>
+        <DiscussionListSkeleton count={3} />
       ) : discussions.length === 0 ? (
         <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-8 text-center">
           <p className="text-[var(--muted)]">No discussions found</p>
