@@ -25,9 +25,12 @@ CommunityPage
 │   ├── Sort dropdown
 │   └── Search input
 ├── CommunityFeed
+│   ├── DiscussionListSkeleton (initial load)      #997
 │   ├── CommunityErrorState (message + retry)     #999
 │   ├── CommunityEmptyState (icon + message + CTA) #998
 │   ├── DiscussionCard (or MemoizedDiscussionCard)
+│   │   ├── DiscussionCategoryBadge                #984
+│   │   ├── TrendingBadgeForDiscussion             #985
 │   │   ├── DiscussionActions
 │   │   │   ├── FollowButton (follow author)      #1015
 │   │   │   ├── Bookmark toggle                   #1013

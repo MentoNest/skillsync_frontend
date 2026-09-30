@@ -5,6 +5,8 @@ import Link from "next/link";
 import type { Discussion } from "@/lib/community-types";
 import { DiscussionActions } from "./DiscussionActions";
 import { DiscussionComments } from "./DiscussionComments";
+import { DiscussionCategoryBadge } from "./DiscussionCategoryBadge";
+import { TrendingBadgeForDiscussion } from "./TrendingBadge";
 
 interface DiscussionCardProps {
   discussion: Discussion;
@@ -48,6 +50,7 @@ export function DiscussionCard({
                 Locked
               </span>
             )}
+            <TrendingBadgeForDiscussion discussion={discussion} />
           </div>
           <h3
             id={`discussion-title-${discussion.id}`}
@@ -84,9 +87,7 @@ export function DiscussionCard({
               </svg>
               {discussion.viewCount}
             </span>
-            <span className="rounded-full bg-[var(--secondary)] px-2 py-0.5 text-xs font-medium text-[var(--muted)]">
-              {discussion.category}
-            </span>
+            <DiscussionCategoryBadge label={discussion.category} />
           </div>
 
           <DiscussionActions
