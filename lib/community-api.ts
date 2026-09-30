@@ -2,9 +2,7 @@ import type {
   Comment,
   CommunityCategoryId,
   CommunityMember,
-  CommunityOverview,
-  DiscussionPage,
-  DiscussionQuery,
+  Discussion,
   Report,
   SavedDiscussion,
 } from "./community-types";
@@ -31,17 +29,22 @@ export class CommunityApiError extends Error {
   }
 }
 
-function viewerHeaders(): Record<string, string> {
-  if (typeof window === "undefined") return {};
+/** The signed-in user persisted by `AuthProvider`, or null when unavailable. */
+function storedAuthUser(): { id?: string; name?: string } | null {
+  if (typeof window === "undefined") return null;
 
   try {
     const stored = window.localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!stored) return {};
-    const user = JSON.parse(stored) as { id?: string };
-    return user?.id ? { "x-user-id": user.id } : {};
+    if (!stored) return null;
+    return JSON.parse(stored) as { id?: string; name?: string };
   } catch {
-    return {};
+    return null;
   }
+}
+
+function viewerHeaders(): Record<string, string> {
+  const user = storedAuthUser();
+  return user?.id ? { "x-user-id": user.id } : {};
 }
 
 async function request<T>(
@@ -68,6 +71,14 @@ async function request<T>(
   return response.json() as Promise<T>;
 }
 
+export interface CreateDiscussionInput {
+  title: string;
+  content: string;
+  category: string;
+  tags?: string[];
+  authorName?: string;
+}
+
 export const communityApi = {
   /* Discussion feed (#995) */
   async getDiscussions(query: DiscussionQuery = {}): Promise<DiscussionPage> {
@@ -84,6 +95,19 @@ export const communityApi = {
   /* Sidebar overview: statistics + events (#990, #996) */
   async getCommunityOverview(): Promise<CommunityOverview> {
     return request<CommunityOverview>("/overview");
+  /* Discussion creation (#1004) */
+  async createDiscussion(input: CreateDiscussionInput): Promise<Discussion> {
+    return request("/discussions", {
+      method: "POST",
+      body: JSON.stringify({
+        title: input.title,
+        content: input.content,
+        category: input.category,
+        tags: input.tags ?? [],
+        // Fall back to the signed-in user so callers don't need auth wiring.
+        authorName: input.authorName?.trim() || storedAuthUser()?.name?.trim(),
+      }),
+    });
   },
 
   /* Bookmarks (#1013) */

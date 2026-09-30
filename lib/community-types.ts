@@ -209,6 +209,22 @@ export function buildDiscussionPath(
   return `/community/discussions/${discussion.id}`;
 }
 
+/** An event shown in the community sidebar's upcoming events widget (#988). */
+export interface CommunityEvent {
+  id: string;
+  title: string;
+  /** Member or team hosting the event. */
+  host: string;
+  /** ISO 8601 timestamp the event starts at. */
+  startsAt: string;
+  /** ISO 8601 timestamp the event ends at; the end time is hidden without it. */
+  endsAt?: string;
+  /** Members who have already registered. */
+  registrationCount: number;
+  /** Whether the viewer already has a spot (#988). */
+  isRegistered?: boolean;
+}
+
 export interface CommunityNotification {
   id: string;
   type: "reply" | "mention" | "category_update" | "event_reminder";

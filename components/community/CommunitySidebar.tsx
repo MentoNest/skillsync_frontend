@@ -1,11 +1,18 @@
 "use client";
 
+import {
+  COMMUNITY_CATEGORIES,
+  type CommunityCategoryId,
+} from "@/lib/community-types";
 import { useCategoryFollows } from "@/hooks/useCategoryFollows";
-import type { CommunityEvent, CommunityStatistics } from "@/lib/community-types";
+import { CommunityCategories } from "./CommunityCategories";
 import { FollowButton } from "./FollowButton";
-import { CommunityStatisticsWidget } from "./CommunityStatisticsWidget";
-import { CommunityEventCard } from "./CommunityEventCard";
-import { useCommunity } from "./CommunityProvider";
+import { UpcomingEvents } from "./UpcomingEvents";
+
+interface CommunitySidebarProps {
+  selectedCategory: string | null;
+  onCategoryChange: (category: string | null) => void;
+}
 
 // Display counts are placeholder UI until real counts come from the API (#993).
 const categoryCounts: Record<string, number> = {
@@ -16,46 +23,36 @@ const categoryCounts: Record<string, number> = {
   announcements: 8,
 };
 
-const EMPTY_STATISTICS: CommunityStatistics = {
-  totalMembers: 0,
-  activeDiscussions: 0,
-  totalDiscussions: 0,
-  eventsThisMonth: 0,
-};
+const categories = COMMUNITY_CATEGORIES.map((c) => ({
+  id: c.id,
+  name: c.name,
+  discussionCount: categoryCounts[c.id] ?? 0,
+}));
 
-/** Max events shown in the sidebar so it stays scannable. */
-const MAX_UPCOMING_EVENTS = 2;
+// Placeholder events until the events API lands (#988).
+const upcomingEvents: CommunityEvent[] = [
+  {
+    id: "resume-review-clinic",
+    title: "Resume Review Clinic",
+    host: "SkillSync Mentors",
+    startsAt: "2026-10-06T16:00:00.000Z",
+    endsAt: "2026-10-06T17:00:00.000Z",
+    registrationCount: 42,
+  },
+  {
+    id: "career-paths-ama",
+    title: "Career Paths AMA",
+    host: "Amara Okafor",
+    startsAt: "2026-10-13T15:30:00.000Z",
+    endsAt: "2026-10-13T16:30:00.000Z",
+    registrationCount: 128,
+  },
+];
 
-function upcomingEvents(
-  events: CommunityEvent[],
-  now: number
-): CommunityEvent[] {
-  return events
-    .filter((event) => new Date(event.startsAt).getTime() >= now)
-    .sort(
-      (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
-    )
-    .slice(0, MAX_UPCOMING_EVENTS);
-}
-
-/**
- * Community sidebar.
- *
- * Reads the shared community state (#996) instead of receiving props, so the
- * active category, statistics and events stay in sync with the feed.
- */
-export function CommunitySidebar() {
-  const {
-    categories,
-    events,
-    statistics,
-    isLoadingOverview,
-    overviewError,
-    filters,
-    setCategory,
-    registerForEvent,
-  } = useCommunity();
-
+export function CommunitySidebar({
+  selectedCategory,
+  onCategoryChange,
+}: CommunitySidebarProps) {
   // Followed state is owned by the API so it persists across pages (#1014).
   const {
     isFollowing,
@@ -69,14 +66,10 @@ export function CommunitySidebar() {
   const nextEvents = upcomingEvents(events, Date.now());
 
   return (
-    <div className="space-y-6">
-      <CommunityStatisticsWidget
-        stats={statistics ?? EMPTY_STATISTICS}
-        isLoading={isLoadingOverview}
-        error={overviewError}
-      />
-
-      <nav aria-label="Community categories">
+    // #1000: widgets stack vertically on tablet/mobile and fill the desktop
+    // rail on lg+. `min-w-0` keeps long category names from forcing overflow.
+    <div className="min-w-0 space-y-6 lg:space-y-8">
+      <nav aria-label="Community categories" className="min-w-0">
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">
             Categories
@@ -87,7 +80,9 @@ export function CommunitySidebar() {
             </span>
           )}
         </div>
-        <ul className="space-y-1">
+        {/* #1000: single column on small screens, two columns from md up so
+        the stacked widgets stay compact on tablets. */}
+        <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-1">
           <li key="all">
             <button
               onClick={() => setCategory(null)}
@@ -104,7 +99,7 @@ export function CommunitySidebar() {
           {categories.map((cat) => (
             <li key={cat.id}>
               <div
-                className={`flex items-center gap-1 rounded-lg pr-1 transition-colors ${
+                className={`flex min-w-0 items-center gap-1 rounded-lg pr-1 transition-colors ${
                   selectedCategory === cat.id
                     ? "bg-[var(--primary)]/10"
                     : "hover:bg-[var(--secondary)]"
@@ -113,16 +108,14 @@ export function CommunitySidebar() {
                 <button
                   onClick={() => setCategory(cat.id)}
                   aria-current={selectedCategory === cat.id ? "true" : undefined}
-                  className={`flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
+                  className={`flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                     selectedCategory === cat.id
                       ? "font-medium text-[var(--primary)]"
                       : "text-[var(--foreground)]"
                   }`}
                 >
-                  <span>{cat.name}</span>
-                  <span className="text-xs text-[var(--muted)]">
-                    {categoryCounts[cat.id] ?? 0}
-                  </span>
+                  <span className="min-w-0 truncate">{cat.name}</span>
+                  <span className="shrink-0 text-xs text-[var(--muted)]">{cat.count}</span>
                 </button>
                 <FollowButton
                   kind="category"
@@ -141,30 +134,9 @@ export function CommunitySidebar() {
             {followError}
           </p>
         )}
-      </nav>
+      </div>
 
-      {nextEvents.length > 0 && (
-        <section aria-labelledby="community-events-heading" className="space-y-3">
-          <h2
-            id="community-events-heading"
-            className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]"
-          >
-            Upcoming Events
-          </h2>
-          <ul className="space-y-3">
-            {nextEvents.map((event) => (
-              <li key={event.id}>
-                <CommunityEventCard
-                  event={event}
-                  onRegister={registerForEvent}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4">
+      <div className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4">
         <h2 className="mb-2 text-sm font-semibold text-[var(--foreground)]">
           Community Guidelines
         </h2>
@@ -175,6 +147,8 @@ export function CommunitySidebar() {
           <li>Search before posting</li>
         </ul>
       </div>
+
+      <UpcomingEvents events={upcomingEvents} />
     </div>
   );
 }

@@ -5,39 +5,124 @@ import Link from "next/link";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
-import {
-  CommunityProvider,
-  useCommunity,
-} from "@/components/community/CommunityProvider";
+import { StartDiscussionModal } from "@/components/community/StartDiscussionModal";
+import { CommunityToast } from "@/components/community/CommunityToast";
+import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { trackDiscussionCreated } from "@/lib/community-analytics";
+import {
+  isCommunityCategoryId,
+  type Discussion,
+  type DiscussionSort,
+} from "@/lib/community-types";
 
-/**
- * Feed view. All discussion, filter and real-time state comes from
- * `CommunityProvider` (#995, #996) so the sidebar reads the same source.
- */
-function CommunityPageContent() {
-  const {
-    discussions,
-    isLoading,
-    isLoadingMore,
-    hasMore,
-    error,
-    filters,
-    isLive,
-    loadMore,
-    setCategory,
-    setSearchQuery,
-    setSortBy,
-  } = useCommunity();
-
+export default function CommunityPage() {
+  const [discussions, setDiscussions] = useState<Discussion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<DiscussionSort>("latest");
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  // Real-time updates
+  const { isConnected } = useCommunityRealtime({
+    onNewDiscussion: (discussion) => {
+      const newDisc = discussion as Discussion;
+      if (!newDisc?.id) return;
+      setDiscussions((prev) => {
+        // Prevent duplicates
+        if (prev.some((d) => d.id === newDisc.id)) return prev;
+        return [newDisc, ...prev];
+      });
+    },
+    onNewReply: (discussionId, reply) => {
+      setDiscussions((prev) =>
+        prev.map((d) =>
+          d.id === discussionId
+            ? { ...d, replyCount: d.replyCount + 1, lastReply: reply as Discussion["lastReply"] }
+            : d
+        )
+      );
+    },
+    onLikeUpdate: (discussionId, likeCount) => {
+      setDiscussions((prev) =>
+        prev.map((d) =>
+          d.id === discussionId ? { ...d, likeCount } : d
+        )
+      );
+    },
+  });
+
+  // Fetch discussions
+  const fetchDiscussions = useCallback(
+    async (page = 1, append = false) => {
+      try {
+        if (page === 1) {
+          setIsLoading(true);
+        } else {
+          setIsLoadingMore(true);
+        }
+        setError(null);
+
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: "10",
+          sort: sortBy,
+        });
+        if (selectedCategory) params.set("category", selectedCategory);
+        if (searchQuery) params.set("q", searchQuery);
+
+        const res = await fetch(`/api/community/discussions?${params}`);
+        if (!res.ok) throw new Error("Failed to fetch discussions");
+
+        const data = await res.json();
+
+        if (append) {
+          setDiscussions((prev) => {
+            // Prevent duplicates
+            const existingIds = new Set(prev.map((d) => d.id));
+            const newDiscussions = data.discussions.filter(
+              (d: Discussion) => !existingIds.has(d.id)
+            );
+            return [...prev, ...newDiscussions];
+          });
+        } else {
+          setDiscussions(data.discussions);
+        }
+
+        setHasMore(data.hasMore);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [selectedCategory, searchQuery, sortBy]
+  );
+
+  // Initial fetch
+  useEffect(() => {
+    fetchDiscussions();
+  }, [fetchDiscussions]);
+
+  // Next page of results, shared by the load-more button and the scroll sentinel.
+  const handleLoadMore = useCallback(
+    () => fetchDiscussions(Math.floor(discussions.length / 10) + 1, true),
+    [fetchDiscussions, discussions.length]
+  );
 
   // Infinite scroll
   const { resetInfiniteScroll } = useInfiniteScroll({
     isLoading: isLoadingMore,
     hasMore,
-    onLoadMore: loadMore,
+    onLoadMore: handleLoadMore,
     observerRef,
     loadMoreRef,
   });
@@ -45,12 +130,37 @@ function CommunityPageContent() {
   // Reset infinite scroll when filters change
   useEffect(() => {
     resetInfiniteScroll();
-  }, [
-    filters.selectedCategory,
-    filters.searchQuery,
-    filters.sortBy,
-    resetInfiniteScroll,
-  ]);
+  }, [selectedCategory, searchQuery, sortBy, resetInfiniteScroll]);
+
+  const dismissToast = useCallback(() => setToastMessage(null), []);
+
+  // #1004: surface the created discussion immediately and refresh the feed so
+  // the new item is visible without a manual reload. Reset infinite scroll so
+  // the next load-more page stays consistent with the inserted item.
+  const handleDiscussionCreated = useCallback(
+    (created: Discussion) => {
+      setDiscussions((prev) =>
+        prev.some((d) => d.id === created.id) ? prev : [created, ...prev]
+      );
+      setHasMore(true);
+      resetInfiniteScroll();
+      setToastMessage("Your discussion was published.");
+      trackDiscussionCreated(created.id, created.category);
+    },
+    [resetInfiniteScroll]
+  );
+
+  const handleCategoryChange = (category: string | null) => {
+    setSelectedCategory(category);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleSortChange = (sort: DiscussionSort) => {
+    setSortBy(sort);
+  };
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -94,10 +204,22 @@ function CommunityPageContent() {
           </div>
         </div>
 
-        <CommunityHeroBanner />
+        <CommunityHeroBanner
+          onStartDiscussion={() => setIsComposerOpen(true)}
+        />
 
+        {/**
+         * #1000 — Responsive Community Sidebar layout:
+         * - Desktop (lg+): right sidebar (feed left, sidebar right).
+         * - Tablet (md): single column — sidebar widgets stack below the feed
+         *   and keep full width for comfortable touch targets.
+         * - Mobile (<md): same single column; the sidebar (categories +
+         *   guidelines) renders after the discussion feed for logical ordering.
+         * DOM order stays feed-then-sidebar on every breakpoint so keyboard
+         * focus and screen-reader order always match the visual order.
+         */}
         <div className="mt-8 flex flex-col gap-8 lg:flex-row">
-          <main className="flex-1 min-w-0">
+          <main className="min-w-0 flex-1">
             {error && (
               <div
                 role="alert"
@@ -112,21 +234,49 @@ function CommunityPageContent() {
               isLoading={isLoading}
               isLoadingMore={isLoadingMore}
               hasMore={hasMore}
-              selectedCategory={filters.selectedCategory}
-              searchQuery={filters.searchQuery}
-              sortBy={filters.sortBy}
-              onCategoryChange={setCategory}
-              onSearchChange={setSearchQuery}
-              onSortChange={setSortBy}
+              selectedCategory={selectedCategory}
+              searchQuery={searchQuery}
+              sortBy={sortBy}
+              onCategoryChange={handleCategoryChange}
+              onSearchChange={handleSearchChange}
+              onSortChange={handleSortChange}
+              error={error}
+              onRetry={() => fetchDiscussions(1, false)}
+              onStartDiscussion={() => setIsComposerOpen(true)}
               loadMoreRef={loadMoreRef}
             />
           </main>
 
-          <aside className="w-full lg:w-80 flex-shrink-0">
-            <CommunitySidebar />
+          <aside
+            aria-label="Community sidebar"
+            className="
+              w-full min-w-0
+              lg:w-80 lg:flex-shrink-0
+              border-t border-[var(--border)] pt-6 lg:border-t-0 lg:pt-0
+            "
+          >
+            <CommunitySidebar
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+            />
           </aside>
         </div>
       </div>
+
+      <StartDiscussionModal
+        isOpen={isComposerOpen}
+        onClose={() => setIsComposerOpen(false)}
+        onCreated={handleDiscussionCreated}
+        defaultCategory={
+          selectedCategory && isCommunityCategoryId(selectedCategory)
+            ? selectedCategory
+            : undefined
+        }
+      />
+
+      {toastMessage && (
+        <CommunityToast message={toastMessage} onDismiss={dismissToast} />
+      )}
     </div>
   );
 }

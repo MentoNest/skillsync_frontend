@@ -3,6 +3,8 @@
 import { memo } from "react";
 import type { Discussion } from "@/lib/community-types";
 import { DiscussionActions } from "./DiscussionActions";
+import { DiscussionCategoryBadge } from "./DiscussionCategoryBadge";
+import { TrendingBadgeForDiscussion } from "./TrendingBadge";
 
 interface MemoizedDiscussionCardProps {
   discussion: Discussion;
@@ -36,9 +38,6 @@ export const MemoizedDiscussionCard = memo(function MemoizedDiscussionCard({
             <span className="text-sm font-medium text-[var(--foreground)]">
               {discussion.authorName}
             </span>
-            <span className="text-xs text-[var(--muted)]">
-              {new Date(discussion.createdAt).toLocaleDateString()}
-            </span>
             {discussion.isPinned && (
               <span className="rounded bg-[var(--primary)]/10 px-1.5 py-0.5 text-xs font-medium text-[var(--primary)]">
                 Pinned
@@ -49,6 +48,7 @@ export const MemoizedDiscussionCard = memo(function MemoizedDiscussionCard({
                 Locked
               </span>
             )}
+            <TrendingBadgeForDiscussion discussion={discussion} />
           </div>
           <h3
             id={`discussion-title-${discussion.id}`}
@@ -79,9 +79,7 @@ export const MemoizedDiscussionCard = memo(function MemoizedDiscussionCard({
               </svg>
               {discussion.viewCount}
             </span>
-            <span className="rounded-full bg-[var(--secondary)] px-2 py-0.5 text-xs font-medium text-[var(--muted)]">
-              {discussion.category}
-            </span>
+            <DiscussionCategoryBadge label={discussion.category} />
           </div>
 
           <DiscussionActions
