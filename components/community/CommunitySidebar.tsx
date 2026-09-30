@@ -1,7 +1,11 @@
 "use client";
 
-import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
+import {
+  COMMUNITY_CATEGORIES,
+  type CommunityCategoryId,
+} from "@/lib/community-types";
 import { useCategoryFollows } from "@/hooks/useCategoryFollows";
+import { CommunityCategories } from "./CommunityCategories";
 import { FollowButton } from "./FollowButton";
 
 interface CommunitySidebarProps {
@@ -19,8 +23,9 @@ const categoryCounts: Record<string, number> = {
 };
 
 const categories = COMMUNITY_CATEGORIES.map((c) => ({
-  ...c,
-  count: categoryCounts[c.id] ?? 0,
+  id: c.id,
+  name: c.name,
+  discussionCount: categoryCounts[c.id] ?? 0,
 }));
 
 export function CommunitySidebar({
@@ -105,7 +110,7 @@ export function CommunitySidebar({
             {followError}
           </p>
         )}
-      </nav>
+      </div>
 
       <div className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4">
         <h2 className="mb-2 text-sm font-semibold text-[var(--foreground)]">
