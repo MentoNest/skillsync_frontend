@@ -112,11 +112,17 @@ export default function CommunityPage() {
     fetchDiscussions();
   }, [fetchDiscussions]);
 
+  // Next page of results, shared by the load-more button and the scroll sentinel.
+  const handleLoadMore = useCallback(
+    () => fetchDiscussions(Math.floor(discussions.length / 10) + 1, true),
+    [fetchDiscussions, discussions.length]
+  );
+
   // Infinite scroll
   const { resetInfiniteScroll } = useInfiniteScroll({
     isLoading: isLoadingMore,
     hasMore,
-    onLoadMore: () => fetchDiscussions(Math.floor(discussions.length / 10) + 1, true),
+    onLoadMore: handleLoadMore,
     observerRef,
     loadMoreRef,
   });
