@@ -62,6 +62,9 @@ export function CommunitySidebar({
     toggle,
   } = useCategoryFollows();
 
+  const selectedCategory = filters.selectedCategory;
+  const nextEvents = upcomingEvents(events, Date.now());
+
   return (
     // #1000: widgets stack vertically on tablet/mobile and fill the desktop
     // rail on lg+. `min-w-0` keeps long category names from forcing overflow.
@@ -82,7 +85,7 @@ export function CommunitySidebar({
         <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-1">
           <li key="all">
             <button
-              onClick={() => onCategoryChange(null)}
+              onClick={() => setCategory(null)}
               aria-current={selectedCategory === null ? "true" : undefined}
               className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                 selectedCategory === null
@@ -103,7 +106,7 @@ export function CommunitySidebar({
                 }`}
               >
                 <button
-                  onClick={() => onCategoryChange(cat.id)}
+                  onClick={() => setCategory(cat.id)}
                   aria-current={selectedCategory === cat.id ? "true" : undefined}
                   className={`flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                     selectedCategory === cat.id

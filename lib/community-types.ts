@@ -83,6 +83,60 @@ export interface Category {
   icon?: string;
 }
 
+/** A community event (#989). Dates are ISO 8601 strings so the type is
+ * serializable across the server/client boundary. */
+export interface CommunityEvent {
+  id: string;
+  title: string;
+  /** Display name of the host/organizer. */
+  host: string;
+  /** ISO 8601 date-time the event starts. */
+  startsAt: string;
+  /** ISO 8601 date-time the event ends (optional). */
+  endsAt?: string;
+  /** Number of members already registered. */
+  registrationCount: number;
+  /** Optional registration cap; at/over capacity the event is full. */
+  capacity?: number;
+  /** Whether the signed-in viewer has already registered. */
+  isRegistered?: boolean;
+  /** Optional venue or meeting link. */
+  location?: string;
+}
+
+/** Sidebar metrics for the community statistics widget (#990). */
+export interface CommunityStatistics {
+  totalMembers: number;
+  activeDiscussions: number;
+  totalDiscussions: number;
+  eventsThisMonth: number;
+}
+
+/** Query accepted by `GET /api/community/discussions` (#995). */
+export interface DiscussionQuery {
+  page?: number;
+  limit?: number;
+  sort?: DiscussionSort;
+  /** Single category id; multi-select is reserved for a future change. */
+  category?: string | null;
+  /** Free-text search across title, content, author and category. */
+  search?: string;
+}
+
+/** Response shape of `GET /api/community/discussions` (#995). */
+export interface DiscussionPage {
+  discussions: Discussion[];
+  total: number;
+  page: number;
+  hasMore: boolean;
+}
+
+/** Sidebar overview payload: statistics plus upcoming/recent events (#990, #996). */
+export interface CommunityOverview {
+  statistics: CommunityStatistics;
+  events: CommunityEvent[];
+}
+
 // #993: Single source of truth for community category filtering.
 // Single-select UX (selectedCategory: string | null); helpers are
 // multi-compatible so "multiple category selection can be supported

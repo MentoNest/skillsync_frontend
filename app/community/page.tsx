@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
@@ -174,7 +174,7 @@ export default function CommunityPage() {
               <p className="mt-2 text-[var(--muted)]">
                 Connect, share, and learn with fellow mentees and mentors
               </p>
-              {isConnected && (
+              {isLive && (
                 <span className="mt-2 inline-flex items-center gap-1 text-sm text-green-600">
                   <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                   Live updates enabled
@@ -278,5 +278,13 @@ export default function CommunityPage() {
         <CommunityToast message={toastMessage} onDismiss={dismissToast} />
       )}
     </div>
+  );
+}
+
+export default function CommunityPage() {
+  return (
+    <CommunityProvider>
+      <CommunityPageContent />
+    </CommunityProvider>
   );
 }

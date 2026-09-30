@@ -3,9 +3,10 @@ import {
   buildDiscussionPath,
   type Comment,
   type CommunityCategoryId,
+  type CommunityEvent,
   type CommunityMember,
+  type CommunityStatistics,
   type Discussion,
-  type Reply,
   type Report,
   type SavedDiscussion,
 } from "./community-types";
@@ -99,8 +100,75 @@ const memberSeed: Array<Omit<CommunityMember, "isFollowing">> = [
   },
 ];
 
+/**
+ * Seed events for the sidebar stats and event cards (#989, #990).
+ *
+ * Dates are anchored to the current calendar month (plus one event next
+ * month to prove the boundary) so `eventsThisMonth` is deterministic no
+ * matter which day the app runs on.
+ */
+function seedEvents(): CommunityEvent[] {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth();
+  const at = (monthOffset: number, day: number, hour = 18) =>
+    new Date(Date.UTC(year, month + monthOffset, day, hour)).toISOString();
+
+  return [
+    {
+      id: "event-1",
+      title: "Resume Review Clinic",
+      host: "Alice Johnson",
+      startsAt: at(0, 4, 17),
+      endsAt: at(0, 4, 19),
+      registrationCount: 42,
+      capacity: 60,
+      location: "Online",
+    },
+    {
+      id: "event-2",
+      title: "Mentorship Kickoff Social",
+      host: "Bob Smith",
+      startsAt: at(0, 10, 18),
+      endsAt: at(0, 10, 20),
+      registrationCount: 88,
+      capacity: 88,
+      location: "Community Hall",
+    },
+    {
+      id: "event-3",
+      title: "System Design Study Group",
+      host: "Carol Williams",
+      startsAt: at(0, 16, 16),
+      endsAt: at(0, 16, 18),
+      registrationCount: 25,
+      capacity: 40,
+      location: "Online",
+    },
+    {
+      id: "event-4",
+      title: "Career Paths AMA",
+      host: "Eve Davis",
+      startsAt: at(0, 22, 15),
+      endsAt: at(0, 22, 17),
+      registrationCount: 120,
+      location: "Online",
+    },
+    {
+      id: "event-5",
+      title: "Next Month Planning Session",
+      host: "David Brown",
+      startsAt: at(1, 6, 17),
+      endsAt: at(1, 6, 18),
+      registrationCount: 12,
+      capacity: 50,
+    },
+  ];
+}
+
 interface CommunityStore {
   discussions: Discussion[];
+  events: CommunityEvent[];
   members: Map<string, Omit<CommunityMember, "isFollowing">>;
   /** userId -> (discussionId -> ISO timestamp the discussion was bookmarked) */
   bookmarks: Map<string, Map<string, string>>;
@@ -122,6 +190,7 @@ function createStore(): CommunityStore {
       ...discussion,
       shareCount: 0,
     })),
+    events: seedEvents(),
     members: new Map(memberSeed.map((member) => [member.id, member] as const)),
     bookmarks: new Map(),
     followingUsers: new Map(),
@@ -163,6 +232,58 @@ export function resolveViewerId(request: ViewerRequest): string {
 
 export function listDiscussions(): Discussion[] {
   return store.discussions;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Events and statistics (#989, #990)                                         */
+/* -------------------------------------------------------------------------- */
+
+/** Events in chronological order. */
+export function listEvents(): CommunityEvent[] {
+  return [...store.events].sort(
+    (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+  );
+}
+
+/** Discussions updated within this window count as "active". */
+const ACTIVE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Metrics for the sidebar statistics widget (#990), derived from the store so
+ * the numbers cannot drift from the data the feed renders.
+ *
+ * `now` is injectable to keep the stats deterministic in tests.
+ */
+export function getCommunityStatistics(
+  now: Date = new Date()
+): CommunityStatistics {
+  const activeSince = now.getTime() - ACTIVE_WINDOW_MS;
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth();
+
+  return {
+    totalMembers: store.members.size,
+    activeDiscussions: store.discussions.filter(
+      (discussion) => new Date(discussion.updatedAt).getTime() >= activeSince
+    ).length,
+    totalDiscussions: store.discussions.length,
+    eventsThisMonth: store.events.filter((event) => {
+      const starts = new Date(event.startsAt);
+      return starts.getUTCFullYear() === year && starts.getUTCMonth() === month;
+    }).length,
+  };
+}
+
+/** Optimistically bump an event's registration count (#989 register action). */
+export function registerForEvent(eventId: string): CommunityEvent | undefined {
+  const event = store.events.find((item) => item.id === eventId);
+  if (!event || event.isRegistered) return event;
+  if (event.capacity !== undefined && event.registrationCount >= event.capacity) {
+    return event;
+  }
+  event.registrationCount += 1;
+  event.isRegistered = true;
+  return event;
 }
 
 export function getDiscussion(id: string): Discussion | undefined {
