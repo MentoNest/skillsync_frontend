@@ -5,9 +5,16 @@ import Link from "next/link";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import { StartDiscussionModal } from "@/components/community/StartDiscussionModal";
+import { CommunityToast } from "@/components/community/CommunityToast";
 import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import type { Discussion, DiscussionSort } from "@/lib/community-types";
+import { trackDiscussionCreated } from "@/lib/community-analytics";
+import {
+  isCommunityCategoryId,
+  type Discussion,
+  type DiscussionSort,
+} from "@/lib/community-types";
 
 export default function CommunityPage() {
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
@@ -15,6 +22,8 @@ export default function CommunityPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<DiscussionSort>("latest");
@@ -117,6 +126,24 @@ export default function CommunityPage() {
     resetInfiniteScroll();
   }, [selectedCategory, searchQuery, sortBy, resetInfiniteScroll]);
 
+  const dismissToast = useCallback(() => setToastMessage(null), []);
+
+  // #1004: surface the created discussion immediately and refresh the feed so
+  // the new item is visible without a manual reload. Reset infinite scroll so
+  // the next load-more page stays consistent with the inserted item.
+  const handleDiscussionCreated = useCallback(
+    (created: Discussion) => {
+      setDiscussions((prev) =>
+        prev.some((d) => d.id === created.id) ? prev : [created, ...prev]
+      );
+      setHasMore(true);
+      resetInfiniteScroll();
+      setToastMessage("Your discussion was published.");
+      trackDiscussionCreated(created.id, created.category);
+    },
+    [resetInfiniteScroll]
+  );
+
   const handleCategoryChange = (category: string | null) => {
     setSelectedCategory(category);
   };
@@ -171,19 +198,12 @@ export default function CommunityPage() {
           </div>
         </div>
 
-        <CommunityHeroBanner />
+        <CommunityHeroBanner
+          onStartDiscussion={() => setIsComposerOpen(true)}
+        />
 
         <div className="mt-8 flex flex-col gap-8 lg:flex-row">
           <main className="flex-1 min-w-0">
-            {error && (
-              <div
-                role="alert"
-                className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800"
-              >
-                {error}
-              </div>
-            )}
-
             <CommunityFeed
               discussions={discussions}
               isLoading={isLoading}
@@ -195,6 +215,9 @@ export default function CommunityPage() {
               onCategoryChange={handleCategoryChange}
               onSearchChange={handleSearchChange}
               onSortChange={handleSortChange}
+              error={error}
+              onRetry={() => fetchDiscussions(1, false)}
+              onStartDiscussion={() => setIsComposerOpen(true)}
               loadMoreRef={loadMoreRef}
             />
           </main>
@@ -207,6 +230,21 @@ export default function CommunityPage() {
           </aside>
         </div>
       </div>
+
+      <StartDiscussionModal
+        isOpen={isComposerOpen}
+        onClose={() => setIsComposerOpen(false)}
+        onCreated={handleDiscussionCreated}
+        defaultCategory={
+          selectedCategory && isCommunityCategoryId(selectedCategory)
+            ? selectedCategory
+            : undefined
+        }
+      />
+
+      {toastMessage && (
+        <CommunityToast message={toastMessage} onDismiss={dismissToast} />
+      )}
     </div>
   );
 }
