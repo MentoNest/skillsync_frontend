@@ -173,8 +173,18 @@ export default function CommunityPage() {
 
         <CommunityHeroBanner />
 
+        {/**
+         * #1000 — Responsive Community Sidebar layout:
+         * - Desktop (lg+): right sidebar (feed left, sidebar right).
+         * - Tablet (md): single column — sidebar widgets stack below the feed
+         *   and keep full width for comfortable touch targets.
+         * - Mobile (<md): same single column; the sidebar (categories +
+         *   guidelines) renders after the discussion feed for logical ordering.
+         * DOM order stays feed-then-sidebar on every breakpoint so keyboard
+         * focus and screen-reader order always match the visual order.
+         */}
         <div className="mt-8 flex flex-col gap-8 lg:flex-row">
-          <main className="flex-1 min-w-0">
+          <main className="min-w-0 flex-1">
             {error && (
               <div
                 role="alert"
@@ -199,7 +209,14 @@ export default function CommunityPage() {
             />
           </main>
 
-          <aside className="w-full lg:w-80 flex-shrink-0">
+          <aside
+            aria-label="Community sidebar"
+            className="
+              w-full min-w-0
+              lg:w-80 lg:flex-shrink-0
+              border-t border-[var(--border)] pt-6 lg:border-t-0 lg:pt-0
+            "
+          >
             <CommunitySidebar
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategoryChange}

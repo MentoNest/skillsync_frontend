@@ -37,8 +37,10 @@ export function CommunitySidebar({
   } = useCategoryFollows();
 
   return (
-    <div className="space-y-6">
-      <nav aria-label="Community categories">
+    // #1000: widgets stack vertically on tablet/mobile and fill the desktop
+    // rail on lg+. `min-w-0` keeps long category names from forcing overflow.
+    <div className="min-w-0 space-y-6 lg:space-y-8">
+      <nav aria-label="Community categories" className="min-w-0">
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">
             Categories
@@ -49,7 +51,9 @@ export function CommunitySidebar({
             </span>
           )}
         </div>
-        <ul className="space-y-1">
+        {/* #1000: single column on small screens, two columns from md up so
+        the stacked widgets stay compact on tablets. */}
+        <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-1">
           <li key="all">
             <button
               onClick={() => onCategoryChange(null)}
@@ -66,7 +70,7 @@ export function CommunitySidebar({
           {categories.map((cat) => (
             <li key={cat.id}>
               <div
-                className={`flex items-center gap-1 rounded-lg pr-1 transition-colors ${
+                className={`flex min-w-0 items-center gap-1 rounded-lg pr-1 transition-colors ${
                   selectedCategory === cat.id
                     ? "bg-[var(--primary)]/10"
                     : "hover:bg-[var(--secondary)]"
@@ -75,14 +79,14 @@ export function CommunitySidebar({
                 <button
                   onClick={() => onCategoryChange(cat.id)}
                   aria-current={selectedCategory === cat.id ? "true" : undefined}
-                  className={`flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
+                  className={`flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                     selectedCategory === cat.id
                       ? "font-medium text-[var(--primary)]"
                       : "text-[var(--foreground)]"
                   }`}
                 >
-                  <span>{cat.name}</span>
-                  <span className="text-xs text-[var(--muted)]">{cat.count}</span>
+                  <span className="min-w-0 truncate">{cat.name}</span>
+                  <span className="shrink-0 text-xs text-[var(--muted)]">{cat.count}</span>
                 </button>
                 <FollowButton
                   kind="category"
@@ -103,7 +107,7 @@ export function CommunitySidebar({
         )}
       </nav>
 
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4">
+      <div className="min-w-0 rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4">
         <h2 className="mb-2 text-sm font-semibold text-[var(--foreground)]">
           Community Guidelines
         </h2>
