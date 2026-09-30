@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { Discussion } from "@/lib/community-types";
 import { DiscussionActions } from "./DiscussionActions";
 import { DiscussionComments } from "./DiscussionComments";
+import { DiscussionCategoryBadge } from "./DiscussionCategoryBadge";
+import { TrendingBadgeForDiscussion } from "./TrendingBadge";
 
 interface DiscussionCardProps {
   discussion: Discussion;
@@ -34,9 +37,6 @@ export function DiscussionCard({
             <span className="text-sm font-medium text-[var(--foreground)]">
               {discussion.authorName}
             </span>
-            <span className="text-xs text-[var(--muted)]">
-              {new Date(discussion.createdAt).toLocaleDateString()}
-            </span>
             {discussion.isPinned && (
               <span className="rounded bg-[var(--primary)]/10 px-1.5 py-0.5 text-xs font-medium text-[var(--primary)]">
                 Pinned
@@ -47,6 +47,7 @@ export function DiscussionCard({
                 Locked
               </span>
             )}
+            <TrendingBadgeForDiscussion discussion={discussion} />
           </div>
           <h3
             id={`discussion-title-${discussion.id}`}
@@ -62,7 +63,8 @@ export function DiscussionCard({
           <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">
             {discussion.content}
           </p>
-          <div className="mt-3 flex items-center gap-4 text-sm text-[var(--muted)]">
+          {/* #1000: wrap instead of pushing past the viewport on phones */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
             <span className="flex items-center gap-1">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -82,9 +84,7 @@ export function DiscussionCard({
               </svg>
               {discussion.viewCount}
             </span>
-            <span className="rounded-full bg-[var(--secondary)] px-2 py-0.5 text-xs font-medium text-[var(--muted)]">
-              {discussion.category}
-            </span>
+            <DiscussionCategoryBadge label={discussion.category} />
           </div>
 
           <DiscussionActions
