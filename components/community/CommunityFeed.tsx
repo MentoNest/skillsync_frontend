@@ -2,6 +2,7 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
+import { LoadMoreDiscussionsButton } from "./LoadMoreDiscussionsButton";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
 
 interface CommunityFeedProps {
@@ -15,6 +16,8 @@ interface CommunityFeedProps {
   onCategoryChange: (category: string | null) => void;
   onSearchChange: (query: string) => void;
   onSortChange: (sort: DiscussionSort) => void;
+  /** Requests the next page; shared by the button and the scroll sentinel. */
+  onLoadMore: () => void;
   loadMoreRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -29,6 +32,7 @@ export function CommunityFeed({
   onCategoryChange,
   onSearchChange,
   onSortChange,
+  onLoadMore,
   loadMoreRef,
 }: CommunityFeedProps) {
   return (
@@ -58,16 +62,12 @@ export function CommunityFeed({
         </div>
       )}
 
-      {isLoadingMore && (
-        <div className="flex justify-center py-4" role="status" aria-label="Loading more">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
-        </div>
-      )}
-
-      {!isLoading && !isLoadingMore && discussions.length > 0 && !hasMore && (
-        <p className="py-4 text-center text-sm text-[var(--muted)]">
-          You've reached the end of the feed
-        </p>
+      {!isLoading && discussions.length > 0 && (
+        <LoadMoreDiscussionsButton
+          hasMore={hasMore}
+          isLoading={isLoadingMore}
+          onLoadMore={onLoadMore}
+        />
       )}
 
       <div ref={loadMoreRef} className="h-1" aria-hidden="true" />
