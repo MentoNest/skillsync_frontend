@@ -1,7 +1,11 @@
 "use client";
 
-import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
+import {
+  COMMUNITY_CATEGORIES,
+  type CommunityCategoryId,
+} from "@/lib/community-types";
 import { useCategoryFollows } from "@/hooks/useCategoryFollows";
+import { CommunityCategories } from "./CommunityCategories";
 import { FollowButton } from "./FollowButton";
 
 interface CommunitySidebarProps {
@@ -19,8 +23,9 @@ const categoryCounts: Record<string, number> = {
 };
 
 const categories = COMMUNITY_CATEGORIES.map((c) => ({
-  ...c,
-  count: categoryCounts[c.id] ?? 0,
+  id: c.id,
+  name: c.name,
+  discussionCount: categoryCounts[c.id] ?? 0,
 }));
 
 export function CommunitySidebar({
@@ -38,70 +43,39 @@ export function CommunitySidebar({
 
   return (
     <div className="space-y-6">
-      <nav aria-label="Community categories">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">
-            Categories
-          </h2>
-          {followedCount > 0 && (
-            <span className="text-xs text-[var(--muted)]">
-              {followedCount} followed
-            </span>
+      <div>
+        <CommunityCategories
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={onCategoryChange}
+          headerMeta={
+            followedCount > 0 ? (
+              <span className="text-xs text-[var(--muted)]">
+                {followedCount} followed
+              </span>
+            ) : undefined
+          }
+          renderCategoryAction={(category) => (
+            <FollowButton
+              kind="category"
+              targetName={category.name}
+              isFollowing={isFollowing(category.id)}
+              isPending={isPending(category.id)}
+              onToggle={() =>
+                // Ids originate from COMMUNITY_CATEGORIES, so they are already
+                // valid category ids.
+                toggle(category.id as CommunityCategoryId)
+              }
+              className="shrink-0"
+            />
           )}
-        </div>
-        <ul className="space-y-1">
-          <li key="all">
-            <button
-              onClick={() => onCategoryChange(null)}
-              aria-current={selectedCategory === null ? "true" : undefined}
-              className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
-                selectedCategory === null
-                  ? "bg-[var(--primary)]/10 font-medium text-[var(--primary)]"
-                  : "text-[var(--foreground)] hover:bg-[var(--secondary)]"
-              }`}
-            >
-              <span>All</span>
-            </button>
-          </li>
-          {categories.map((cat) => (
-            <li key={cat.id}>
-              <div
-                className={`flex items-center gap-1 rounded-lg pr-1 transition-colors ${
-                  selectedCategory === cat.id
-                    ? "bg-[var(--primary)]/10"
-                    : "hover:bg-[var(--secondary)]"
-                }`}
-              >
-                <button
-                  onClick={() => onCategoryChange(cat.id)}
-                  aria-current={selectedCategory === cat.id ? "true" : undefined}
-                  className={`flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
-                    selectedCategory === cat.id
-                      ? "font-medium text-[var(--primary)]"
-                      : "text-[var(--foreground)]"
-                  }`}
-                >
-                  <span>{cat.name}</span>
-                  <span className="text-xs text-[var(--muted)]">{cat.count}</span>
-                </button>
-                <FollowButton
-                  kind="category"
-                  targetName={cat.name}
-                  isFollowing={isFollowing(cat.id)}
-                  isPending={isPending(cat.id)}
-                  onToggle={() => toggle(cat.id)}
-                  className="shrink-0"
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        />
         {followError && (
           <p role="alert" className="mt-2 text-xs text-red-600">
             {followError}
           </p>
         )}
-      </nav>
+      </div>
 
       <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4">
         <h2 className="mb-2 text-sm font-semibold text-[var(--foreground)]">
