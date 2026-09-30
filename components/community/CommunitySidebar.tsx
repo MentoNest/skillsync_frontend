@@ -1,13 +1,11 @@
 "use client";
 
-import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
 import { useCategoryFollows } from "@/hooks/useCategoryFollows";
+import type { CommunityEvent, CommunityStatistics } from "@/lib/community-types";
 import { FollowButton } from "./FollowButton";
-
-interface CommunitySidebarProps {
-  selectedCategory: string | null;
-  onCategoryChange: (category: string | null) => void;
-}
+import { CommunityStatisticsWidget } from "./CommunityStatisticsWidget";
+import { CommunityEventCard } from "./CommunityEventCard";
+import { useCommunity } from "./CommunityProvider";
 
 // Display counts are placeholder UI until real counts come from the API (#993).
 const categoryCounts: Record<string, number> = {
@@ -18,15 +16,46 @@ const categoryCounts: Record<string, number> = {
   announcements: 8,
 };
 
-const categories = COMMUNITY_CATEGORIES.map((c) => ({
-  ...c,
-  count: categoryCounts[c.id] ?? 0,
-}));
+const EMPTY_STATISTICS: CommunityStatistics = {
+  totalMembers: 0,
+  activeDiscussions: 0,
+  totalDiscussions: 0,
+  eventsThisMonth: 0,
+};
 
-export function CommunitySidebar({
-  selectedCategory,
-  onCategoryChange,
-}: CommunitySidebarProps) {
+/** Max events shown in the sidebar so it stays scannable. */
+const MAX_UPCOMING_EVENTS = 2;
+
+function upcomingEvents(
+  events: CommunityEvent[],
+  now: number
+): CommunityEvent[] {
+  return events
+    .filter((event) => new Date(event.startsAt).getTime() >= now)
+    .sort(
+      (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+    )
+    .slice(0, MAX_UPCOMING_EVENTS);
+}
+
+/**
+ * Community sidebar.
+ *
+ * Reads the shared community state (#996) instead of receiving props, so the
+ * active category, statistics and events stay in sync with the feed.
+ */
+export function CommunitySidebar() {
+  const {
+    categories,
+    events,
+    statistics,
+    isLoadingOverview,
+    overviewError,
+    filters,
+    setCategory,
+    registerForEvent,
+  } = useCommunity();
+
   // Followed state is owned by the API so it persists across pages (#1014).
   const {
     isFollowing,
@@ -36,8 +65,17 @@ export function CommunitySidebar({
     toggle,
   } = useCategoryFollows();
 
+  const selectedCategory = filters.selectedCategory;
+  const nextEvents = upcomingEvents(events, Date.now());
+
   return (
     <div className="space-y-6">
+      <CommunityStatisticsWidget
+        stats={statistics ?? EMPTY_STATISTICS}
+        isLoading={isLoadingOverview}
+        error={overviewError}
+      />
+
       <nav aria-label="Community categories">
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]">
@@ -52,7 +90,7 @@ export function CommunitySidebar({
         <ul className="space-y-1">
           <li key="all">
             <button
-              onClick={() => onCategoryChange(null)}
+              onClick={() => setCategory(null)}
               aria-current={selectedCategory === null ? "true" : undefined}
               className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                 selectedCategory === null
@@ -73,7 +111,7 @@ export function CommunitySidebar({
                 }`}
               >
                 <button
-                  onClick={() => onCategoryChange(cat.id)}
+                  onClick={() => setCategory(cat.id)}
                   aria-current={selectedCategory === cat.id ? "true" : undefined}
                   className={`flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                     selectedCategory === cat.id
@@ -82,7 +120,9 @@ export function CommunitySidebar({
                   }`}
                 >
                   <span>{cat.name}</span>
-                  <span className="text-xs text-[var(--muted)]">{cat.count}</span>
+                  <span className="text-xs text-[var(--muted)]">
+                    {categoryCounts[cat.id] ?? 0}
+                  </span>
                 </button>
                 <FollowButton
                   kind="category"
@@ -102,6 +142,27 @@ export function CommunitySidebar({
           </p>
         )}
       </nav>
+
+      {nextEvents.length > 0 && (
+        <section aria-labelledby="community-events-heading" className="space-y-3">
+          <h2
+            id="community-events-heading"
+            className="text-sm font-semibold uppercase tracking-wide text-[var(--muted)]"
+          >
+            Upcoming Events
+          </h2>
+          <ul className="space-y-3">
+            {nextEvents.map((event) => (
+              <li key={event.id}>
+                <CommunityEventCard
+                  event={event}
+                  onRegister={registerForEvent}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4">
         <h2 className="mb-2 text-sm font-semibold text-[var(--foreground)]">

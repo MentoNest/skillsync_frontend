@@ -17,24 +17,28 @@ The Community module provides a discussion platform for SkillSync users to conne
 ## Component Hierarchy
 
 ```
-CommunityPage
-├── DiscussionFilters
-│   ├── Category tabs
-│   ├── Sort dropdown
-│   └── Search input
-├── CommunityFeed
-│   ├── DiscussionCard (or MemoizedDiscussionCard)
-│   │   ├── DiscussionActions
-│   │   │   ├── FollowButton (follow author)      #1015
-│   │   │   ├── Bookmark toggle                   #1013
-│   │   │   └── ShareDiscussionButton (copy/native share) #1016
-│   │   └── DiscussionModeration (moderator only)
-│   └── Infinite scroll trigger
-├── CommunitySidebar
-│   ├── Category list with FollowButton per category #1014
-│   └── Community guidelines
-└── NotificationDropdown
-    └── Notification list
+CommunityProvider (#996) — shared discussions, filters, events, statistics
+└── CommunityPage
+    ├── DiscussionFilters
+    │   ├── Category tabs
+    │   ├── Sort dropdown
+    │   └── Search input
+    ├── CommunityFeed
+    │   ├── DiscussionCard (or MemoizedDiscussionCard)
+    │   │   ├── DiscussionActions
+    │   │   │   ├── FollowButton (follow author)      #1015
+    │   │   │   ├── Bookmark toggle                   #1013
+    │   │   │   └── ShareDiscussionButton (copy/native share) #1016
+    │   │   └── DiscussionModeration (moderator only)
+    │   └── Infinite scroll trigger
+    ├── CommunitySidebar
+    │   ├── CommunityStatisticsWidget (#990)
+    │   │   └── CommunityStatisticCard ×4
+    │   ├── Category list with FollowButton per category #1014
+    │   ├── Upcoming events → CommunityEventCard (#989)
+    │   └── Community guidelines
+    └── NotificationDropdown
+        └── Notification list
 ```
 
 ## API Endpoints
@@ -72,6 +76,10 @@ All social endpoints scope their state to the viewer, resolved from the
 `x-user-id` request header (sent by `lib/community-api.ts`), the
 `skillsync-user-id` cookie, or the shared demo viewer.
 
+### Overview (#990, #996)
+
+- `GET /api/community/overview` - Sidebar payload: community statistics plus the events list
+
 ### Notifications
 
 - `GET /api/community/notifications` - Get user notifications
@@ -92,7 +100,16 @@ All social endpoints scope their state to the viewer, resolved from the
 
 ## State Management
 
-The module uses React hooks for state management:
+Shared feed state lives in `CommunityProvider` (#996) and is read with the
+`useCommunity` hook, so the page, the feed and the sidebar do not thread
+props between them:
+
+- `CommunityProvider` / `useCommunity` - Discussions, categories, events,
+  statistics, filters, sorting, loading and error state. Owns the feed fetch
+  (`GET /api/community/discussions`, #995) and the sidebar overview
+  (`GET /api/community/overview`).
+
+Focused hooks cover the rest:
 
 - `useCommunityRealtime` - Manages SSE connection and real-time updates
 - `useInfiniteScroll` - Handles infinite scroll with IntersectionObserver
@@ -102,11 +119,10 @@ The module uses React hooks for state management:
 
 Server-side social state (bookmarks, follows, share counts) lives in
 `lib/community-store.ts`, so it stays consistent between the feed, the saved
-page and the sidebar.
+page and the sidebar. The store also derives the community statistics and owns
+the event seed used by the sidebar (#989, #990).
 
 Local component state is used for:
-- Discussion list and pagination
-- Filter/search/sort state
 - Notification read status
 - Moderation actions
 
@@ -145,11 +161,14 @@ Local component state is used for:
 ### Unit Tests
 ```bash
 npm test -- tests/unit/discussion-card.test.tsx
+npm test -- tests/unit/community-event-card.test.tsx
+npm test -- tests/unit/community-statistics-widget.test.tsx
 ```
 
 ### Integration Tests
 ```bash
 npm test -- tests/integration/community-workflows.test.tsx
+npm test -- tests/integration/community-state.test.tsx
 ```
 
 ### E2E Tests

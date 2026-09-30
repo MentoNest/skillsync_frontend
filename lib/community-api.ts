@@ -2,6 +2,9 @@ import type {
   Comment,
   CommunityCategoryId,
   CommunityMember,
+  CommunityOverview,
+  DiscussionPage,
+  DiscussionQuery,
   Report,
   SavedDiscussion,
 } from "./community-types";
@@ -66,6 +69,23 @@ async function request<T>(
 }
 
 export const communityApi = {
+  /* Discussion feed (#995) */
+  async getDiscussions(query: DiscussionQuery = {}): Promise<DiscussionPage> {
+    const params = new URLSearchParams();
+    params.set("page", String(query.page ?? 1));
+    params.set("limit", String(query.limit ?? 10));
+    if (query.sort) params.set("sort", query.sort);
+    if (query.category) params.set("category", query.category);
+    if (query.search) params.set("q", query.search);
+
+    return request<DiscussionPage>(`/discussions?${params.toString()}`);
+  },
+
+  /* Sidebar overview: statistics + events (#990, #996) */
+  async getCommunityOverview(): Promise<CommunityOverview> {
+    return request<CommunityOverview>("/overview");
+  },
+
   /* Bookmarks (#1013) */
   async getSavedDiscussions(): Promise<{
     discussions: SavedDiscussion[];

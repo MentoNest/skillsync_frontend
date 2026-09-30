@@ -57,7 +57,8 @@ describe("Community Page Integration", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("category=technical")
+        expect.stringContaining("category=technical"),
+        expect.anything()
       );
     });
   });
@@ -70,12 +71,13 @@ describe("Community Page Integration", () => {
     });
 
     fireEvent.change(screen.getByLabelText("Sort discussions"), {
-      target: { value: "popular" },
+      target: { value: "most-liked" },
     });
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("sort=popular")
+        expect.stringContaining("sort=most-liked"),
+        expect.anything()
       );
     });
   });
@@ -93,7 +95,8 @@ describe("Community Page Integration", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("q=test")
+        expect.stringContaining("q=test"),
+        expect.anything()
       );
     });
   });
