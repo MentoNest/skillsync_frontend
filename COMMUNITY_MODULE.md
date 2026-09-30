@@ -18,12 +18,19 @@ The Community module provides a discussion platform for SkillSync users to conne
 
 ```
 CommunityPage
+├── CommunityHeroBanner
+│   └── Start Discussion CTA (opens StartDiscussionModal)  #1001
 ├── DiscussionFilters
 │   ├── Category tabs
 │   ├── Sort dropdown
 │   └── Search input
 ├── CommunityFeed
+│   ├── DiscussionListSkeleton (initial load)      #997
+│   ├── CommunityErrorState (message + retry)     #999
+│   ├── CommunityEmptyState (icon + message + CTA) #998
 │   ├── DiscussionCard (or MemoizedDiscussionCard)
+│   │   ├── DiscussionCategoryBadge                #984
+│   │   ├── TrendingBadgeForDiscussion             #985
 │   │   ├── DiscussionActions
 │   │   │   ├── FollowButton (follow author)      #1015
 │   │   │   ├── Bookmark toggle                   #1013
@@ -33,16 +40,46 @@ CommunityPage
 ├── CommunitySidebar
 │   ├── Category list with FollowButton per category #1014
 │   └── Community guidelines
+├── StartDiscussionModal                            #1001, #1004
+│   └── RichTextEditor
+├── CommunityToast (success notification)           #1004
 └── NotificationDropdown
     └── Notification list
 ```
+
+## Discussion creation (#998, #999, #1001, #1004)
+
+The composer flow is owned by `CommunityPage`, which holds a single
+`isComposerOpen` flag so both the hero banner CTA and the empty state CTA open
+the same modal:
+
+1. **Empty state** (`CommunityEmptyState`, #998) — icon, message and a *Start
+   Discussion* call to action, shown when the feed has no discussions. A
+   filtered variant (`No discussions found`) is used when filters return no
+   matches.
+2. **Error state** (`CommunityErrorState`, #999) — rendered as `role="alert"`
+   with the failure message and a retry action that re-issues the feed request
+   with the current filters.
+3. **Composer** (`StartDiscussionModal`, #1001) — title, category, rich-text
+   content, free-form tags and an attachments placeholder. Supports Publish,
+   Cancel, a close button, Escape, backdrop click, a focus trap and focus
+   restoration. The dialog is a bottom sheet on mobile and centred on desktop.
+4. **Backend submission** (#1004) — `communityApi.createDiscussion` posts to
+   `POST /api/community/discussions` while the modal shows a loading state and
+   blocks closing. Failures render inline and keep the draft; success closes
+   the modal, prepends the created discussion to the feed, resets infinite
+   scroll, announces a `CommunityToast` confirmation and tracks a
+   `discussion_created` analytics event.
+
+The API client attaches the signed-in user's id (`x-user-id`) and display name
+to the request, so the composer does not need to wire up auth itself.
 
 ## API Endpoints
 
 ### Discussions
 
 - `GET /api/community/discussions` - List discussions (supports pagination, filtering, sorting)
-- `POST /api/community/discussions` - Create a new discussion
+- `POST /api/community/discussions` - Create a new discussion (#1004; used by the Start Discussion composer)
 - `PATCH /api/community/discussions/[id]/pin` - Pin/unpin a discussion
 - `PATCH /api/community/discussions/[id]/lock` - Lock/unlock a discussion
 - `POST /api/community/discussions/[id]/share` - Record a share, returns the canonical URL and share count (#1016)
@@ -150,6 +187,7 @@ npm test -- tests/unit/discussion-card.test.tsx
 ### Integration Tests
 ```bash
 npm test -- tests/integration/community-workflows.test.tsx
+npm test -- tests/integration/discussion-creation-flow.test.tsx
 ```
 
 ### E2E Tests
