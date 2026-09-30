@@ -18,12 +18,16 @@ The Community module provides a discussion platform for SkillSync users to conne
 
 ```
 CommunityPage
+├── CommunityHeroBanner
+│   └── Start Discussion CTA (opens StartDiscussionModal)  #1001
 ├── DiscussionFilters
 │   ├── Category tabs
 │   ├── Sort dropdown
 │   └── Search input
 ├── CommunityFeed
 │   ├── DiscussionListSkeleton (initial load)      #997
+│   ├── CommunityErrorState (message + retry)     #999
+│   ├── CommunityEmptyState (icon + message + CTA) #998
 │   ├── DiscussionCard (or MemoizedDiscussionCard)
 │   │   ├── DiscussionCategoryBadge                #984
 │   │   ├── TrendingBadgeForDiscussion             #985
@@ -36,39 +40,46 @@ CommunityPage
 ├── CommunitySidebar
 │   ├── Category list with FollowButton per category #1014
 │   └── Community guidelines
+├── StartDiscussionModal                            #1001, #1004
+│   └── RichTextEditor
+├── CommunityToast (success notification)           #1004
 └── NotificationDropdown
     └── Notification list
 ```
 
-### Reusable components
+## Discussion creation (#998, #999, #1001, #1004)
 
-| Component | Purpose |
-|-----------|---------|
-| `DiscussionForm` | Reusable create-discussion form (#1002). Owns field state and validation; `onSubmit` receives `{ title, category, content, tags }`. |
-| `DiscussionCategoryBadge` | Dynamic category pill (#984) with a stable colour per known category and a neutral fallback. |
-| `TrendingBadge` / `TrendingBadgeForDiscussion` | Optional, accessible trending indicator (#985). Renders nothing when a discussion is not trending. |
-| `CommunitySkeletons` | Hero, discussion-card, category, event and statistic placeholders (#997) sized to match the real components so the layout does not shift. |
+The composer flow is owned by `CommunityPage`, which holds a single
+`isComposerOpen` flag so both the hero banner CTA and the empty state CTA open
+the same modal:
 
-### Discussion form validation (#1002)
+1. **Empty state** (`CommunityEmptyState`, #998) — icon, message and a *Start
+   Discussion* call to action, shown when the feed has no discussions. A
+   filtered variant (`No discussions found`) is used when filters return no
+   matches.
+2. **Error state** (`CommunityErrorState`, #999) — rendered as `role="alert"`
+   with the failure message and a retry action that re-issues the feed request
+   with the current filters.
+3. **Composer** (`StartDiscussionModal`, #1001) — title, category, rich-text
+   content, free-form tags and an attachments placeholder. Supports Publish,
+   Cancel, a close button, Escape, backdrop click, a focus trap and focus
+   restoration. The dialog is a bottom sheet on mobile and centred on desktop.
+4. **Backend submission** (#1004) — `communityApi.createDiscussion` posts to
+   `POST /api/community/discussions` while the modal shows a loading state and
+   blocks closing. Failures render inline and keep the draft; success closes
+   the modal, prepends the created discussion to the feed, resets infinite
+   scroll, announces a `CommunityToast` confirmation and tracks a
+   `discussion_created` analytics event.
 
-Title, category and content are required; the title is capped at 200
-characters. Invalid submissions are blocked, the first invalid field receives
-focus, and every message is rendered as a `role="alert"` referenced by the
-field's `aria-describedby`, with `aria-invalid` set on the control.
-`validateDiscussionForm` and `parseTags` are exported for reuse and testing.
-
-### Trending score (#985)
-
-`lib/community-trending.ts` exposes `getEngagementScore` (likes ×2, replies
-×3, views ×0.5) and `isTrendingDiscussion` (threshold `TRENDING_SCORE_THRESHOLD`),
-the same weighting the `trending` sort uses in the discussions API.
+The API client attaches the signed-in user's id (`x-user-id`) and display name
+to the request, so the composer does not need to wire up auth itself.
 
 ## API Endpoints
 
 ### Discussions
 
 - `GET /api/community/discussions` - List discussions (supports pagination, filtering, sorting)
-- `POST /api/community/discussions` - Create a new discussion
+- `POST /api/community/discussions` - Create a new discussion (#1004; used by the Start Discussion composer)
 - `PATCH /api/community/discussions/[id]/pin` - Pin/unpin a discussion
 - `PATCH /api/community/discussions/[id]/lock` - Lock/unlock a discussion
 - `POST /api/community/discussions/[id]/share` - Record a share, returns the canonical URL and share count (#1016)
@@ -176,6 +187,7 @@ npm test -- tests/unit/discussion-card.test.tsx
 ### Integration Tests
 ```bash
 npm test -- tests/integration/community-workflows.test.tsx
+npm test -- tests/integration/discussion-creation-flow.test.tsx
 ```
 
 ### E2E Tests
