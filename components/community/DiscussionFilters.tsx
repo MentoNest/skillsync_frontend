@@ -68,7 +68,7 @@ export function DiscussionFilters({
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value as DiscussionSort)}
-          className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+          className="max-w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           aria-label="Sort discussions"
         >
           <option value="trending">Trending</option>
