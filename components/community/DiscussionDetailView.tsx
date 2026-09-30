@@ -7,6 +7,8 @@ import { DiscussionActions } from "./DiscussionActions";
 import { EditDiscussionForm } from "./EditDiscussionForm";
 import { DeleteDiscussionButton } from "./DeleteDiscussionButton";
 import { RichTextEditor, richTextPlainLength } from "./RichTextEditor";
+import { DiscussionCategoryBadge } from "./DiscussionCategoryBadge";
+import { TrendingBadgeForDiscussion } from "./TrendingBadge";
 
 interface Props {
   discussion: Discussion;
@@ -102,15 +104,17 @@ export function DiscussionDetailView({
         <article className="space-y-4">
           <header className="space-y-3">
             <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
-              <span className="rounded-full bg-[var(--secondary)] px-2 py-0.5 font-medium">
-                {discussion.category}
-              </span>
+              <DiscussionCategoryBadge
+                label={discussion.category}
+                className="font-medium"
+              />
               {discussion.isPinned && (
                 <span className="text-[var(--primary)]">Pinned</span>
               )}
               {discussion.isLocked && (
                 <span className="text-amber-700">Locked</span>
               )}
+              <TrendingBadgeForDiscussion discussion={discussion} />
               <time dateTime={discussion.createdAt}>
                 {new Date(discussion.createdAt).toLocaleString()}
               </time>
