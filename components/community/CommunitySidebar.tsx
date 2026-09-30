@@ -7,6 +7,7 @@ import {
 import { useCategoryFollows } from "@/hooks/useCategoryFollows";
 import { CommunityCategories } from "./CommunityCategories";
 import { FollowButton } from "./FollowButton";
+import { UpcomingEvents } from "./UpcomingEvents";
 
 interface CommunitySidebarProps {
   selectedCategory: string | null;
@@ -27,6 +28,26 @@ const categories = COMMUNITY_CATEGORIES.map((c) => ({
   name: c.name,
   discussionCount: categoryCounts[c.id] ?? 0,
 }));
+
+// Placeholder events until the events API lands (#988).
+const upcomingEvents: CommunityEvent[] = [
+  {
+    id: "resume-review-clinic",
+    title: "Resume Review Clinic",
+    host: "SkillSync Mentors",
+    startsAt: "2026-10-06T16:00:00.000Z",
+    endsAt: "2026-10-06T17:00:00.000Z",
+    registrationCount: 42,
+  },
+  {
+    id: "career-paths-ama",
+    title: "Career Paths AMA",
+    host: "Amara Okafor",
+    startsAt: "2026-10-13T15:30:00.000Z",
+    endsAt: "2026-10-13T16:30:00.000Z",
+    registrationCount: 128,
+  },
+];
 
 export function CommunitySidebar({
   selectedCategory,
@@ -123,6 +144,8 @@ export function CommunitySidebar({
           <li>Search before posting</li>
         </ul>
       </div>
+
+      <UpcomingEvents events={upcomingEvents} />
     </div>
   );
 }
