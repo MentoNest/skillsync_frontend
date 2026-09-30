@@ -38,9 +38,6 @@ export const MemoizedDiscussionCard = memo(function MemoizedDiscussionCard({
             <span className="text-sm font-medium text-[var(--foreground)]">
               {discussion.authorName}
             </span>
-            <span className="text-xs text-[var(--muted)]">
-              {new Date(discussion.createdAt).toLocaleDateString()}
-            </span>
             {discussion.isPinned && (
               <span className="rounded bg-[var(--primary)]/10 px-1.5 py-0.5 text-xs font-medium text-[var(--primary)]">
                 Pinned
