@@ -3,135 +3,146 @@ import MentorCard, { MentorCardProps } from "./MentorCard";
 
 const FEATURED_MENTORS: MentorCardProps[] = [
   {
-    id: "1",
-    name: "James Okafor",
-    title: "Staff Software Engineer · Meta",
+    id: "101",
+    name: "Chidi Eze",
+    title: "Principal Engineer · Datadog",
     description:
-      "10+ years building distributed systems at scale. I help engineers crack senior and staff-level interviews, improve system design skills, and navigate big-tech transitions.",
-    skills: ["System Design", "Distributed Systems", "Go", "Kubernetes", "Career Growth"],
-    avatarInitials: "JO",
-    avatarColor: "bg-gradient-to-br from-violet-500 to-indigo-600",
+      "I have spent a decade keeping distributed systems upright under load. I mentor engineers on observability, incident response, and the unspoken skills that get ICs promoted to staff.",
+    skills: ["Distributed Systems", "Observability", "Go", "Incident Response"],
+    avatarInitials: "CE",
+    avatarColor: "bg-gradient-to-br from-indigo-500 to-blue-600",
     rating: 4.9,
-    sessions: 320,
+    sessions: 286,
   },
   {
-    id: "2",
-    name: "Aisha Nwosu",
-    title: "Principal Product Manager · Stripe",
+    id: "102",
+    name: "Elena Petrova",
+    title: "Head of Design · Bolt",
     description:
-      "Turned 3 zero-to-one products into market leaders. I mentor aspiring PMs and help experienced PMs move into leadership with a structured, data-informed approach.",
-    skills: ["Product Strategy", "0-to-1 Products", "Stakeholder Management", "Analytics"],
-    avatarInitials: "AN",
-    avatarColor: "bg-gradient-to-br from-rose-500 to-orange-400",
+      "Design leader with three zero-to-one launches behind me. I help designers build portfolios that get callbacks and run design critiques that actually improve the work.",
+    skills: ["Product Design", "Design Systems", "Portfolio Review", "Critique"],
+    avatarInitials: "EP",
+    avatarColor: "bg-gradient-to-br from-fuchsia-500 to-pink-500",
     rating: 4.8,
-    sessions: 210,
+    sessions: 164,
   },
   {
-    id: "3",
-    name: "Marcus Liu",
-    title: "Lead UX Designer · Figma",
+    id: "103",
+    name: "Raj Malhotra",
+    title: "Senior Engineering Manager · Atlassian",
     description:
-      "Obsessed with craft and clarity. I help designers build strong portfolios, master design systems, and land roles at top-tier product companies.",
-    skills: ["UX Research", "Design Systems", "Figma", "Prototyping", "Portfolio Review"],
-    avatarInitials: "ML",
-    avatarColor: "bg-gradient-to-br from-cyan-500 to-teal-500",
+      "From staff engineer to managing a 20-person org. I coach new managers through their first year: 1-on-1s, difficult conversations, and earning trust without authority.",
+    skills: ["Engineering Management", "1-on-1s", "Team Health", "Hiring"],
+    avatarInitials: "RM",
+    avatarColor: "bg-gradient-to-br from-amber-500 to-orange-500",
+    rating: 5.0,
+    sessions: 132,
+  },
+  {
+    id: "104",
+    name: "Grace Kim",
+    title: "Staff Data Scientist · Shopify",
+    description:
+      "I turn messy product data into decisions executives will sign off on. Mentoring data scientists on experiment design, causal inference, and communicating uncertainty.",
+    skills: ["Experimentation", "Causal Inference", "Python", "SQL"],
+    avatarInitials: "GK",
+    avatarColor: "bg-gradient-to-br from-emerald-500 to-teal-500",
     rating: 4.9,
-    sessions: 175,
+    sessions: 203,
   },
   {
-    id: "4",
-    name: "Priya Sharma",
-    title: "Senior Data Scientist · Netflix",
+    id: "105",
+    name: "Tobi Adeyemi",
+    title: "Founding Engineer · Paystack",
     description:
-      "Bridging ML and business impact at Netflix. I mentor data scientists on model deployment, stakeholder communication, and breaking into ML engineering.",
-    skills: ["Machine Learning", "Python", "MLOps", "SQL", "Data Strategy"],
-    avatarInitials: "PS",
-    avatarColor: "bg-gradient-to-br from-emerald-500 to-green-400",
+      "Built payment infrastructure used by 200k+ businesses across Africa. I help engineers navigate early-stage startups: wearing many hats, shipping fast, and knowing when to refactor.",
+    skills: ["Fintech", "Backend", "Startup Engineering", "System Design"],
+    avatarInitials: "TA",
+    avatarColor: "bg-gradient-to-br from-rose-500 to-red-500",
     rating: 4.7,
-    sessions: 142,
+    sessions: 97,
   },
   {
-    id: "5",
-    name: "David Torres",
-    title: "Engineering Manager · Shopify",
+    id: "106",
+    name: "Maya Johansson",
+    title: "Director of Product · Klarna",
     description:
-      "From IC to EM in 18 months. I coach engineers transitioning into management, help EMs build high-performing teams, and work through common leadership challenges.",
-    skills: ["Engineering Leadership", "Team Building", "1-on-1s", "Roadmapping"],
-    avatarInitials: "DT",
-    avatarColor: "bg-gradient-to-br from-amber-500 to-yellow-400",
+      "PM turned product director across fintech and e-commerce. I mentor aspiring PMs on case interviews and experienced PMs on stakeholder management at scale.",
+    skills: ["Product Strategy", "Stakeholders", "Growth", "Case Interviews"],
+    avatarInitials: "MJ",
+    avatarColor: "bg-gradient-to-br from-sky-500 to-cyan-500",
     rating: 4.8,
-    sessions: 198,
-  },
-  {
-    id: "6",
-    name: "Fatima Al-Rashid",
-    title: "Startup Founder & Angel Investor",
-    description:
-      "Built and sold two startups. I work with founders on fundraising strategy, product-market fit, and building lean teams that punch above their weight.",
-    skills: ["Fundraising", "GTM Strategy", "Product-Market Fit", "Pitch Decks"],
-    avatarInitials: "FA",
-    avatarColor: "bg-gradient-to-br from-pink-500 to-fuchsia-500",
-    rating: 4.9,
-    sessions: 87,
+    sessions: 178,
   },
 ];
 
+/**
+ * Mentor discovery section (#1156).
+ *
+ * Renders the shared `MentorCard` in a responsive grid. The cards are the same
+ * component the mentee mentor browser uses, so a fix here fixes both.
+ */
 export default function MentorDiscoverySection() {
   return (
     <section
       id="mentors"
-      className="py-20 lg:py-28 bg-slate-50"
+      className="bg-white py-20 lg:py-28"
       aria-labelledby="mentors-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <header className="max-w-2xl mx-auto text-center mb-12 lg:mb-16">
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-indigo-600 mb-3" aria-hidden="true">
-            Mentor Discovery
-          </span>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <header className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-indigo-600">
+            Mentor discovery
+          </p>
           <h2
             id="mentors-heading"
-            className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight"
+            className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
           >
-            Learn from people who&rsquo;ve been there
+            People who have done it, ready to help you do it
           </h2>
-          <p className="mt-4 text-lg text-slate-600 leading-relaxed">
-            Every mentor on SkillSync is vetted, experienced, and genuinely invested
-            in your success. Find the right fit for where you want to go.
+          <p className="mt-4 text-lg leading-relaxed text-slate-600">
+            Every mentor is vetted for real-world experience and a track record
+            of helping others grow. Browse a few below, or explore the full
+            catalogue.
           </p>
         </header>
 
-        {/* Mentor grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" role="list" aria-label="Featured mentors">
+        <div
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+          role="list"
+          aria-label="Featured mentors"
+        >
           {FEATURED_MENTORS.map((mentor) => (
-            <article key={mentor.id ?? mentor.name} role="listitem">
-              {/* #59: no explicit profileHref — MentorCard resolves
-                  /mentors/[mentorId] from the mentor's id. */}
+            <div role="listitem" key={mentor.id}>
               <MentorCard {...mentor} />
-            </article>
+            </div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
         <div className="mt-12 text-center">
-          <p className="text-slate-600 mb-4">
-            These are just a few of our{" "}
-            <span className="font-semibold text-slate-800">2,400+</span> mentors.
+          <p className="mb-4 text-slate-600">
+            These are six of over{" "}
+            <span className="font-semibold text-slate-800">2,400+</span>{" "}
+            mentors on SkillSync.
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/25 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 font-semibold text-white shadow-md shadow-indigo-500/25 transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             Explore all mentors
             <svg
-              className="w-5 h-5 flex-shrink-0"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={2}
               aria-hidden="true"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
             </svg>
           </Link>
         </div>
