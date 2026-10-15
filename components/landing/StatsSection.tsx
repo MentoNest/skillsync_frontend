@@ -1,150 +1,87 @@
-import { ReactNode } from "react";
-import StatCard, { StatCardProps } from "./StatCard";
+import StatCard from "./StatCard";
 
-/**
- * The figures the hero also quotes.
- *
- * These deliberately match the three stats in `HeroSection` — 2,400+ mentors,
- * 18k+ learners, 95% satisfaction — rather than introducing a fourth set of
- * numbers. Two sections of a landing page disagreeing about how many mentors
- * there are is the kind of thing a user screenshots and asks about, and there
- * is no version of that which is good.
- *
- * They live here rather than in a shared module because the rest of the landing
- * page keeps its content next to its component, and hoisting four numbers into
- * `lib/` for one duplication is not worth the indirection. If a fifth section
- * needs them, extract then — see the note in the PR.
- */
-interface PlatformStat extends StatCardProps {
-  /** Accent colour applied to the value text */
-  valueClassName?: string;
-}
-
-const PLATFORM_STATS: PlatformStat[] = [
+const PLATFORM_STATS = [
   {
     value: "2,400+",
-    label: "Vetted expert mentors",
-    description: "Engineers, designers, PMs and founders across 14 industries.",
+    label: "Vetted mentors",
+    description: "Across engineering, design, product, and data.",
     icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-        />
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
       </svg>
     ),
   },
   {
     value: "18k+",
     label: "Learners matched",
-    description: "Mentorship pairings created since the platform launched.",
+    description: "Pairings created since launch.",
     icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-        />
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     ),
   },
   {
     value: "95%",
     label: "Session satisfaction",
+    description: "Rated 4 or 5 stars after completed sessions.",
     icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M14.828 9l-2.828-2.786A2 2 0 007.172 7.828a2 2 0 00-2.829 2.829l4.243 4.243a2 2 0 002.828 0l2.829-2.83A2 2 0 0018.829 9.83a2 2 0 00-2.829-2.829l-1.172 1.172zm-6.172 6.829L6 14.828l2.828-2.829a2 2 0 014.243 0l1.172 1.172 1.172-1.172a2 2 0 014.243 0l2.828 2.829a2 2 0 010 2.829L19.514 21a2 2 0 01-2.829 0l-1.172-1.171-1.172 1.171a2 2 0 01-2.828 0L6.343 16.343a2 2 0 010-2.828z"
-        />
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.077 10.1c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
       </svg>
     ),
   },
   {
     value: "48h",
-    label: "Median time to first match",
+    label: "Median time to match",
+    description: "From sign-up to first session booked.",
     icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
   },
-];
+] as const;
 
 /**
- * Platform statistics section.
+ * Platform statistics section (#1160).
  *
- * Placed between mentor discovery and the closing CTA, which is the order a
- * reader expects: here is the product, here is the proof it works, now sign up.
- *
- * The three figures the hero quotes are repeated here on purpose — see the note
- * on `PLATFORM_STATS`. The fourth ("48h median time to first match") is new, and
- * is a claim that should be measured rather than assumed before launch.
+ * Four figures in a responsive 1/2/4-column grid, each rendered by the
+ * reusable `StatCard`. The first three figures deliberately match the numbers
+ * the hero quotes — a landing page where two sections disagree about how many
+ * mentors exist is a screenshot nobody wants.
  */
 export default function StatsSection() {
   return (
     <section
-      className="relative py-20 lg:py-28 bg-slate-50 border-y border-slate-200"
+      id="platform-stats"
+      className="border-y border-slate-200 bg-slate-50 py-20 lg:py-28"
       aria-labelledby="stats-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <span className="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold uppercase tracking-widest mb-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <header className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-indigo-600">
             By the numbers
-          </span>
-
+          </p>
           <h2
             id="stats-heading"
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight"
+            className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
           >
-            Results, not promises
+            The platform at a glance
           </h2>
-
-          <p className="mt-5 text-lg text-slate-600 leading-relaxed">
-            Every number below is measured from completed sessions, not from
-            signups. Mentors are vetted before they can list, and a session only
-            counts once it has actually happened.
+          <p className="mt-4 text-lg leading-relaxed text-slate-600">
+            Figures are drawn from completed sessions on SkillSync, not from
+            sign-ups.
           </p>
-        </div>
+        </header>
 
-        {/* A description list, because each figure is a label and the value it
-            describes. `StatCard` renders the inner dt/dd pair. */}
-        <dl className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {PLATFORM_STATS.map((stat) => (
             <StatCard
               key={stat.label}
               value={stat.value}
               label={stat.label}
+              description={stat.description}
               icon={stat.icon}
             />
           ))}
