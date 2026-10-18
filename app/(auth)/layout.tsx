@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Sign in · SkillSync",
+    template: "%s · SkillSync",
+  },
+  description:
+    "Sign in or create a SkillSync account to find mentors and grow your career.",
+};
 
 export default function AuthLayout({
   children,

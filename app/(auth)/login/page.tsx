@@ -5,13 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authApi } from "@/lib/api";
 import { useAuth } from "@/components/auth/AuthProvider";
+import PasswordInput from "@/components/auth/PasswordInput";
 
 export default function LoginPage() {
   const router = useRouter();
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,30 +73,15 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-[var(--foreground)]">
-            Password
-          </label>
-          <div className="relative mt-1">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 pr-16 text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-              placeholder="Enter your password"
-            />
-            <button
-              type="button"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              aria-pressed={showPassword}
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-3 text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)]"
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
+          <PasswordInput
+            id="password"
+            label="Password"
+            value={password}
+            onChange={setPassword}
+            required
+            minLength={8}
+            placeholder="Enter your password"
+          />
           <p className="mt-1 text-right">
             <Link
               href="/forgot-password"
