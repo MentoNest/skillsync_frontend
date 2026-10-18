@@ -130,34 +130,7 @@ export default function MobileFilterDrawer({
               />
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Expertise</h3>
-              <div className="flex flex-wrap gap-2">
-                {EXPERTISE_OPTIONS.map((expertise) => (
-                  <label
-                    key={expertise}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-700 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={filters.expertise?.includes(expertise) || false}
-                      onChange={(e) => {
-                        const newExpertise = filters.expertise || [];
-                        if (e.target.checked) {
-                          onFiltersChange({ ...filters, expertise: [...newExpertise, expertise] });
-                        } else {
-                          onFiltersChange({
-                            ...filters,
-                            expertise: newExpertise.filter((e) => e !== expertise),
-                          });
-                        }
-                      }}
-                      className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
-                    />
-                    {expertise}
-                  </label>
-                ))}
-      <MentorDiscoveryLayout
+        <MentorDiscoveryLayout
         sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
         sidebar={
             <>
