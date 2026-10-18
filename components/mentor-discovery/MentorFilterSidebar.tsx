@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import IndustryFilter, {
   DEFAULT_INDUSTRIES,
 } from "@/components/mentor-discovery/IndustryFilter";
+import ExperienceLevelFilter from "@/components/mentor-discovery/ExperienceLevelFilter";
 
 export const EXPERTISE_OPTIONS = [
   "Frontend",
@@ -20,7 +21,25 @@ export const EXPERTISE_OPTIONS = [
   "QA Engineering",
 ];
 
+/**
+ * App-wide experience vocabulary.
+ *
+ * These are the values stored in `MentorFilters.experience`, persisted to the URL
+ * by `useUrlFilters`, and mapped back to display text by `EXPERIENCE_LABELS` on
+ * the mentor profile page. They are deliberately *not* the Junior / Mid-Level /
+ * Senior / Executive set in `EXPERIENCE_LEVELS` — changing them would invalidate
+ * every bookmarked filter URL and silently stop matching mentors.
+ */
 export const EXPERIENCE_OPTIONS = ["junior", "mid", "senior", "lead", "principal"];
+
+/** Display text for `EXPERIENCE_OPTIONS`, matching the mentor profile page. */
+const EXPERIENCE_LABELS: Record<string, string> = {
+  junior: "Junior",
+  mid: "Mid-level",
+  senior: "Senior",
+  lead: "Lead",
+  principal: "Principal",
+};
 
 const RATING_OPTIONS = [4.5, 4.0, 3.5, 3.0];
 
@@ -30,6 +49,7 @@ const SIDEBAR_FILTER_KEYS = [
   "experience",
   "industry",
   "minRating",
+  "minHourlyRate",
   "maxHourlyRate",
 ] as const satisfies readonly (keyof MentorFilters)[];
 
@@ -55,7 +75,6 @@ interface CheckboxGroupProps {
   selected: string[];
   onChange: (selected: string[]) => void;
   variant: MentorFilterSidebarVariant;
-  capitalize?: boolean;
 }
 
 /** One independent multi-select group. Only reports its own selection. */
@@ -65,7 +84,6 @@ function CheckboxGroup({
   selected,
   onChange,
   variant,
-  capitalize,
 }: CheckboxGroupProps) {
   const groupId = useId();
 
@@ -103,10 +121,7 @@ function CheckboxGroup({
               className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
             />
             <span
-              className={cn(
-                variant === "list" && "text-sm text-slate-700",
-                capitalize && "capitalize"
-              )}
+              className={cn(variant === "list" && "text-sm text-slate-700")}
             >
               {option}
             </span>
@@ -138,6 +153,44 @@ export default function MentorFilterSidebar({
       value === undefined || (Array.isArray(value) && value.length === 0);
     onFiltersChange({ ...filters, [key]: isEmpty ? undefined : value });
   };
+
+  /**
+   * #1206 — the rate range.
+   *
+   * `MentorFilters.minHourlyRate` has existed on the type and is sent to
+   * `mentorApi.getMentors`, but nothing in the UI ever set it: the sidebar only
+   * offered a maximum, so a mentor could be capped from above but never bounded
+   * from below.
+   *
+   * "Valid range is enforced" means the pair is kept ordered. When an edit would
+   * invert it, the opposite bound is moved rather than the edit being dropped —
+   * silently discarding what the user just typed is worse than moving a number
+   * they can see and correct. Doing it here rather than during render keeps the
+   * correction on the event that caused it.
+   */
+  const setRateBound = (bound: "minHourlyRate" | "maxHourlyRate", raw: string) => {
+    const value = toPositiveNumber(raw);
+    const next: MentorFilters = { ...filters, [bound]: value };
+
+    if (
+      next.minHourlyRate !== undefined &&
+      next.maxHourlyRate !== undefined &&
+      next.minHourlyRate > next.maxHourlyRate
+    ) {
+      if (bound === "minHourlyRate") {
+        next.maxHourlyRate = next.minHourlyRate;
+      } else {
+        next.minHourlyRate = next.maxHourlyRate;
+      }
+    }
+
+    onFiltersChange(next);
+  };
+
+  const isRangeInverted =
+    filters.minHourlyRate !== undefined &&
+    filters.maxHourlyRate !== undefined &&
+    filters.minHourlyRate > filters.maxHourlyRate;
 
   const activeCount = SIDEBAR_FILTER_KEYS.reduce((count, key) => {
     const value = filters[key];
@@ -178,13 +231,11 @@ export default function MentorFilterSidebar({
         variant={variant}
       />
 
-      <CheckboxGroup
-        title="Experience Level"
-        options={EXPERIENCE_OPTIONS}
-        selected={filters.experience || []}
+      <ExperienceLevelFilter
+        selectedLevels={filters.experience || []}
         onChange={(v) => setFilter("experience", v)}
         variant={variant}
-        capitalize
+        options={EXPERIENCE_OPTIONS.map((value) => ({ value, label: EXPERIENCE_LABELS[value] ?? value }))}
       />
 
       {variant === "list" ? (
@@ -226,23 +277,63 @@ export default function MentorFilterSidebar({
 
       <div>
         <label
-          htmlFor="filter-max-rate"
+          htmlFor="filter-min-rate"
           className="block text-sm font-semibold text-slate-900 mb-3"
         >
-          Max Hourly Rate
+          Hourly Rate
         </label>
-        <input
-          id="filter-max-rate"
-          type="number"
-          min={0}
-          value={filters.maxHourlyRate || ""}
-          onChange={(e) => setFilter("maxHourlyRate", Number(e.target.value) || undefined)}
-          placeholder="e.g., 200"
-          className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        />
+
+        <div className="flex items-center gap-2">
+          <input
+            id="filter-min-rate"
+            type="number"
+            min={0}
+            inputMode="numeric"
+            aria-label="Minimum hourly rate"
+            value={filters.minHourlyRate ?? ""}
+            onChange={(e) => setRateBound("minHourlyRate", e.target.value)}
+            placeholder="Min"
+            className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          <span aria-hidden="true" className="text-slate-400 text-sm">
+            –
+          </span>
+          <input
+            id="filter-max-rate"
+            type="number"
+            min={0}
+            inputMode="numeric"
+            aria-label="Maximum hourly rate"
+            value={filters.maxHourlyRate ?? ""}
+            onChange={(e) => setRateBound("maxHourlyRate", e.target.value)}
+            placeholder="Max"
+            className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        {isRangeInverted ? (
+          <p
+            role="alert"
+            className="mt-2 flex items-start gap-1 text-xs text-amber-700"
+          >
+            <span aria-hidden="true">⚠</span>
+            <span>
+              Minimum is above maximum — no mentor can match. Maximum has been
+              raised to the minimum.
+            </span>
+          </p>
+        ) : null}
       </div>
     </div>
   );
+}
+
+/** Parse a rate input, treating blank and non-numeric as "no bound". */
+function toPositiveNumber(raw: string): number | undefined {
+  if (raw.trim() === "") return undefined;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0) return undefined;
+  return value;
 }
 
 export { MentorFilterSidebar };
