@@ -70,7 +70,12 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
       }
 
       try {
-        const response = await mentorApi.getMentors(filters, pageNumber, pageSize);
+        // AFTER
+const response = await mentorApi.getMentors(
+  { ...filters, sortBy: filters.sortBy || "relevance" },
+  pageNumber,
+  pageSize
+);
 
         if (append) {
           setMentors((prev) => {
