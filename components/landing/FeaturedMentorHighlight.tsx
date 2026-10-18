@@ -80,7 +80,7 @@ export default function FeaturedMentorHighlight() {
             </div>
 
             {/* Bio and expertise column */}
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <p className="text-lg leading-relaxed text-slate-300">
                 {FEATURED.bio}
               </p>

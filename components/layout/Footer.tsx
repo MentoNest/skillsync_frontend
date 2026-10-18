@@ -186,9 +186,18 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-slate-800 pt-8 text-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-slate-800 pt-8 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p>&copy; {year} SkillSync. All rights reserved.</p>
-          <p>Built for learners, by mentors.</p>
+          <div className="flex items-center justify-between gap-4 sm:justify-end">
+            <p>Built for learners, by mentors.</p>
+            <Link
+              href="#main-content"
+              className="inline-flex items-center gap-1 rounded font-medium text-slate-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            >
+              Back to top
+              <span aria-hidden="true">&uarr;</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

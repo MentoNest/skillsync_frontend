@@ -94,17 +94,16 @@ export default function WhyChooseUsSection() {
           </p>
         </header>
 
-        <div
+        <ul
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-          role="list"
           aria-label="Platform benefits"
         >
           {BENEFITS.map((benefit) => (
-            <div role="listitem" key={benefit.title}>
+            <li key={benefit.title} className="min-w-0">
               <BenefitCard {...benefit} />
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
