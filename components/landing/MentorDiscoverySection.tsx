@@ -107,17 +107,16 @@ export default function MentorDiscoverySection() {
           </p>
         </header>
 
-        <div
+        <ul
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-          role="list"
           aria-label="Featured mentors"
         >
           {FEATURED_MENTORS.map((mentor) => (
-            <div role="listitem" key={mentor.id}>
+            <li key={mentor.id} className="min-w-0">
               <MentorCard {...mentor} />
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <div className="mt-12 text-center">
           <p className="mb-4 text-slate-600">

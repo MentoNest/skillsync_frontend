@@ -25,9 +25,9 @@ export default function CTASection() {
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Badge */}
-        <div className="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold uppercase tracking-widest mb-6" role="status" aria-live="polite">
+        <p className="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-semibold uppercase tracking-widest mb-6">
           Get started today
-        </div>
+        </p>
 
         {/* Headline */}
         <h2
@@ -76,8 +76,11 @@ export default function CTASection() {
         </div>
 
         {/* Trust signals */}
-        <div className="mt-12 flex flex-wrap justify-center gap-8 text-indigo-200" role="list" aria-label="Trust signals">
-          <div className="flex items-center gap-2" role="listitem">
+        <ul
+          className="mt-12 flex flex-wrap justify-center gap-x-8 gap-y-3 text-indigo-200"
+          aria-label="Trust signals"
+        >
+          <li className="flex items-center gap-2">
             <svg
               className="w-5 h-5 text-indigo-300 flex-shrink-0"
               fill="none"
@@ -93,8 +96,8 @@ export default function CTASection() {
               />
             </svg>
             <span className="text-sm font-medium">No credit card required</span>
-          </div>
-          <div className="flex items-center gap-2" role="listitem">
+          </li>
+          <li className="flex items-center gap-2">
             <svg
               className="w-5 h-5 text-indigo-300 flex-shrink-0"
               fill="none"
@@ -110,8 +113,8 @@ export default function CTASection() {
               />
             </svg>
             <span className="text-sm font-medium">Cancel anytime</span>
-          </div>
-          <div className="flex items-center gap-2" role="listitem">
+          </li>
+          <li className="flex items-center gap-2">
             <svg
               className="w-5 h-5 text-indigo-300 flex-shrink-0"
               fill="none"
@@ -127,8 +130,8 @@ export default function CTASection() {
               />
             </svg>
             <span className="text-sm font-medium">2,400+ vetted mentors</span>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
     </section>
   );

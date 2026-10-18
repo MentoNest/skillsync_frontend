@@ -106,17 +106,16 @@ export default function TestimonialsSection() {
           </p>
         </header>
 
-        <div
+        <ul
           className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          role="list"
           aria-label="Learner testimonials"
         >
           {TESTIMONIALS.map((testimonial) => (
-            <div role="listitem" key={testimonial.name} className="flex">
+            <li key={testimonial.name} className="flex min-w-0">
               <TestimonialCard {...testimonial} />
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
