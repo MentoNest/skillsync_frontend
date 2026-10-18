@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import CategoryBadge from "@/components/resources/CategoryBadge";
-import { memo, useDeferredValue, useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export interface ResourceListItem {
 	title: string;
@@ -25,9 +26,8 @@ interface ResourceSearchListProps {
  * The only interactive part of the resource listing pages. Kept as a small
  * client island so the page shell, heading and back link stay server-rendered.
  *
- * `useDeferredValue` replaces the old timer-based debounce: typing stays
- * responsive and the list re-renders at low priority, without an extra state
- * update per keystroke.
+ * The query is debounced (300ms) so results update once typing pauses,
+ * instead of re-filtering on every keystroke.
  */
 export default function ResourceSearchList({
 	items,
@@ -38,7 +38,7 @@ export default function ResourceSearchList({
 	ctaLabel,
 }: ResourceSearchListProps) {
 	const [query, setQuery] = useState("");
-	const deferredQuery = useDeferredValue(query);
+	const deferredQuery = useDebouncedValue(query, 300);
 
 	const filtered = useMemo(() => {
 		const value = deferredQuery.trim().toLowerCase();
