@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authApi } from "@/lib/api";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { getAuthUser, getDashboardPath } from "@/lib/auth";
 import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
 import {
   hasFormErrors,
@@ -37,6 +39,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [errors, setErrors] = useState<LoginFormErrors>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const { signIn } = useAuth();
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -51,8 +55,10 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await authApi.login(email.trim(), password);
-      window.location.href = "/community";
+      const response = await authApi.login(email.trim(), password);
+      const user = getAuthUser(response, email.trim());
+      if (user) signIn(user);
+      window.location.href = user ? getDashboardPath(user.role) : "/community";
     } catch (error) {
       setServerError(
         error instanceof Error ? error.message : "Login failed"

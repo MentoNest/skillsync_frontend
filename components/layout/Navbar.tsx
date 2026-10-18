@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { getDashboardPath } from "@/lib/auth";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
+  const pathname = usePathname();
+  const isActive = (href: string) =>
+    href.startsWith("/") && (pathname === href || pathname.startsWith(`${href}/`));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
@@ -94,7 +98,8 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg"
+                aria-current={isActive(link.href) ? "page" : undefined}
+                className={`text-sm font-medium ${isActive(link.href) ? "text-indigo-600" : "text-slate-600"} hover:text-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg`}
               >
                 {link.label}
               </Link>
@@ -184,7 +189,8 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block px-4 py-3 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  aria-current={isActive(link.href) ? "page" : undefined}
+                  className={`block px-4 py-3 rounded-lg text-base font-medium ${isActive(link.href) ? "bg-slate-100 text-indigo-600" : "text-slate-700"} hover:bg-slate-100 hover:text-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
