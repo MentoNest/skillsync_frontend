@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback } from "react";
+import { memo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MentorCardProps } from "@/components/landing/MentorCard";
@@ -23,16 +23,14 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
   title,
   description,
   skills,
+  avatar,
+  avatarUrl,
   avatarInitials,
   avatarColor,
   rating,
   sessions,
   profileHref,
   children,
-  onBookmark,
-  onCompare,
-  isBookmarked = false,
-  isSelectedForComparison = false,
 }: OptimizedMentorCardProps) {
   // #59: default the CTA to this mentor's own profile route rather than
   // /register, so the link always carries the correct mentor id.
@@ -42,24 +40,53 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
       ? mentorProfileHref(id)
       : `/mentors/${name.toLowerCase().replace(/\s+/g, "-")}`);
 
-  const handleBookmark = useCallback(() => {
-    onBookmark?.(name);
-  }, [onBookmark, name]);
-
-  const handleCompare = useCallback(() => {
-    onCompare?.({ name, title, description, skills, avatarInitials, avatarColor, rating, sessions, profileHref: resolvedHref });
-  }, [onCompare, name, title, description, skills, avatarInitials, avatarColor, rating, sessions, resolvedHref]);
+  // Profile image with a monogram fallback (#1208).
+  //
+  // `Image` was imported here but never rendered, so every card showed the
+  // initials block regardless of whether a mentor had a photo — `avatar` and
+  // `avatarUrl` were accepted and silently ignored. Mirrors the resolution and
+  // fallback logic in `components/landing/MentorCard` so both cards agree:
+  // prefer `avatarUrl`, fall back to `avatar`, and treat a load failure the same
+  // as having no image at all rather than leaving a broken image icon.
+  const [imageFailed, setImageFailed] = useState(false);
+  const imageUrl = avatarUrl || avatar;
+  const hasValidImage = Boolean(imageUrl) && !imageFailed;
+  const initials =
+    avatarInitials ||
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("");
 
   return (
     <article className="group flex flex-col bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 overflow-hidden">
       <div className="p-6 pb-4">
         <div className="flex items-start gap-4">
-          <div
-            className={`shrink-0 w-14 h-14 rounded-2xl ${avatarColor} flex items-center justify-center text-white font-bold text-lg shadow-sm`}
-            aria-hidden="true"
-          >
-            {avatarInitials}
-          </div>
+          {hasValidImage ? (
+            <div className="relative shrink-0 w-12 h-12 sm:w-14 sm:h-14 overflow-hidden rounded-2xl bg-slate-100 shadow-sm">
+              <Image
+                src={imageUrl as string}
+                alt={`${name}'s profile`}
+                fill
+                sizes="(min-width: 640px) 56px, 48px"
+                loading="lazy"
+                decoding="async"
+                onError={() => setImageFailed(true)}
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-sm ${
+                avatarColor ?? "bg-gradient-to-br from-indigo-500 to-cyan-500"
+              }`}
+              aria-hidden="true"
+            >
+              {initials}
+            </div>
+          )}
 
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-slate-900 truncate">{name}</h3>
