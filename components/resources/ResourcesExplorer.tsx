@@ -1,6 +1,7 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import LearningTrackCard, { type LearningTrackCardProps } from "@/components/resources/LearningTrackCard";
 import QuickAccessGrid, { QUICK_ACCESS_CATEGORIES } from "@/components/resources/QuickAccessGrid";
 import ResourceSearchBar from "@/components/resources/ResourceSearchBar";
@@ -47,7 +48,7 @@ function matches(query: string, ...fields: string[]) {
  */
 export default function ResourcesExplorer() {
   const [query, setQuery] = useState("");
-  const deferredQuery = useDeferredValue(query);
+  const deferredQuery = useDebouncedValue(query, 300);
   const normalized = deferredQuery.trim().toLowerCase();
 
   const categories = useMemo(
