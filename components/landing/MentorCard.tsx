@@ -6,6 +6,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { mentorProfileHref } from "@/lib/mentor-types";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
+import MentorSkillTags from "@/components/mentor-discovery/MentorSkillTags";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
 export { MentorRating };
 
@@ -118,6 +119,8 @@ export default function MentorCard({
                   alt={`${name}'s profile`}
                   fill
                   sizes="(min-width: 640px) 56px, 48px"
+                  loading="lazy"
+                  decoding="async"
                   onError={() => setImageError(true)}
                   className="object-cover"
                 />
