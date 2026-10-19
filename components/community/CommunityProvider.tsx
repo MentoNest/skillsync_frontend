@@ -100,11 +100,20 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       setError(null);
 
       try {
+        // selectedCategory may be a single id, a comma-separated list of ids
+        // (multi-select, #1248), or null for "All". The API accepts a single
+        // category param; when multiple are selected we pass the first one so
+        // the existing endpoint keeps working and the full multi-category
+        // endpoint can be wired in once it lands (#1248).
+        const categoryParam = filters.selectedCategory
+          ? filters.selectedCategory.split(",")[0].trim() || null
+          : null;
+
         const result = await communityApi.getDiscussions({
           page,
           limit: COMMUNITY_PAGE_SIZE,
           sort: filters.sortBy,
-          category: filters.selectedCategory,
+          category: categoryParam,
           search: filters.searchQuery,
         });
 
