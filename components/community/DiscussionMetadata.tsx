@@ -1,16 +1,17 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { DiscussionCategoryBadge } from "./DiscussionCategoryBadge";
 
 /**
  * Props are loose fields rather than a whole `Discussion` so the component
- * can also describe saved items, replies or any other card that carries the
- * same metadata (#983).
+ * can also describe saved items, replies, or any other card that carries the
+ * same metadata.
  */
 export interface DiscussionMetadataProps {
   /** ISO 8601 timestamp the discussion was posted at. */
   createdAt: string;
-  /** Category id or label, rendered as a badge. */
+  /** Category label, e.g. "Career Growth". Rendered via DiscussionCategoryBadge. */
   category: string;
   likeCount: number;
   replyCount: number;
@@ -26,19 +27,21 @@ const LIKE_PATH =
 const REPLY_PATH =
   "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z";
 
-const VIEW_PATH =
-  "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z";
+const VIEW_PATH_1 = "M15 12a3 3 0 11-6 0 3 3 0 016 0z";
+const VIEW_PATH_2 =
+  "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z";
 
 /**
- * A single counter inside the metadata list. The visible text is only the
- * number, so the `<dt>` carries the accessible name for screen readers.
+ * A single engagement counter inside the metadata list.
+ * The `<dt>` carries the accessible name; the visible text is only the number.
  */
 function MetadataStat({
-  path,
+  children,
   value,
   label,
 }: {
-  path: string;
+  /** SVG path element(s) for the icon. */
+  children: React.ReactNode;
   value: number;
   label: string;
 }) {
@@ -53,12 +56,7 @@ function MetadataStat({
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d={path}
-          />
+          {children}
         </svg>
         <span>{value}</span>
       </dd>
@@ -67,12 +65,11 @@ function MetadataStat({
 }
 
 /**
- * Reusable metadata row for a discussion: when it was posted, its category and
- * its engagement counters (#983).
+ * Reusable metadata row for a discussion: when it was posted, its engagement
+ * counters (likes, replies, optionally views), and its category badge.
  *
- * Rendered as a description list so the label/value pairs are exposed to
- * assistive technology even though the icons and numbers are the only thing
- * on screen.
+ * Rendered as a `<dl>` (description list) so every label/value pair is exposed
+ * to assistive technology even though only icons and numbers appear on screen.
  */
 export function DiscussionMetadata({
   createdAt,
@@ -96,22 +93,55 @@ export function DiscussionMetadata({
         <div className="flex items-center gap-1">
           <dt className="sr-only">Posted</dt>
           <dd>
-            <time dateTime={createdAt}>{created.toLocaleDateString()}</time>
+            <time dateTime={createdAt}>
+              {created.toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
+            </time>
           </dd>
         </div>
       )}
 
-      <MetadataStat path={LIKE_PATH} value={likeCount} label="Likes" />
-      <MetadataStat path={REPLY_PATH} value={replyCount} label="Replies" />
+      <MetadataStat value={likeCount} label="Likes">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d={LIKE_PATH}
+        />
+      </MetadataStat>
+
+      <MetadataStat value={replyCount} label="Replies">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d={REPLY_PATH}
+        />
+      </MetadataStat>
 
       {typeof viewCount === "number" && (
-        <MetadataStat path={VIEW_PATH} value={viewCount} label="Views" />
+        <MetadataStat value={viewCount} label="Views">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d={VIEW_PATH_1}
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d={VIEW_PATH_2}
+          />
+        </MetadataStat>
       )}
 
       <div className="flex items-center">
         <dt className="sr-only">Category</dt>
-        <dd className="rounded-full bg-[var(--secondary)] px-2 py-0.5 text-xs font-medium text-[var(--muted)]">
-          {category}
+        <dd>
+          <DiscussionCategoryBadge label={category} />
         </dd>
       </div>
     </dl>
