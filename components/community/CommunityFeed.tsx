@@ -47,14 +47,7 @@ export function CommunityFeed({
 
   return (
     <div className="space-y-4">
-      <DiscussionFilters
-        selectedCategory={selectedCategory}
-        searchQuery={searchQuery}
-        sortBy={sortBy}
-        onCategoryChange={onCategoryChange}
-        onSearchChange={onSearchChange}
-        onSortChange={onSortChange}
-      />
+      <DiscussionFilters />
 
       {isLoading ? (
         <DiscussionFeedSkeleton count={4} />
