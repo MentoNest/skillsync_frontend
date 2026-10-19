@@ -1,13 +1,6 @@
 "use client";
 
-import { CommunityFeed } from "@/components/community/CommunityFeed";
-import { CommunitySidebar } from "@/components/community/CommunitySidebar";
-import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
-import { CommunityProvider, useCommunityState } from "@/lib/community-store";
-
-function CommunityContent() {
-  const { isConnected, error } = useCommunityState();
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
@@ -22,6 +15,8 @@ import {
   type Discussion,
   type DiscussionSort,
 } from "@/lib/community-types";
+
+const PAGE_SIZE = 10;
 
 export default function CommunityPage() {
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
@@ -43,7 +38,6 @@ export default function CommunityPage() {
       const newDisc = discussion as Discussion;
       if (!newDisc?.id) return;
       setDiscussions((prev) => {
-        // Prevent duplicates
         if (prev.some((d) => d.id === newDisc.id)) return prev;
         return [newDisc, ...prev];
       });
@@ -52,16 +46,18 @@ export default function CommunityPage() {
       setDiscussions((prev) =>
         prev.map((d) =>
           d.id === discussionId
-            ? { ...d, replyCount: d.replyCount + 1, lastReply: reply as Discussion["lastReply"] }
+            ? {
+                ...d,
+                replyCount: d.replyCount + 1,
+                lastReply: reply as Discussion["lastReply"],
+              }
             : d
         )
       );
     },
     onLikeUpdate: (discussionId, likeCount) => {
       setDiscussions((prev) =>
-        prev.map((d) =>
-          d.id === discussionId ? { ...d, likeCount } : d
-        )
+        prev.map((d) => (d.id === discussionId ? { ...d, likeCount } : d))
       );
     },
   });
@@ -79,7 +75,7 @@ export default function CommunityPage() {
 
         const params = new URLSearchParams({
           page: String(page),
-          limit: "10",
+          limit: String(PAGE_SIZE),
           sort: sortBy,
         });
         if (selectedCategory) params.set("category", selectedCategory);
@@ -92,7 +88,6 @@ export default function CommunityPage() {
 
         if (append) {
           setDiscussions((prev) => {
-            // Prevent duplicates
             const existingIds = new Set(prev.map((d) => d.id));
             const newDiscussions = data.discussions.filter(
               (d: Discussion) => !existingIds.has(d.id)
@@ -119,13 +114,13 @@ export default function CommunityPage() {
     fetchDiscussions();
   }, [fetchDiscussions]);
 
-  // Next page of results, shared by the load-more button and the scroll sentinel.
+  // Next page — shared by the load-more button and the scroll sentinel.
   const handleLoadMore = useCallback(
-    () => fetchDiscussions(Math.floor(discussions.length / 10) + 1, true),
+    () => fetchDiscussions(Math.floor(discussions.length / PAGE_SIZE) + 1, true),
     [fetchDiscussions, discussions.length]
   );
 
-  // Infinite scroll
+  // Infinite scroll sentinel
   const { resetInfiniteScroll } = useInfiniteScroll({
     isLoading: isLoadingMore,
     hasMore,
@@ -134,16 +129,13 @@ export default function CommunityPage() {
     loadMoreRef,
   });
 
-  // Reset infinite scroll when filters change
+  // Reset scroll position when filters change
   useEffect(() => {
     resetInfiniteScroll();
   }, [selectedCategory, searchQuery, sortBy, resetInfiniteScroll]);
 
   const dismissToast = useCallback(() => setToastMessage(null), []);
 
-  // #1004: surface the created discussion immediately and refresh the feed so
-  // the new item is visible without a manual reload. Reset infinite scroll so
-  // the next load-more page stays consistent with the inserted item.
   const handleDiscussionCreated = useCallback(
     (created: Discussion) => {
       setDiscussions((prev) =>
@@ -157,18 +149,6 @@ export default function CommunityPage() {
     [resetInfiniteScroll]
   );
 
-  const handleCategoryChange = (category: string | null) => {
-    setSelectedCategory(category);
-  };
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleSortChange = (sort: DiscussionSort) => {
-    setSortBy(sort);
-  };
-
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -181,9 +161,9 @@ export default function CommunityPage() {
               <p className="mt-2 text-[var(--muted)]">
                 Connect, share, and learn with fellow mentees and mentors
               </p>
-              {isLive && (
+              {isConnected && (
                 <span className="mt-2 inline-flex items-center gap-1 text-sm text-green-600">
-                  <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
                   Live updates enabled
                 </span>
               )}
@@ -211,36 +191,17 @@ export default function CommunityPage() {
           </div>
         </div>
 
-        <CommunityHeroBanner
-          onStartDiscussion={() => setIsComposerOpen(true)}
-        />
+        <CommunityHeroBanner onStartDiscussion={() => setIsComposerOpen(true)} />
 
-        {/**
-         * #1000 — Responsive Community Sidebar layout:
-         * - Desktop (lg+): right sidebar (feed left, sidebar right).
-         * - Tablet (md): single column — sidebar widgets stack below the feed
-         *   and keep full width for comfortable touch targets.
-         * - Mobile (<md): same single column; the sidebar (categories +
-         *   guidelines) renders after the discussion feed for logical ordering.
-         * DOM order stays feed-then-sidebar on every breakpoint so keyboard
-         * focus and screen-reader order always match the visual order.
+        {/*
+         * Responsive layout:
+         * - Desktop (lg+): feed left, sidebar right.
+         * - Tablet / mobile: single column; sidebar stacks below the feed.
+         * DOM order is always feed-then-sidebar so keyboard focus and
+         * screen-reader reading order match the visual layout on every breakpoint.
          */}
         <div className="mt-8 flex flex-col gap-8 lg:flex-row">
           <main className="min-w-0 flex-1">
-            {error && (
-              <div
-                role="alert"
-                className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800"
-              >
-                {error}
-              </div>
-            )}
-
-            <CommunityFeed />
-          </main>
-
-          <aside className="w-full lg:w-80 flex-shrink-0">
-            <CommunitySidebar />
             <CommunityFeed
               discussions={discussions}
               isLoading={isLoading}
@@ -249,9 +210,10 @@ export default function CommunityPage() {
               selectedCategory={selectedCategory}
               searchQuery={searchQuery}
               sortBy={sortBy}
-              onCategoryChange={handleCategoryChange}
-              onSearchChange={handleSearchChange}
-              onSortChange={handleSortChange}
+              onCategoryChange={setSelectedCategory}
+              onSearchChange={setSearchQuery}
+              onSortChange={setSortBy}
+              onLoadMore={handleLoadMore}
               error={error}
               onRetry={() => fetchDiscussions(1, false)}
               onStartDiscussion={() => setIsComposerOpen(true)}
@@ -261,15 +223,11 @@ export default function CommunityPage() {
 
           <aside
             aria-label="Community sidebar"
-            className="
-              w-full min-w-0
-              lg:w-80 lg:flex-shrink-0
-              border-t border-[var(--border)] pt-6 lg:border-t-0 lg:pt-0
-            "
+            className="w-full min-w-0 border-t border-[var(--border)] pt-6 lg:w-80 lg:flex-shrink-0 lg:border-t-0 lg:pt-0"
           >
             <CommunitySidebar
               selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
+              onCategoryChange={setSelectedCategory}
             />
           </aside>
         </div>
@@ -290,14 +248,5 @@ export default function CommunityPage() {
         <CommunityToast message={toastMessage} onDismiss={dismissToast} />
       )}
     </div>
-  );
-}
-
-export default function CommunityPage() {
-  return (
-    <CommunityProvider>
-      <CommunityContent />
-      <CommunityPageContent />
-    </CommunityProvider>
   );
 }
