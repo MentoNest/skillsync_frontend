@@ -66,7 +66,7 @@ export function DiscussionFilters({
   useEffect(() => {
     if (searchInput === searchQuery) return;
     const timeout = window.setTimeout(() => {
-      onSearchChange(searchInput.trim());
+      setSearchQuery(searchInput.trim());
     }, 300);
     return () => window.clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,6 +138,8 @@ export function DiscussionFilters({
 
         <select
           value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as DiscussionSort)}
+          className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           onChange={(e) => onSortChange(e.target.value as DiscussionSort)}
           className="max-w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           aria-label="Sort discussions"

@@ -170,6 +170,7 @@ function CommunityPageContent() {
 export default function CommunityPage() {
   return (
     <CommunityProvider>
+      <CommunityContent />
       <CommunityPageContent />
     </CommunityProvider>
   );
