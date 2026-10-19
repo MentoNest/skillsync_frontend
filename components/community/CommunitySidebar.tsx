@@ -1,6 +1,14 @@
 "use client";
 
 import {
+  useCommunityActions,
+  useCommunityState,
+} from "@/lib/community-store";
+
+export function CommunitySidebar() {
+  const { categories, selectedCategory } = useCommunityState();
+  const { setCategory } = useCommunityActions();
+
   COMMUNITY_CATEGORIES,
   type CommunityCategoryId,
   type CommunityEvent,

@@ -2,6 +2,7 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
+import { DiscussionFeedSkeleton } from "./CommunitySkeleton";
 import { CommunityEmptyState } from "./CommunityEmptyState";
 import { CommunityErrorState } from "./CommunityErrorState";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
@@ -46,16 +47,10 @@ export function CommunityFeed({
 
   return (
     <div className="space-y-4">
-      <DiscussionFilters
-        selectedCategory={selectedCategory}
-        searchQuery={searchQuery}
-        sortBy={sortBy}
-        onCategoryChange={onCategoryChange}
-        onSearchChange={onSearchChange}
-        onSortChange={onSortChange}
-      />
+      <DiscussionFilters />
 
       {isLoading ? (
+        <DiscussionFeedSkeleton count={4} />
         <div className="flex justify-center py-12" role="status" aria-label="Loading discussions">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--primary)] border-t-transparent" />
         </div>
