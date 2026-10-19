@@ -1,5 +1,12 @@
 "use client";
 
+import { CommunityFeed } from "@/components/community/CommunityFeed";
+import { CommunitySidebar } from "@/components/community/CommunitySidebar";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import { CommunityProvider, useCommunityState } from "@/lib/community-store";
+
+function CommunityContent() {
+  const { isConnected, error } = useCommunityState();
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
@@ -229,6 +236,11 @@ export default function CommunityPage() {
               </div>
             )}
 
+            <CommunityFeed />
+          </main>
+
+          <aside className="w-full lg:w-80 flex-shrink-0">
+            <CommunitySidebar />
             <CommunityFeed
               discussions={discussions}
               isLoading={isLoading}
@@ -284,6 +296,7 @@ export default function CommunityPage() {
 export default function CommunityPage() {
   return (
     <CommunityProvider>
+      <CommunityContent />
       <CommunityPageContent />
     </CommunityProvider>
   );

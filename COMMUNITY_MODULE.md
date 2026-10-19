@@ -113,6 +113,11 @@ All social endpoints scope their state to the viewer, resolved from the
 
 - `GET /api/community/overview` - Sidebar payload: community statistics plus the events list
 
+### Categories & Events
+
+- `GET /api/community/categories` - List categories with discussion counts
+- `GET /api/community/events/upcoming` - List upcoming community events
+
 ### Notifications
 
 - `GET /api/community/notifications` - Get user notifications
@@ -133,6 +138,19 @@ All social endpoints scope their state to the viewer, resolved from the
 
 ## State Management
 
+Community state is centralized in a React Context store (`lib/community-store.tsx`).
+`CommunityProvider` owns the shared state and exposes it through hooks, so
+components read and update it directly instead of passing props down the tree:
+
+- `useCommunityState` - Discussions, categories, events, filters, sorting,
+  loading, errors, and the infinite-scroll sentinel ref
+- `useCommunityActions` - Set category/search/sort, refetch, and load more
+- `useCommunity` - Convenience hook returning both
+
+`CommunityProvider` also wires `useCommunityRealtime` (SSE updates) and
+`useInfiniteScroll` (IntersectionObserver pagination) into the shared state.
+Local component state remains for ephemeral UI only (e.g. the debounced
+search input, notification read status, and moderation actions).
 Shared feed state lives in `CommunityProvider` (#996) and is read with the
 `useCommunity` hook, so the page, the feed and the sidebar do not thread
 props between them:

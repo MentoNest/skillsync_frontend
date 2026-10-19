@@ -1,6 +1,14 @@
 "use client";
 
 import {
+  useCommunityActions,
+  useCommunityState,
+} from "@/lib/community-store";
+
+export function CommunitySidebar() {
+  const { categories, selectedCategory } = useCommunityState();
+  const { setCategory } = useCommunityActions();
+
   COMMUNITY_CATEGORIES,
   type CommunityCategoryId,
 } from "@/lib/community-types";
@@ -98,6 +106,10 @@ export function CommunitySidebar({
           </li>
           {categories.map((cat) => (
             <li key={cat.id}>
+              <button
+                onClick={() => setCategory(cat.id)}
+                aria-current={selectedCategory === cat.id ? "true" : undefined}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
               <div
                 className={`flex min-w-0 items-center gap-1 rounded-lg pr-1 transition-colors ${
                   selectedCategory === cat.id
@@ -105,6 +117,11 @@ export function CommunitySidebar({
                     : "hover:bg-[var(--secondary)]"
                 }`}
               >
+                <span>{cat.name}</span>
+                <span className="text-xs text-[var(--muted)]">
+                  {cat.discussionCount}
+                </span>
+              </button>
                 <button
                   onClick={() => setCategory(cat.id)}
                   aria-current={selectedCategory === cat.id ? "true" : undefined}
