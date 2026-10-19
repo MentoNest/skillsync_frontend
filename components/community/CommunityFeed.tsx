@@ -2,6 +2,7 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
+import { CommunityEmptyState } from "./CommunityEmptyState";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
 
 interface CommunityFeedProps {
@@ -47,9 +48,13 @@ export function CommunityFeed({
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--primary)] border-t-transparent" />
         </div>
       ) : discussions.length === 0 ? (
-        <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-8 text-center">
-          <p className="text-[var(--muted)]">No discussions found</p>
-        </div>
+        <CommunityEmptyState
+          filtered={Boolean(selectedCategory || searchQuery)}
+          onClearFilters={() => {
+            onCategoryChange(null);
+            onSearchChange("");
+          }}
+        />
       ) : (
         <div className="space-y-4" role="feed" aria-label="Discussion feed">
           {discussions.map((discussion) => (
@@ -66,7 +71,7 @@ export function CommunityFeed({
 
       {!isLoading && !isLoadingMore && discussions.length > 0 && !hasMore && (
         <p className="py-4 text-center text-sm text-[var(--muted)]">
-          You've reached the end of the feed
+          You&apos;ve reached the end of the feed
         </p>
       )}
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
-import { CommunityHeroBanner } from "@/components/community/CommunityHeroBanner";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
 import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
@@ -21,7 +21,7 @@ export default function CommunityPage() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Real-time updates
-  const { isConnected, lastEvent } = useCommunityRealtime({
+  const { isConnected } = useCommunityRealtime({
     onNewDiscussion: (discussion) => {
       const newDisc = discussion as Discussion;
       if (!newDisc?.id) return;
