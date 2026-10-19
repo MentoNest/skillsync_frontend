@@ -1,30 +1,14 @@
 "use client";
 
-import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
+import {
+  useCommunityActions,
+  useCommunityState,
+} from "@/lib/community-store";
 
-interface CommunitySidebarProps {
-  selectedCategory: string | null;
-  onCategoryChange: (category: string | null) => void;
-}
+export function CommunitySidebar() {
+  const { categories, selectedCategory } = useCommunityState();
+  const { setCategory } = useCommunityActions();
 
-// Display counts are placeholder UI until real counts come from the API (#993).
-const categoryCounts: Record<string, number> = {
-  general: 45,
-  career: 32,
-  technical: 28,
-  mentoring: 19,
-  announcements: 8,
-};
-
-const categories = COMMUNITY_CATEGORIES.map((c) => ({
-  ...c,
-  count: categoryCounts[c.id] ?? 0,
-}));
-
-export function CommunitySidebar({
-  selectedCategory,
-  onCategoryChange,
-}: CommunitySidebarProps) {
   return (
     <div className="space-y-6">
       <nav aria-label="Community categories">
@@ -34,7 +18,7 @@ export function CommunitySidebar({
         <ul className="space-y-1">
           <li key="all">
             <button
-              onClick={() => onCategoryChange(null)}
+              onClick={() => setCategory(null)}
               aria-current={selectedCategory === null ? "true" : undefined}
               className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                 selectedCategory === null
@@ -48,7 +32,7 @@ export function CommunitySidebar({
           {categories.map((cat) => (
             <li key={cat.id}>
               <button
-                onClick={() => onCategoryChange(cat.id)}
+                onClick={() => setCategory(cat.id)}
                 aria-current={selectedCategory === cat.id ? "true" : undefined}
                 className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                   selectedCategory === cat.id
@@ -57,7 +41,9 @@ export function CommunitySidebar({
                 }`}
               >
                 <span>{cat.name}</span>
-                <span className="text-xs text-[var(--muted)]">{cat.count}</span>
+                <span className="text-xs text-[var(--muted)]">
+                  {cat.discussionCount}
+                </span>
               </button>
             </li>
           ))}

@@ -41,6 +41,11 @@ CommunityPage
 - `PATCH /api/community/discussions/[id]/pin` - Pin/unpin a discussion
 - `PATCH /api/community/discussions/[id]/lock` - Lock/unlock a discussion
 
+### Categories & Events
+
+- `GET /api/community/categories` - List categories with discussion counts
+- `GET /api/community/events/upcoming` - List upcoming community events
+
 ### Notifications
 
 - `GET /api/community/notifications` - Get user notifications
@@ -61,16 +66,19 @@ CommunityPage
 
 ## State Management
 
-The module uses React hooks for state management:
+Community state is centralized in a React Context store (`lib/community-store.tsx`).
+`CommunityProvider` owns the shared state and exposes it through hooks, so
+components read and update it directly instead of passing props down the tree:
 
-- `useCommunityRealtime` - Manages SSE connection and real-time updates
-- `useInfiniteScroll` - Handles infinite scroll with IntersectionObserver
+- `useCommunityState` - Discussions, categories, events, filters, sorting,
+  loading, errors, and the infinite-scroll sentinel ref
+- `useCommunityActions` - Set category/search/sort, refetch, and load more
+- `useCommunity` - Convenience hook returning both
 
-Local component state is used for:
-- Discussion list and pagination
-- Filter/search/sort state
-- Notification read status
-- Moderation actions
+`CommunityProvider` also wires `useCommunityRealtime` (SSE updates) and
+`useInfiniteScroll` (IntersectionObserver pagination) into the shared state.
+Local component state remains for ephemeral UI only (e.g. the debounced
+search input, notification read status, and moderation actions).
 
 ## Permissions
 

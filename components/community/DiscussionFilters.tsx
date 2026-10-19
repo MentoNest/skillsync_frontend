@@ -3,31 +3,22 @@
 import { useEffect, useState } from "react";
 import type { DiscussionSort } from "@/lib/community-types";
 import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
-
-interface DiscussionFiltersProps {
-  selectedCategory: string | null;
-  searchQuery: string;
-  sortBy: DiscussionSort;
-  onCategoryChange: (category: string | null) => void;
-  onSearchChange: (query: string) => void;
-  onSortChange: (sort: DiscussionSort) => void;
-}
+import {
+  useCommunityActions,
+  useCommunityState,
+} from "@/lib/community-store";
 
 const categories: { id: string | null; name: string }[] = [
   { id: null, name: "All" },
   ...COMMUNITY_CATEGORIES.map((c) => ({ id: c.id as string, name: c.name })),
 ];
 
-export function DiscussionFilters({
-  selectedCategory,
-  searchQuery,
-  sortBy,
-  onCategoryChange,
-  onSearchChange,
-  onSortChange,
-}: DiscussionFiltersProps) {
+export function DiscussionFilters() {
+  const { selectedCategory, searchQuery, sortBy } = useCommunityState();
+  const { setCategory, setSearchQuery, setSortBy } = useCommunityActions();
+
   // Debounced search input (#992): local state updates instantly for
-  // dynamic filtering feel, parent query updates after 300ms idle.
+  // dynamic filtering feel, shared store updates after 300ms idle.
   const [searchInput, setSearchInput] = useState(searchQuery);
 
   useEffect(() => {
@@ -37,7 +28,7 @@ export function DiscussionFilters({
   useEffect(() => {
     if (searchInput === searchQuery) return;
     const timeout = window.setTimeout(() => {
-      onSearchChange(searchInput.trim());
+      setSearchQuery(searchInput.trim());
     }, 300);
 
     return () => window.clearTimeout(timeout);
@@ -53,7 +44,7 @@ export function DiscussionFilters({
               key={cat.id || "all"}
               role="tab"
               aria-selected={selectedCategory === cat.id}
-              onClick={() => onCategoryChange(cat.id)}
+              onClick={() => setCategory(cat.id)}
               className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
                 selectedCategory === cat.id
                   ? "bg-[var(--primary)] text-white"
@@ -67,7 +58,7 @@ export function DiscussionFilters({
 
         <select
           value={sortBy}
-          onChange={(e) => onSortChange(e.target.value as DiscussionSort)}
+          onChange={(e) => setSortBy(e.target.value as DiscussionSort)}
           className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           aria-label="Sort discussions"
         >

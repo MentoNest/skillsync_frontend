@@ -2,45 +2,15 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
-import type { Discussion, DiscussionSort } from "@/lib/community-types";
+import { useCommunityState } from "@/lib/community-store";
 
-interface CommunityFeedProps {
-  discussions: Discussion[];
-  isLoading: boolean;
-  isLoadingMore: boolean;
-  hasMore: boolean;
-  selectedCategory: string | null;
-  searchQuery: string;
-  sortBy: DiscussionSort;
-  onCategoryChange: (category: string | null) => void;
-  onSearchChange: (query: string) => void;
-  onSortChange: (sort: DiscussionSort) => void;
-  loadMoreRef: React.RefObject<HTMLDivElement | null>;
-}
+export function CommunityFeed() {
+  const { discussions, isLoading, isLoadingMore, hasMore, loadMoreRef } =
+    useCommunityState();
 
-export function CommunityFeed({
-  discussions,
-  isLoading,
-  isLoadingMore,
-  hasMore,
-  selectedCategory,
-  searchQuery,
-  sortBy,
-  onCategoryChange,
-  onSearchChange,
-  onSortChange,
-  loadMoreRef,
-}: CommunityFeedProps) {
   return (
     <div className="space-y-4">
-      <DiscussionFilters
-        selectedCategory={selectedCategory}
-        searchQuery={searchQuery}
-        sortBy={sortBy}
-        onCategoryChange={onCategoryChange}
-        onSearchChange={onSearchChange}
-        onSortChange={onSortChange}
-      />
+      <DiscussionFilters />
 
       {isLoading ? (
         <div className="flex justify-center py-12" role="status" aria-label="Loading discussions">
@@ -66,7 +36,7 @@ export function CommunityFeed({
 
       {!isLoading && !isLoadingMore && discussions.length > 0 && !hasMore && (
         <p className="py-4 text-center text-sm text-[var(--muted)]">
-          You've reached the end of the feed
+          You&apos;ve reached the end of the feed
         </p>
       )}
 
