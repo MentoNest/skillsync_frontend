@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import OptimizedMentorCard from "./OptimizedMentorCard";
 import { MentorCardProps } from "@/components/landing/MentorCard";
 
@@ -12,6 +12,10 @@ interface VirtualizedMentorListProps {
   selectedForComparison?: MentorCardProps[];
   itemHeight?: number;
   overscan?: number;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  loadMoreThreshold?: number;
 }
 
 export default function VirtualizedMentorList({
@@ -22,10 +26,15 @@ export default function VirtualizedMentorList({
   selectedForComparison = [],
   itemHeight = 400,
   overscan = 3,
+  onLoadMore,
+  hasMore = false,
+  isLoadingMore = false,
+  loadMoreThreshold = 3,
 }: VirtualizedMentorListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
+  const loadMoreLockRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -49,18 +58,54 @@ export default function VirtualizedMentorList({
     };
   }, []);
 
+  const uniqueMentors = useMemo(() => {
+    const seen = new Set<string>();
+    return mentors.filter((mentor) => {
+      const key = mentor.name;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [mentors]);
+
   const visibleRange = useCallback(() => {
     const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
     const endIndex = Math.min(
-      mentors.length - 1,
+      uniqueMentors.length - 1,
       Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
     );
     return { startIndex, endIndex };
-  }, [scrollTop, containerHeight, itemHeight, overscan, mentors.length]);
+  }, [scrollTop, containerHeight, itemHeight, overscan, uniqueMentors.length]);
 
   const { startIndex, endIndex } = visibleRange();
-  const visibleMentors = mentors.slice(startIndex, endIndex + 1);
+  const visibleMentors = uniqueMentors.slice(startIndex, endIndex + 1);
   const offsetY = startIndex * itemHeight;
+
+  useEffect(() => {
+    if (!onLoadMore || !hasMore || isLoadingMore) return;
+    if (uniqueMentors.length === 0) return;
+
+    const nearEnd =
+      endIndex >= uniqueMentors.length - 1 - loadMoreThreshold;
+
+    if (nearEnd && !loadMoreLockRef.current) {
+      loadMoreLockRef.current = true;
+      onLoadMore();
+    }
+  }, [
+    endIndex,
+    uniqueMentors.length,
+    onLoadMore,
+    hasMore,
+    isLoadingMore,
+    loadMoreThreshold,
+  ]);
+
+  useEffect(() => {
+    if (!isLoadingMore) {
+      loadMoreLockRef.current = false;
+    }
+  }, [isLoadingMore]);
 
   return (
     <div
@@ -70,7 +115,7 @@ export default function VirtualizedMentorList({
       role="list"
       aria-label="Mentors"
     >
-      <div style={{ height: `${mentors.length * itemHeight}px`, position: "relative" }}>
+      <div style={{ height: `${uniqueMentors.length * itemHeight}px`, position: "relative" }}>
         <div
           style={{
             transform: `translateY(${offsetY}px)`,
@@ -85,7 +130,7 @@ export default function VirtualizedMentorList({
 
             return (
               <div
-                key={mentor.name}
+                key={`${mentor.name}-${actualIndex}`}
                 style={{
                   height: `${itemHeight}px`,
                   contain: "layout paint",
@@ -98,48 +143,29 @@ export default function VirtualizedMentorList({
                   onCompare={onCompare}
                   isBookmarked={isBookmarked}
                   isSelectedForComparison={isSelectedForComparison}
-                >
-                  <div className="mt-auto px-6 pb-6 space-y-3">
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => onBookmark?.(mentor.name)}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                          isBookmarked
-                            ? "bg-rose-600 text-white border-rose-600 focus:ring-rose-500"
-                            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:ring-slate-500"
-                        }`}
-                        aria-label={isBookmarked ? `Remove ${mentor.name} from bookmarks` : `Bookmark ${mentor.name}`}
-                        aria-pressed={isBookmarked}
-                      >
-                        <svg className="w-5 h-5" fill={isBookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                        {isBookmarked ? "Saved" : "Save"}
-                      </button>
-                      <button
-                        onClick={() => onCompare?.(mentor)}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                          isSelectedForComparison
-                            ? "bg-indigo-600 text-white border-indigo-600 focus:ring-indigo-500"
-                            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:ring-slate-500"
-                        }`}
-                        aria-label={isSelectedForComparison ? `Remove ${mentor.name} from comparison` : `Add ${mentor.name} to comparison`}
-                        aria-pressed={isSelectedForComparison}
-                        disabled={!isSelectedForComparison && selectedForComparison.length >= 3}
-                      >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Compare
-                      </button>
-                    </div>
-                  </div>
-                </OptimizedMentorCard>
+                />
               </div>
             );
           })}
         </div>
       </div>
+      {isLoadingMore && (
+        <div
+          className="flex items-center justify-center gap-2 py-6 text-sm font-medium text-slate-600"
+          role="status"
+          aria-live="polite"
+        >
+          <svg
+            className="w-5 h-5 animate-spin text-indigo-600"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+          </svg>
+          Loading more mentors...
+        </div>
+      )}
     </div>
   );
 }

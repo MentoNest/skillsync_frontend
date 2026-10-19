@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
-import { MOCK_MENTORS } from "@/lib/mock-mentors";
+import { MICK_MENTORS } from "@/lib/mock-mentors";
+import { normalizeHourlyRateRange, normalizeSearchTerm, mentorMatchesSearch } from "@/lib/mentor-search";
 
 function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
   let result = [...mentors];
 
   if (filters.search) {
-    result = result.filter((m) => mentorMatchesSearch(m, filters.search));
+    result = result.filter((m) => mentorMatchesSearch(m, filters.search!));
   }
 
   if (filters.expertise && filters.expertise.length > 0) {
@@ -68,8 +69,11 @@ function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "12", 10);
+    const parsedPage = parseInt(searchParams.get("page") || "1", 10);
+    const parsedLimit = parseInt(searchParams.get("limit") || "12", 10);
+    const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+    const limit =
+      Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 12;
 
     const filters: MentorFilters = {};
     const arrayFilterKeys: (keyof MentorFilters)[] = [
@@ -111,7 +115,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    const filtered = applyFilters(MOCK_MENTORS, filters);
+    const filtered = applyFilters(MICK_MENTORS, filters);
     const total = filtered.length;
     const totalPages = Math.ceil(total / limit);
     const start = (page - 1) * limit;

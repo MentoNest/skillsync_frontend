@@ -70,12 +70,11 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
       }
 
       try {
-        // AFTER
-const response = await mentorApi.getMentors(
-  { ...filters, sortBy: filters.sortBy || "relevance" },
-  pageNumber,
-  pageSize
-);
+        const response = await mentorApi.getMentors(
+          { ...filters, sortBy: filters.sortBy || "relevance" },
+          pageNumber,
+          pageSize
+        );
 
         if (append) {
           setMentors((prev) => {
@@ -295,196 +294,89 @@ const response = await mentorApi.getMentors(
           <div>
             {/* Active expertise filter badges */}
             {filters.expertise && filters.expertise.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active expertise filters">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Expertise:
-                </span>
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-sm text-slate-500">Expertise:</span>
                 {filters.expertise.map((exp) => (
-                  <button
-                    key={exp}
-                    onClick={() => {
-                      const newExp = filters.expertise?.filter((e) => e !== exp) || [];
-                      updateFilters(
-                        { ...filters, expertise: newExp.length > 0 ? newExp : undefined },
-                        { replace: true }
-                      );
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors group"
-                    aria-label={`Remove ${exp} expertise filter`}
-                  >
-                    <span>{exp}</span>
-                    <svg className="w-3.5 h-3.5 text-indigo-500 group-hover:text-indigo-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                  <span key={exp} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-medium">
+                    {exp}
+                  </span>
                 ))}
-                <button
-                  onClick={() => updateFilters({ ...filters, expertise: undefined }, { replace: true })}
-                  className="text-xs text-slate-500 hover:text-indigo-600 underline font-medium ml-1"
-                >
-                  Clear all expertise
-                </button>
               </div>
             )}
-            {/* Active industry filter badges */}
-            {filters.industry && filters.industry.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active industry filters">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Industry:
-                </span>
-                {filters.industry.map((ind) => (
-                  <button
-                    key={ind}
-                    onClick={() => {
-                      const newInd = filters.industry?.filter((i) => i !== ind) || [];
-                      updateFilters(
-                        { ...filters, industry: newInd.length > 0 ? newInd : undefined },
-                        { replace: true }
-                      );
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors group"
-                    aria-label={`Remove ${ind} industry filter`}
-                  >
-                    <span>{ind}</span>
-                    <svg className="w-3.5 h-3.5 text-indigo-500 group-hover:text-indigo-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                ))}
-                <button
-                  onClick={() => updateFilters({ ...filters, industry: undefined }, { replace: true })}
-                  className="text-xs text-slate-500 hover:text-indigo-600 underline font-medium ml-1"
-                >
-                  Clear all industries
-                </button>
-              </div>
-            )}
+
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                {[...Array(6)].map((_, i) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {Array.from({ length: pageSize }).map((_, i) => (
                   <MentorCardSkeleton key={i} />
                 ))}
               </div>
             ) : mentors.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="mx-auto h-16 w-16 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2.5-5.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z" />
                 </svg>
-                <h2 className="mt-4 text-xl font-semibold text-slate-900">No mentors found</h2>
-                <p className="mt-2 text-slate-600">
-                  {filters.search ? (
-                    <>
-                      No mentors match your search for &quot;<strong>{filters.search}</strong>&quot;.
-                      {hasActiveFilters && " Try removing some filters or search for something else."}
-                    </>
-                  ) : (
-                    "Try adjusting your filters to find more mentors."
-                  )}
-                </p>
-                <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
-                  Clear all filters
-                </button>
+                <h3 className="mt-4 text-lg font-semibold text-slate-900">No mentors found</h3>
+                <p className="mt-2 text-slate-600">Try adjusting your filters or search term.</p>
+                {hasActiveFilters && (
+                  <button
+                    onClick={handleClearFilters}
+                    className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
+                  >
+                    Clear filters
+                  </button>
+                )}
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {mentors.map((mentor) => {
-                    const isBookmarked = bookmarkedIds.includes(mentor.id);
-
-                    return (
-                      <MentorCard
-                        key={mentor.id}
-                        id={mentor.id}
-                        name={mentor.name}
-                        title={mentor.headline}
-                        description={mentor.bio}
-                        skills={mentor.skills}
-                        avatar={mentor.avatar}
-                        avatarInitials={mentor.name.split(" ").map((n) => n[0]).join("")}
-                        avatarColor="bg-gradient-to-br from-indigo-500 to-cyan-500"
-                        rating={mentor.rating}
-                        sessions={mentor.sessions}
-                        hourlyRate={mentor.hourlyRate}
-                        availability={mentor.availability}
-                        profileHref={mentor.profileHref || `/mentors/${mentor.id}`}
-                      >
-                        <div className="mt-auto px-6 pb-6 space-y-3">
-                          <div className="flex gap-3">
-                            <button
-                              onClick={() => toggleBookmark(mentor.id)}
-                              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                                isBookmarked
-                                  ? "bg-rose-600 text-white border-rose-600 focus:ring-rose-500"
-                                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:ring-slate-500"
-                              }`}
-                              aria-label={isBookmarked ? `Remove ${mentor.name} from bookmarks` : `Bookmark ${mentor.name}`}
-                              aria-pressed={isBookmarked}
-                            >
-                              <svg className="w-5 h-5" fill={isBookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                              </svg>
-                              {isBookmarked ? "Saved" : "Save"}
-                            </button>
-                          </div>
-                          <Link
-                            href={mentor.profileHref || `/mentors/${mentor.id}`}
-                            className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                          >
-                            View profile
-                          </Link>
-                        </div>
-                      </MentorCard>
-                    );
-                  })}
+                <div ref={mentorListRef} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {mentors.map((mentor) => (
+                    <MentorCard
+                      key={mentor.id}
+                      mentor={mentor}
+                      isBookmarked={bookmarkedIds.includes(mentor.id)}
+                      onToggleBookmark={() => toggleBookmark(mentor.id)}
+                    />
+                  ))}
                 </div>
 
-                {/* Pagination controls (only in pagination mode) */}
-                {usePagination && (
-                  <MentorPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                )}
-
-                {/* Loading state when fetching additional mentors (infinite scroll only) */}
-                {!usePagination && isLoadingMore && (
-                  <div
-                    role="status"
-                    aria-live="polite"
-                    aria-label="Loading more mentors"
-                    className="mt-8 flex flex-col items-center justify-center py-6 gap-3"
-                  >
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
-                    <span className="text-sm font-medium text-slate-500">Loading more mentors...</span>
-                  </div>
-                )}
-
-                {/* Error retry when loading more fails (infinite scroll only) */}
-                {!usePagination && loadMoreError && (
-                  <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-center">
-                    <p className="text-sm text-red-600 mb-2">{loadMoreError}</p>
-                    <button
-                      onClick={() => fetchMentors(currentPage + 1, true)}
-                      className="inline-flex items-center px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors"
-                    >
-                      Retry loading more
-                    </button>
-                  </div>
-                )}
-
-                {/* End of results message (infinite scroll only) */}
-                {!usePagination && !hasMore && !isLoading && !isLoadingMore && mentors.length > 0 && (
-                  <div className="mt-10 py-6 border-t border-slate-200 text-center">
-                    <p className="text-sm font-medium text-slate-500">
-                      You&apos;ve reached the end of the mentors list ({mentors.length} mentor{mentors.length !== 1 ? "s" : ""} loaded)
-                    </p>
-                  </div>
-                )}
-
-                {/* Sentinel element for infinite scroll (infinite scroll only) */}
+                {/* Infinite scroll trigger / loading indicator */}
                 {!usePagination && (
-                  <div ref={loadMoreRef} className="h-4 w-full" aria-hidden="true" />
+                  <div ref={loadMoreRef} className="mt-8 flex justify-center">
+                    {isLoadingMore ? (
+                      <div className="flex items-center gap-2 text-slate-600">
+                        <svg className="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4h-4z" />
+                        </svg>
+                        <span className="text-sm font-medium">Loading more mentors...</span>
+                      </div>
+                    ) : loadMoreError ? (
+                      <div className="text-center">
+                        <p className="text-sm text-red-600 mb-2">{loadMoreError}</p>
+                        <button
+                          onClick={handleLoadMore}
+                          className="inline-flex items-center px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    ) : hasMore ? (
+                      <span className="text-sm text-slate-400">Scroll for more</span>
+                    ) : mentors.length > 0 ? (
+                      <span className="text-sm text-slate-400">You&#x27ve reached the end</span>
+                    ) : null}
+                  </div>
+                )}
+
+                {/* Pagination (pagination mode only) */}
+                {usePagination && totalPages > 1 && (
+                  <div className="mt-8">
+                    <MentorPagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
                 )}
               </>
             )}
@@ -495,9 +387,8 @@ const response = await mentorApi.getMentors(
         isOpen={isMobileFiltersOpen}
         onClose={() => setIsMobileFiltersOpen(false)}
         filters={filters}
-        onFiltersChange={(f) => updateFilters(f, { replace: true })}
+        onFiltersChange={handleFiltersChange}
         onClearFilters={handleClearFilters}
-        onApplyFilters={() => setIsMobileFiltersOpen(false)}
       />
     </div>
   );
@@ -505,16 +396,17 @@ const response = await mentorApi.getMentors(
 
 export default function MentorDiscovery(props: MentorDiscoveryProps) {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
-          <div className="flex items-center gap-3 text-slate-500 font-medium">
-            <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-            Loading mentors...
-          </div>
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-slate-600">
+          <svg className="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4h-4z" />
+          </svg>
+          <span className="text-sm font-medium">Loading mentors...</span>
         </div>
-      }
-    >
+      </div>
+    }>
       <MentorsPageContent {...props} />
     </Suspense>
   );

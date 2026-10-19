@@ -29,3 +29,50 @@ export function mentorMatchesSearch(
 
   return terms.every((term) => haystack.includes(term));
 }
+
+export const DEFAULT_PAGE_SIZE = 20;
+
+export interface MentorPageResult {
+  mentors: Mentor[];
+  hasMore: boolean;
+  nextOffset: number;
+}
+
+export function getMentorId(mentor: Mentor): string {
+  return String(mentor.id);
+}
+
+export function dedupeMentors(mentors: Mentor[]): Mentor[] {
+  const seen = new Set<string>();
+  const result: Mentor[] = [];
+  for (const mentor of mentors) {
+    const id = getMentorId(mentor);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    result.push(mentor);
+  }
+  return result;
+}
+
+export function appendUniqueMentors(
+  existing: Mentor[],
+  incoming: Mentor[]
+): Mentor[] {
+  return dedupeMentors([...existing, ...incoming]);
+}
+
+export function paginateMentors(
+  mentors: Mentor[],
+  offset: number,
+  pageSize: number = DEFAULT_PAGE_SIZE
+): MentorPageResult {
+  const safeOffset = Math.max(0, Math.floor(offset));
+  const safeSize = Math.max(1, Math.floor(pageSize));
+  const slice = mentors.slice(safeOffset, safeOffset + safeSize);
+  const nextOffset = safeOffset + slice.length;
+  return {
+    mentors: slice,
+    hasMore: nextOffset < mentors.length,
+    nextOffset,
+  };
+}
