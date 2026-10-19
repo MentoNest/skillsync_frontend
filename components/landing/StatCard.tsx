@@ -2,51 +2,28 @@ import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export interface StatCardProps {
-  /**
-   * The number, already formatted — "2,400+", "98%", "4.9/5".
-   *
-   * A string rather than a number because a stat is nearly always a formatted
-   * claim, not a measurement, and the moment it becomes a number somebody adds
-   * `toLocaleString()` in the component and the caller loses the ability to
-   * write "18k+". Passing the literal also stops a placeholder from silently
-   * rendering as `NaN` or `0`.
-   */
+  /** Already-formatted figure: "2,400+", "48h", "4.9/5" */
   value: string;
-  /** What the number measures. Reads as the term for the value above it. */
+  /** What the figure measures */
   label: string;
-  /** Optional supporting sentence for extra context */
+  /** Optional supporting sentence */
   description?: string;
-  /** Optional glyph. Always decorative — see the note on `aria-hidden` below. */
+  /** Optional decorative glyph */
   icon?: ReactNode;
-  /** Optional accent colour classes for the icon container */
+  /** Optional accent classes for the icon container */
   iconClassName?: string;
 }
 
 /**
- * One platform statistic.
+ * One platform statistic (#1160).
  *
- * ## Why this is a `<dt>`/`<dd>` pair inside a `<dl>`
+ * A statistic is a label and the value it describes, so it is a `<dt>`/`<dd>`
+ * pair inside the section's `<dl>` — the only markup that tells a screen
+ * reader which number belongs to which label.
  *
- * A statistic is a term and its description: "Expert Mentors" *is* 2,400+. That
- * is exactly what a description list is for, and it is the only markup that
- * states the relationship to a screen reader. Two loose paragraphs do not: they
- * read as "2,400 plus. Expert Mentors." — two unrelated strings that happen to
- * be adjacent, with nothing telling the listener which number belongs to which
- * label. On a grid of four that is genuinely hard to follow.
- *
- * So the grid in `StatsSection` is the `<dl>`, and this component is the
- * `<div>` wrapper around one `<dt>`/`<dd>` pair, which is the shape HTML
- * allows.
- *
- * ## Why the DOM order is inverted relative to the visual order
- *
- * `<dt>` must precede `<dd>`, but the design wants the number on top. That is
- * what `flex-col-reverse` is for: the accessible and DOM order stay
- * "label, then value" while the eye reads "value, then label".
- *
- * The upside is not incidental — announcing the label *before* the number is
- * the better order anyway, because it tells the listener what the number is
- * before they have to hold it in memory.
+ * `flex-col-reverse` puts the value above the label visually while keeping DOM
+ * order label-then-value, so the label is announced first: the listener learns
+ * what the number measures before having to hold the number in memory.
  */
 export default function StatCard({
   value,
@@ -56,14 +33,14 @@ export default function StatCard({
   iconClassName,
 }: StatCardProps) {
   return (
-    <div className="group flex flex-col-reverse items-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-8 text-center transition-all duration-300 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50">
+    <div className="flex flex-col-reverse items-center gap-3 rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200">
       <dt className="text-sm font-medium text-slate-600">
         <span>{label}</span>
-        {description && (
-          <span className="block mt-1 text-xs text-slate-500 font-normal">
+        {description ? (
+          <span className="mt-1 block text-xs font-normal text-slate-500">
             {description}
           </span>
-        )}
+        ) : null}
       </dt>
 
       <dd className="flex flex-col items-center gap-3">
@@ -71,7 +48,7 @@ export default function StatCard({
           <span
             aria-hidden="true"
             className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-colors duration-300 group-hover:bg-indigo-100",
+              "flex h-11 w-11 items-center justify-center rounded-full bg-indigo-50 text-indigo-600",
               iconClassName
             )}
           >
@@ -79,7 +56,7 @@ export default function StatCard({
           </span>
         ) : null}
 
-        <span className="text-4xl sm:text-5xl font-extrabold tabular-nums tracking-tight text-slate-900">
+        <span className="text-4xl font-extrabold tabular-nums tracking-tight text-indigo-600 sm:text-5xl">
           {value}
         </span>
       </dd>

@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SkillSync Frontend
+
+Mentorship platform frontend built with Next.js App Router, TypeScript, and Tailwind CSS.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Stack
+
+- **Framework** — Next.js 15 (App Router)
+- **Language** — TypeScript
+- **Styling** — Tailwind CSS v4 (`@tailwindcss/postcss`)
+- **Fonts** — `next/font` (Geist)
+
+## Project Structure
+
+```text
+app/
+├── (public)/          # Unauthenticated routes (landing page, mentors, auth)
+│   ├── layout.tsx     # Navbar + Footer shell
+│   └── page.tsx       # Landing page at /
+├── (mentor)/          # Mentor-only routes, guarded by RoleGuard
+│   ├── layout.tsx
+│   └── mentor/page.tsx
+├── (mentee)/          # Mentee-only routes, guarded by RoleGuard
+│   ├── layout.tsx
+│   └── mentee/page.tsx
+├── (admin)/           # Admin-only routes, guarded by RoleGuard
+│   ├── layout.tsx
+│   └── admin/page.tsx
+├── layout.tsx         # Root layout (metadata, AuthProvider)
+└── globals.css        # Global styles and design tokens
+components/            # Reusable UI components (landing, layout, auth, ...)
+lib/                   # Shared utilities and helpers
+```
+
+### Route Groups
+
+Each audience has its own route group and layout so navigation and guards stay isolated:
+
+| Route | Group | Layout |
+| --- | --- | --- |
+| `/` | `(public)` | Navbar + Footer, no guard |
+| `/mentor` | `(mentor)` | `RoleGuard role="mentor"` |
+| `/mentee` | `(mentee)` | `RoleGuard role="mentee"` |
+| `/admin` | `(admin)` | `RoleGuard role="admin"` |
+
+### Path Aliases
+
+`tsconfig.json` maps `@/*` to the project root, so imports stay stable as the tree grows:
+
+```ts
+import Navbar from "@/components/layout/Navbar";
+```
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)

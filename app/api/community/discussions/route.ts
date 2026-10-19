@@ -1,26 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseCategoryParam } from "@/lib/community-types";
+import {
+  createDiscussion,
+  isBookmarked,
+  isFollowingUser,
+  listDiscussions,
+  resolveViewerId,
+} from "@/lib/community-store";
 
-// Mock data for now - will be replaced with actual database
-const mockDiscussions = Array.from({ length: 25 }, (_, i) => ({
-  id: `discussion-${i + 1}`,
-  title: `Discussion ${i + 1}: ${
-    ["Getting started with React", "Best practices for mentoring", "Career growth tips", "Industry trends", "Networking strategies"][i % 5]
-  }`,
-  content: `This is the content of discussion ${i + 1}. It contains valuable insights and information.`,
-  authorId: `user-${(i % 5) + 1}`,
-  authorName: ["Alice Johnson", "Bob Smith", "Carol Williams", "David Brown", "Eve Davis"][i % 5],
-  authorAvatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
-  category: ["general", "career", "technical", "mentoring", "announcements"][i % 5],
-  tags: ["react", "mentoring", "career"],
-  likeCount: Math.floor(Math.random() * 50),
-  replyCount: Math.floor(Math.random() * 20),
-  viewCount: Math.floor(Math.random() * 200),
-  isPinned: i < 2,
-  isLocked: false,
-  createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-  updatedAt: new Date(Date.now() - i * 43200000).toISOString(),
-}));
+// Discussions are generated data for now - will be replaced with actual database
+// (`lib/community-store.ts` owns the seed and the viewer-specific state).
+const mockDiscussions = listDiscussions();
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -88,8 +78,17 @@ export async function GET(request: NextRequest) {
   const end = start + limit;
   const paginated = filtered.slice(start, end);
 
+  // Decorate with viewer-specific state so cards can render bookmark/follow
+  // state without extra requests (#1013, #1015).
+  const viewerId = resolveViewerId(request);
+  const discussions = paginated.map((discussion) => ({
+    ...discussion,
+    isBookmarked: isBookmarked(viewerId, discussion.id),
+    isAuthorFollowed: isFollowingUser(viewerId, discussion.authorId),
+  }));
+
   return NextResponse.json({
-    discussions: paginated,
+    discussions,
     hasMore: end < filtered.length,
     total: filtered.length,
     page,
@@ -107,22 +106,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newDiscussion = {
-      id: `discussion-${Date.now()}`,
+    const viewerId = resolveViewerId(request);
+
+    const newDiscussion = createDiscussion({
       title: body.title,
       content: body.content,
-      authorId: "current-user",
-      authorName: "Current User",
       category: body.category,
       tags: body.tags || [],
-      likeCount: 0,
-      replyCount: 0,
-      viewCount: 0,
-      isPinned: false,
-      isLocked: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      authorId: viewerId,
+      authorName: body.authorName || "Current User",
+    });
 
     return NextResponse.json(newDiscussion, { status: 201 });
   } catch {

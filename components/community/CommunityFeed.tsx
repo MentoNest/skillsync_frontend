@@ -8,6 +8,48 @@ export function CommunityFeed() {
   const { discussions, isLoading, isLoadingMore, hasMore, loadMoreRef } =
     useCommunityState();
 
+import { CommunityEmptyState } from "./CommunityEmptyState";
+import { CommunityErrorState } from "./CommunityErrorState";
+import type { Discussion, DiscussionSort } from "@/lib/community-types";
+
+interface CommunityFeedProps {
+  discussions: Discussion[];
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  hasMore: boolean;
+  selectedCategory: string | null;
+  searchQuery: string;
+  sortBy: DiscussionSort;
+  onCategoryChange: (category: string | null) => void;
+  onSearchChange: (query: string) => void;
+  onSortChange: (sort: DiscussionSort) => void;
+  /** Error message from the last feed request, if any (#999). */
+  error?: string | null;
+  /** Re-issues the feed request after a failure (#999). */
+  onRetry?: () => void;
+  /** Opens the discussion composer from the empty state CTA (#998). */
+  onStartDiscussion?: () => void;
+  loadMoreRef: React.RefObject<HTMLDivElement | null>;
+}
+
+export function CommunityFeed({
+  discussions,
+  isLoading,
+  isLoadingMore,
+  hasMore,
+  selectedCategory,
+  searchQuery,
+  sortBy,
+  onCategoryChange,
+  onSearchChange,
+  onSortChange,
+  error,
+  onRetry,
+  onStartDiscussion,
+  loadMoreRef,
+}: CommunityFeedProps) {
+  const hasActiveFilters = Boolean(selectedCategory) || searchQuery.trim().length > 0;
+
   return (
     <div className="space-y-4">
       <DiscussionFilters />
@@ -16,10 +58,18 @@ export function CommunityFeed() {
         <div className="flex justify-center py-12" role="status" aria-label="Loading discussions">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--primary)] border-t-transparent" />
         </div>
+      ) : error ? (
+        <CommunityErrorState message={error} onRetry={onRetry} />
       ) : discussions.length === 0 ? (
-        <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-8 text-center">
-          <p className="text-[var(--muted)]">No discussions found</p>
-        </div>
+        hasActiveFilters ? (
+          <CommunityEmptyState
+            title="No discussions found"
+            message="No discussions match your current filters. Try another category or a different search term."
+            onAction={onStartDiscussion}
+          />
+        ) : (
+          <CommunityEmptyState onAction={onStartDiscussion} />
+        )
       ) : (
         <div className="space-y-4" role="feed" aria-label="Discussion feed">
           {discussions.map((discussion) => (

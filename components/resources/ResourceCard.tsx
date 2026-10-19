@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import CategoryBadge from "@/components/resources/CategoryBadge";
 
 export interface ResourceCardProps {
   title: string;
@@ -63,15 +65,16 @@ export default function ResourceCard({
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover"
-            priority={false}
+            loading="lazy"
+            // SVGs are vectors; running them through the optimizer adds a
+            // request hop for no size win.
+            unoptimized={image.src.endsWith(".svg")}
           />
         </div>
       ) : null}
 
       <div className="flex items-center gap-2 mb-3">
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
-          {type}
-        </span>
+        <CategoryBadge label={type} />
         <span className="text-xs text-slate-500 tabular-nums">
           {readMinutes} min read
         </span>
@@ -97,8 +100,8 @@ export default function ResourceCard({
   }
 
   return (
-    <a href={href} className={`${shell} focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2`}>
+    <Link href={href} className={`${shell} focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2`}>
       {body}
-    </a>
+    </Link>
   );
 }
