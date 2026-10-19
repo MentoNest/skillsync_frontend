@@ -11,35 +11,112 @@ The Community module provides a discussion platform for SkillSync users to conne
 | `/community` | Main community feed with discussions |
 | `/community/[category]` | Category-filtered discussions |
 | `/community/[category]/[id]` | Individual discussion detail |
+| `/community/saved` | Discussions bookmarked by the signed-in user (#1013) |
 | `/admin/moderation` | Moderation dashboard (moderators only) |
 
 ## Component Hierarchy
 
 ```
 CommunityPage
+├── CommunityHeroBanner
+│   └── Start Discussion CTA (opens StartDiscussionModal)  #1001
 ├── DiscussionFilters
 │   ├── Category tabs
 │   ├── Sort dropdown
 │   └── Search input
 ├── CommunityFeed
+│   ├── DiscussionListSkeleton (initial load)      #997
+│   ├── CommunityErrorState (message + retry)     #999
+│   ├── CommunityEmptyState (icon + message + CTA) #998
 │   ├── DiscussionCard (or MemoizedDiscussionCard)
+│   │   ├── DiscussionCategoryBadge                #984
+│   │   ├── TrendingBadgeForDiscussion             #985
+│   │   ├── DiscussionActions
+│   │   │   ├── FollowButton (follow author)      #1015
+│   │   │   ├── Bookmark toggle                   #1013
+│   │   │   └── ShareDiscussionButton (copy/native share) #1016
 │   │   └── DiscussionModeration (moderator only)
 │   └── Infinite scroll trigger
 ├── CommunitySidebar
-│   ├── Category list
+│   ├── Category list with FollowButton per category #1014
 │   └── Community guidelines
+├── StartDiscussionModal                            #1001, #1004
+│   └── RichTextEditor
+├── CommunityToast (success notification)           #1004
 └── NotificationDropdown
     └── Notification list
 ```
+
+## Discussion creation (#998, #999, #1001, #1004)
+
+The composer flow is owned by `CommunityPage`, which holds a single
+`isComposerOpen` flag so both the hero banner CTA and the empty state CTA open
+the same modal:
+
+1. **Empty state** (`CommunityEmptyState`, #998) — icon, message and a *Start
+   Discussion* call to action, shown when the feed has no discussions. A
+   filtered variant (`No discussions found`) is used when filters return no
+   matches.
+2. **Error state** (`CommunityErrorState`, #999) — rendered as `role="alert"`
+   with the failure message and a retry action that re-issues the feed request
+   with the current filters.
+3. **Composer** (`StartDiscussionModal`, #1001) — title, category, rich-text
+   content, free-form tags and an attachments placeholder. Supports Publish,
+   Cancel, a close button, Escape, backdrop click, a focus trap and focus
+   restoration. The dialog is a bottom sheet on mobile and centred on desktop.
+4. **Backend submission** (#1004) — `communityApi.createDiscussion` posts to
+   `POST /api/community/discussions` while the modal shows a loading state and
+   blocks closing. Failures render inline and keep the draft; success closes
+   the modal, prepends the created discussion to the feed, resets infinite
+   scroll, announces a `CommunityToast` confirmation and tracks a
+   `discussion_created` analytics event.
+
+The API client attaches the signed-in user's id (`x-user-id`) and display name
+to the request, so the composer does not need to wire up auth itself.
 
 ## API Endpoints
 
 ### Discussions
 
 - `GET /api/community/discussions` - List discussions (supports pagination, filtering, sorting)
-- `POST /api/community/discussions` - Create a new discussion
+- `POST /api/community/discussions` - Create a new discussion (#1004; used by the Start Discussion composer)
 - `PATCH /api/community/discussions/[id]/pin` - Pin/unpin a discussion
 - `PATCH /api/community/discussions/[id]/lock` - Lock/unlock a discussion
+- `POST /api/community/discussions/[id]/share` - Record a share, returns the canonical URL and share count (#1016)
+
+### Bookmarks (#1013)
+
+- `GET /api/community/discussions/saved` - Discussions bookmarked by the viewer, newest first
+- `GET /api/community/discussions/[id]/bookmark` - Current bookmark state
+- `POST /api/community/discussions/[id]/bookmark` - Bookmark a discussion
+- `DELETE /api/community/discussions/[id]/bookmark` - Remove a bookmark
+
+### User follows (#1015)
+
+- `GET /api/community/users/following` - Members the viewer follows
+- `GET /api/community/users/[id]/follow` - Current follow state for one member
+- `POST /api/community/users/[id]/follow` - Follow a member
+- `DELETE /api/community/users/[id]/follow` - Unfollow a member
+
+### Category follows (#1014)
+
+- `GET /api/community/categories/following` - Followed category ids in display order
+- `GET /api/community/categories/[id]/follow` - Current follow state for one category
+- `POST /api/community/categories/[id]/follow` - Follow a category
+- `DELETE /api/community/categories/[id]/follow` - Unfollow a category
+
+All social endpoints scope their state to the viewer, resolved from the
+`x-user-id` request header (sent by `lib/community-api.ts`), the
+`skillsync-user-id` cookie, or the shared demo viewer.
+
+### Overview (#990, #996)
+
+- `GET /api/community/overview` - Sidebar payload: community statistics plus the events list
+
+### Categories & Events
+
+- `GET /api/community/categories` - List categories with discussion counts
+- `GET /api/community/events/upcoming` - List upcoming community events
 
 ### Notifications
 
@@ -61,14 +138,42 @@ CommunityPage
 
 ## State Management
 
-The module uses React hooks for state management:
+Community state is centralized in a React Context store (`lib/community-store.tsx`).
+`CommunityProvider` owns the shared state and exposes it through hooks, so
+components read and update it directly instead of passing props down the tree:
+
+- `useCommunityState` - Discussions, categories, events, filters, sorting,
+  loading, errors, and the infinite-scroll sentinel ref
+- `useCommunityActions` - Set category/search/sort, refetch, and load more
+- `useCommunity` - Convenience hook returning both
+
+`CommunityProvider` also wires `useCommunityRealtime` (SSE updates) and
+`useInfiniteScroll` (IntersectionObserver pagination) into the shared state.
+Local component state remains for ephemeral UI only (e.g. the debounced
+search input, notification read status, and moderation actions).
+Shared feed state lives in `CommunityProvider` (#996) and is read with the
+`useCommunity` hook, so the page, the feed and the sidebar do not thread
+props between them:
+
+- `CommunityProvider` / `useCommunity` - Discussions, categories, events,
+  statistics, filters, sorting, loading and error state. Owns the feed fetch
+  (`GET /api/community/discussions`, #995) and the sidebar overview
+  (`GET /api/community/overview`).
+
+Focused hooks cover the rest:
 
 - `useCommunityRealtime` - Manages SSE connection and real-time updates
 - `useInfiniteScroll` - Handles infinite scroll with IntersectionObserver
+- `useDiscussionBookmark` - Bookmark state for a discussion (#1013)
+- `useUserFollow` - Follow state for a community member (#1015)
+- `useCategoryFollows` - Followed categories for the sidebar (#1014)
+
+Server-side social state (bookmarks, follows, share counts) lives in
+`lib/community-store.ts`, so it stays consistent between the feed, the saved
+page and the sidebar. The store also derives the community statistics and owns
+the event seed used by the sidebar (#989, #990).
 
 Local component state is used for:
-- Discussion list and pagination
-- Filter/search/sort state
 - Notification read status
 - Moderation actions
 
@@ -76,7 +181,7 @@ Local component state is used for:
 
 | Role | Permissions |
 |------|-------------|
-| User | View discussions, create discussions, like, reply, bookmark |
+| User | View discussions, create discussions, like, reply, bookmark, share, follow members, follow categories |
 | Moderator | All user permissions + pin, lock, resolve reports |
 | Admin | All moderator permissions + access moderation dashboard |
 
@@ -107,11 +212,14 @@ Local component state is used for:
 ### Unit Tests
 ```bash
 npm test -- tests/unit/discussion-card.test.tsx
+npm test -- tests/unit/community-event-card.test.tsx
+npm test -- tests/unit/community-statistics-widget.test.tsx
 ```
 
 ### Integration Tests
 ```bash
 npm test -- tests/integration/community-workflows.test.tsx
+npm test -- tests/integration/discussion-creation-flow.test.tsx
 ```
 
 ### E2E Tests

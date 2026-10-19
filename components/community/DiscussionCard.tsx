@@ -1,12 +1,26 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import type { Discussion } from "@/lib/community-types";
+import { DiscussionActions } from "./DiscussionActions";
+import { DiscussionComments } from "./DiscussionComments";
+import { DiscussionCategoryBadge } from "./DiscussionCategoryBadge";
+import { TrendingBadgeForDiscussion } from "./TrendingBadge";
 
 interface DiscussionCardProps {
   discussion: Discussion;
+  /** Passed through to `DiscussionActions` for the saved page (#1013). */
+  onRemoveBookmark?: (discussionId: string) => void;
+  isRemovingBookmark?: boolean;
 }
 
-export function DiscussionCard({ discussion }: DiscussionCardProps) {
+export function DiscussionCard({
+  discussion,
+  onRemoveBookmark,
+  isRemovingBookmark,
+}: DiscussionCardProps) {
+  const [showComments, setShowComments] = useState(false);
   return (
     <article
       className="rounded-lg border border-[var(--border)] bg-[var(--background)] p-4 transition-shadow hover:shadow-md focus-within:shadow-md"
@@ -23,9 +37,6 @@ export function DiscussionCard({ discussion }: DiscussionCardProps) {
             <span className="text-sm font-medium text-[var(--foreground)]">
               {discussion.authorName}
             </span>
-            <span className="text-xs text-[var(--muted)]">
-              {new Date(discussion.createdAt).toLocaleDateString()}
-            </span>
             {discussion.isPinned && (
               <span className="rounded bg-[var(--primary)]/10 px-1.5 py-0.5 text-xs font-medium text-[var(--primary)]">
                 Pinned
@@ -36,17 +47,24 @@ export function DiscussionCard({ discussion }: DiscussionCardProps) {
                 Locked
               </span>
             )}
+            <TrendingBadgeForDiscussion discussion={discussion} />
           </div>
           <h3
             id={`discussion-title-${discussion.id}`}
             className="mt-1 text-base font-semibold text-[var(--foreground)]"
           >
-            {discussion.title}
+            <Link
+              href={`/community/discussions/${discussion.id}`}
+              className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            >
+              {discussion.title}
+            </Link>
           </h3>
           <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">
             {discussion.content}
           </p>
-          <div className="mt-3 flex items-center gap-4 text-sm text-[var(--muted)]">
+          {/* #1000: wrap instead of pushing past the viewport on phones */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
             <span className="flex items-center gap-1">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -66,12 +84,34 @@ export function DiscussionCard({ discussion }: DiscussionCardProps) {
               </svg>
               {discussion.viewCount}
             </span>
-            <span className="rounded-full bg-[var(--secondary)] px-2 py-0.5 text-xs font-medium text-[var(--muted)]">
-              {discussion.category}
-            </span>
+            <DiscussionCategoryBadge label={discussion.category} />
           </div>
+
+          <DiscussionActions
+            discussion={discussion}
+            onRemoveBookmark={onRemoveBookmark}
+            isRemovingBookmark={isRemovingBookmark}
+          />
         </div>
       </div>
+          <div className="mt-3 flex items-center gap-3 border-t border-[var(--border)] pt-3">
+        <button
+          type="button"
+          onClick={() => setShowComments((v) => !v)}
+          aria-expanded={showComments}
+          className="text-xs font-medium text-[var(--primary)] hover:underline"
+        >
+          {showComments
+            ? "Hide comments"
+            : `Comments${discussion.replyCount ? ` (${discussion.replyCount})` : ""}`}
+        </button>
+      </div>
+      {showComments && (
+        <DiscussionComments
+          discussionId={discussion.id}
+          locked={discussion.isLocked}
+        />
+      )}
     </article>
   );
 }

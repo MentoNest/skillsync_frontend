@@ -1,45 +1,48 @@
-import { NextResponse } from "next/server";
-
-const mockReports = [
-  {
-    id: "report-1",
-    discussionId: "discussion-1",
-    reporterId: "user-1",
-    reason: "Spam content",
-    status: "pending" as const,
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-  },
-  {
-    id: "report-2",
-    discussionId: "discussion-2",
-    reporterId: "user-2",
-    reason: "Inappropriate language",
-    status: "pending" as const,
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-  {
-    id: "report-3",
-    discussionId: "discussion-3",
-    reporterId: "user-3",
-    reason: "Off-topic",
-    status: "reviewed" as const,
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: "report-4",
-    discussionId: "discussion-4",
-    reporterId: "user-4",
-    reason: "Duplicate post",
-    status: "resolved" as const,
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-    resolvedAt: new Date(Date.now() - 86400000).toISOString(),
-    resolvedBy: "moderator-1",
-  },
-];
+import { NextRequest, NextResponse } from "next/server";
+import {
+  createReport,
+  listReports,
+  resolveViewerId,
+} from "@/lib/community-store";
 
 export async function GET() {
   return NextResponse.json({
-    reports: mockReports,
-    pendingCount: mockReports.filter((r) => r.status === "pending").length,
+    reports: listReports(),
+    pendingCount: listReports().filter((r) => r.status === "pending").length,
   });
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { discussionId, reason } = body;
+
+    if (!discussionId || typeof discussionId !== "string") {
+      return NextResponse.json(
+        { error: "Discussion ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!reason || typeof reason !== "string") {
+      return NextResponse.json(
+        { error: "Report reason is required" },
+        { status: 400 }
+      );
+    }
+
+    const viewerId = resolveViewerId(request);
+
+    const report = createReport({
+      discussionId,
+      reporterId: viewerId,
+      reason,
+    });
+
+    return NextResponse.json(report, { status: 201 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to submit report";
+    const status = message === "Discussion not found" ? 404 : message === "Invalid report reason" ? 400 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
 }
