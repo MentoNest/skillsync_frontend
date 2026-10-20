@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useOptionalAuth } from "@/components/auth/AuthProvider";
 import CommunityFeedTabs, {
   type FeedView,
@@ -38,12 +38,12 @@ function CommunityPageContent() {
     refresh,
     refreshOverview,
     registerForEvent,
+    loadMoreRef,
   } = useCommunity();
 
   const [activeView, setActiveView] = useState<FeedView>("trending");
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const userId = auth?.user?.id;
   const myDiscussions = userId

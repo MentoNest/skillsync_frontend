@@ -19,6 +19,7 @@ import {
   type DiscussionSort,
 } from "@/lib/community-types";
 import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 /** Feed page size, shared by the initial fetch and pagination. */
 export const COMMUNITY_PAGE_SIZE = 10;
@@ -56,8 +57,8 @@ export interface CommunityContextValue {
   refresh: () => void;
   /** Optimistically register the viewer for an event (#989). */
   registerForEvent: (eventId: string) => void;
-  /** Re-issues only the sidebar overview request (#1254). */
-  refreshOverview: () => void;
+  /** Sentinel ref the feed attaches to auto-load the next page (#1277). */
+  loadMoreRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const CommunityContext = createContext<CommunityContextValue | null>(null);
@@ -90,6 +91,10 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
   // Monotonic id so a slow response for stale filters cannot overwrite the
   // results of a newer request.
   const requestIdRef = useRef(0);
+
+  // Sentinel observed by the feed so reaching the bottom auto-loads the next
+  // page (#1277). The ref is exposed to consumers to attach to that element.
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const fetchDiscussions = useCallback(
     async (page: number, append: boolean) => {
@@ -234,6 +239,14 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     void loadOverview();
   }, [fetchDiscussions, loadOverview]);
 
+  // Auto-load the next page when the feed sentinel scrolls into view (#1277).
+  useInfiniteScroll({
+    isLoading: isLoading || isLoadingMore,
+    hasMore,
+    onLoadMore: loadMore,
+    loadMoreRef,
+  });
+
   const setCategory = useCallback((category: string | null) => {
     setFilters((previous) => ({ ...previous, selectedCategory: category }));
   }, []);
@@ -286,6 +299,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       refresh,
       refreshOverview: loadOverview,
       registerForEvent,
+      loadMoreRef,
     }),
     [
       discussions,
@@ -306,6 +320,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       refresh,
       loadOverview,
       registerForEvent,
+      loadMoreRef,
     ]
   );
 
