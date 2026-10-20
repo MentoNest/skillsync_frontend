@@ -69,100 +69,125 @@ function CommunityPageContent() {
   const { selectedCategory } = filters;
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-[var(--foreground)]">
-                Community
-              </h1>
-              <p className="mt-2 text-[var(--muted)]">
-                Connect, share, and learn with fellow mentees and mentors
-              </p>
-              {isConnected && (
-                <span className="mt-2 inline-flex items-center gap-1 text-sm text-green-600">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                  Live updates enabled
-                </span>
-              )}
-            </div>
-            <Link
-              href="/community/saved"
-              className="inline-flex items-center gap-1 rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+          <h1 className="text-3xl font-bold text-slate-900">Community</h1>
+          <p className="mt-2 text-slate-600">
+            Connect, share, and learn with fellow mentees and mentors
+          </p>
+        </div>
+
+        {/* Placeholder content */}
+        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+          <div className="mx-auto max-w-md">
+            <svg
+              className="mx-auto h-16 w-16 text-slate-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
             >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            <h2 className="mt-4 text-xl font-semibold text-slate-900">
+              Community features coming soon
+            </h2>
+            <p className="mt-2 text-slate-600">
+              Join discussions, share insights, and connect with mentors and peers.
+              We're building an amazing community experience for you.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="/mentors"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors"
+              >
+                Explore mentors
+              </a>
+              <a
+                href="/resources"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
+              >
+                Browse resources
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Feature preview cards */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
               <svg
-                className="h-4 w-4"
+                className="w-6 h-6 text-indigo-600"
                 fill="none"
-                stroke="currentColor"
                 viewBox="0 0 24 24"
-                aria-hidden="true"
+                stroke="currentColor"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                 />
               </svg>
-              Saved discussions
-            </Link>
+            </div>
+            <h3 className="font-semibold text-slate-900 mb-2">Discussions</h3>
+            <p className="text-sm text-slate-600">
+              Start and join conversations about career growth, skills, and industry insights.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center mb-4">
+              <svg
+                className="w-6 h-6 text-emerald-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="font-semibold text-slate-900 mb-2">Networking</h3>
+            <p className="text-sm text-slate-600">
+              Connect with peers and mentors who share your interests and goals.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center mb-4">
+              <svg
+                className="w-6 h-6 text-amber-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+            </div>
+            <h3 className="font-semibold text-slate-900 mb-2">Knowledge Sharing</h3>
+            <p className="text-sm text-slate-600">
+              Share your experiences and learn from others in the community.
+            </p>
           </div>
         </div>
-
-        <CommunityHeroBanner onStartDiscussion={() => setIsComposerOpen(true)} />
-
-        {/*
-         * Responsive layout (#1000):
-         * - Desktop (lg+): feed left, sidebar right.
-         * - Tablet / Mobile: single column; sidebar stacks below the feed.
-         */}
-        <div className="mt-8 flex flex-col gap-8 lg:flex-row">
-          <main className="min-w-0 flex-1">
-            <CommunityFeed
-              discussions={discussions}
-              isLoading={isLoading}
-              isLoadingMore={isLoadingMore}
-              hasMore={hasMore}
-              selectedCategory={selectedCategory}
-              searchQuery={filters.searchQuery}
-              sortBy={filters.sortBy}
-              onCategoryChange={setCategory}
-              onSearchChange={setSearchQuery}
-              onSortChange={setSortBy}
-              error={error}
-              onRetry={refresh}
-              onStartDiscussion={() => setIsComposerOpen(true)}
-              loadMoreRef={loadMoreRef}
-            />
-          </main>
-
-          <aside
-            aria-label="Community sidebar"
-            className="w-full min-w-0 border-t border-[var(--border)] pt-6 lg:w-80 lg:flex-shrink-0 lg:border-t-0 lg:pt-0"
-          >
-            <CommunitySidebar
-              selectedCategory={selectedCategory}
-              onCategoryChange={setCategory}
-            />
-          </aside>
-        </div>
       </div>
-
-      <StartDiscussionModal
-        isOpen={isComposerOpen}
-        onClose={() => setIsComposerOpen(false)}
-        onCreated={handleDiscussionCreated}
-        defaultCategory={
-          selectedCategory && isCommunityCategoryId(selectedCategory)
-            ? selectedCategory
-            : undefined
-        }
-      />
-
-      {toastMessage && (
-        <CommunityToast message={toastMessage} onDismiss={dismissToast} />
-      )}
     </div>
   );
 }
