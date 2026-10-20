@@ -6,6 +6,7 @@ import { CommunityEmptyState } from "./CommunityEmptyState";
 import { DiscussionFeedSkeleton } from "./CommunitySkeleton";
 import { CommunityEmptyState } from "./CommunityEmptyState";
 import { CommunityErrorState } from "./CommunityErrorState";
+import { LoadMoreDiscussionsButton } from "./LoadMoreDiscussionsButton";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
 
 interface CommunityFeedProps {
@@ -19,6 +20,8 @@ interface CommunityFeedProps {
   onCategoryChange: (category: string | null) => void;
   onSearchChange: (query: string) => void;
   onSortChange: (sort: DiscussionSort) => void;
+  /** Requests the next page of discussions. */
+  onLoadMore: () => void;
   /** Error message from the last feed request, if any (#999). */
   error?: string | null;
   /** Re-issues the feed request after a failure (#999). */
@@ -39,12 +42,14 @@ export function CommunityFeed({
   onCategoryChange,
   onSearchChange,
   onSortChange,
+  onLoadMore,
   error,
   onRetry,
   onStartDiscussion,
   loadMoreRef,
 }: CommunityFeedProps) {
-  const hasActiveFilters = Boolean(selectedCategory) || searchQuery.trim().length > 0;
+  const hasActiveFilters =
+    Boolean(selectedCategory) || searchQuery.trim().length > 0;
 
   return (
     <div className="space-y-4">
@@ -52,9 +57,6 @@ export function CommunityFeed({
 
       {isLoading ? (
         <DiscussionFeedSkeleton count={4} />
-        <div className="flex justify-center py-12" role="status" aria-label="Loading discussions">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--primary)] border-t-transparent" />
-        </div>
       ) : error ? (
         <CommunityErrorState message={error} onRetry={onRetry} />
       ) : discussions.length === 0 ? (
@@ -82,18 +84,18 @@ export function CommunityFeed({
         </div>
       )}
 
-      {isLoadingMore && (
-        <div className="flex justify-center py-4" role="status" aria-label="Loading more">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
-        </div>
+      {/* Explicit load-more control — keyboard-accessible complement to the
+          invisible infinite-scroll sentinel below. Handles loading, disabled
+          and end-of-results states internally. */}
+      {!isLoading && !error && discussions.length > 0 && (
+        <LoadMoreDiscussionsButton
+          hasMore={hasMore}
+          isLoading={isLoadingMore}
+          onLoadMore={onLoadMore}
+        />
       )}
 
-      {!isLoading && !isLoadingMore && discussions.length > 0 && !hasMore && (
-        <p className="py-4 text-center text-sm text-[var(--muted)]">
-          You&apos;ve reached the end of the feed
-        </p>
-      )}
-
+      {/* Intersection-observer sentinel for automatic infinite scroll */}
       <div ref={loadMoreRef} className="h-1" aria-hidden="true" />
     </div>
   );
