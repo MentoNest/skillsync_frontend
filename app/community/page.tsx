@@ -36,6 +36,7 @@ function CommunityPageContent() {
     setSortBy,
     loadMore,
     refresh,
+    refreshOverview,
     registerForEvent,
     loadMoreRef,
   } = useCommunity();
@@ -119,6 +120,8 @@ function CommunityPageContent() {
             statistics={statistics}
             isLoadingStatistics={isLoadingOverview}
             overviewError={overviewError}
+            onRetryOverview={refreshOverview}
+            isRetryingOverview={isLoadingOverview}
             onRegisterForEvent={registerForEvent}
           />
         </div>

@@ -297,6 +297,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       setSortBy,
       loadMore,
       refresh,
+      refreshOverview: loadOverview,
       registerForEvent,
       loadMoreRef,
     }),
@@ -317,6 +318,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       setSortBy,
       loadMore,
       refresh,
+      loadOverview,
       registerForEvent,
       loadMoreRef,
     ]

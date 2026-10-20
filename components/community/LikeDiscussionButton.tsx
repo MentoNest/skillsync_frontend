@@ -4,6 +4,7 @@ import { useDiscussionLike } from "@/hooks/useDiscussionLike";
 
 interface LikeDiscussionButtonProps {
   discussionId: string;
+  /** Viewer's known like state; when omitted the hook fetches it (#1266). */
   initialLiked?: boolean;
   initialCount?: number;
   onCountChange?: (count: number) => void;
@@ -11,7 +12,7 @@ interface LikeDiscussionButtonProps {
 
 export function LikeDiscussionButton({
   discussionId,
-  initialLiked = false,
+  initialLiked,
   initialCount = 0,
   onCountChange,
 }: LikeDiscussionButtonProps) {

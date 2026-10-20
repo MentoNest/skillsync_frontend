@@ -21,6 +21,9 @@ interface CommunitySidebarProps {
   overviewError?: string | null;
   eventsError?: string | null;
   onRegisterForEvent?: (eventId: string) => void;
+  /** Re-issues the sidebar overview request after a failure (#1254). */
+  onRetryOverview?: () => void;
+  isRetryingOverview?: boolean;
 }
 
 const categoryCounts: Record<string, number> = {
@@ -53,6 +56,8 @@ export function CommunitySidebar({
   overviewError,
   eventsError,
   onRegisterForEvent,
+  onRetryOverview,
+  isRetryingOverview = false,
 }: CommunitySidebarProps) {
   const {
     isFollowing,
@@ -105,6 +110,8 @@ export function CommunitySidebar({
         stats={statistics ?? emptyStatistics}
         isLoading={isLoadingStatistics}
         error={overviewError}
+        onRetry={onRetryOverview}
+        isRetrying={isRetryingOverview}
       />
 
       {eventsError ? (
