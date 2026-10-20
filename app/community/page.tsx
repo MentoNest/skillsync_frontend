@@ -1,31 +1,72 @@
 "use client";
 
-import { useAuth } from "@/components/auth/AuthProvider";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useRef, useState } from "react";
+import Link from "next/link";
+import { CommunityFeed } from "@/components/community/CommunityFeed";
+import { CommunitySidebar } from "@/components/community/CommunitySidebar";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import { StartDiscussionModal } from "@/components/community/StartDiscussionModal";
+import { CommunityToast } from "@/components/community/CommunityToast";
+import {
+  CommunityProvider,
+  useCommunity,
+} from "@/components/community/CommunityProvider";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { trackDiscussionCreated } from "@/lib/community-analytics";
+import {
+  isCommunityCategoryId,
+  type Discussion,
+} from "@/lib/community-types";
 
-export default function CommunityPage() {
-  const { user, isReady } = useAuth();
-  const router = useRouter();
+/**
+ * Inner page content — reads all state from CommunityProvider via
+ * useCommunity() so the page doesn't manage its own duplicate fetch/filter
+ * state (#996, #1248).
+ */
+function CommunityPageContent() {
+  const {
+    discussions,
+    filters,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    error,
+    isLive,
+    setCategory,
+    setSearchQuery,
+    setSortBy,
+    loadMore,
+    refresh,
+  } = useCommunity();
 
-  useEffect(() => {
-    if (!isReady) return;
-    if (!user) {
-      router.replace("/login");
-    }
-  }, [isReady, user, router]);
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Show loading state while checking auth
-  if (!isReady || !user) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent"></div>
-          <p className="mt-4 text-slate-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const { resetInfiniteScroll } = useInfiniteScroll({
+    isLoading: isLoadingMore,
+    hasMore,
+    onLoadMore: loadMore,
+    observerRef,
+    loadMoreRef,
+  });
+
+  const dismissToast = useCallback(() => setToastMessage(null), []);
+
+  // Surface the created discussion immediately and reset pagination (#1004).
+  const handleDiscussionCreated = useCallback(
+    (created: Discussion) => {
+      resetInfiniteScroll();
+      setToastMessage("Your discussion was published.");
+      trackDiscussionCreated(created.id, created.category);
+      refresh();
+    },
+    [resetInfiniteScroll, refresh]
+  );
+
+  const { selectedCategory } = filters;
 
   return (
     <div className="min-h-screen bg-slate-50">
