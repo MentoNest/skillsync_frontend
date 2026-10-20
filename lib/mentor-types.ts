@@ -14,6 +14,8 @@ export interface Mentor {
   availability: "available" | "busy" | "unavailable";
   sessions: number;
   profileHref?: string;
+  /** Platform-curated spotlight. When true, cards/profile show a Featured badge. */
+  featured?: boolean;
 }
 
 export interface MentorFilters {

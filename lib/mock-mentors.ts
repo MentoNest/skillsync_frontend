@@ -25,6 +25,7 @@ export const MOCK_MENTORS: Mentor[] = [
     hourlyRate: 250,
     availability: "available",
     sessions: 320,
+    featured: true,
   },
   {
     id: "2",
@@ -40,6 +41,7 @@ export const MOCK_MENTORS: Mentor[] = [
     hourlyRate: 300,
     availability: "available",
     sessions: 210,
+    featured: true,
   },
   {
     id: "3",
@@ -85,6 +87,7 @@ export const MOCK_MENTORS: Mentor[] = [
     hourlyRate: 280,
     availability: "available",
     sessions: 198,
+    featured: true,
   },
   {
     id: "6",

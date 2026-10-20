@@ -7,6 +7,7 @@ import { MentorCardProps } from "@/components/landing/MentorCard";
 import { mentorProfileHref } from "@/lib/mentor-types";
 import MentorRating from "./MentorRating";
 import MentorSkillTags from "./MentorSkillTags";
+import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 export { default as MentorCardSkeleton } from "@/components/landing/MentorCardSkeleton";
 export { MentorRating };
 
@@ -30,6 +31,7 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
   rating,
   sessions,
   profileHref,
+  featured,
   children,
 }: OptimizedMentorCardProps) {
   // #59: default the CTA to this mentor's own profile route rather than
@@ -89,7 +91,10 @@ const OptimizedMentorCard = memo(function OptimizedMentorCard({
           )}
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 truncate">{name}</h3>
+            <div className="flex min-w-0 items-center gap-2">
+              <h3 className="font-semibold text-slate-900 truncate">{name}</h3>
+              {featured && <FeaturedMentorBadge />}
+            </div>
             <p className="text-sm text-indigo-600 font-medium truncate">{title}</p>
 
             <div className="mt-1">

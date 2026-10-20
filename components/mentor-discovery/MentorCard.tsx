@@ -28,6 +28,7 @@ export default function MentorCard({
       skills={mentor.skills}
       availability={mentor.availability}
       profileHref={mentor.profileHref}
+      featured={mentor.featured}
       onCtaClick={onProfileClick}
     >
       <div className="mt-auto px-6 pb-6 flex gap-3">

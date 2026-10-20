@@ -13,6 +13,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     avatarColor: "bg-gradient-to-br from-indigo-500 to-blue-600",
     rating: 4.9,
     sessions: 286,
+    featured: true,
   },
   {
     id: "102",
@@ -25,6 +26,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     avatarColor: "bg-gradient-to-br from-fuchsia-500 to-pink-500",
     rating: 4.8,
     sessions: 164,
+    featured: true,
   },
   {
     id: "103",
@@ -37,6 +39,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     avatarColor: "bg-gradient-to-br from-amber-500 to-orange-500",
     rating: 5.0,
     sessions: 132,
+    featured: true,
   },
   {
     id: "104",
@@ -49,6 +52,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     avatarColor: "bg-gradient-to-br from-emerald-500 to-teal-500",
     rating: 4.9,
     sessions: 203,
+    featured: true,
   },
   {
     id: "105",
@@ -61,6 +65,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     avatarColor: "bg-gradient-to-br from-rose-500 to-red-500",
     rating: 4.7,
     sessions: 97,
+    featured: true,
   },
   {
     id: "106",
@@ -73,6 +78,7 @@ const FEATURED_MENTORS: MentorCardProps[] = [
     avatarColor: "bg-gradient-to-br from-sky-500 to-cyan-500",
     rating: 4.8,
     sessions: 178,
+    featured: true,
   },
 ];
 

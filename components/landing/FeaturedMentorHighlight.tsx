@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 
 const FEATURED = {
   name: "Amara Osei",
@@ -58,7 +59,10 @@ export default function FeaturedMentorHighlight() {
                 {FEATURED.avatarInitials}
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white">{FEATURED.name}</h3>
+                <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+                  <h3 className="text-2xl font-bold text-white">{FEATURED.name}</h3>
+                  <FeaturedMentorBadge />
+                </div>
                 <p className="mt-1 text-sm font-medium text-cyan-300">
                   {FEATURED.title}
                 </p>

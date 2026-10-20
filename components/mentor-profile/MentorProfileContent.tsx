@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Mentor } from "@/lib/mentor-types";
+import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 
 interface MentorProfileContentProps {
   mentor: Mentor;
@@ -76,9 +77,12 @@ export default function MentorProfileContent({ mentor }: MentorProfileContentPro
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                {mentor.name}
-              </h1>
+              <div className="mb-2 flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-bold text-slate-900">
+                  {mentor.name}
+                </h1>
+                {mentor.featured && <FeaturedMentorBadge size="md" />}
+              </div>
               <p className="text-lg text-slate-600 mb-4">{mentor.headline}</p>
               
               <div className="flex flex-wrap gap-3 items-center">

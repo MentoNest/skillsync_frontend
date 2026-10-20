@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { mentorApi, ApiError } from "@/lib/api";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
+import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 
 // Mentor profiles are user-specific and served from the mock API, so render
 // per request rather than prerendering at build time.
@@ -129,12 +130,15 @@ export default async function MentorProfilePage({
               )}
 
               <div className="flex-1 min-w-0">
-                <h1
-                  id="mentor-name"
-                  className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"
-                >
-                  {mentor.name}
-                </h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1
+                    id="mentor-name"
+                    className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"
+                  >
+                    {mentor.name}
+                  </h1>
+                  {mentor.featured && <FeaturedMentorBadge size="md" />}
+                </div>
                 <p className="mt-1 text-indigo-600 font-medium">
                   {mentor.headline}
                 </p>
