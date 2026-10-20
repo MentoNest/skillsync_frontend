@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { CommunityStatistics } from "@/lib/community-types";
+import { CommunityErrorState } from "./CommunityErrorState";
 import { CommunityStatisticCard } from "./CommunityStatisticCard";
 
 export interface CommunityStatisticsWidgetProps {
@@ -11,6 +12,10 @@ export interface CommunityStatisticsWidgetProps {
   isLoading?: boolean;
   /** Shown in place of the metrics when loading fails. */
   error?: string | null;
+  /** Re-issues the metrics request (#1254). */
+  onRetry?: () => void;
+  /** True while the retried metrics request is in flight (#1254). */
+  isRetrying?: boolean;
   className?: string;
 }
 
@@ -39,6 +44,8 @@ export function CommunityStatisticsWidget({
   stats,
   isLoading = false,
   error = null,
+  onRetry,
+  isRetrying = false,
   className,
 }: CommunityStatisticsWidgetProps) {
   return (
@@ -57,9 +64,13 @@ export function CommunityStatisticsWidget({
       </h2>
 
       {error ? (
-        <p role="alert" className="text-xs text-red-600">
-          {error}
-        </p>
+        <CommunityErrorState
+          title="Couldn't load statistics"
+          message={error}
+          onRetry={onRetry}
+          isRetrying={isRetrying}
+          className="px-3 py-6"
+        />
       ) : null}
 
       {isLoading ? (
