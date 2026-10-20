@@ -31,6 +31,8 @@ export default function CommunityPage() {
   const [sortBy, setSortBy] = useState<DiscussionSort>("latest");
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const pageRef = useRef(1);
 
   // Real-time updates
   const { isConnected } = useCommunityRealtime({
@@ -62,9 +64,14 @@ export default function CommunityPage() {
     },
   });
 
-  // Fetch discussions
+  // Fetch discussions from the backend. A new request aborts the previous one
+  // so a slow response for old filters can never overwrite newer results.
   const fetchDiscussions = useCallback(
     async (page = 1, append = false) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       try {
         if (page === 1) {
           setIsLoading(true);
@@ -84,26 +91,36 @@ export default function CommunityPage() {
         const res = await fetch(`/api/community/discussions?${params}`);
         if (!res.ok) throw new Error("Failed to fetch discussions");
 
-        const data = await res.json();
+        if (controller.signal.aborted) return;
 
         if (append) {
           setDiscussions((prev) => {
             const existingIds = new Set(prev.map((d) => d.id));
-            const newDiscussions = data.discussions.filter(
-              (d: Discussion) => !existingIds.has(d.id)
+            const newDiscussions = result.discussions.filter(
+              (d) => !existingIds.has(d.id)
             );
             return [...prev, ...newDiscussions];
           });
         } else {
-          setDiscussions(data.discussions);
+          setDiscussions(result.discussions);
         }
 
-        setHasMore(data.hasMore);
+        setHasMore(result.hasMore);
+        pageRef.current = result.page;
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        if (controller.signal.aborted) return;
+        setError(
+          err instanceof Error ? err.message : "Failed to load discussions"
+        );
+        if (!append) {
+          setDiscussions([]);
+          setHasMore(false);
+        }
       } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+          setIsLoadingMore(false);
+        }
       }
     },
     [selectedCategory, searchQuery, sortBy]

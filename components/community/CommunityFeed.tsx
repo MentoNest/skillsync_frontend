@@ -2,6 +2,7 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
+import { CommunityEmptyState } from "./CommunityEmptyState";
 import { DiscussionFeedSkeleton } from "./CommunitySkeleton";
 import { CommunityEmptyState } from "./CommunityEmptyState";
 import { CommunityErrorState } from "./CommunityErrorState";
@@ -59,6 +60,13 @@ export function CommunityFeed({
       ) : error ? (
         <CommunityErrorState message={error} onRetry={onRetry} />
       ) : discussions.length === 0 ? (
+        <CommunityEmptyState
+          filtered={Boolean(selectedCategory || searchQuery)}
+          onClearFilters={() => {
+            onCategoryChange(null);
+            onSearchChange("");
+          }}
+        />
         hasActiveFilters ? (
           <CommunityEmptyState
             title="No discussions found"
