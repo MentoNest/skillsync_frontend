@@ -80,9 +80,9 @@ function CommunityPageContent() {
               <p className="mt-2 text-[var(--muted)]">
                 Connect, share, and learn with fellow mentees and mentors
               </p>
-              {isLive && (
+              {isConnected && (
                 <span className="mt-2 inline-flex items-center gap-1 text-sm text-green-600">
-                  <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
                   Live updates enabled
                 </span>
               )}
@@ -164,14 +164,5 @@ function CommunityPageContent() {
         <CommunityToast message={toastMessage} onDismiss={dismissToast} />
       )}
     </div>
-  );
-}
-
-export default function CommunityPage() {
-  return (
-    <CommunityProvider>
-      <CommunityContent />
-      <CommunityPageContent />
-    </CommunityProvider>
   );
 }

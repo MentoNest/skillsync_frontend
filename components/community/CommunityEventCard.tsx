@@ -151,3 +151,5 @@ export function CommunityEventCard({
     </article>
   );
 }
+
+export default CommunityEventCard;

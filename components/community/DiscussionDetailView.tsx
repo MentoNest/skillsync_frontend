@@ -8,6 +8,7 @@ import { EditDiscussionForm } from "./EditDiscussionForm";
 import { DeleteDiscussionButton } from "./DeleteDiscussionButton";
 import { RichTextEditor, richTextPlainLength } from "./RichTextEditor";
 import { DiscussionCategoryBadge } from "./DiscussionCategoryBadge";
+import { DiscussionMetadata } from "./DiscussionMetadata";
 import { TrendingBadgeForDiscussion } from "./TrendingBadge";
 
 interface Props {
@@ -103,22 +104,24 @@ export function DiscussionDetailView({
       ) : (
         <article className="space-y-4">
           <header className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
-              <DiscussionCategoryBadge
-                label={discussion.category}
-                className="font-medium"
-              />
-              {discussion.isPinned && (
-                <span className="text-[var(--primary)]">Pinned</span>
-              )}
-              {discussion.isLocked && (
-                <span className="text-amber-700">Locked</span>
-              )}
-              <TrendingBadgeForDiscussion discussion={discussion} />
-              <time dateTime={discussion.createdAt}>
-                {new Date(discussion.createdAt).toLocaleString()}
-              </time>
-            </div>
+            {(discussion.isPinned || discussion.isLocked) && (
+              <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
+                {discussion.isPinned && (
+                  <span className="text-[var(--primary)]">Pinned</span>
+                )}
+                {discussion.isLocked && (
+                  <span className="text-amber-700">Locked</span>
+                )}
+                <TrendingBadgeForDiscussion discussion={discussion} />
+              </div>
+            )}
+            <DiscussionMetadata
+              createdAt={discussion.createdAt}
+              category={discussion.category}
+              likeCount={discussion.likeCount}
+              replyCount={discussion.replyCount}
+              viewCount={discussion.viewCount}
+            />
             <h1 className="text-2xl font-bold text-[var(--foreground)]">
               {discussion.title}
             </h1>

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Category badge for discussions (#984).
+ * Category badge for discussions.
  *
  * The label is dynamic — it renders whatever category string a discussion
  * carries, so the feed keeps working when the backend returns a category that
@@ -26,24 +26,42 @@ export interface DiscussionCategoryBadgeProps {
 }
 
 /**
- * Colour per canonical category. Keys are lower-cased and trimmed before
- * lookup so `"Career Growth"`, `"career growth"` and `" career growth "` all
- * resolve to the same style.
+ * Fine-grained discussion-level categories shown as badges throughout the UI.
+ * This is the single source of truth for label → colour mapping; add new
+ * categories here and the badge picks them up automatically.
+ */
+export const DISCUSSION_CATEGORY_BADGES = [
+  { label: "Career Growth",        style: "bg-indigo-50 text-indigo-700"  },
+  { label: "Leadership",           style: "bg-violet-50 text-violet-700"  },
+  { label: "Interview Prep",       style: "bg-rose-50   text-rose-700"    },
+  { label: "Networking",           style: "bg-teal-50   text-teal-700"    },
+  { label: "Salary & Compensation",style: "bg-amber-50  text-amber-700"   },
+  { label: "Work-Life Balance",    style: "bg-cyan-50   text-cyan-700"    },
+] as const;
+
+export type DiscussionCategoryLabel =
+  (typeof DISCUSSION_CATEGORY_BADGES)[number]["label"];
+
+/**
+ * Colour map built from DISCUSSION_CATEGORY_BADGES plus the broader community
+ * taxonomy. Keys are lower-cased and trimmed before lookup so
+ * `"Career Growth"`, `"career growth"` and `" career growth "` all resolve to
+ * the same style.
  */
 const CATEGORY_STYLES: Record<string, string> = {
-  // Categories from the community taxonomy (#993)
-  general: "bg-slate-100 text-slate-700",
-  career: "bg-indigo-50 text-indigo-700",
-  technical: "bg-sky-50 text-sky-700",
-  mentoring: "bg-emerald-50 text-emerald-700",
-  announcements: "bg-amber-50 text-amber-700",
-  // Finer-grained discussion categories (#984)
-  "career growth": "bg-indigo-50 text-indigo-700",
-  leadership: "bg-violet-50 text-violet-700",
-  "interview prep": "bg-rose-50 text-rose-700",
-  networking: "bg-teal-50 text-teal-700",
-  "salary & compensation": "bg-amber-50 text-amber-700",
-  "work-life balance": "bg-cyan-50 text-cyan-700",
+  // Broad community taxonomy
+  general:       "bg-slate-100 text-slate-700",
+  career:        "bg-indigo-50 text-indigo-700",
+  technical:     "bg-sky-50    text-sky-700",
+  mentoring:     "bg-emerald-50 text-emerald-700",
+  announcements: "bg-amber-50  text-amber-700",
+  // Fine-grained discussion categories (driven by DISCUSSION_CATEGORY_BADGES)
+  ...Object.fromEntries(
+    DISCUSSION_CATEGORY_BADGES.map(({ label, style }) => [
+      label.trim().toLowerCase(),
+      style,
+    ])
+  ),
 };
 
 const FALLBACK_STYLE = "bg-[var(--secondary)] text-[var(--muted)]";
@@ -53,7 +71,7 @@ const SIZE_STYLES: Record<DiscussionCategoryBadgeSize, string> = {
   md: "px-2.5 py-1 text-sm",
 };
 
-/** Resolve the style for a category, case- and whitespace-insensitively. */
+/** Resolve the Tailwind classes for a category, case- and whitespace-insensitively. */
 export function discussionCategoryStyle(label: string): string {
   const key = label?.trim().toLowerCase() ?? "";
   return CATEGORY_STYLES[key] ?? FALLBACK_STYLE;
