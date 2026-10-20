@@ -53,7 +53,7 @@ export function CommunityStatisticsWidget({
         id="community-stats-heading"
         className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--muted)]"
       >
-        Community Stats
+        Community Statistics
       </h2>
 
       {error ? (

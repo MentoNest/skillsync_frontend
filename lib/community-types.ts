@@ -178,18 +178,6 @@ export function serializeCategoryParam(
   return parsed.length > 0 ? parsed.join(",") : null;
 }
 
-export interface CommunityEvent {
-  id: string;
-  title: string;
-  description: string;
-  /** ISO-8601 start timestamp. */
-  date: string;
-  /** ISO-8601 end timestamp. */
-  endDate?: string;
-  location: string;
-  category?: string;
-  attendeeCount: number;
-  isOnline: boolean;
 /** Canonical list of category ids (single source of truth for #993/#1014). */
 export const COMMUNITY_CATEGORY_IDS = COMMUNITY_CATEGORIES.map(
   (category) => category.id
