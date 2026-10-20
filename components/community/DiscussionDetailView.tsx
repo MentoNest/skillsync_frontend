@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Discussion, Reply } from "@/lib/community-types";
+import { trackDiscussionViewed } from "@/lib/community-analytics";
 import { DiscussionActions } from "./DiscussionActions";
 import { EditDiscussionForm } from "./EditDiscussionForm";
 import { DeleteDiscussionButton } from "./DeleteDiscussionButton";
@@ -51,6 +52,11 @@ export function DiscussionDetailView({
   const [posting, setPosting] = useState(false);
 
   const isAuthor = viewerId === discussion.authorId;
+
+  // Track a view once per discussion mount (#1279).
+  useEffect(() => {
+    trackDiscussionViewed(initial.id);
+  }, [initial.id]);
 
   const relatedCards = useMemo(() => related, [related]);
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { communityApi, CommunityApiError } from "@/lib/community-api";
+import { trackDiscussionReplied } from "@/lib/community-analytics";
 import type { Comment } from "@/lib/community-types";
 
 interface CommentFormProps {
@@ -41,6 +42,7 @@ export function CommentForm({
       });
       setContent("");
       onSubmitted(comment);
+      trackDiscussionReplied(discussionId);
     } catch (err) {
       setError(
         err instanceof CommunityApiError

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { communityApi, CommunityApiError } from "@/lib/community-api";
+import { trackDiscussionLiked } from "@/lib/community-analytics";
 
 /**
  * Optimistic like/unlike for a discussion (#1011).
@@ -47,6 +48,9 @@ export function useDiscussionLike(
       const result = await communityApi.toggleDiscussionLike(discussionId);
       setIsLiked(result.isLiked);
       setLikeCount(result.likeCount);
+      if (result.isLiked) {
+        trackDiscussionLiked(discussionId);
+      }
     } catch (err) {
       setIsLiked(prevLiked);
       setLikeCount(prevCount);
