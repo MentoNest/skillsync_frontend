@@ -11,7 +11,6 @@ import {
   type ReactNode,
 } from "react";
 import { communityApi } from "@/lib/community-api";
-import { trackEventRegistered } from "@/lib/community-analytics";
 import {
   COMMUNITY_CATEGORIES,
   type CommunityEvent,
@@ -77,7 +76,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
   const [filters, setFilters] = useState<CommunityFilters>({
     selectedCategory: null,
     searchQuery: "",
-    sortBy: "latest",
+    sortBy: "trending",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -262,7 +261,6 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
         };
       })
     );
-    trackEventRegistered(eventId);
   }, []);
 
   const value = useMemo<CommunityContextValue>(

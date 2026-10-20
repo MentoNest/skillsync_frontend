@@ -11,6 +11,7 @@ interface DiscussionFiltersProps {
   onCategoryChange: (category: string | null) => void;
   onSearchChange: (query: string) => void;
   onSortChange: (sort: DiscussionSort) => void;
+  showCategories?: boolean;
   /**
    * Enable multi-category selection (#1248).
    * When true, Ctrl/Cmd+click (or a second click on an already-selected pill)
@@ -54,6 +55,7 @@ export function DiscussionFilters({
   onCategoryChange,
   onSearchChange,
   onSortChange,
+  showCategories = true,
   multiSelect = false,
 }: DiscussionFiltersProps) {
   // Debounced search (#992): local state updates instantly, parent updates after 300 ms.
@@ -66,11 +68,10 @@ export function DiscussionFilters({
   useEffect(() => {
     if (searchInput === searchQuery) return;
     const timeout = window.setTimeout(() => {
-      setSearchQuery(searchInput.trim());
+      onSearchChange(searchInput.trim());
     }, 300);
     return () => window.clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchInput]);
+  }, [onSearchChange, searchInput, searchQuery]);
 
   const activeIds = parseSelected(selectedCategory);
 
@@ -105,41 +106,41 @@ export function DiscussionFilters({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div
-          className="flex flex-wrap gap-2"
-          role="tablist"
-          aria-label="Discussion categories"
-          aria-multiselectable={multiSelect}
-        >
-          {CATEGORY_OPTIONS.map((cat) => {
-            const active = isActive(cat.id);
-            return (
-              <button
-                key={cat.id ?? "all"}
-                role="tab"
-                aria-selected={active}
-                onClick={(e) => handleCategoryClick(cat.id, e)}
-                title={
-                  multiSelect && cat.id !== null
-                    ? "Ctrl/Cmd+click to add to selection"
-                    : undefined
-                }
-                className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
-                  active
-                    ? "bg-[var(--primary)] text-white"
-                    : "bg-[var(--secondary)] text-[var(--muted)] hover:bg-[var(--border)]"
-                }`}
-              >
-                {cat.name}
-              </button>
-            );
-          })}
-        </div>
+        {showCategories ? (
+          <div
+            className="flex flex-wrap gap-2"
+            role="tablist"
+            aria-label="Discussion categories"
+            aria-multiselectable={multiSelect}
+          >
+            {CATEGORY_OPTIONS.map((cat) => {
+              const active = isActive(cat.id);
+              return (
+                <button
+                  key={cat.id ?? "all"}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={(e) => handleCategoryClick(cat.id, e)}
+                  title={
+                    multiSelect && cat.id !== null
+                      ? "Ctrl/Cmd+click to add to selection"
+                      : undefined
+                  }
+                  className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
+                    active
+                      ? "bg-[var(--primary)] text-white"
+                      : "bg-[var(--secondary)] text-[var(--muted)] hover:bg-[var(--border)]"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
 
         <select
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as DiscussionSort)}
-          className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           onChange={(e) => onSortChange(e.target.value as DiscussionSort)}
           className="max-w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           aria-label="Sort discussions"

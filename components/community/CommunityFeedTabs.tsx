@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import type { ReactNode } from "react";
 
 export type FeedView = "trending" | "latest" | "my-posts";
 
@@ -14,7 +15,7 @@ interface CommunityFeedTabsProps {
 interface TabConfig {
   id: FeedView;
   label: string;
-  icon: JSX.Element;
+  icon: ReactNode;
   ariaLabel: string;
 }
 
@@ -93,9 +94,6 @@ export default function CommunityFeedTabs({
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Find active tab index
-  const activeIndex = TABS.findIndex((tab) => tab.id === activeView);
-
   useEffect(() => {
     // Focus the tab when keyboard navigation happens
     if (focusedIndex >= 0 && tabRefs.current[focusedIndex]) {
@@ -145,6 +143,7 @@ export default function CommunityFeedTabs({
           return (
             <button
               key={tab.id}
+              id={`${tab.id}-tab`}
               ref={(el) => (tabRefs.current[index] = el)}
               role="tab"
               aria-selected={isActive}

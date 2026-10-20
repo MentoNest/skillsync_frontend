@@ -4,7 +4,6 @@ import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
 import { CommunityEmptyState } from "./CommunityEmptyState";
 import { DiscussionFeedSkeleton } from "./CommunitySkeleton";
-import { CommunityEmptyState } from "./CommunityEmptyState";
 import { CommunityErrorState } from "./CommunityErrorState";
 import { LoadMoreDiscussionsButton } from "./LoadMoreDiscussionsButton";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
@@ -28,6 +27,8 @@ interface CommunityFeedProps {
   onRetry?: () => void;
   /** Opens the discussion composer from the empty state CTA (#998). */
   onStartDiscussion?: () => void;
+  /** Hide category pills when category selection is provided by the sidebar. */
+  showCategoryFilters?: boolean;
   loadMoreRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -46,14 +47,22 @@ export function CommunityFeed({
   error,
   onRetry,
   onStartDiscussion,
+  showCategoryFilters = true,
   loadMoreRef,
 }: CommunityFeedProps) {
-  const hasActiveFilters =
-    Boolean(selectedCategory) || searchQuery.trim().length > 0;
+  const hasActiveFilters = Boolean(selectedCategory) || searchQuery.trim().length > 0;
 
   return (
     <div className="space-y-4">
-      <DiscussionFilters />
+      <DiscussionFilters
+        selectedCategory={selectedCategory}
+        searchQuery={searchQuery}
+        sortBy={sortBy}
+        onCategoryChange={onCategoryChange}
+        onSearchChange={onSearchChange}
+        onSortChange={onSortChange}
+        showCategories={showCategoryFilters}
+      />
 
       {isLoading ? (
         <DiscussionFeedSkeleton count={4} />
@@ -61,21 +70,14 @@ export function CommunityFeed({
         <CommunityErrorState message={error} onRetry={onRetry} />
       ) : discussions.length === 0 ? (
         <CommunityEmptyState
-          filtered={Boolean(selectedCategory || searchQuery)}
-          onClearFilters={() => {
-            onCategoryChange(null);
-            onSearchChange("");
-          }}
+          title={hasActiveFilters ? "No discussions found" : "No discussions yet"}
+          message={
+            hasActiveFilters
+              ? "No discussions match your current filters. Try another category or search term."
+              : "Be the first to start a conversation with the community."
+          }
+          onAction={onStartDiscussion}
         />
-        hasActiveFilters ? (
-          <CommunityEmptyState
-            title="No discussions found"
-            message="No discussions match your current filters. Try another category or a different search term."
-            onAction={onStartDiscussion}
-          />
-        ) : (
-          <CommunityEmptyState onAction={onStartDiscussion} />
-        )
       ) : (
         <div className="space-y-4" role="feed" aria-label="Discussion feed">
           {discussions.map((discussion) => (
