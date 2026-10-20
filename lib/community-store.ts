@@ -290,6 +290,77 @@ export function getDiscussion(id: string): Discussion | undefined {
   return store.discussions.find((discussion) => discussion.id === id);
 }
 
+/**
+ * Bump a discussion's view counter, called by the detail route/page (#1262).
+ * No-ops for an unknown id.
+ */
+export function incrementViewCount(id: string): number {
+  const discussion = getDiscussion(id);
+  if (!discussion) return 0;
+  discussion.viewCount += 1;
+  return discussion.viewCount;
+}
+
+/**
+ * Discussions in the same category as `id`, excluding it, most recently
+ * updated first (#1262). Powers the "Related discussions" list on the detail
+ * page.
+ */
+export function listRelatedDiscussions(
+  id: string,
+  limit = 5,
+): Discussion[] {
+  const discussion = getDiscussion(id);
+  if (!discussion) return [];
+  return store.discussions
+    .filter(
+      (candidate) =>
+        candidate.id !== id && candidate.category === discussion.category,
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    )
+    .slice(0, limit);
+}
+
+/**
+ * Update a discussion authored by `viewerId` (#1260). Returns `undefined`
+ * when the discussion does not exist (mapped to 404) and throws `FORBIDDEN`
+ * when the viewer is not the author (mapped to 403).
+ */
+export function updateDiscussion(
+  id: string,
+  viewerId: string,
+  changes: {
+    title?: string;
+    content?: string;
+    category?: string;
+    tags?: string[];
+  },
+): Discussion | undefined {
+  const discussion = getDiscussion(id);
+  if (!discussion) return undefined;
+  if (discussion.authorId !== viewerId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  if (typeof changes.title === "string") {
+    discussion.title = changes.title;
+  }
+  if (typeof changes.content === "string") {
+    discussion.content = changes.content;
+  }
+  if (typeof changes.category === "string") {
+    discussion.category = changes.category;
+  }
+  if (Array.isArray(changes.tags)) {
+    discussion.tags = changes.tags;
+  }
+  discussion.updatedAt = new Date().toISOString();
+  return discussion;
+}
+
 export function getMember(id: string): Omit<CommunityMember, "isFollowing"> | undefined {
   return store.members.get(id);
 }
@@ -647,6 +718,24 @@ export function listComments(discussionId: string): Comment[] {
 
 export function listCommentsFlat(discussionId: string): Comment[] {
   return [...commentsFor(discussionId)];
+}
+
+/**
+ * Flat replies for a discussion's detail page (#1262), in creation order.
+ * Backed by the same comment storage the threaded feed uses.
+ */
+export function listReplies(discussionId: string): Reply[] {
+  return listCommentsFlat(discussionId).map((comment) => ({
+    id: comment.id,
+    discussionId: comment.discussionId,
+    content: comment.content,
+    authorId: comment.authorId,
+    authorName: comment.authorName,
+    authorAvatar: comment.authorAvatar,
+    likeCount: comment.likeCount,
+    createdAt: comment.createdAt,
+    parentId: comment.parentId ?? null,
+  }));
 }
 
 export function addComment(input: {
