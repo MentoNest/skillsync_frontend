@@ -15,6 +15,16 @@ import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer
 import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
 import MentorPagination from "@/components/mentor/MentorPagination";
 import PageSizeSelector from "@/components/mentor/PageSizeSelector";
+import {
+  trackSearch,
+  trackFilterUsage,
+  trackSortChange,
+  trackMentorProfileClick,
+  trackBookmarkAction,
+  trackFilterDrawerOpen,
+  trackFilterDrawerClose,
+  trackFilterClear,
+} from "@/lib/analytics";
 
 interface MentorDiscoveryProps {
   /**
@@ -147,18 +157,47 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
   }, [filters, resetInfiniteScroll]);
 
   const handleFiltersChange = (newFilters: MentorFilters) => {
+    // Track filter changes
+    const oldFilters = filters;
+    Object.keys(newFilters).forEach((key) => {
+      const filterKey = key as keyof MentorFilters;
+      const oldValue = oldFilters[filterKey];
+      const newValue = newFilters[filterKey];
+      
+      if (JSON.stringify(oldValue) !== JSON.stringify(newValue) && filterKey !== 'search' && filterKey !== 'sortBy' && filterKey !== 'sortOrder') {
+        if (Array.isArray(newValue) && Array.isArray(oldValue)) {
+          // Track added items
+          newValue.filter(v => !oldValue.includes(v)).forEach(v => {
+            trackFilterUsage(filterKey, v, 'add');
+          });
+          // Track removed items
+          oldValue.filter(v => !newValue.includes(v)).forEach(v => {
+            trackFilterUsage(filterKey, v, 'remove');
+          });
+        } else if (newValue !== oldValue) {
+          trackFilterUsage(filterKey, String(newValue), newValue ? 'add' : 'remove');
+        }
+      }
+    });
+    
     updateFilters(newFilters, { replace: true });
   };
 
   const handleClearFilters = () => {
+    trackFilterClear();
     clearFilters();
   };
 
-  const toggleBookmark = (mentorId: string) => {
+  const toggleBookmark = (mentorId: string, mentorName: string) => {
     setBookmarkedIds((prev) => {
-      const updated = prev.includes(mentorId)
+      const isBookmarked = prev.includes(mentorId);
+      const updated = isBookmarked
         ? prev.filter((id) => id !== mentorId)
         : [...prev, mentorId];
+      
+      // Track bookmark action
+      trackBookmarkAction(mentorId, mentorName, isBookmarked ? 'remove' : 'add');
+      
       localStorage.setItem("bookmarkedMentors", JSON.stringify(updated));
       return updated;
     });
@@ -214,7 +253,10 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setIsMobileFiltersOpen(true)}
+                onClick={() => {
+                  trackFilterDrawerOpen();
+                  setIsMobileFiltersOpen(true);
+                }}
                 className="lg:hidden inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                 aria-label="Open filter drawer"
               >
@@ -245,7 +287,13 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
             <div className="flex-1 min-w-[200px]">
               <SearchInput
                 value={filters.search || ""}
-                onChange={(value) => updateFilters({ ...filters, search: value || undefined }, { replace: true })}
+                onChange={(value) => {
+                  const activeFilterCount = Object.values(filters).flat().filter(Boolean).length;
+                  if (value) {
+                    trackSearch(value, activeFilterCount);
+                  }
+                  updateFilters({ ...filters, search: value || undefined }, { replace: true });
+                }}
                 placeholder="Search mentors by name, skill, or company..."
               />
             </div>
@@ -259,7 +307,11 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
               )}
               <select
                 value={filters.sortBy || "relevance"}
-                onChange={(e) => updateFilters({ ...filters, sortBy: e.target.value as MentorFilters["sortBy"] }, { replace: true })}
+                onChange={(e) => {
+                  const newSortBy = e.target.value as MentorFilters["sortBy"];
+                  trackSortChange(newSortBy || 'relevance', filters.sortOrder || 'desc');
+                  updateFilters({ ...filters, sortBy: newSortBy }, { replace: true });
+                }}
                 className="px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 aria-label="Sort by"
               >
@@ -334,7 +386,8 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
                       key={mentor.id}
                       mentor={mentor}
                       isBookmarked={bookmarkedIds.includes(mentor.id)}
-                      onToggleBookmark={() => toggleBookmark(mentor.id)}
+                      onToggleBookmark={() => toggleBookmark(mentor.id, mentor.name)}
+                      onProfileClick={() => trackMentorProfileClick(mentor.id, mentor.name, 'discovery_page')}
                     />
                   ))}
                 </div>
@@ -385,7 +438,10 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
 
       <MobileFilterDrawer
         isOpen={isMobileFiltersOpen}
-        onClose={() => setIsMobileFiltersOpen(false)}
+        onClose={() => {
+          trackFilterDrawerClose();
+          setIsMobileFiltersOpen(false);
+        }}
         filters={filters}
         onFiltersChange={handleFiltersChange}
         onClearFilters={handleClearFilters}
