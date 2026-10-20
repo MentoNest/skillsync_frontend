@@ -1,170 +1,72 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
 import { StartDiscussionModal } from "@/components/community/StartDiscussionModal";
 import { CommunityToast } from "@/components/community/CommunityToast";
-import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
+import {
+  CommunityProvider,
+  useCommunity,
+} from "@/components/community/CommunityProvider";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { trackDiscussionCreated } from "@/lib/community-analytics";
 import {
   isCommunityCategoryId,
   type Discussion,
-  type DiscussionSort,
 } from "@/lib/community-types";
 
-const PAGE_SIZE = 10;
+/**
+ * Inner page content — reads all state from CommunityProvider via
+ * useCommunity() so the page doesn't manage its own duplicate fetch/filter
+ * state (#996, #1248).
+ */
+function CommunityPageContent() {
+  const {
+    discussions,
+    filters,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    error,
+    isLive,
+    setCategory,
+    setSearchQuery,
+    setSortBy,
+    loadMore,
+    refresh,
+  } = useCommunity();
 
-export default function CommunityPage() {
-  const [discussions, setDiscussions] = useState<Discussion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<DiscussionSort>("latest");
-  const observerRef = useRef<IntersectionObserver | null>(null);
+
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const pageRef = useRef(1);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Real-time updates
-  const { isConnected } = useCommunityRealtime({
-    onNewDiscussion: (discussion) => {
-      const newDisc = discussion as Discussion;
-      if (!newDisc?.id) return;
-      setDiscussions((prev) => {
-        if (prev.some((d) => d.id === newDisc.id)) return prev;
-        return [newDisc, ...prev];
-      });
-    },
-    onNewReply: (discussionId, reply) => {
-      setDiscussions((prev) =>
-        prev.map((d) =>
-          d.id === discussionId
-            ? {
-                ...d,
-                replyCount: d.replyCount + 1,
-                lastReply: reply as Discussion["lastReply"],
-              }
-            : d
-        )
-      );
-    },
-    onLikeUpdate: (discussionId, likeCount) => {
-      setDiscussions((prev) =>
-        prev.map((d) => (d.id === discussionId ? { ...d, likeCount } : d))
-      );
-    },
-  });
-
-  // Fetch discussions from the backend. A new request aborts the previous one
-  // so a slow response for old filters can never overwrite newer results.
-  const fetchDiscussions = useCallback(
-    async (page = 1, append = false) => {
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
-
-      try {
-        if (page === 1) {
-          setIsLoading(true);
-        } else {
-          setIsLoadingMore(true);
-        }
-        setError(null);
-
-        const params = new URLSearchParams({
-          page: String(page),
-          limit: String(PAGE_SIZE),
-          sort: sortBy,
-        });
-        if (selectedCategory) params.set("category", selectedCategory);
-        if (searchQuery) params.set("q", searchQuery);
-
-        const res = await fetch(`/api/community/discussions?${params}`);
-        if (!res.ok) throw new Error("Failed to fetch discussions");
-
-        if (controller.signal.aborted) return;
-
-        if (append) {
-          setDiscussions((prev) => {
-            const existingIds = new Set(prev.map((d) => d.id));
-            const newDiscussions = result.discussions.filter(
-              (d) => !existingIds.has(d.id)
-            );
-            return [...prev, ...newDiscussions];
-          });
-        } else {
-          setDiscussions(result.discussions);
-        }
-
-        setHasMore(result.hasMore);
-        pageRef.current = result.page;
-      } catch (err) {
-        if (controller.signal.aborted) return;
-        setError(
-          err instanceof Error ? err.message : "Failed to load discussions"
-        );
-        if (!append) {
-          setDiscussions([]);
-          setHasMore(false);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoading(false);
-          setIsLoadingMore(false);
-        }
-      }
-    },
-    [selectedCategory, searchQuery, sortBy]
-  );
-
-  // Initial fetch
-  useEffect(() => {
-    fetchDiscussions();
-  }, [fetchDiscussions]);
-
-  // Next page — shared by the load-more button and the scroll sentinel.
-  const handleLoadMore = useCallback(
-    () => fetchDiscussions(Math.floor(discussions.length / PAGE_SIZE) + 1, true),
-    [fetchDiscussions, discussions.length]
-  );
-
-  // Infinite scroll sentinel
   const { resetInfiniteScroll } = useInfiniteScroll({
     isLoading: isLoadingMore,
     hasMore,
-    onLoadMore: handleLoadMore,
+    onLoadMore: loadMore,
     observerRef,
     loadMoreRef,
   });
 
-  // Reset scroll position when filters change
-  useEffect(() => {
-    resetInfiniteScroll();
-  }, [selectedCategory, searchQuery, sortBy, resetInfiniteScroll]);
-
   const dismissToast = useCallback(() => setToastMessage(null), []);
 
+  // Surface the created discussion immediately and reset pagination (#1004).
   const handleDiscussionCreated = useCallback(
     (created: Discussion) => {
-      setDiscussions((prev) =>
-        prev.some((d) => d.id === created.id) ? prev : [created, ...prev]
-      );
-      setHasMore(true);
       resetInfiniteScroll();
       setToastMessage("Your discussion was published.");
       trackDiscussionCreated(created.id, created.category);
+      refresh();
     },
-    [resetInfiniteScroll]
+    [resetInfiniteScroll, refresh]
   );
+
+  const { selectedCategory } = filters;
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -211,11 +113,9 @@ export default function CommunityPage() {
         <CommunityHeroBanner onStartDiscussion={() => setIsComposerOpen(true)} />
 
         {/*
-         * Responsive layout:
+         * Responsive layout (#1000):
          * - Desktop (lg+): feed left, sidebar right.
-         * - Tablet / mobile: single column; sidebar stacks below the feed.
-         * DOM order is always feed-then-sidebar so keyboard focus and
-         * screen-reader reading order match the visual layout on every breakpoint.
+         * - Tablet / Mobile: single column; sidebar stacks below the feed.
          */}
         <div className="mt-8 flex flex-col gap-8 lg:flex-row">
           <main className="min-w-0 flex-1">
@@ -225,14 +125,13 @@ export default function CommunityPage() {
               isLoadingMore={isLoadingMore}
               hasMore={hasMore}
               selectedCategory={selectedCategory}
-              searchQuery={searchQuery}
-              sortBy={sortBy}
-              onCategoryChange={setSelectedCategory}
+              searchQuery={filters.searchQuery}
+              sortBy={filters.sortBy}
+              onCategoryChange={setCategory}
               onSearchChange={setSearchQuery}
               onSortChange={setSortBy}
-              onLoadMore={handleLoadMore}
               error={error}
-              onRetry={() => fetchDiscussions(1, false)}
+              onRetry={refresh}
               onStartDiscussion={() => setIsComposerOpen(true)}
               loadMoreRef={loadMoreRef}
             />
@@ -244,7 +143,7 @@ export default function CommunityPage() {
           >
             <CommunitySidebar
               selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
+              onCategoryChange={setCategory}
             />
           </aside>
         </div>
