@@ -4,20 +4,24 @@ import { useCallback, useEffect, useState } from "react";
 import { communityApi, CommunityApiError } from "@/lib/community-api";
 
 /**
- * Optimistic like/unlike for a discussion (#1011).
- * State is reconciled from the server after toggle and on mount.
+ * Optimistic like/unlike for a discussion (#1011, #1266).
+ * When the parent already knows the viewer's like state (e.g. feed cards
+ * decorated with `isLiked`), the initial GET is skipped; otherwise the state
+ * is reconciled from the server on mount.
  */
 export function useDiscussionLike(
   discussionId: string,
-  initialLiked = false,
+  initialLiked?: boolean,
   initialCount = 0,
 ) {
-  const [isLiked, setIsLiked] = useState(initialLiked);
+  const hasInitialLiked = initialLiked !== undefined;
+  const [isLiked, setIsLiked] = useState(initialLiked ?? false);
   const [likeCount, setLikeCount] = useState(initialCount);
   const [isToggling, setIsToggling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (hasInitialLiked) return;
     let cancelled = false;
     communityApi
       .getLikeState(discussionId)
@@ -32,7 +36,7 @@ export function useDiscussionLike(
     return () => {
       cancelled = true;
     };
-  }, [discussionId]);
+  }, [discussionId, hasInitialLiked]);
 
   const toggle = useCallback(async () => {
     if (isToggling) return;
