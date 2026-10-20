@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
-import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
+import MentorCard, { MentorCardSkeleton } from "@/components/mentor-discovery/MentorCard";
 import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
 import { mentorApi } from "@/lib/api";
@@ -13,6 +13,7 @@ import SearchInput from "@/components/mentor-discovery/SearchInput";
 import MentorFilterSidebar from "@/components/mentor-discovery/MentorFilterSidebar";
 import MobileFilterDrawer from "@/components/mentor-discovery/MobileFilterDrawer";
 import MentorDiscoveryLayout from "@/components/mentor-discovery/MentorDiscoveryLayout";
+import MentorComparison from "@/components/mentor-discovery/MentorComparison";
 import MentorPagination from "@/components/mentor/MentorPagination";
 import PageSizeSelector from "@/components/mentor/PageSizeSelector";
 import {
@@ -25,6 +26,8 @@ import {
   trackFilterDrawerClose,
   trackFilterClear,
 } from "@/lib/analytics";
+
+const MAX_COMPARISON_MENTORS = 3;
 
 interface MentorDiscoveryProps {
   /**
@@ -58,6 +61,8 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [totalMentors, setTotalMentors] = useState(0);
   const [pageSize, setPageSize] = useState(initialPageSize);
+  const [selectedMentors, setSelectedMentors] = useState<Mentor[]>([]);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const mentorListRef = useRef<HTMLDivElement | null>(null);
@@ -202,6 +207,23 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
       return updated;
     });
   };
+
+  const toggleMentorComparison = (mentor: Mentor) => {
+    setSelectedMentors((selected) => {
+      if (selected.some((item) => item.id === mentor.id)) {
+        return selected.filter((item) => item.id !== mentor.id);
+      }
+      if (selected.length >= MAX_COMPARISON_MENTORS) return selected;
+      return [...selected, mentor];
+    });
+  };
+
+  const removeMentorFromComparison = (mentorId: string) => {
+    setSelectedMentors((selected) => selected.filter((mentor) => mentor.id !== mentorId));
+    if (selectedMentors.length <= 1) setIsComparisonOpen(false);
+  };
+
+  const closeComparison = useCallback(() => setIsComparisonOpen(false), []);
 
   const activeFilterCount = Object.values(filters).flat().filter(Boolean).length +
     (filters.minRating ? 1 : 0) +
@@ -388,6 +410,12 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
                       isBookmarked={bookmarkedIds.includes(mentor.id)}
                       onToggleBookmark={() => toggleBookmark(mentor.id, mentor.name)}
                       onProfileClick={() => trackMentorProfileClick(mentor.id, mentor.name, 'discovery_page')}
+                      isSelectedForComparison={selectedMentors.some((item) => item.id === mentor.id)}
+                      isComparisonLimitReached={
+                        selectedMentors.length >= MAX_COMPARISON_MENTORS &&
+                        !selectedMentors.some((item) => item.id === mentor.id)
+                      }
+                      onToggleComparison={() => toggleMentorComparison(mentor)}
                     />
                   ))}
                 </div>
@@ -435,6 +463,48 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
             )}
           </div>
       </MentorDiscoveryLayout>
+
+      {selectedMentors.length > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:px-6">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <div aria-live="polite" className="min-w-0">
+              <p className="text-sm font-semibold text-slate-900">
+                {selectedMentors.length} of {MAX_COMPARISON_MENTORS} mentors selected
+              </p>
+              <p className="hidden text-xs text-slate-500 sm:block">
+                Select at least 2 mentors to compare side by side.
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedMentors([]);
+                  setIsComparisonOpen(false);
+                }}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsComparisonOpen(true)}
+                disabled={selectedMentors.length < 2}
+                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Compare ({selectedMentors.length})
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <MentorComparison
+        selectedMentors={selectedMentors}
+        isOpen={isComparisonOpen}
+        onClose={closeComparison}
+        onRemoveMentor={removeMentorFromComparison}
+      />
 
       <MobileFilterDrawer
         isOpen={isMobileFiltersOpen}
