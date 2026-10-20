@@ -3,6 +3,7 @@ import { parseCategoryParam } from "@/lib/community-types";
 import {
   createDiscussion,
   isBookmarked,
+  isDiscussionLiked,
   isFollowingUser,
   listDiscussions,
   resolveViewerId,
@@ -85,6 +86,9 @@ export async function GET(request: NextRequest) {
     ...discussion,
     isBookmarked: isBookmarked(viewerId, discussion.id),
     isAuthorFollowed: isFollowingUser(viewerId, discussion.authorId),
+    // Decorate like state too (#1266) so cards render the correct initial
+    // state instead of flashing "unliked" until their per-card GET resolves.
+    isLiked: isDiscussionLiked(viewerId, discussion.id),
   }));
 
   return NextResponse.json({

@@ -117,7 +117,7 @@ export function DiscussionActions({
 
       <LikeDiscussionButton
         discussionId={discussion.id}
-        initialLiked={discussion.isLiked ?? false}
+        initialLiked={discussion.isLiked}
         initialCount={discussion.likeCount}
       />
 
