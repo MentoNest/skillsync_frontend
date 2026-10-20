@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Mentor, type MentorComparison as MentorComparisonType, ComparisonCriteria } from "@/lib/mentor-types";
+import { useEffect, useRef } from "react";
+import type { ComparisonCriteria, Mentor } from "@/lib/mentor-types";
 import { createPortal } from "react-dom";
 
 const COMPARISON_CRITERIA: ComparisonCriteria[] = [
@@ -19,26 +19,24 @@ const COMPARISON_CRITERIA: ComparisonCriteria[] = [
 
 interface MentorComparisonProps {
   selectedMentors: Mentor[];
+  isOpen: boolean;
   onClose: () => void;
   onRemoveMentor: (mentorId: string) => void;
 }
 
-export default function MentorComparison({ selectedMentors, onClose, onRemoveMentor }: MentorComparisonProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function MentorComparison({
+  selectedMentors,
+  isOpen,
+  onClose,
+  onRemoveMentor,
+}: MentorComparisonProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (selectedMentors.length > 0) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
-  }, [selectedMentors.length]);
-
-  useEffect(() => {
     if (isOpen) {
-      previousActiveElement.current = document.activeElement as HTMLElement;
+      previousActiveElement.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       document.body.style.overflow = "hidden";
       drawerRef.current?.focus();
     } else {
@@ -79,12 +77,13 @@ export default function MentorComparison({ selectedMentors, onClose, onRemoveMen
   const getValue = (mentor: Mentor, criterion: ComparisonCriteria) => {
     const value = mentor[criterion.key];
     if (criterion.type === "array") {
-      return (value as string[]).join(", ");
+      return Array.isArray(value) ? value.join(", ") : "—";
     }
     if (criterion.type === "number") {
-      return criterion.key === "hourlyRate" ? `$${value}/hr` : String(value);
+      if (criterion.key === "hourlyRate") return `$${value}/hr`;
+      if (criterion.key === "rating") return `${value}/5`;
     }
-    return String(value);
+    return String(value ?? "—");
   };
 
   if (!isOpen || selectedMentors.length === 0) return null;
@@ -125,14 +124,14 @@ export default function MentorComparison({ selectedMentors, onClose, onRemoveMen
 
           <div className="flex-1 overflow-auto p-4">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px] text-sm" role="table">
+              <table className="w-full min-w-[600px] table-fixed text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    <th className="sticky left-0 bg-white p-3 text-left font-medium text-slate-900 border-r border-slate-200 z-10">
+                    <th scope="col" className="sticky left-0 z-10 w-36 border-r border-slate-200 bg-white p-3 text-left font-medium text-slate-900">
                       Criteria
                     </th>
                     {selectedMentors.map((mentor) => (
-                      <th key={mentor.id} className="sticky p-3 text-left font-medium text-slate-900 border-b border-slate-200 relative">
+                      <th key={mentor.id} scope="col" className="min-w-48 border-b border-slate-200 p-3 text-left font-medium text-slate-900">
                         <div className="flex items-center gap-2">
                           <div
                             className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm"
@@ -161,11 +160,11 @@ export default function MentorComparison({ selectedMentors, onClose, onRemoveMen
                 <tbody>
                   {COMPARISON_CRITERIA.map((criterion) => (
                     <tr key={criterion.key} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="sticky left-0 bg-white p-3 font-medium text-slate-900 border-r border-slate-200 z-10">
+                      <th scope="row" className="sticky left-0 z-10 border-r border-slate-200 bg-white p-3 text-left font-medium text-slate-900">
                         {criterion.label}
-                      </td>
+                      </th>
                       {selectedMentors.map((mentor) => (
-                        <td key={mentor.id} className="p-3 text-slate-700">
+                        <td key={mentor.id} className="min-w-48 p-3 text-slate-700">
                           {criterion.key === "skills" ? (
                             <div className="flex flex-wrap gap-1">
                               {(mentor.skills || []).slice(0, 5).map((skill) => (
@@ -196,7 +195,7 @@ export default function MentorComparison({ selectedMentors, onClose, onRemoveMen
 
           <div className="p-4 border-t border-slate-200">
             <p className="text-sm text-slate-500 text-center mb-4">
-              Select up to 3 mentors to compare side by side
+              Compare mentors side by side. Remove a mentor above to update your selection.
             </p>
           </div>
         </div>
