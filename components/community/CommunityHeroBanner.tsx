@@ -21,28 +21,14 @@ export default function CommunityHeroBanner({
       className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-cyan-500"
       aria-labelledby="community-hero-heading"
     >
-      {/* Decorative circles */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-24 -right-24 hidden w-96 h-96 rounded-full bg-white/5 sm:block"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -left-24 hidden w-80 h-80 rounded-full bg-white/5 sm:block"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden w-[600px] h-[600px] rounded-full bg-white/5 sm:block"
-      />
-
       <div className="relative max-w-4xl mx-auto px-6 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-20 text-center">
         {/* Heading */}
-        <h2
+        <h1
           id="community-hero-heading"
           className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight"
         >
           Join the conversation
-        </h2>
+        </h1>
 
         {/* Description */}
         <p className="mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-indigo-100 leading-relaxed max-w-2xl mx-auto">

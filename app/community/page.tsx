@@ -4,6 +4,8 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CommunityFeedTabs, { FeedView } from "@/components/community/CommunityFeedTabs";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import StartDiscussionModal from "@/components/community/StartDiscussionModal";
 
 export default function CommunityPage() {
   const { user, isReady } = useAuth();
@@ -50,11 +52,14 @@ export default function CommunityPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-900">Community</h1>
-          <p className="mt-2 text-slate-600">
-            Connect, share, and learn with fellow mentees and mentors
-          </p>
+          <CommunityHeroBanner onStartDiscussion={() => setIsComposerOpen(true)} />
         </div>
+
+        <StartDiscussionModal
+          isOpen={isComposerOpen}
+          onClose={() => setIsComposerOpen(false)}
+          onCreated={handleDiscussionCreated}
+        />
 
         {/* Community Feed Tabs */}
         <CommunityFeedTabs
