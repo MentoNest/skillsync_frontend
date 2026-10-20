@@ -11,24 +11,34 @@ export default function CommunityPage() {
   const [activeView, setActiveView] = useState<FeedView>("trending");
   const [myPostsCount] = useState(12); // Mock count - replace with real data
 
-  useEffect(() => {
-    if (!isReady) return;
-    if (!user) {
-      router.replace("/login");
-    }
-  }, [isReady, user, router]);
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Show loading state while checking auth
-  if (!isReady || !user) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent"></div>
-          <p className="mt-4 text-slate-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const { resetInfiniteScroll } = useInfiniteScroll({
+    isLoading: isLoadingMore,
+    hasMore,
+    onLoadMore: loadMore,
+    observerRef,
+    loadMoreRef,
+  });
+
+  const dismissToast = useCallback(() => setToastMessage(null), []);
+
+  // Surface the created discussion immediately and reset pagination (#1004).
+  const handleDiscussionCreated = useCallback(
+    (created: Discussion) => {
+      resetInfiniteScroll();
+      setToastMessage("Your discussion was published.");
+      trackDiscussionCreated(created.id, created.category);
+      refresh();
+    },
+    [resetInfiniteScroll, refresh]
+  );
+
+  const { selectedCategory } = filters;
 
   const handleViewChange = (view: FeedView) => {
     setActiveView(view);
