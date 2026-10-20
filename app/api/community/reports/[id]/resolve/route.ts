@@ -1,32 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getReport, resolveReport, resolveViewerId } from "@/lib/community-store";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
+  let action: unknown;
   try {
-    const { id } = await params;
     const body = await request.json();
-    const { action } = body;
-
-    if (!["dismiss", "remove_content", "warn_user"].includes(action)) {
-      return NextResponse.json(
-        { error: "Invalid action" },
-        { status: 400 }
-      );
-    }
-
-    // In a real app, this would update the database
-    return NextResponse.json({
-      id,
-      status: "resolved",
-      resolvedAt: new Date().toISOString(),
-      action,
-    });
+    action = body?.action;
   } catch {
     return NextResponse.json(
       { error: "Invalid request body" },
       { status: 400 }
     );
   }
+
+  if (
+    action !== "dismiss" &&
+    action !== "remove_content" &&
+    action !== "warn_user"
+  ) {
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  }
+
+  if (!getReport(id)) {
+    return NextResponse.json({ error: "Report not found" }, { status: 404 });
+  }
+
+  const report = resolveReport(id, action, resolveViewerId(request));
+  if (!report) {
+    return NextResponse.json({ error: "Report not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ report });
 }
