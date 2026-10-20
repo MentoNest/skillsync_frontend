@@ -538,6 +538,7 @@ export function resolveReport(
   report.status = "resolved";
   report.resolvedAt = new Date().toISOString();
   report.resolvedBy = resolvedBy;
+  report.resolution = action;
   return report;
 }
 

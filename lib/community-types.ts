@@ -244,4 +244,6 @@ export interface Report {
   createdAt: string;
   resolvedAt?: string;
   resolvedBy?: string;
+  /** Moderation action taken when the report was resolved (#1273). */
+  resolution?: "dismiss" | "remove_content" | "warn_user";
 }
