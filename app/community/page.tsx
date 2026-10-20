@@ -3,6 +3,10 @@
 import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { communityApi } from "@/lib/community-api";
+import type { Discussion, DiscussionSort } from "@/lib/community-types";
 import { CommunityProvider, useCommunityState } from "@/lib/community-store";
 
 function CommunityContent() {
@@ -36,6 +40,8 @@ export default function CommunityPage() {
   const [sortBy, setSortBy] = useState<DiscussionSort>("latest");
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const pageRef = useRef(1);
 
   // Real-time updates
   const { isConnected } = useCommunityRealtime({
@@ -66,9 +72,14 @@ export default function CommunityPage() {
     },
   });
 
-  // Fetch discussions
+  // Fetch discussions from the backend. A new request aborts the previous one
+  // so a slow response for old filters can never overwrite newer results.
   const fetchDiscussions = useCallback(
     async (page = 1, append = false) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       try {
         if (page === 1) {
           setIsLoading(true);
@@ -77,38 +88,48 @@ export default function CommunityPage() {
         }
         setError(null);
 
-        const params = new URLSearchParams({
-          page: String(page),
-          limit: "10",
-          sort: sortBy,
-        });
-        if (selectedCategory) params.set("category", selectedCategory);
-        if (searchQuery) params.set("q", searchQuery);
+        const result = await communityApi.getDiscussions(
+          {
+            page,
+            limit: 10,
+            sort: sortBy,
+            category: selectedCategory,
+            search: searchQuery,
+          },
+          controller.signal
+        );
 
-        const res = await fetch(`/api/community/discussions?${params}`);
-        if (!res.ok) throw new Error("Failed to fetch discussions");
-
-        const data = await res.json();
+        if (controller.signal.aborted) return;
 
         if (append) {
           setDiscussions((prev) => {
             // Prevent duplicates
             const existingIds = new Set(prev.map((d) => d.id));
-            const newDiscussions = data.discussions.filter(
-              (d: Discussion) => !existingIds.has(d.id)
+            const newDiscussions = result.discussions.filter(
+              (d) => !existingIds.has(d.id)
             );
             return [...prev, ...newDiscussions];
           });
         } else {
-          setDiscussions(data.discussions);
+          setDiscussions(result.discussions);
         }
 
-        setHasMore(data.hasMore);
+        setHasMore(result.hasMore);
+        pageRef.current = result.page;
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        if (controller.signal.aborted) return;
+        setError(
+          err instanceof Error ? err.message : "Failed to load discussions"
+        );
+        if (!append) {
+          setDiscussions([]);
+          setHasMore(false);
+        }
       } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+          setIsLoadingMore(false);
+        }
       }
     },
     [selectedCategory, searchQuery, sortBy]
@@ -119,6 +140,17 @@ export default function CommunityPage() {
     fetchDiscussions();
   }, [fetchDiscussions]);
 
+  // Cancel any in-flight request when the page unmounts.
+  useEffect(() => {
+    return () => abortRef.current?.abort();
+  }, []);
+
+  // Next page of results. Guard against firing while the first page is still
+  // loading, which would abort that request.
+  const handleLoadMore = useCallback(() => {
+    if (isLoading || isLoadingMore || !hasMore) return;
+    fetchDiscussions(pageRef.current + 1, true);
+  }, [fetchDiscussions, hasMore, isLoading, isLoadingMore]);
   // Next page of results, shared by the load-more button and the scroll sentinel.
   const handleLoadMore = useCallback(
     () => fetchDiscussions(Math.floor(discussions.length / 10) + 1, true),
@@ -230,9 +262,16 @@ export default function CommunityPage() {
             {error && (
               <div
                 role="alert"
-                className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800"
+                className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800"
               >
-                {error}
+                <span>{error}</span>
+                <button
+                  type="button"
+                  onClick={() => fetchDiscussions(1, false)}
+                  className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-800 transition-colors hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                >
+                  Try again
+                </button>
               </div>
             )}
 
