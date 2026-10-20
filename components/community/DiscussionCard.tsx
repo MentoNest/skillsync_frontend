@@ -51,7 +51,13 @@ function AuthorAvatar({ src, name, lazy = false }: AuthorAvatarProps) {
 interface AuthorRowProps {
   discussion: Pick<
     Discussion,
-    "authorName" | "isPinned" | "isLocked" | "likeCount" | "replyCount" | "viewCount"
+    | "authorName"
+    | "isPinned"
+    | "isLocked"
+    | "likeCount"
+    | "replyCount"
+    | "viewCount"
+    | "isTrending"
   >;
 }
 
@@ -71,7 +77,11 @@ function AuthorRow({ discussion }: AuthorRowProps) {
           Locked
         </span>
       )}
-      <TrendingBadgeForDiscussion discussion={discussion} />
+      {discussion.isTrending && (
+        <span role="status" aria-label="Trending discussion indicator">
+          <TrendingBadgeForDiscussion discussion={discussion} />
+        </span>
+      )}
     </div>
   );
 }
