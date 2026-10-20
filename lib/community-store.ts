@@ -327,6 +327,29 @@ export function createDiscussion(
   return discussion;
 }
 
+/**
+ * Delete a discussion authored by `viewerId`. Returns `false` when the
+ * discussion does not exist (mapped to 404) and throws `FORBIDDEN` when the
+ * viewer is not the author (mapped to 403), so only the author can remove
+ * their own post.
+ */
+export function deleteDiscussion(id: string, viewerId: string): boolean {
+  const index = store.discussions.findIndex((discussion) => discussion.id === id);
+  if (index === -1) return false;
+
+  const discussion = store.discussions[index];
+  if (discussion.authorId !== viewerId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  store.discussions.splice(index, 1);
+
+  const author = store.members.get(discussion.authorId);
+  if (author && author.discussionCount > 0) author.discussionCount -= 1;
+
+  return true;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Bookmarks (#1013)                                                          */
 /* -------------------------------------------------------------------------- */
