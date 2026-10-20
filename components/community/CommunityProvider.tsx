@@ -56,6 +56,8 @@ export interface CommunityContextValue {
   refresh: () => void;
   /** Optimistically register the viewer for an event (#989). */
   registerForEvent: (eventId: string) => void;
+  /** Re-issues only the sidebar overview request (#1254). */
+  refreshOverview: () => void;
 }
 
 const CommunityContext = createContext<CommunityContextValue | null>(null);
@@ -282,6 +284,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       setSortBy,
       loadMore,
       refresh,
+      refreshOverview: loadOverview,
       registerForEvent,
     }),
     [
@@ -301,6 +304,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       setSortBy,
       loadMore,
       refresh,
+      loadOverview,
       registerForEvent,
     ]
   );
