@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { mentorProfileHref } from "@/lib/mentor-types";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
 import MentorSkillTags from "@/components/mentor-discovery/MentorSkillTags";
+import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
 export { MentorRating };
 
@@ -29,6 +30,8 @@ export interface MentorCardProps {
   skills?: string[];
   availability?: "available" | "busy" | "unavailable";
   profileHref?: string;
+  /** Platform-curated mentor. Shows the optional Featured badge when true. */
+  featured?: boolean;
   ctaText?: string;
   ctaHref?: string;
   onCtaClick?: () => void;
@@ -55,6 +58,7 @@ export default function MentorCard({
   skills = [],
   availability,
   profileHref,
+  featured,
   ctaText = "View profile",
   ctaHref,
   onCtaClick,
@@ -139,9 +143,12 @@ export default function MentorCard({
 
             {/* Name, Professional Title & Rating */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-slate-900 truncate text-base">
-                {name}
-              </h3>
+              <div className="flex min-w-0 items-center gap-2">
+                <h3 className="font-semibold text-slate-900 truncate text-base">
+                  {name}
+                </h3>
+                {featured && <FeaturedMentorBadge />}
+              </div>
               {displayTitle && (
                 <p className="text-sm text-indigo-600 font-medium truncate mt-0.5">
                   {displayTitle}
