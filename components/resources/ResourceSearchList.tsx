@@ -3,7 +3,6 @@
 import Link from "next/link";
 import CategoryBadge from "@/components/resources/CategoryBadge";
 import { memo, useMemo, useState } from "react";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export interface ResourceListItem {
 	title: string;
@@ -38,10 +37,9 @@ export default function ResourceSearchList({
 	ctaLabel,
 }: ResourceSearchListProps) {
 	const [query, setQuery] = useState("");
-	const deferredQuery = useDebouncedValue(query, 300);
 
 	const filtered = useMemo(() => {
-		const value = deferredQuery.trim().toLowerCase();
+		const value = query.trim().toLowerCase();
 		if (!value) return items;
 
 		return items.filter(
@@ -50,7 +48,7 @@ export default function ResourceSearchList({
 				summary.toLowerCase().includes(value) ||
 				tag.toLowerCase().includes(value),
 		);
-	}, [deferredQuery, items]);
+	}, [query, items]);
 
 	return (
 		<>
