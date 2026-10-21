@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { normalizeSearchQuery } from "@/lib/community-search";
 import type { DiscussionSort } from "@/lib/community-types";
 import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
 
@@ -66,12 +67,19 @@ export function DiscussionFilters({
   }, [searchQuery]);
 
   useEffect(() => {
-    if (searchInput === searchQuery) return;
+    if (normalizeSearchQuery(searchInput) === searchQuery) return;
     const timeout = window.setTimeout(() => {
-      onSearchChange(searchInput.trim());
+      onSearchChange(normalizeSearchQuery(searchInput));
     }, 300);
     return () => window.clearTimeout(timeout);
   }, [onSearchChange, searchInput, searchQuery]);
+
+  // Clearing is immediate rather than debounced, so the full feed is restored
+  // without the 300 ms delay.
+  function handleClearSearch() {
+    setSearchInput("");
+    onSearchChange("");
+  }
 
   const activeIds = parseSelected(selectedCategory);
 
@@ -152,7 +160,7 @@ export function DiscussionFilters({
         </select>
       </div>
 
-      <div>
+      <div className="relative">
         <label htmlFor="discussion-search" className="sr-only">
           Search discussions
         </label>
@@ -162,8 +170,27 @@ export function DiscussionFilters({
           placeholder="Search by title, content, author, or category..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2 text-sm text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+          className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2 pr-10 text-sm text-[var(--foreground)] placeholder-[var(--muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
         />
+        {searchInput ? (
+          <button
+            type="button"
+            onClick={handleClearSearch}
+            aria-label="Clear search"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="h-4 w-4"
+            >
+              <path strokeLinecap="round" d="m6 6 8 8M14 6l-8 8" />
+            </svg>
+          </button>
+        ) : null}
       </div>
     </div>
   );
