@@ -119,6 +119,7 @@ function CommunityPageContent() {
             events={events}
             statistics={statistics}
             isLoadingStatistics={isLoadingOverview}
+            isLoadingEvents={isLoadingOverview}
             overviewError={overviewError}
             onRetryOverview={refreshOverview}
             isRetryingOverview={isLoadingOverview}

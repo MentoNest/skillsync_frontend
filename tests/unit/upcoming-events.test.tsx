@@ -121,4 +121,36 @@ describe("UpcomingEvents", () => {
       })
     ).not.toBeDisabled();
   });
+
+  it("shows a loading state instead of the empty message while fetching", () => {
+    const { container } = render(<UpcomingEvents events={[]} isLoading />);
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Loading upcoming events"
+    );
+    expect(screen.queryByText("No events scheduled yet")).not.toBeInTheDocument();
+    expect(container.querySelector("section")).toHaveAttribute(
+      "aria-busy",
+      "true"
+    );
+  });
+
+  it("disables the CTA when the event has reached capacity", () => {
+    const onRegister = jest.fn();
+    render(
+      <UpcomingEvents
+        events={[{ ...event, capacity: 42 }]}
+        onRegister={onRegister}
+      />
+    );
+
+    const button = screen.getByRole("button", {
+      name: "Resume Review Clinic is full",
+    });
+    expect(button).toBeDisabled();
+    expect(button).toHaveTextContent("Full");
+
+    fireEvent.click(button);
+    expect(onRegister).not.toHaveBeenCalled();
+  });
 });

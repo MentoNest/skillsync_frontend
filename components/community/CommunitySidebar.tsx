@@ -18,6 +18,8 @@ interface CommunitySidebarProps {
   events?: CommunityEvent[];
   statistics?: CommunityStatistics | null;
   isLoadingStatistics?: boolean;
+  /** Shows the events skeleton while the overview request is in flight. */
+  isLoadingEvents?: boolean;
   overviewError?: string | null;
   eventsError?: string | null;
   onRegisterForEvent?: (eventId: string) => void;
@@ -53,6 +55,7 @@ export function CommunitySidebar({
   events = [],
   statistics,
   isLoadingStatistics = false,
+  isLoadingEvents = false,
   overviewError,
   eventsError,
   onRegisterForEvent,
@@ -119,7 +122,11 @@ export function CommunitySidebar({
           {eventsError}
         </p>
       ) : null}
-      <UpcomingEvents events={events} onRegister={onRegisterForEvent} />
+      <UpcomingEvents
+        events={events}
+        isLoading={isLoadingEvents}
+        onRegister={onRegisterForEvent}
+      />
 
       <section className="min-w-0 rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4">
         <h2 className="mb-2 text-sm font-semibold text-[var(--foreground)]">
