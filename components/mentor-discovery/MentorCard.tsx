@@ -1,4 +1,6 @@
 import { Mentor } from "@/lib/mentor-types";
+import Link from "next/link";
+import { mentorProfileHref } from "@/lib/mentor-types";
 import BaseMentorCard from "../landing/MentorCard";
 export { default as MentorCardSkeleton } from "../landing/MentorCardSkeleton";
 export type { MentorCardProps } from "../landing/MentorCard";
@@ -40,13 +42,13 @@ export default function MentorCard({
     >
       <div className="mt-auto px-6 pb-6 flex flex-col gap-3">
         <div className="flex gap-3">
-          <a
-            href={mentor.profileHref || `/mentors/${mentor.id}`}
+          <Link
+            href={mentorProfileHref(mentor.id)}
             onClick={onProfileClick}
             className="flex-1 text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             View profile
-          </a>
+          </Link>
           {onToggleBookmark && (
             <button
               type="button"
