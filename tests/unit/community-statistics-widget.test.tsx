@@ -28,9 +28,39 @@ describe("CommunityStatisticsWidget", () => {
     expect(screen.getByText("4")).toBeInTheDocument();
   });
 
+  it("pairs every value with its label", () => {
+    render(<CommunityStatisticsWidget stats={stats} />);
+
+    const expected: Array<[string, string]> = [
+      ["Total Members", "2,400"],
+      ["Active Discussions", "128"],
+      ["Total Discussions", "940"],
+      ["Events This Month", "4"],
+    ];
+
+    expected.forEach(([label, value]) => {
+      const term = screen.getByText(label);
+      const definition = term.closest("dl")?.querySelector("dd");
+      expect(definition).toHaveTextContent(value);
+    });
+  });
+
   it("renders a responsive grid", () => {
     const { container } = render(<CommunityStatisticsWidget stats={stats} />);
-    expect(container.querySelector(".grid-cols-2")).not.toBeNull();
+    const grid = container.querySelector('[role="list"]');
+
+    expect(grid).not.toBeNull();
+    expect(grid).toHaveClass("grid-cols-1", "min-[380px]:grid-cols-2");
+  });
+
+  it("renders an icon for each metric and hides it from assistive technology", () => {
+    const { container } = render(<CommunityStatisticsWidget stats={stats} />);
+    const iconWrappers = container.querySelectorAll('span[aria-hidden="true"]');
+
+    expect(iconWrappers).toHaveLength(4);
+    iconWrappers.forEach((wrapper) => {
+      expect(wrapper.querySelector("svg")).not.toBeNull();
+    });
   });
 
   it("shows a loading status while stats load", () => {
