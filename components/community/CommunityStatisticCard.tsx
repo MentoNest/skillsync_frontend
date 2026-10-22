@@ -45,10 +45,14 @@ export function CommunityStatisticCard({
           {icon}
         </span>
       ) : null}
-      <p className="text-2xl font-bold tabular-nums tracking-tight text-[var(--foreground)]">
-        {value}
-      </p>
-      <p className="text-sm text-[var(--muted)]">{label}</p>
+      {/* `flex-col-reverse` keeps the value above its label visually while the
+          markup keeps `dt` before `dd`. */}
+      <dl className="flex w-full flex-col-reverse items-center gap-2">
+        <dt className="text-sm text-[var(--muted)]">{label}</dt>
+        <dd className="text-2xl font-bold tabular-nums tracking-tight text-[var(--foreground)]">
+          {value}
+        </dd>
+      </dl>
     </div>
   );
 }
