@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { MentorFilters } from "@/lib/mentor-types";
 import { createPortal } from "react-dom";
 
@@ -58,16 +58,31 @@ export default function MobileFilterDrawer({
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = "hidden";
-      drawerRef.current?.focus();
-    } else {
-      document.body.style.overflow = "";
-      previousActiveElement.current?.focus();
-    }
+    if (!isOpen) return;
+
+    previousActiveElement.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const previousOverflow = document.body.style.overflow;
+    const drawer = drawerRef.current;
+    const backgroundElements = Array.from(document.body.children).filter(
+      (element): element is HTMLElement =>
+        element instanceof HTMLElement && (!drawer || !element.contains(drawer))
+    );
+    const previousInertStates = backgroundElements.map((element) => [element, element.inert] as const);
+
+    document.body.style.overflow = "hidden";
+    backgroundElements.forEach((element) => {
+      element.inert = true;
+    });
+    drawer?.focus();
+
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
+      previousInertStates.forEach(([element, wasInert]) => {
+        element.inert = wasInert;
+      });
+      previousActiveElement.current?.focus();
     };
   }, [isOpen]);
 
@@ -78,16 +93,23 @@ export default function MobileFilterDrawer({
         onClose();
       }
       if (e.key === "Tab") {
-        const focusableElements = drawerRef.current?.querySelectorAll<HTMLElement>(
+        const focusableElements = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []).filter(
+          (element) => !element.hasAttribute("disabled") && element.tabIndex >= 0
         );
-        if (!focusableElements || focusableElements.length === 0) return;
+        if (focusableElements.length === 0) {
+          e.preventDefault();
+          drawerRef.current?.focus();
+          return;
+        }
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
-        if (e.shiftKey && document.activeElement === firstElement) {
+        const focusIsOutsideDrawer = !drawerRef.current?.contains(document.activeElement);
+        if (e.shiftKey && (document.activeElement === firstElement || focusIsOutsideDrawer)) {
           e.preventDefault();
           lastElement.focus();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
+        } else if (!e.shiftKey && (document.activeElement === lastElement || focusIsOutsideDrawer)) {
           e.preventDefault();
           firstElement.focus();
         }
@@ -101,6 +123,7 @@ export default function MobileFilterDrawer({
 
   const drawerContent = (
     <div
+      id="mentor-filter-drawer"
       className="fixed inset-0 z-50 lg:hidden"
       role="dialog"
       aria-modal="true"
