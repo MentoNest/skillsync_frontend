@@ -6,8 +6,8 @@ interface UseInfiniteScrollOptions {
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
-  observerRef?: React.RefObject<IntersectionObserver | null> | React.MutableRefObject<IntersectionObserver | null>;
-  loadMoreRef: React.RefObject<HTMLDivElement | null>;
+  observerRef?: React.Refobject<IntersectionObserver | null> | React.MutableRefobject<IntersectionObserver | null>;
+  loadMoreRef: React.RefObject<HTMLDiv | null>;
 }
 
 export function useInfiniteScroll({
@@ -19,31 +19,38 @@ export function useInfiniteScroll({
 }: UseInfiniteScrollOptions) {
   const internalObserverRef = useRef<IntersectionObserver | null>(null);
   const observerRef = externalObserverRef ?? internalObserverRef;
+  const latestOptionsRef = useRef({ isLoading, hasMore, onLoadMore });
+  latestOptionsRef.current = { isLoading, hasMore, onLoadMore };
+
   const resetInfiniteScroll = useCallback(() => {
     if (observerRef.current) {
       observerRef.current.disconnect();
+      observerRef.current = null;
     }
-    if (loadMoreRef.current && hasMore && !isLoading) {
+    const { hasMore: canLoadMore, isLoading: isCurrentlyLoading } = latestOptionsRef.current;
+    if (loadMoreRef.current && canLoadMore && !isCurrentlyLoading) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasMore && !isLoading) {
-            onLoadMore();
+          const currentOptions = latestOptionsRef.current;
+          if (entries[0]?.isIntersecting && currentOptions.hasMore && !currentOptions.isLoading) {
+            currentOptions.onLoadMore();
           }
         },
         { rootMargin: "100px" }
       );
       observerRef.current.observe(loadMoreRef.current);
     }
-  }, [hasMore, isLoading, onLoadMore, observerRef, loadMoreRef]);
+  }, [observerRef, loadMoreRef]);
 
   useEffect(() => {
     resetInfiniteScroll();
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
+        observerRef.current = null;
       }
     };
-  }, [resetInfiniteScroll, observerRef]);
+  }, [resetInfiniteScroll, observerRef, hasMore, isLoading]);
 
   return { resetInfiniteScroll };
 }

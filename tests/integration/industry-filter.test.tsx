@@ -112,7 +112,9 @@ describe("Industry Filter Integration", () => {
         expect.objectContaining({
           industry: ["Healthcare"],
         }),
-        1
+        1,
+        12,
+        expect.objectContaining({ signal: expect.any(Object) })
       );
     });
   });
@@ -138,7 +140,9 @@ describe("Industry Filter Integration", () => {
         expect.objectContaining({
           industry: expect.arrayContaining(["Technology", "Finance"]),
         }),
-        1
+        1,
+        12,
+        expect.objectContaining({ signal: expect.any(Object) })
       );
     });
   });
@@ -166,7 +170,9 @@ describe("Industry Filter Integration", () => {
         expect.objectContaining({
           industry: ["Healthcare"],
         }),
-        1
+        1,
+        12,
+        expect.objectContaining({ signal: expect.any(Object) })
       );
     });
   });
