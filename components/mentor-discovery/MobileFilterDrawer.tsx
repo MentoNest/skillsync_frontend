@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { MentorFilters } from "@/lib/mentor-types";
 import { createPortal } from "react-dom";
 
@@ -58,16 +58,31 @@ export default function MobileFilterDrawer({
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = "hidden";
-      drawerRef.current?.focus();
-    } else {
-      document.body.style.overflow = "";
-      previousActiveElement.current?.focus();
-    }
+    if (!isOpen) return;
+
+    previousActiveElement.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const previousOverflow = document.body.style.overflow;
+    const drawer = drawerRef.current;
+    const backgroundElements = Array.from(document.body.children).filter(
+      (element): element is HTMLElement =>
+        element instanceof HTMLElement && (!drawer || !element.contains(drawer))
+    );
+    const previousInertStates = backgroundElements.map((element) => [element, element.inert] as const);
+
+    document.body.style.overflow = "hidden";
+    backgroundElements.forEach((element) => {
+      element.inert = true;
+    });
+    drawer?.focus();
+
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
+      previousInertStates.forEach(([element, wasInert]) => {
+        element.inert = wasInert;
+      });
+      previousActiveElement.current?.focus();
     };
   }, [isOpen]);
 
@@ -75,19 +90,27 @@ export default function MobileFilterDrawer({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
       if (e.key === "Escape") {
+        e.preventDefault();
         onClose();
       }
       if (e.key === "Tab") {
-        const focusableElements = drawerRef.current?.querySelectorAll<HTMLElement>(
+        const focusableElements = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []).filter(
+          (element) => !element.hasAttribute("disabled") && element.tabIndex >= 0
         );
-        if (!focusableElements || focusableElements.length === 0) return;
+        if (focusableElements.length === 0) {
+          e.preventDefault();
+          drawerRef.current?.focus();
+          return;
+        }
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
-        if (e.shiftKey && document.activeElement === firstElement) {
+        const focusIsOutsideDrawer = !drawerRef.current?.contains(document.activeElement);
+        if (e.shiftKey && (document.activeElement === firstElement || focusIsOutsideDrawer)) {
           e.preventDefault();
           lastElement.focus();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
+        } else if (!e.shiftKey && (document.activeElement === lastElement || focusIsOutsideDrawer)) {
           e.preventDefault();
           firstElement.focus();
         }
@@ -101,6 +124,7 @@ export default function MobileFilterDrawer({
 
   const drawerContent = (
     <div
+      id="mentor-filter-drawer"
       className="fixed inset-0 z-50 lg:hidden"
       role="dialog"
       aria-modal="true"
@@ -134,8 +158,8 @@ export default function MobileFilterDrawer({
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Expertise</h3>
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Expertise</legend>
               <div className="flex flex-wrap gap-2">
                 {EXPERTISE_OPTIONS.map((expertise) => (
                   <label
@@ -162,10 +186,10 @@ export default function MobileFilterDrawer({
                   </label>
                 ))}
               </div>
-            </div>
+            </fieldset>
 
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Experience Level</h3>
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Experience Level</legend>
               <div className="flex flex-wrap gap-2">
                 {EXPERIENCE_OPTIONS.map((exp) => (
                   <label
@@ -192,10 +216,10 @@ export default function MobileFilterDrawer({
                   </label>
                 ))}
               </div>
-            </div>
+            </fieldset>
 
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Industry</h3>
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Industry</legend>
               <div className="flex flex-wrap gap-2">
                 {INDUSTRY_OPTIONS.map((industry) => (
                   <label
@@ -222,11 +246,12 @@ export default function MobileFilterDrawer({
                   </label>
                 ))}
               </div>
-            </div>
+            </fieldset>
 
             <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Minimum Rating</h3>
+              <label htmlFor="mobile-min-rating" className="block text-sm font-medium text-slate-900 mb-3">Minimum Rating</label>
               <select
+                id="mobile-min-rating"
                 value={filters.minRating || ""}
                 onChange={(e) => onFiltersChange({ ...filters, minRating: Number(e.target.value) || undefined })}
                 className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -241,8 +266,9 @@ export default function MobileFilterDrawer({
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Maximum Hourly Rate</h3>
+              <label htmlFor="mobile-max-hourly-rate" className="block text-sm font-medium text-slate-900 mb-3">Maximum Hourly Rate</label>
               <input
+                id="mobile-max-hourly-rate"
                 type="number"
                 value={filters.maxHourlyRate || ""}
                 onChange={(e) => onFiltersChange({ ...filters, maxHourlyRate: Number(e.target.value) || undefined })}
@@ -253,8 +279,9 @@ export default function MobileFilterDrawer({
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Sort By</h3>
+              <label htmlFor="mobile-sort-by" className="block text-sm font-medium text-slate-900 mb-3">Sort By</label>
               <select
+                id="mobile-sort-by"
                 value={filters.sortBy || "relevance"}
                 onChange={(e) => onFiltersChange({ ...filters, sortBy: e.target.value as MentorFilters["sortBy"] })}
                 className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -268,8 +295,8 @@ export default function MobileFilterDrawer({
               </select>
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Sort Order</h3>
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Sort Order</legend>
               <div className="flex gap-4">
                 {["asc", "desc"].map((order) => (
                   <label
@@ -288,7 +315,7 @@ export default function MobileFilterDrawer({
                   </label>
                 ))}
               </div>
-            </div>
+            </fieldset>
           </div>
 
           <div className="p-4 border-t border-slate-200 space-y-3">

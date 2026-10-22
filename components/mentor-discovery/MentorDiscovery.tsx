@@ -146,7 +146,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
           <p className="mt-2 text-slate-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
+            className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
           >
             Try again
           </button>
@@ -162,7 +162,11 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-slate-900">Find Mentors</h1>
-              <span className="px-2 py-0.5 text-sm font-medium bg-indigo-50 text-indigo-700 rounded-full">
+              <span
+                className="px-2 py-0.5 text-sm font-medium bg-indigo-50 text-indigo-700 rounded-full"
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 {mentors.length} mentor{mentors.length !== 1 ? "s" : ""}
               </span>
             </div>
@@ -171,6 +175,8 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                 onClick={() => setIsMobileFiltersOpen(true)}
                 className="lg:hidden inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                 aria-label="Open filter drawer"
+                aria-controls="mentor-filter-drawer"
+                aria-expanded={isMobileFiltersOpen}
               >
                 <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -185,7 +191,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
               {hasActiveFilters && (
                 <button
                   onClick={handleClearFilters}
-                  className="hidden sm:inline-flex text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                  className="hidden sm:inline-flex text-sm text-indigo-600 hover:text-indigo-700 font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                 >
                   Clear filters
                 </button>
@@ -220,7 +226,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
               {hasActiveFilters && (
                 <button
                   onClick={handleClearFilters}
-                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                 >
                   Clear filters
                 </button>
@@ -234,8 +240,8 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
         sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
         sidebar={
             <>
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Expertise</h3>
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-semibold text-slate-900 mb-3">Expertise</legend>
                 <div className="space-y-2">
                   {["Frontend", "Backend", "Full Stack", "Mobile", "DevOps", "Data Science", "Machine Learning", "Product Management", "UX Design", "QA Engineering"].map((exp) => (
                     <label key={exp} className="flex items-center gap-2 cursor-pointer">
@@ -256,10 +262,10 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                     </label>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Experience Level</h3>
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-semibold text-slate-900 mb-3">Experience Level</legend>
                 <div className="space-y-2">
                   {["junior", "mid", "senior", "lead", "principal"].map((exp) => (
                     <label key={exp} className="flex items-center gap-2 cursor-pointer">
@@ -280,7 +286,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                     </label>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
               <IndustryFilter
                 selectedIndustries={filters.industry || []}
@@ -296,8 +302,9 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
               />
 
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Minimum Rating</h3>
+                <label htmlFor="desktop-min-rating" className="block text-sm font-semibold text-slate-900 mb-3">Minimum Rating</label>
                 <select
+                  id="desktop-min-rating"
                   value={filters.minRating || ""}
                   onChange={(e) => updateFilters({ ...filters, minRating: Number(e.target.value) || undefined }, { replace: true })}
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -311,8 +318,9 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Max Hourly Rate</h3>
+                <label htmlFor="desktop-max-hourly-rate" className="block text-sm font-semibold text-slate-900 mb-3">Max Hourly Rate</label>
                 <input
+                  id="desktop-max-hourly-rate"
                   type="number"
                   value={filters.maxHourlyRate || ""}
                   onChange={(e) => updateFilters({ ...filters, maxHourlyRate: Number(e.target.value) || undefined }, { replace: true })}
@@ -370,7 +378,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                 </svg>
                 <h2 className="mt-4 text-xl font-semibold text-slate-900">No mentors found</h2>
                 <p className="mt-2 text-slate-600">Try adjusting your filters to find more mentors.</p>
-                <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
+                <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
                   Clear all filters
                 </button>
               </div>
@@ -418,6 +426,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                           <Link
                             href={mentor.profileHref || `/mentors/${mentor.id}`}
                             className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            aria-label={`View ${mentor.name}'s profile`}
                           >
                             View profile
                           </Link>
