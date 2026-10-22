@@ -2,6 +2,10 @@
 
 import { DiscussionCard } from "./DiscussionCard";
 import { DiscussionFilters } from "./DiscussionFilters";
+import { CommunityEmptyState } from "./CommunityEmptyState";
+import { DiscussionFeedSkeleton } from "./CommunitySkeleton";
+import { CommunityErrorState } from "./CommunityErrorState";
+import { LoadMoreDiscussionsButton } from "./LoadMoreDiscussionsButton";
 import type { Discussion, DiscussionSort } from "@/lib/community-types";
 
 interface CommunityFeedProps {
@@ -15,6 +19,16 @@ interface CommunityFeedProps {
   onCategoryChange: (category: string | null) => void;
   onSearchChange: (query: string) => void;
   onSortChange: (sort: DiscussionSort) => void;
+  /** Requests the next page of discussions. */
+  onLoadMore: () => void;
+  /** Error message from the last feed request, if any (#999). */
+  error?: string | null;
+  /** Re-issues the feed request after a failure (#999). */
+  onRetry?: () => void;
+  /** Opens the discussion composer from the empty state CTA (#998). */
+  onStartDiscussion?: () => void;
+  /** Hide category pills when category selection is provided by the sidebar. */
+  showCategoryFilters?: boolean;
   loadMoreRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -29,8 +43,15 @@ export function CommunityFeed({
   onCategoryChange,
   onSearchChange,
   onSortChange,
+  onLoadMore,
+  error,
+  onRetry,
+  onStartDiscussion,
+  showCategoryFilters = true,
   loadMoreRef,
 }: CommunityFeedProps) {
+  const hasActiveFilters = Boolean(selectedCategory) || searchQuery.trim().length > 0;
+
   return (
     <div className="space-y-4">
       <DiscussionFilters
@@ -40,16 +61,23 @@ export function CommunityFeed({
         onCategoryChange={onCategoryChange}
         onSearchChange={onSearchChange}
         onSortChange={onSortChange}
+        showCategories={showCategoryFilters}
       />
 
       {isLoading ? (
-        <div className="flex justify-center py-12" role="status" aria-label="Loading discussions">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--primary)] border-t-transparent" />
-        </div>
+        <DiscussionFeedSkeleton count={4} />
+      ) : error ? (
+        <CommunityErrorState message={error} onRetry={onRetry} />
       ) : discussions.length === 0 ? (
-        <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-8 text-center">
-          <p className="text-[var(--muted)]">No discussions found</p>
-        </div>
+        <CommunityEmptyState
+          title={hasActiveFilters ? "No discussions found" : "No discussions yet"}
+          message={
+            hasActiveFilters
+              ? "No discussions match your current filters. Try another category or search term."
+              : "Be the first to start a conversation with the community."
+          }
+          onAction={onStartDiscussion}
+        />
       ) : (
         <div className="space-y-4" role="feed" aria-label="Discussion feed">
           {discussions.map((discussion) => (
@@ -58,18 +86,18 @@ export function CommunityFeed({
         </div>
       )}
 
-      {isLoadingMore && (
-        <div className="flex justify-center py-4" role="status" aria-label="Loading more">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
-        </div>
+      {/* Explicit load-more control — keyboard-accessible complement to the
+          invisible infinite-scroll sentinel below. Handles loading, disabled
+          and end-of-results states internally. */}
+      {!isLoading && !error && discussions.length > 0 && (
+        <LoadMoreDiscussionsButton
+          hasMore={hasMore}
+          isLoading={isLoadingMore}
+          onLoadMore={onLoadMore}
+        />
       )}
 
-      {!isLoading && !isLoadingMore && discussions.length > 0 && !hasMore && (
-        <p className="py-4 text-center text-sm text-[var(--muted)]">
-          You've reached the end of the feed
-        </p>
-      )}
-
+      {/* Intersection-observer sentinel for automatic infinite scroll */}
       <div ref={loadMoreRef} className="h-1" aria-hidden="true" />
     </div>
   );

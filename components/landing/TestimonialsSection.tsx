@@ -3,123 +3,119 @@ import TestimonialCard, { TestimonialCardProps } from "./TestimonialCard";
 /**
  * Placeholder testimonials.
  *
- * ⚠️ **These are invented.** The names, roles, companies and quotes are
- * fabricated, following the pattern already established in `HeroSection` and
- * `MentorDiscoverySection`, which do the same for their mentor profiles.
- *
- * They must be replaced with real, attributed, consented quotes before this
- * ships. A fabricated testimonial is not a placeholder in the way a fabricated
- * hero headline is: it attributes a specific opinion to a specific named person
- * who never gave it, and on a mentorship platform the entire product claim is
- * that the people in it are real. See the note in the PR.
+ * ⚠️ **These are invented.** The names, roles, companies, and quotes are
+ * fabricated placeholder content, following the pattern already established in
+ * `HeroSection` and `MentorDiscoverySection`, which do the same for their
+ * mentor profiles. Replace them with real, attributed, consented quotes before
+ * this ships: a fabricated testimonial attributes a specific opinion to a
+ * specific named person who never gave it, which is a different kind of
+ * placeholder than a fabricated hero headline.
  */
 const TESTIMONIALS: TestimonialCardProps[] = [
   {
-    name: "Priya Nair",
-    role: "Frontend Engineer · Razorpay",
+    name: "Sofia Reyes",
+    role: "Backend Engineer · Nubank",
     quote:
-      "I had been stuck at mid-level for two years and every course taught me the same things I already knew. Ninety minutes with a staff engineer who had actually made the jump was worth more than the six months before it. She didn't give me a study plan — she gave me the specific review that had been holding me back.",
-    initials: "PN",
+      "I had been stuck on the same system design interview loop for six months. One session with a staff engineer who had been on the other side of that table changed how I structured every answer. I had two offers within a month.",
+    initials: "SR",
     avatarColor: "bg-gradient-to-br from-indigo-500 to-violet-600",
     rating: 5,
-    context: "Promoted within four months",
+    context: "Two offers in one month",
   },
   {
-    name: "Tomás Oliveira",
-    role: "Data Scientist · Nubank",
+    name: "Kwame Boateng",
+    role: "Product Manager · Jumia",
     quote:
-      "What sold me was that my mentor would not let me skip the boring part. I wanted to talk about system design and we spent three sessions on SQL query plans instead. It was the least engaging and most useful thing that has happened to my career this year.",
-    initials: "TO",
-    avatarColor: "bg-gradient-to-br from-cyan-500 to-teal-500",
+      "My mentor did not give me a framework. She read the actual doc I was struggling with and showed me what a senior PM would cut from it. That is the difference between a course and a mentor.",
+    initials: "KB",
+    avatarColor: "bg-gradient-to-br from-amber-500 to-orange-500",
+    rating: 4.9,
+    context: "Promoted to senior PM",
+  },
+  {
+    name: "Hannah Müller",
+    role: "Data Analyst · Zalando",
+    quote:
+      "I switched careers from marketing and the hardest part was not the SQL — it was knowing whether I was learning the right things. Three sessions gave me a reading list and a project idea that actually got me hired.",
+    initials: "HM",
+    avatarColor: "bg-gradient-to-br from-rose-500 to-pink-500",
     rating: 4.8,
-    context: "Twice-matched mentor",
+    context: "Career switcher, hired in 5 months",
   },
   {
-    name: "Amara Diallo",
-    role: "Product Manager · Wave",
+    name: "Diego Fernández",
+    role: "Senior SWE · Glovo",
     quote:
-      "I switched to a mentor in a different industry on purpose, because I wanted someone who had solved my problem without my constraints. It made the advice much more useful. Matching on topic would have given me a comfortable, useless conversation.",
-    initials: "AD",
-    avatarColor: "bg-gradient-to-br from-rose-500 to-orange-400",
+      "After my first promotion I completely stalled. My mentor had made the same jump two years earlier and told me the parts nobody writes about — which meetings to run, which to skip. Six months later I made staff.",
+    initials: "DF",
+    avatarColor: "bg-gradient-to-br from-emerald-500 to-teal-500",
     rating: 5,
-    context: "Moved from fintech to climate",
+    context: "Promoted to staff engineer",
   },
   {
-    name: "Ben Whitfield",
-    role: "Engineering Manager · Atlassian",
+    name: "Ayesha Iqbal",
+    role: "UX Designer · Careem",
     quote:
-      "I was promoted into management with zero training and no idea what I was doing. My mentor's first question was what I was going to stop doing, not what I was going to start. That reframe is the reason my team still exists.",
-    initials: "BW",
-    avatarColor: "bg-gradient-to-br from-amber-500 to-yellow-400",
+      "The portfolio review alone was worth a year of free tutorials. My mentor tore my case studies apart in the kindest possible way and rebuilt the narrative with me. Callbacks tripled.",
+    initials: "AI",
+    avatarColor: "bg-gradient-to-br from-sky-500 to-cyan-500",
+    rating: 4.9,
+    context: "Triple the interview callbacks",
+  },
+  {
+    name: "Lucas Moreau",
+    role: "Engineering Manager · Qonto",
+    quote:
+      "I was promoted to manage the team I used to be a peer on, and it was going badly. My mentor had done exactly that transition. Four sessions later my team's retro went from silent to honest.",
+    initials: "LM",
+    avatarColor: "bg-gradient-to-br from-fuchsia-500 to-purple-600",
     rating: 4.8,
     context: "First-time manager",
-  },
-  {
-    name: "Yuki Tanaka",
-    role: "Mobile Engineer · Mercari",
-    quote:
-      "Session times are in my timezone and so is everyone I have been matched with. That sounds trivial until you have tried to book a mentor in San Francisco from Osaka, which is what every other platform I tried assumed.",
-    initials: "YT",
-    avatarColor: "bg-gradient-to-br from-emerald-500 to-green-500",
-    rating: 4.7,
-    context: "Matched in under 24 hours",
-  },
-  {
-    name: "Daniel Osei",
-    role: "Security Engineer · Cloudflare",
-    quote:
-      "I did the free intro session first, mostly to test whether these people were real. The mentor referenced specific projects from their own career, not advice anyone could find in a blog post. After that I booked four more.",
-    initials: "DO",
-    avatarColor: "bg-gradient-to-br from-sky-500 to-blue-600",
-    rating: 5,
-    context: "Referred by a colleague",
   },
 ];
 
 /**
- * Testimonials section.
+ * Testimonials section (#1161).
  *
- * A `<section>` with an `aria-labelledby` heading, matching `HeroSection` and
- * `CTASection`. The grid is one column on the narrowest screens, two from
- * `sm`, three from `lg`.
- *
- * `TestimonialCard` is `h-full` and the grid stretches its rows, so the cards in
- * a row are equal height and the bottom border on the attribution line sits at
- * the same depth in all three. Without that the row looks ragged, because quote
- * lengths differ a lot — which is the main visual failure mode of testimonial
- * grids.
+ * Six cards through the reusable `TestimonialCard` in a responsive
+ * 1/2/3-column grid. Cards are `h-full` inside `items-stretch` so every card
+ * in a row ends at the same depth — quote lengths differ enough that without
+ * it the row reads ragged.
  */
 export default function TestimonialsSection() {
   return (
     <section
-      className="relative py-20 lg:py-28 bg-white"
+      id="testimonials"
+      className="bg-white py-20 lg:py-28"
       aria-labelledby="testimonials-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <span className="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold uppercase tracking-widest mb-4">
-            From the community
-          </span>
-
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <header className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-indigo-600">
+            Testimonials
+          </p>
           <h2
             id="testimonials-heading"
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight"
+            className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
           >
-            What changed for them
+            What people say after the sessions
           </h2>
-
-          <p className="mt-5 text-lg text-slate-600 leading-relaxed">
-            Six learners, six different problems. The one thing they have in
-            common is that they each met someone who had already done the thing
-            they were trying to do.
+          <p className="mt-4 text-lg leading-relaxed text-slate-600">
+            Six learners, six different problems — each one matched with
+            someone who had already solved it.
           </p>
-        </div>
+        </header>
 
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+        <ul
+          className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          aria-label="Learner testimonials"
+        >
           {TESTIMONIALS.map((testimonial) => (
-            <TestimonialCard key={testimonial.name} {...testimonial} />
+            <li key={testimonial.name} className="flex min-w-0">
+              <TestimonialCard {...testimonial} />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
