@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { normalizeSearchQuery } from "@/lib/community-search";
+import { DISCUSSION_SORT_OPTIONS } from "@/lib/community-sort";
 import type { DiscussionSort } from "@/lib/community-types";
 import { COMMUNITY_CATEGORIES } from "@/lib/community-types";
 
@@ -153,10 +153,11 @@ export function DiscussionFilters({
           className="max-w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-sm text-[var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           aria-label="Sort discussions"
         >
-          <option value="trending">Trending</option>
-          <option value="latest">Latest</option>
-          <option value="most-replies">Most Replies</option>
-          <option value="most-liked">Most Liked</option>
+          {DISCUSSION_SORT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
 

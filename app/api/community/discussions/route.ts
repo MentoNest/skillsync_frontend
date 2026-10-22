@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { filterDiscussionsBySearch } from "@/lib/community-search";
+import {
+  normalizeDiscussionSort,
+  sortDiscussions,
+} from "@/lib/community-sort";
 import { parseCategoryParam } from "@/lib/community-types";
 import {
   createDiscussion,
@@ -18,7 +21,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "10");
-  const sort = searchParams.get("sort") || "latest";
+  const sort = normalizeDiscussionSort(searchParams.get("sort"));
   // #993: accept single (?category=technical), comma-separated
   // (?category=career,technical), and repeated (?category=a&category=b)
   // params. Single-select UI sends one value; multi-select can reuse this.
@@ -38,34 +41,9 @@ export async function GET(request: NextRequest) {
     filtered = filterDiscussionsBySearch(filtered, search);
   }
 
-  // Sort (#994): latest | most-liked | most-replies | trending
-  // - latest: newest createdAt first
-  // - most-liked: highest likeCount first
-  // - most-replies: highest replyCount first
-  // - trending: weighted engagement score (likes, replies, views) with recency tie-break
-  // Legacy aliases: "popular" -> "most-liked" for backward compatibility.
-  const getTrendingScore = (d: (typeof filtered)[number]) =>
-    d.likeCount * 2 + d.replyCount * 3 + d.viewCount * 0.5;
-
-  if (sort === "most-liked" || sort === "popular") {
-    filtered.sort((a, b) => b.likeCount - a.likeCount);
-  } else if (sort === "most-replies") {
-    filtered.sort((a, b) => b.replyCount - a.replyCount);
-  } else if (sort === "trending") {
-    filtered.sort((a, b) => {
-      const scoreDiff = getTrendingScore(b) - getTrendingScore(a);
-      if (scoreDiff !== 0) return scoreDiff;
-      return (
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      );
-    });
-  } else {
-    // latest (default)
-    filtered.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }
+  // Sort (#994, #1249): the shared comparator keeps the feed deterministic.
+  // Pinned discussions are promoted by the pass below.
+  filtered = sortDiscussions(filtered, sort);
 
   // Pinned discussions always at top
   filtered.sort((a, b) => (a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1));

@@ -55,6 +55,8 @@ export interface CommunityContextValue {
   setSortBy: (sort: DiscussionSort) => void;
   loadMore: () => void;
   refresh: () => void;
+  /** Reloads the sidebar overview (statistics + events). */
+  refreshOverview: () => void;
   /** Optimistically register the viewer for an event (#989). */
   registerForEvent: (eventId: string) => void;
   /** Sentinel ref the feed attaches to auto-load the next page (#1277). */

@@ -7,6 +7,7 @@ import {
   type CommunityMember,
   type CommunityStatistics,
   type Discussion,
+  type Reply,
   type Report,
   type SavedDiscussion,
 } from "./community-types";
