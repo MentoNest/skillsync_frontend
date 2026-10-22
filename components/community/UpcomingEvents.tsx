@@ -13,13 +13,16 @@ export interface UpcomingEventsProps {
   /**
    * Registers the viewer for an event.
    *
-   * Optional because there is no events API yet (#988). Without a handler the
-   * CTA still records the `event_registered` analytics conversion and moves to
-   * the registered state, so the UI can be wired up ahead of the backend.
+   * Optional so the widget stays usable in read-only contexts. Without a
+   * handler the CTA still records the `event_registered` analytics conversion
+   * and moves to the registered state, which keeps the UI testable before the
+   * registration endpoint lands.
    */
   onRegister?: (eventId: string) => void | Promise<void>;
   /** Shown when nothing is scheduled. */
   emptyMessage?: string;
+  /** Shows skeleton rows while the events request is in flight. */
+  isLoading?: boolean;
   /** Optional extra classes for layout flexibility. */
   className?: string;
 }
@@ -65,17 +68,19 @@ function formatStart(event: CommunityEvent): FormattedStart | null {
 }
 
 /**
- * Upcoming events widget for the community sidebar (#988): the event title,
- * host, date, time, registration count and a register CTA.
+ * Upcoming events widget for the community sidebar (#988, #1243): the event
+ * title, host, date, time, registration count and a register CTA.
  *
  * Registration is optimistic — the CTA flips to "Registered" as soon as the
  * handler resolves, and the failure is surfaced inline without losing the row.
+ * Events that have reached their capacity render a disabled "Full" CTA.
  */
 export function UpcomingEvents({
   events,
   heading = "Upcoming Events",
   onRegister,
   emptyMessage = "No events scheduled yet",
+  isLoading = false,
   className,
 }: UpcomingEventsProps) {
   const [registeringId, setRegisteringId] = useState<string | null>(null);
@@ -87,7 +92,14 @@ export function UpcomingEvents({
   }
 
   async function handleRegister(event: CommunityEvent) {
-    if (isRegistered(event) || registeringId === event.id) return;
+    if (
+      isRegistered(event) ||
+      registeringId === event.id ||
+      (event.capacity !== undefined &&
+        event.registrationCount >= event.capacity)
+    ) {
+      return;
+    }
 
     setRegisteringId(event.id);
     setError(null);
@@ -109,6 +121,7 @@ export function UpcomingEvents({
   return (
     <section
       aria-labelledby="upcoming-events-heading"
+      aria-busy={isLoading || undefined}
       className={cn("min-w-0", className)}
     >
       <h2
@@ -118,7 +131,23 @@ export function UpcomingEvents({
         {heading}
       </h2>
 
-      {events.length === 0 ? (
+      {isLoading ? (
+        <div role="status" className="space-y-3">
+          <span className="sr-only">Loading upcoming events</span>
+          {[0, 1].map((index) => (
+            <div
+              key={index}
+              aria-hidden="true"
+              className="animate-pulse rounded-lg border border-[var(--border)] bg-[var(--background)] p-3"
+            >
+              <div className="h-4 w-3/4 rounded bg-[var(--secondary)]" />
+              <div className="mt-2 h-3 w-1/2 rounded bg-[var(--secondary)]" />
+              <div className="mt-2 h-3 w-2/3 rounded bg-[var(--secondary)]" />
+              <div className="mt-3 h-7 w-full rounded-lg bg-[var(--secondary)]" />
+            </div>
+          ))}
+        </div>
+      ) : events.length === 0 ? (
         <p className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm text-[var(--muted)]">
           {emptyMessage}
         </p>
@@ -128,17 +157,21 @@ export function UpcomingEvents({
             const start = formatStart(event);
             const registered = isRegistered(event);
             const isPending = registeringId === event.id;
+            const isFull =
+              event.capacity !== undefined &&
+              event.registrationCount >= event.capacity;
 
             return (
               <li
                 key={event.id}
-                className="rounded-lg border border-[var(--border)] bg-[var(--background)] p-3"
+                className="min-w-0 break-words rounded-lg border border-[var(--border)] bg-[var(--background)] p-3"
               >
-                <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                <h3 className="break-words text-sm font-semibold text-[var(--foreground)]">
                   {event.title}
                 </h3>
-                <p className="mt-0.5 text-xs text-[var(--muted)]">
-                  Hosted by <span className="font-medium">{event.host}</span>
+                <p className="mt-0.5 break-words text-xs text-[var(--muted)]">
+                  Hosted by{" "}
+                  <span className="font-medium">{event.host}</span>
                 </p>
 
                 {start && (
@@ -165,25 +198,29 @@ export function UpcomingEvents({
                 <button
                   type="button"
                   onClick={() => handleRegister(event)}
-                  disabled={registered || isPending}
+                  disabled={registered || isFull || isPending}
                   aria-busy={isPending}
                   aria-label={
                     registered
                       ? `Registered for ${event.title}`
-                      : `Register for ${event.title}`
+                      : isFull
+                        ? `${event.title} is full`
+                        : `Register for ${event.title}`
                   }
                   className={cn(
                     "mt-2 inline-flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:cursor-not-allowed disabled:opacity-60",
-                    registered
+                    registered || isFull
                       ? "bg-[var(--secondary)] text-[var(--muted)]"
                       : "bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)]"
                   )}
                 >
                   {registered
                     ? "Registered"
-                    : isPending
-                      ? "Registering…"
-                      : "Register"}
+                    : isFull
+                      ? "Full"
+                      : isPending
+                        ? "Registering…"
+                        : "Register"}
                 </button>
               </li>
             );

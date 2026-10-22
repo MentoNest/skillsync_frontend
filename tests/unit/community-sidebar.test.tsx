@@ -86,4 +86,18 @@ describe("CommunitySidebar (responsive, #1000)", () => {
     screen.getByRole("button", { name: /all/i }).click();
     expect(onCategoryChange).toHaveBeenCalledWith(null);
   });
+
+  it("shows the events loading state while the overview loads", () => {
+    render(
+      <CommunitySidebar
+        selectedCategory={null}
+        onCategoryChange={jest.fn()}
+        isLoadingEvents
+      />
+    );
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Loading upcoming events"
+    );
+  });
 });
