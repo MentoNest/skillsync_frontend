@@ -1,7 +1,12 @@
 import MentorDiscovery from "@/components/mentor-discovery/MentorDiscovery";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { Mentor, MentorFilters } from "@/lib/mentor-types";
+import {
+  MENTOR_EXPERIENCE_LEVELS,
+  MENTOR_EXPERTISE_OPTIONS,
+  Mentor,
+  MentorFilters,
+} from "@/types/mentor";
 import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
 import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";
@@ -14,14 +19,6 @@ import MentorSearchBar from "@/components/mentor-discovery/MentorSearchBar";
 import { hasSearchTerm, normalizeSearchTerm } from "@/lib/mentor-search";
 
 const SEARCH_DEBOUNCE_MS = 300;
-
-const EXPERIENCE_LABELS: Record<string, string> = {
-  junior: "Junior",
-  mid: "Mid-level",
-  senior: "Senior",
-  lead: "Lead",
-  principal: "Principal",
-};
 
 function MentorsPageContent() {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
@@ -256,7 +253,7 @@ function MentorsPageContent() {
               <div>
                 <h3 className="text-sm font-semibold text-slate-900 mb-3">Expertise</h3>
                 <div className="space-y-2">
-                  {["Frontend", "Backend", "Full Stack", "Mobile", "DevOps", "Data Science", "Machine Learning", "Product Management", "UX Design", "QA Engineering"].map((exp) => (
+                  {MENTOR_EXPERTISE_OPTIONS.map((exp) => (
                     <label key={exp} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -280,7 +277,7 @@ function MentorsPageContent() {
               <div>
                 <h3 className="text-sm font-semibold text-slate-900 mb-3">Experience Level</h3>
                 <div className="space-y-2">
-                  {["junior", "mid", "senior", "lead", "principal"].map((exp) => (
+                  {MENTOR_EXPERIENCE_LEVELS.map((exp) => (
                     <label key={exp} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -516,6 +513,8 @@ function MentorsPageContent() {
       />
     </div>
   );
+}
+
 export default function MenteeMentorsPage() {
   return <MentorDiscovery />;
 }

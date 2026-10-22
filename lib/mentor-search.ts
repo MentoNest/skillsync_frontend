@@ -1,4 +1,4 @@
-import { Mentor } from "@/lib/mentor-types";
+import { Mentor, MentorPageResult } from "@/types/mentor";
 
 export const MAX_SEARCH_LENGTH = 100;
 
@@ -32,11 +32,7 @@ export function mentorMatchesSearch(
 
 export const DEFAULT_PAGE_SIZE = 20;
 
-export interface MentorPageResult {
-  mentors: Mentor[];
-  hasMore: boolean;
-  nextOffset: number;
-}
+export type { MentorPageResult };
 
 export function getMentorId(mentor: Mentor): string {
   return String(mentor.id);

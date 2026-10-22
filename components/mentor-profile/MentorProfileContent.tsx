@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Mentor } from "@/lib/mentor-types";
+import { Mentor, MentorAvailability } from "@/types/mentor";
 import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 
 interface MentorProfileContentProps {
@@ -25,7 +25,10 @@ export default function MentorProfileContent({ mentor }: MentorProfileContentPro
     // TODO: Integrate with bookmark API
   };
 
-  const availabilityConfig = {
+  const availabilityConfig: Record<
+    MentorAvailability,
+    { label: string; color: string; icon: string }
+  > = {
     available: {
       label: "Available",
       color: "bg-green-100 text-green-800 border-green-200",
@@ -43,7 +46,7 @@ export default function MentorProfileContent({ mentor }: MentorProfileContentPro
     },
   };
 
-  const availability = availabilityConfig[mentor.availability] || availabilityConfig.available;
+  const availability = availabilityConfig[mentor.availability];
 
   return (
     <div className="min-h-screen bg-slate-50">

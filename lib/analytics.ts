@@ -1,7 +1,5 @@
 "use client";
 
-import { AnalyticsEvent } from "./mentor-types";
-
 const EVENT_NAMES = {
   SEARCH: "mentor_discovery_search",
   FILTER_USAGE: "mentor_discovery_filter_usage",
@@ -20,6 +18,13 @@ type EventName = (typeof EVENT_NAMES)[keyof typeof EVENT_NAMES];
 interface TrackOptions {
   event: EventName;
   properties: Record<string, unknown>;
+}
+
+/** A single tracked event, as it is sent to the analytics endpoint. */
+export interface AnalyticsEvent {
+  event: string;
+  properties: Record<string, unknown>;
+  timestamp: number;
 }
 
 let eventQueue: AnalyticsEvent[] = [];
