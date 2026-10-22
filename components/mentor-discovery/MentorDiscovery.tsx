@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, memo, Suspense } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
 import MentorCard, { MentorCardSkeleton } from "@/components/mentor-discovery/MentorCard";
 import Link from "next/link";
@@ -47,7 +47,63 @@ interface MentorDiscoveryProps {
   pageSize?: number;
 }
 
-function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, pageSize: initialPageSize = 12 }: MentorDiscoveryProps) {
+interface MentorDiscoveryCardProps {
+  mentor: Mentor;
+  isBookmarked: boolean;
+  onToggleBookmark: (mentorId: string) => void;
+}
+
+const MentorDiscoveryCard = memo(function MentorDiscoveryCard({
+  mentor,
+  isBookmarked,
+  onToggleBookmark,
+}: MentorDiscoveryCardProps) {
+  return (
+    <MentorCard
+      id={mentor.id}
+      name={mentor.name}
+      title={mentor.headline}
+      description={mentor.bio}
+      skills={mentor.skills}
+      avatar={mentor.avatar}
+      avatarInitials={mentor.name.split(" ").map((namePart) => namePart[0]).join("")}
+      avatarColor="bg-gradient-to-br from-indigo-500 to-cyan-500"
+      rating={mentor.rating}
+      sessions={mentor.sessions}
+      hourlyRate={mentor.hourlyRate}
+      availability={mentor.availability}
+      profileHref={mentor.profileHref || `/mentors/${mentor.id}`}
+    >
+      <div className="mt-auto px-6 pb-6 space-y-3">
+        <div className="flex gap-3">
+          <button
+            onClick={() => onToggleBookmark(mentor.id)}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              isBookmarked
+                ? "bg-rose-600 text-white border-rose-600 focus:ring-rose-500"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:ring-slate-500"
+            }`}
+            aria-label={isBookmarked ? `Remove ${mentor.name} from bookmarks` : `Bookmark ${mentor.name}`}
+            aria-pressed={isBookmarked}
+          >
+            <svg className="w-5 h-5" fill={isBookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            {isBookmarked ? "Saved" : "Save"}
+          </button>
+        </div>
+        <Link
+          href={mentor.profileHref || `/mentors/${mentor.id}`}
+          className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          View profile
+        </Link>
+      </div>
+    </MentorCard>
+  );
+});
+
+function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -55,7 +111,6 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -65,7 +120,8 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const mentorListRef = useRef<HTMLDivElement | null>(null);
+  const filterRequestControllerRef = useRef<AbortController | null>(null);
+  const requestedPagesRef = useRef(new Set<number>());
 
   useEffect(() => {
     const stored = localStorage.getItem("bookmarkedMentors");
@@ -75,21 +131,24 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
   }, []);
 
   const fetchMentors = useCallback(
-    async (pageNumber = 1, append = false) => {
+    async (pageNumber = 1, append = false, signal?: AbortSignal) => {
+      if (signal?.aborted || (append && requestedPagesRef.current.has(pageNumber))) return;
+      if (append) requestedPagesRef.current.add(pageNumber);
+
       if (append) {
         setIsLoadingMore(true);
         setLoadMoreError(null);
       } else {
         setIsLoading(true);
+        setIsLoadingMore(false);
+        setLoadMoreError(null);
         setError(null);
       }
 
       try {
-        const response = await mentorApi.getMentors(
-          { ...filters, sortBy: filters.sortBy || "relevance" },
-          pageNumber,
-          pageSize
-        );
+        const response = await mentorApi.getMentors(filters, pageNumber, 12, { signal });
+
+        if (signal?.aborted) return;
 
         if (append) {
           setMentors((prev) => {
@@ -107,34 +166,44 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
         }
 
         setCurrentPage(pageNumber);
-        setTotalPages(response.totalPages);
-        setTotalMentors(response.total);
         setHasMore(response.hasMore ?? (pageNumber < response.totalPages));
       } catch (err) {
+        if (signal?.aborted) return;
         const message = "Failed to load mentors. Please try again.";
         if (append) {
           setLoadMoreError(message);
+          requestedPagesRef.current.delete(pageNumber);
         } else {
           setError(message);
         }
         console.error("Error fetching mentors:", err);
       } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        if (!signal?.aborted) {
+          setIsLoading(false);
+          setIsLoadingMore(false);
+        }
       }
     },
     [filters, pageSize, usePagination, currentPage]
   );
 
   useEffect(() => {
-    // Reset to page 1 when filters change
-    setCurrentPage(1);
-    fetchMentors(1, false);
+    const controller = new AbortController();
+    filterRequestControllerRef.current = controller;
+    requestedPagesRef.current.clear();
+    void fetchMentors(1, false, controller.signal);
+
+    return () => {
+      controller.abort();
+      if (filterRequestControllerRef.current === controller) {
+        filterRequestControllerRef.current = null;
+      }
+    };
   }, [fetchMentors]);
 
   const handleLoadMore = useCallback(() => {
-    if (!isLoading && !isLoadingMore && hasMore && !usePagination) {
-      fetchMentors(currentPage + 1, true);
+    if (!isLoading && !isLoadingMore && hasMore) {
+      fetchMentors(currentPage + 1, true, filterRequestControllerRef.current?.signal);
     }
   }, [isLoading, isLoadingMore, hasMore, currentPage, fetchMentors, usePagination]);
 
@@ -150,50 +219,19 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
     // fetchMentors will be called automatically via useEffect when pageSize changes
   }, []);
 
-  const { resetInfiniteScroll } = useInfiniteScroll({
-    isLoading: isLoadingMore,
+  useInfiniteScroll({
+    isLoading: isLoadingMore || Boolean(loadMoreError),
     hasMore,
     onLoadMore: handleLoadMore,
     loadMoreRef,
   });
-
-  useEffect(() => {
-    resetInfiniteScroll();
-  }, [filters, resetInfiniteScroll]);
-
-  const handleFiltersChange = (newFilters: MentorFilters) => {
-    // Track filter changes
-    const oldFilters = filters;
-    Object.keys(newFilters).forEach((key) => {
-      const filterKey = key as keyof MentorFilters;
-      const oldValue = oldFilters[filterKey];
-      const newValue = newFilters[filterKey];
-      
-      if (JSON.stringify(oldValue) !== JSON.stringify(newValue) && filterKey !== 'search' && filterKey !== 'sortBy' && filterKey !== 'sortOrder') {
-        if (Array.isArray(newValue) && Array.isArray(oldValue)) {
-          // Track added items
-          newValue.filter(v => !oldValue.includes(v)).forEach(v => {
-            trackFilterUsage(filterKey, v, 'add');
-          });
-          // Track removed items
-          oldValue.filter(v => !newValue.includes(v)).forEach(v => {
-            trackFilterUsage(filterKey, v, 'remove');
-          });
-        } else if (newValue !== oldValue) {
-          trackFilterUsage(filterKey, String(newValue), newValue ? 'add' : 'remove');
-        }
-      }
-    });
-    
-    updateFilters(newFilters, { replace: true });
-  };
 
   const handleClearFilters = () => {
     trackFilterClear();
     clearFilters();
   };
 
-  const toggleBookmark = (mentorId: string, mentorName: string) => {
+  const toggleBookmark = useCallback((mentorId: string) => {
     setBookmarkedIds((prev) => {
       const isBookmarked = prev.includes(mentorId);
       const updated = isBookmarked
@@ -206,7 +244,9 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
       localStorage.setItem("bookmarkedMentors", JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
+
+  const bookmarkedIdSet = useMemo(() => new Set(bookmarkedIds), [bookmarkedIds]);
 
   const toggleMentorComparison = (mentor: Mentor) => {
     setSelectedMentors((selected) => {
@@ -281,6 +321,8 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
                 }}
                 className="lg:hidden inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                 aria-label="Open filter drawer"
+                aria-controls="mentor-filter-drawer"
+                aria-expanded={isMobileFiltersOpen}
               >
                 <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -402,50 +444,40 @@ function MentorsPageContent({ belowFixedNavbar = false, usePagination = false, p
               </div>
             ) : (
               <>
-                <div ref={mentorListRef} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                   {mentors.map((mentor) => (
-                    <MentorCard
+                    <MentorDiscoveryCard
                       key={mentor.id}
                       mentor={mentor}
-                      isBookmarked={bookmarkedIds.includes(mentor.id)}
-                      onToggleBookmark={() => toggleBookmark(mentor.id, mentor.name)}
-                      onProfileClick={() => trackMentorProfileClick(mentor.id, mentor.name, 'discovery_page')}
-                      isSelectedForComparison={selectedMentors.some((item) => item.id === mentor.id)}
-                      isComparisonLimitReached={
-                        selectedMentors.length >= MAX_COMPARISON_MENTORS &&
-                        !selectedMentors.some((item) => item.id === mentor.id)
-                      }
-                      onToggleComparison={() => toggleMentorComparison(mentor)}
+                      isBookmarked={bookmarkedIdSet.has(mentor.id)}
+                      onToggleBookmark={toggleBookmark}
                     />
                   ))}
                 </div>
 
-                {/* Infinite scroll trigger / loading indicator */}
-                {!usePagination && (
-                  <div ref={loadMoreRef} className="mt-8 flex justify-center">
-                    {isLoadingMore ? (
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <svg className="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4h-4z" />
-                        </svg>
-                        <span className="text-sm font-medium">Loading more mentors...</span>
-                      </div>
-                    ) : loadMoreError ? (
-                      <div className="text-center">
-                        <p className="text-sm text-red-600 mb-2">{loadMoreError}</p>
-                        <button
-                          onClick={handleLoadMore}
-                          className="inline-flex items-center px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50"
-                        >
-                          Retry
-                        </button>
-                      </div>
-                    ) : hasMore ? (
-                      <span className="text-sm text-slate-400">Scroll for more</span>
-                    ) : mentors.length > 0 ? (
-                      <span className="text-sm text-slate-400">You&#x27ve reached the end</span>
-                    ) : null}
+                {/* Loading state when fetching additional mentors */}
+                {isLoadingMore && (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    aria-label="Loading more mentors"
+                    className="mt-8 flex flex-col items-center justify-center py-6 gap-3"
+                  >
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+                    <span className="text-sm font-medium text-slate-500">Loading more mentors...</span>
+                  </div>
+                )}
+
+                {/* Error retry when loading more fails */}
+                {loadMoreError && (
+                  <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-center">
+                    <p className="text-sm text-red-600 mb-2">{loadMoreError}</p>
+                    <button
+                      onClick={() => fetchMentors(currentPage + 1, true, filterRequestControllerRef.current?.signal)}
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors"
+                    >
+                      Retry loading more
+                    </button>
                   </div>
                 )}
 
