@@ -19,43 +19,27 @@ export function useInfiniteScroll({
 }: UseInfiniteScrollOptions) {
   const internalObserverRef = useRef<IntersectionObserver | null>(null);
   const observerRef = externalObserverRef ?? internalObserverRef;
-
-  // Keep the latest values in refs so the observer callback never reads stale
-  // state and we don't have to tear down/recreate the observer on every change.
-  const isLoadingRef = useRef(isLoading);
-  const hasMoreRef = useRef(hasMore);
-  const onLoadMoreRef = useRef(onLoadMore);
-
-  useEffect(() => {
-    isLoadingRef.current = isLoading;
-  }, [isLoading]);
-
-  useEffect(() => {
-    hasMoreRef.current = hasMore;
-  }, [hasMore]);
-
-  useEffect(() => {
-    onLoadMoreRef.current = onLoadMore;
-  }, [onLoadMore]);
+  const latestOptionsRef = useRef({ isLoading, hasMore, onLoadMore });
+  latestOptionsRef.current = { isLoading, hasMore, onLoadMore };
 
   const resetInfiniteScroll = useCallback(() => {
     if (observerRef.current) {
       observerRef.current.disconnect();
       observerRef.current = null;
     }
-
-    const target = loadMoreRef.current;
-    if (!target) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMoreRef.current && !isLoadingRef.current) {
-          onLoadMoreRef.current();
-        }
-      },
-      { rootMargin: "100px" }
-    );
-    observerRef.current.observe(target);
+    const { hasMore: canLoadMore, isLoading: isCurrentlyLoading } = latestOptionsRef.current;
+    if (loadMoreRef.current && canLoadMore && !isCurrentlyLoading) {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          const currentOptions = latestOptionsRef.current;
+          if (entries[0]?.isIntersecting && currentOptions.hasMore && !currentOptions.isLoading) {
+            currentOptions.onLoadMore();
+          }
+        },
+        { rootMargin: "100px" }
+      );
+      observerRef.current.observe(loadMoreRef.current);
+    }
   }, [observerRef, loadMoreRef]);
 
   useEffect(() => {
@@ -66,7 +50,7 @@ export function useInfiniteScroll({
         observerRef.current = null;
       }
     };
-  }, [resetInfiniteScroll, observerRef]);
+  }, [resetInfiniteScroll, observerRef, hasMore, isLoading]);
 
   return { resetInfiniteScroll };
 }
