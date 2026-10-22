@@ -26,7 +26,12 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const mentorApi = {
-  async getMentors(filters: MentorFilters = {}, page = 1, limit = 12): Promise<{
+  async getMentors(
+    filters: MentorFilters = {},
+    page = 1,
+    limit = 12,
+    options: { signal?: AbortSignal } = {}
+  ): Promise<{
     mentors: Mentor[];
     total: number;
     page: number;
@@ -53,6 +58,7 @@ export const mentorApi = {
         "Content-Type": "application/json",
       },
       next: { revalidate: 60 },
+      signal: options.signal,
     });
 
     return handleResponse(response);

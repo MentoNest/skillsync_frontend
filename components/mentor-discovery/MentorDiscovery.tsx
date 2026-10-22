@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, memo, Suspense } from "react";
 import { Mentor, MentorFilters } from "@/lib/mentor-types";
 import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
 import Link from "next/link";
@@ -19,13 +19,61 @@ interface MentorDiscoveryProps {
   belowFixedNavbar?: boolean;
 }
 
-const EXPERIENCE_LABELS: Record<string, string> = {
-  junior: "Junior",
-  mid: "Mid-level",
-  senior: "Senior",
-  lead: "Lead",
-  principal: "Principal",
-};
+interface MentorDiscoveryCardProps {
+  mentor: Mentor;
+  isBookmarked: boolean;
+  onToggleBookmark: (mentorId: string) => void;
+}
+
+const MentorDiscoveryCard = memo(function MentorDiscoveryCard({
+  mentor,
+  isBookmarked,
+  onToggleBookmark,
+}: MentorDiscoveryCardProps) {
+  return (
+    <MentorCard
+      id={mentor.id}
+      name={mentor.name}
+      title={mentor.headline}
+      description={mentor.bio}
+      skills={mentor.skills}
+      avatar={mentor.avatar}
+      avatarInitials={mentor.name.split(" ").map((namePart) => namePart[0]).join("")}
+      avatarColor="bg-gradient-to-br from-indigo-500 to-cyan-500"
+      rating={mentor.rating}
+      sessions={mentor.sessions}
+      hourlyRate={mentor.hourlyRate}
+      availability={mentor.availability}
+      profileHref={mentor.profileHref || `/mentors/${mentor.id}`}
+    >
+      <div className="mt-auto px-6 pb-6 space-y-3">
+        <div className="flex gap-3">
+          <button
+            onClick={() => onToggleBookmark(mentor.id)}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              isBookmarked
+                ? "bg-rose-600 text-white border-rose-600 focus:ring-rose-500"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:ring-slate-500"
+            }`}
+            aria-label={isBookmarked ? `Remove ${mentor.name} from bookmarks` : `Bookmark ${mentor.name}`}
+            aria-pressed={isBookmarked}
+          >
+            <svg className="w-5 h-5" fill={isBookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            {isBookmarked ? "Saved" : "Save"}
+          </button>
+        </div>
+        <Link
+          href={mentor.profileHref || `/mentors/${mentor.id}`}
+          className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          View profile
+        </Link>
+      </div>
+    </MentorCard>
+  );
+});
 
 function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) {
   const { filters, updateFilters, clearFilters, hasActiveFilters } = useUrlFilters();
@@ -35,12 +83,13 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const filterRequestControllerRef = useRef<AbortController | null>(null);
+  const requestedPagesRef = useRef(new Set<number>());
 
   useEffect(() => {
     const stored = localStorage.getItem("bookmarkedMentors");
@@ -50,17 +99,24 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
   }, []);
 
   const fetchMentors = useCallback(
-    async (pageNumber = 1, append = false) => {
+    async (pageNumber = 1, append = false, signal?: AbortSignal) => {
+      if (signal?.aborted || (append && requestedPagesRef.current.has(pageNumber))) return;
+      if (append) requestedPagesRef.current.add(pageNumber);
+
       if (append) {
         setIsLoadingMore(true);
         setLoadMoreError(null);
       } else {
         setIsLoading(true);
+        setIsLoadingMore(false);
+        setLoadMoreError(null);
         setError(null);
       }
 
       try {
-        const response = await mentorApi.getMentors(filters, pageNumber);
+        const response = await mentorApi.getMentors(filters, pageNumber, 12, { signal });
+
+        if (signal?.aborted) return;
 
         if (append) {
           setMentors((prev) => {
@@ -74,54 +130,59 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
         }
 
         setCurrentPage(pageNumber);
-        setTotalPages(response.totalPages);
         setHasMore(response.hasMore ?? (pageNumber < response.totalPages));
       } catch (err) {
+        if (signal?.aborted) return;
         const message = "Failed to load mentors. Please try again.";
         if (append) {
           setLoadMoreError(message);
+          requestedPagesRef.current.delete(pageNumber);
         } else {
           setError(message);
         }
         console.error("Error fetching mentors:", err);
       } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        if (!signal?.aborted) {
+          setIsLoading(false);
+          setIsLoadingMore(false);
+        }
       }
     },
     [filters]
   );
 
   useEffect(() => {
-    fetchMentors(1, false);
+    const controller = new AbortController();
+    filterRequestControllerRef.current = controller;
+    requestedPagesRef.current.clear();
+    void fetchMentors(1, false, controller.signal);
+
+    return () => {
+      controller.abort();
+      if (filterRequestControllerRef.current === controller) {
+        filterRequestControllerRef.current = null;
+      }
+    };
   }, [fetchMentors]);
 
   const handleLoadMore = useCallback(() => {
     if (!isLoading && !isLoadingMore && hasMore) {
-      fetchMentors(currentPage + 1, true);
+      fetchMentors(currentPage + 1, true, filterRequestControllerRef.current?.signal);
     }
   }, [isLoading, isLoadingMore, hasMore, currentPage, fetchMentors]);
 
-  const { resetInfiniteScroll } = useInfiniteScroll({
-    isLoading: isLoadingMore,
+  useInfiniteScroll({
+    isLoading: isLoadingMore || Boolean(loadMoreError),
     hasMore,
     onLoadMore: handleLoadMore,
     loadMoreRef,
   });
 
-  useEffect(() => {
-    resetInfiniteScroll();
-  }, [filters, resetInfiniteScroll]);
-
-  const handleFiltersChange = (newFilters: MentorFilters) => {
-    updateFilters(newFilters, { replace: true });
-  };
-
   const handleClearFilters = () => {
     clearFilters();
   };
 
-  const toggleBookmark = (mentorId: string) => {
+  const toggleBookmark = useCallback((mentorId: string) => {
     setBookmarkedIds((prev) => {
       const updated = prev.includes(mentorId)
         ? prev.filter((id) => id !== mentorId)
@@ -129,7 +190,9 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
       localStorage.setItem("bookmarkedMentors", JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
+
+  const bookmarkedIdSet = useMemo(() => new Set(bookmarkedIds), [bookmarkedIds]);
 
   const activeFilterCount = Object.values(filters).flat().filter(Boolean).length +
     (filters.minRating ? 1 : 0) +
@@ -377,54 +440,14 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {mentors.map((mentor) => {
-                    const isBookmarked = bookmarkedIds.includes(mentor.id);
-
-                    return (
-                      <MentorCard
-                        key={mentor.id}
-                        id={mentor.id}
-                        name={mentor.name}
-                        title={mentor.headline}
-                        description={mentor.bio}
-                        skills={mentor.skills}
-                        avatar={mentor.avatar}
-                        avatarInitials={mentor.name.split(" ").map((n) => n[0]).join("")}
-                        avatarColor="bg-gradient-to-br from-indigo-500 to-cyan-500"
-                        rating={mentor.rating}
-                        sessions={mentor.sessions}
-                        hourlyRate={mentor.hourlyRate}
-                        availability={mentor.availability}
-                        profileHref={mentor.profileHref || `/mentors/${mentor.id}`}
-                      >
-                        <div className="mt-auto px-6 pb-6 space-y-3">
-                          <div className="flex gap-3">
-                            <button
-                              onClick={() => toggleBookmark(mentor.id)}
-                              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                                isBookmarked
-                                  ? "bg-rose-600 text-white border-rose-600 focus:ring-rose-500"
-                                  : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:ring-slate-500"
-                              }`}
-                              aria-label={isBookmarked ? `Remove ${mentor.name} from bookmarks` : `Bookmark ${mentor.name}`}
-                              aria-pressed={isBookmarked}
-                            >
-                              <svg className="w-5 h-5" fill={isBookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                              </svg>
-                              {isBookmarked ? "Saved" : "Save"}
-                            </button>
-                          </div>
-                          <Link
-                            href={mentor.profileHref || `/mentors/${mentor.id}`}
-                            className="block w-full text-center px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                          >
-                            View profile
-                          </Link>
-                        </div>
-                      </MentorCard>
-                    );
-                  })}
+                  {mentors.map((mentor) => (
+                    <MentorDiscoveryCard
+                      key={mentor.id}
+                      mentor={mentor}
+                      isBookmarked={bookmarkedIdSet.has(mentor.id)}
+                      onToggleBookmark={toggleBookmark}
+                    />
+                  ))}
                 </div>
 
                 {/* Loading state when fetching additional mentors */}
@@ -445,7 +468,7 @@ function MentorsPageContent({ belowFixedNavbar = false }: MentorDiscoveryProps) 
                   <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-center">
                     <p className="text-sm text-red-600 mb-2">{loadMoreError}</p>
                     <button
-                      onClick={() => fetchMentors(currentPage + 1, true)}
+                      onClick={() => fetchMentors(currentPage + 1, true, filterRequestControllerRef.current?.signal)}
                       className="inline-flex items-center px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors"
                     >
                       Retry loading more

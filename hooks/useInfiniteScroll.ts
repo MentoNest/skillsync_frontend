@@ -19,22 +19,27 @@ export function useInfiniteScroll({
 }: UseInfiniteScrollOptions) {
   const internalObserverRef = useRef<IntersectionObserver | null>(null);
   const observerRef = externalObserverRef ?? internalObserverRef;
+  const latestOptionsRef = useRef({ isLoading, hasMore, onLoadMore });
+  latestOptionsRef.current = { isLoading, hasMore, onLoadMore };
+
   const resetInfiniteScroll = useCallback(() => {
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
-    if (loadMoreRef.current && hasMore && !isLoading) {
+    const { hasMore: canLoadMore, isLoading: isCurrentlyLoading } = latestOptionsRef.current;
+    if (loadMoreRef.current && canLoadMore && !isCurrentlyLoading) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasMore && !isLoading) {
-            onLoadMore();
+          const currentOptions = latestOptionsRef.current;
+          if (entries[0]?.isIntersecting && currentOptions.hasMore && !currentOptions.isLoading) {
+            currentOptions.onLoadMore();
           }
         },
         { rootMargin: "100px" }
       );
       observerRef.current.observe(loadMoreRef.current);
     }
-  }, [hasMore, isLoading, onLoadMore, observerRef, loadMoreRef]);
+  }, [observerRef, loadMoreRef]);
 
   useEffect(() => {
     resetInfiniteScroll();
@@ -43,7 +48,7 @@ export function useInfiniteScroll({
         observerRef.current.disconnect();
       }
     };
-  }, [resetInfiniteScroll, observerRef]);
+  }, [resetInfiniteScroll, observerRef, hasMore, isLoading]);
 
   return { resetInfiniteScroll };
 }

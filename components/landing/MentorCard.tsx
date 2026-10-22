@@ -2,6 +2,7 @@
 
 import React, { useState, ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
 import MentorAvailabilityBadge, {
@@ -66,7 +67,6 @@ export default function MentorCard({
   const displayTitle = title || headline;
   const displayBio = bio || description;
   const imageUrl = avatarUrl || avatar;
-  const hasValidImage = Boolean(imageUrl && !imageError);
 
   const initials =
     avatarInitials ||
@@ -107,12 +107,18 @@ export default function MentorCard({
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4 min-w-0 flex-1">
             {/* Profile Image or Monogram */}
-            {hasValidImage ? (
-              <img
+            {imageUrl && !imageError ? (
+              <Image
                 src={imageUrl}
                 alt={`${name}'s profile`}
                 onError={() => setImageError(true)}
                 className="shrink-0 w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-100"
+                width={56}
+                height={56}
+                sizes="56px"
+                unoptimized
+                loading="lazy"
+                decoding="async"
               />
             ) : (
               <div

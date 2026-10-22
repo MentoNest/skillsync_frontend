@@ -115,7 +115,12 @@ describe("Mentors Page Infinite Scroll", () => {
       expect(screen.getByText("Sarah Chen")).toBeInTheDocument();
     });
 
-    expect(mentorApi.getMentors).toHaveBeenCalledWith(expect.any(Object), 1);
+    expect(mentorApi.getMentors).toHaveBeenCalledWith(
+      expect.any(Object),
+      1,
+      12,
+      expect.objectContaining({ signal: expect.any(Object) })
+    );
   });
 
   it("automatically loads additional results when scrolling and prevents duplicates", async () => {
@@ -212,6 +217,49 @@ describe("Mentors Page Infinite Scroll", () => {
     await waitFor(() => {
       expect(screen.queryByLabelText("Loading more mentors")).not.toBeInTheDocument();
       expect(screen.getByText("Marcus Liu")).toBeInTheDocument();
+    });
+  });
+
+  it("requests a pagination page only once while it is in flight", async () => {
+    let resolveBatch2: (value: unknown) => void;
+    const batch2Promise = new Promise((resolve) => {
+      resolveBatch2 = resolve;
+    });
+
+    (mentorApi.getMentors as jest.Mock)
+      .mockResolvedValueOnce({
+        mentors: mockMentorsBatch1,
+        total: 3,
+        page: 1,
+        totalPages: 2,
+        hasMore: true,
+      })
+      .mockImplementationOnce(() => batch2Promise);
+
+    render(<MentorsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Alex Rivera")).toBeInTheDocument();
+    });
+
+    act(() => {
+      const intersection = [{ isIntersecting: true } as IntersectionObserverEntry];
+      observerCallback(intersection);
+      observerCallback(intersection);
+    });
+
+    await waitFor(() => {
+      expect(mentorApi.getMentors).toHaveBeenCalledTimes(2);
+    });
+
+    await act(async () => {
+      resolveBatch2!({
+        mentors: [mockMentorsBatch2WithDuplicate[1]],
+        total: 3,
+        page: 2,
+        totalPages: 2,
+        hasMore: false,
+      });
     });
   });
 });
