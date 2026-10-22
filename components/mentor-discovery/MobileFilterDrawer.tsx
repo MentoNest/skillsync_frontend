@@ -62,14 +62,12 @@ export default function MobileFilterDrawer({
     };
   }, [isOpen]);
 
-  const fetchMentors = useCallback(
-    async (pageNumber = 1, append = false) => {
-      if (append) {
-        setIsLoadingMore(true);
-        setLoadMoreError(null);
-      } else {
-        setIsLoading(true);
-        setError(null);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
       }
       if (e.key === "Tab") {
         const focusableElements = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>(
@@ -148,118 +146,150 @@ export default function MobileFilterDrawer({
       </header>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            {/* Search Input */}
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Expertise</legend>
+              <div className="flex flex-wrap gap-2">
+                {EXPERTISE_OPTIONS.map((expertise) => (
+                  <label
+                    key={expertise}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-700 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.expertise?.includes(expertise) || false}
+                      onChange={(e) => {
+                        const newExpertise = filters.expertise || [];
+                        if (e.target.checked) {
+                          onFiltersChange({ ...filters, expertise: [...newExpertise, expertise] });
+                        } else {
+                          onFiltersChange({
+                            ...filters,
+                            expertise: newExpertise.filter((e) => e !== expertise),
+                          });
+                        }
+                      }}
+                      className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                    />
+                    {expertise}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Experience Level</legend>
+              <div className="flex flex-wrap gap-2">
+                {EXPERIENCE_OPTIONS.map((exp) => (
+                  <label
+                    key={exp}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-700 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.experience?.includes(exp) || false}
+                      onChange={(e) => {
+                        const newExp = filters.experience || [];
+                        if (e.target.checked) {
+                          onFiltersChange({ ...filters, experience: [...newExp, exp] });
+                        } else {
+                          onFiltersChange({
+                            ...filters,
+                            experience: newExp.filter((e) => e !== exp),
+                          });
+                        }
+                      }}
+                      className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                    />
+                    {exp.charAt(0).toUpperCase() + exp.slice(1)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Industry</legend>
+              <div className="flex flex-wrap gap-2">
+                {INDUSTRY_OPTIONS.map((industry) => (
+                  <label
+                    key={industry}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-700 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.industry?.includes(industry) || false}
+                      onChange={(e) => {
+                        const newIndustry = filters.industry || [];
+                        if (e.target.checked) {
+                          onFiltersChange({ ...filters, industry: [...newIndustry, industry] });
+                        } else {
+                          onFiltersChange({
+                            ...filters,
+                            industry: newIndustry.filter((i) => i !== industry),
+                          });
+                        }
+                      }}
+                      className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                    />
+                    {industry}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
             <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Search</h3>
-              <SearchInput
-                value={filters.search || ""}
-                onChange={(value) => onFiltersChange({ ...filters, search: value || undefined })}
-                placeholder="Search mentors..."
-                debounceMs={300}
+              <label htmlFor="mobile-min-rating" className="block text-sm font-medium text-slate-900 mb-3">Minimum Rating</label>
+              <select
+                id="mobile-min-rating"
+                value={filters.minRating || ""}
+                onChange={(e) => onFiltersChange({ ...filters, minRating: Number(e.target.value) || undefined })}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                aria-label="Minimum rating"
+              >
+                <option value="">Any rating</option>
+                <option value={4.5}>4.5+</option>
+                <option value={4.0}>4.0+</option>
+                <option value={3.5}>3.5+</option>
+                <option value={3.0}>3.0+</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="mobile-max-hourly-rate" className="block text-sm font-medium text-slate-900 mb-3">Maximum Hourly Rate</label>
+              <input
+                id="mobile-max-hourly-rate"
+                type="number"
+                value={filters.maxHourlyRate || ""}
+                onChange={(e) => onFiltersChange({ ...filters, maxHourlyRate: Number(e.target.value) || undefined })}
+                placeholder="e.g., 200"
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                aria-label="Maximum hourly rate"
               />
             </div>
 
-        <MentorDiscoveryLayout
-        sidebarTopClass={belowFixedNavbar ? "top-56" : "top-40"}
-        sidebar={
-            <>
-              <ExpertiseFilter
-                selectedExpertise={filters.expertise || []}
-                onChange={(newExpertise) => {
-                  updateFilters(
-                    {
-                      ...filters,
-                      expertise: newExpertise.length > 0 ? newExpertise : undefined,
-                    },
-                    { replace: true }
-                  );
-                }}
-              />
+            <div>
+              <label htmlFor="mobile-sort-by" className="block text-sm font-medium text-slate-900 mb-3">Sort By</label>
+              <select
+                id="mobile-sort-by"
+                value={filters.sortBy || "relevance"}
+                onChange={(e) => onFiltersChange({ ...filters, sortBy: e.target.value as MentorFilters["sortBy"] })}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                aria-label="Sort by"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Experience Level</h3>
-                <div className="space-y-2">
-                  {["junior", "mid", "senior", "lead", "principal"].map((exp) => (
-                    <label key={exp} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.experience?.includes(exp) || false}
-                        onChange={(e) => {
-                          const newExp = filters.experience || [];
-                          if (e.target.checked) {
-                            updateFilters({ ...filters, experience: [...newExp, exp] }, { replace: true });
-                          } else {
-                            updateFilters({ ...filters, experience: newExp.filter((e) => e !== exp) }, { replace: true });
-                          }
-                        }}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-slate-700 capitalize">{exp}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <IndustryFilter
-                selectedIndustries={filters.industry || []}
-                onChange={(newIndustries) => {
-                  updateFilters(
-                    {
-                      ...filters,
-                      industry: newIndustries.length > 0 ? newIndustries : undefined,
-                    },
-                    { replace: true }
-                  );
-                }}
-              />
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Minimum Rating</h3>
-                <select
-                  value={filters.minRating || ""}
-                  onChange={(e) => updateFilters({ ...filters, minRating: Number(e.target.value) || undefined }, { replace: true })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">Any rating</option>
-                  <option value={4.5}>4.5+</option>
-                  <option value={4.0}>4.0+</option>
-                  <option value={3.5}>3.5+</option>
-                  <option value={3.0}>3.0+</option>
-                </select>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-3">Max Hourly Rate</h3>
-                <input
-                  type="number"
-                  value={filters.maxHourlyRate || ""}
-                  onChange={(e) => updateFilters({ ...filters, maxHourlyRate: Number(e.target.value) || undefined }, { replace: true })}
-                  placeholder="e.g., 200"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </>
-        }
-      >
-          <div>
-            {/* Active expertise filter badges */}
-            {filters.expertise && filters.expertise.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mb-6" aria-label="Active expertise filters">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Expertise:
-                </span>
-                {filters.expertise.map((exp) => (
-                  <button
-                    key={exp}
-                    onClick={() => {
-                      const newExp = filters.expertise?.filter((e) => e !== exp) || [];
-                      updateFilters(
-                        { ...filters, expertise: newExp.length > 0 ? newExp : undefined },
-                        { replace: true }
-                      );
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors group"
-                    aria-label={`Remove ${exp} expertise filter`}
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-900 mb-3">Sort Order</legend>
+              <div className="flex gap-4">
+                {["asc", "desc"].map((order) => (
+                  <label
+                    key={order}
+                    className="inline-flex items-center gap-2 cursor-pointer"
                   >
                     <span>{exp}</span>
                     <svg className="w-3.5 h-3.5 text-indigo-500 group-hover:text-indigo-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -314,22 +344,8 @@ export default function MobileFilterDrawer({
                   <MentorCardSkeleton key={i} />
                 ))}
               </div>
-            ) : mentors.length === 0 ? (
-              <div className="text-center py-16">
-                <svg className="mx-auto h-16 w-16 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <h2 className="mt-4 text-xl font-semibold text-slate-900">No mentors found</h2>
-                <p className="mt-2 text-slate-600">Try adjusting your filters to find more mentors.</p>
-                <button onClick={handleClearFilters} className="mt-6 inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
-                  Clear all filters
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {mentors.map((mentor) => {
-                    const isBookmarked = bookmarkedIds.includes(mentor.id);
+            </fieldset>
+          </div>
 
                     return (
                       <MentorCard
