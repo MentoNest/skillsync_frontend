@@ -1,39 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import ResourceSearchList, {
-	ResourceListItem,
-} from "@/components/resources/ResourceSearchList";
-
-const RESOURCE_TRACKS: ResourceListItem[] = [
-	{
-		title: "Career Growth Foundations",
-		summary: "Build momentum with the habits, systems, and conversations that compound across your first few roles.",
-		type: "Track",
-		readMinutes: 18,
-		tag: "Beginner",
-	},
-	{
-		title: "Interview Prep Sprint",
-		summary: "Prepare for coding and behavioral interviews with a realistic weekly plan and clear progress markers.",
-		type: "Track",
-		readMinutes: 24,
-		tag: "Intermediate",
-	},
-	{
-		title: "Leadership for ICs",
-		summary: "Learn the subtle shifts in communication, planning, and stakeholder work that come with senior roles.",
-		type: "Track",
-		readMinutes: 30,
-		tag: "Advanced",
-	},
-	{
-		title: "Mentor-Led Product Thinking",
-		summary: "Translate abstract product work into sharper decisions, more confidence, and better examples in interviews.",
-		type: "Track",
-		readMinutes: 16,
-		tag: "All Levels",
-	},
-];
+import ResourceSearchList from "@/components/resources/ResourceSearchList";
+import { RESOURCE_TRACKS } from "@/lib/resources-data";
 
 export const metadata: Metadata = {
 	title: "Learning Tracks · Learning Resources · SkillSync",

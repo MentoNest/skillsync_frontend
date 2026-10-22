@@ -5,20 +5,26 @@ export interface Mentor {
   headline: string;
   bio: string;
   skills: string[];
+  /** Broad expertise categories this mentor covers (e.g. "Frontend", "DevOps") — distinct from `skills`, which lists specific tools/topics. Used by the expertise filter. */
+  expertise?: string[];
   industry: string;
-  experienceLevel: "junior" | "mid" | "senior" | "lead" | "principal";
+  experienceLevel: "junior" | "mid-level" | "senior" | "executive";
   rating: number;
   hourlyRate: number;
   availability: "available" | "busy" | "unavailable";
   sessions: number;
   profileHref?: string;
+  /** Platform-curated spotlight. When true, cards/profile show a Featured badge. */
+  featured?: boolean;
 }
 
 export interface MentorFilters {
+  search?: string;
   expertise?: string[];
   experience?: string[];
   industry?: string[];
   minRating?: number;
+  minHourlyRate?: number;
   maxHourlyRate?: number;
   availability?: string[];
   sortBy?: "rating" | "sessions" | "hourlyRate" | "relevance";
@@ -40,6 +46,15 @@ export interface BookmarkState {
   mentorId: string;
   isBookmarked: boolean;
   timestamp: number;
+}
+
+/**
+ * Single source of truth for mentor profile links (#59).
+ * Every "View profile" CTA resolves through here so the route
+ * `/mentors/[mentorId]` and the id it receives never drift apart.
+ */
+export function mentorProfileHref(mentorId: string): string {
+  return `/mentors/${encodeURIComponent(mentorId)}`;
 }
 
 export interface AnalyticsEvent {

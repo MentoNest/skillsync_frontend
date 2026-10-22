@@ -102,3 +102,19 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/* #1000: belt-and-braces overflow guard for the community layout. Every
+child in the feed/sidebar chain can shrink below its content width, so a
+single long word or wide embed can no longer push the page sideways. */
+#main-content {
+  overflow-x: clip;
+}
+
+#main-content main,
+#main-content aside {
+  max-width: 100%;
+}
+
+#main-content :is(p, h1, h2, h3, li) {
+  overflow-wrap: break-word;
+}

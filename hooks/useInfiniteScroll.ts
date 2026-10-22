@@ -6,8 +6,8 @@ interface UseInfiniteScrollOptions {
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
-  observerRef?: React.RefObject<IntersectionObserver | null> | React.MutableRefObject<IntersectionObserver | null>;
-  loadMoreRef: React.RefObject<HTMLDivElement | null>;
+  observerRef?: React.Refobject<IntersectionObserver | null> | React.MutableRefobject<IntersectionObserver | null>;
+  loadMoreRef: React.RefObject<HTMLDiv | null>;
 }
 
 export function useInfiniteScroll({
@@ -25,6 +25,7 @@ export function useInfiniteScroll({
   const resetInfiniteScroll = useCallback(() => {
     if (observerRef.current) {
       observerRef.current.disconnect();
+      observerRef.current = null;
     }
     const { hasMore: canLoadMore, isLoading: isCurrentlyLoading } = latestOptionsRef.current;
     if (loadMoreRef.current && canLoadMore && !isCurrentlyLoading) {
@@ -46,6 +47,7 @@ export function useInfiniteScroll({
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
+        observerRef.current = null;
       }
     };
   }, [resetInfiniteScroll, observerRef, hasMore, isLoading]);

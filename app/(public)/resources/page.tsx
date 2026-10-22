@@ -3,6 +3,10 @@ import Link from "next/link";
 import ResourceCard, {
   ResourceCardProps,
 } from "@/components/resources/ResourceCard";
+import FeaturedLearningTracks from "@/components/resources/FeaturedLearningTracks";
+import FeaturedArticles from "@/components/resources/FeaturedArticles";
+import ResourceTools from "@/components/resources/ResourceTools";
+import { RESOURCE_ARTICLES, RESOURCE_TRACKS } from "@/lib/resources-data";
 
 /**
  * Per-category resource entries.
@@ -170,6 +174,30 @@ const RESOURCE_CATEGORIES: {
   },
 ];
 
+/** Quick Access tiles: one per major section, linking to its in-page anchor. */
+const QUICK_ACCESS: { href: string; title: string; description: string }[] = [
+  {
+    href: "#featured-tracks",
+    title: "Learning tracks",
+    description: "Structured, step-by-step paths.",
+  },
+  {
+    href: "#featured-articles",
+    title: "Articles",
+    description: "Short reads on one specific thing.",
+  },
+  {
+    href: "#sessions",
+    title: "Recorded sessions",
+    description: "Mentor sessions, edited down.",
+  },
+  {
+    href: "#tools",
+    title: "Tools & templates",
+    description: "Resume builder and career planner.",
+  },
+];
+
 export const metadata: Metadata = {
   title: "Learning Resources · SkillSync",
   description:
@@ -203,23 +231,18 @@ export default function ResourcesPage() {
     // landmarks is invalid HTML.
     <div>
       {/* Hero */}
-      <section className="relative pt-16 pb-16 lg:pt-24 lg:pb-20 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-indigo-100 opacity-50 blur-3xl"
-        />
-
+      <section className="overflow-hidden bg-gradient-to-br from-violet-800 via-purple-700 to-fuchsia-700 py-16 text-white sm:py-20 lg:py-24">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold uppercase tracking-widest mb-5">
+            <span className="mb-5 inline-block rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white">
               Learning resources
             </span>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight">
-              Learn from people who have already done it
+            <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
+              Learning Resources
             </h1>
 
-            <p className="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl">
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
               Guides, articles, and recorded sessions from the mentors on
               SkillSync. Everything here is free and needs no account — if it is
               useful, take it, and book a session when you want the part a page
@@ -229,33 +252,50 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      {/* Category jump list */}
+      {/* Quick Access: 4 columns on desktop, 2 on tablet, 1 on mobile */}
       <nav
-        aria-labelledby="resources-categories-heading"
+        aria-labelledby="resources-quick-access-heading"
         className="border-y border-slate-200 bg-white"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h2
-            id="resources-categories-heading"
+            id="resources-quick-access-heading"
             className="text-sm font-semibold text-slate-900 mb-4"
           >
-            Browse by category
+            Quick access
           </h2>
 
-          <ul className="flex flex-wrap gap-3">
-            {RESOURCE_CATEGORIES.map((category) => (
-              <li key={category.id}>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {QUICK_ACCESS.map((item) => (
+              <li key={item.href} className="flex min-w-0">
                 <a
-                  href={`#${category.id}`}
-                  className="inline-flex items-center px-4 py-2 rounded-full border border-slate-300 text-sm font-medium text-slate-700 transition-colors hover:border-indigo-400 hover:text-indigo-700 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  href={item.href}
+                  className="group flex w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 transition-colors hover:border-indigo-300 hover:bg-indigo-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                 >
-                  {category.title}
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-slate-900 group-hover:text-indigo-700">
+                      {item.title}
+                    </span>
+                    <span className="mt-0.5 block text-sm text-slate-600 break-words">
+                      {item.description}
+                    </span>
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-indigo-600"
+                  >
+                    →
+                  </span>
                 </a>
               </li>
             ))}
           </ul>
         </div>
       </nav>
+
+      <FeaturedLearningTracks tracks={RESOURCE_TRACKS} />
+
+      <FeaturedArticles articles={RESOURCE_ARTICLES} />
 
       {/* Categories */}
       {RESOURCE_CATEGORIES.map((category) => (
@@ -300,6 +340,8 @@ export default function ResourcesPage() {
           </div>
         </section>
       ))}
+
+      <ResourceTools />
 
       {/* Closing CTA */}
       <section className="py-16 lg:py-20 bg-slate-50">

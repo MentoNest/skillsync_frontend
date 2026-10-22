@@ -1,187 +1,161 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useOptionalAuth } from "@/components/auth/AuthProvider";
+import CommunityFeedTabs, {
+  type FeedView,
+} from "@/components/community/CommunityFeedTabs";
 import { CommunityFeed } from "@/components/community/CommunityFeed";
+import CommunityHeroBanner from "@/components/community/CommunityHeroBanner";
+import { CommunityProvider, useCommunity } from "@/components/community/CommunityProvider";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
-import { CommunityHeroBanner } from "@/components/community/CommunityHeroBanner";
-import { useCommunityRealtime } from "@/hooks/useCommunityRealtime";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import type { Discussion, DiscussionSort } from "@/lib/community-types";
+import { CommunityToast } from "@/components/community/CommunityToast";
+import StartDiscussionModal from "@/components/community/StartDiscussionModal";
+import { trackDiscussionCreated } from "@/lib/community-analytics";
+import {
+  isCommunityCategoryId,
+  type Discussion,
+  type DiscussionSort,
+} from "@/lib/community-types";
 
-export default function CommunityPage() {
-  const [discussions, setDiscussions] = useState<Discussion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<DiscussionSort>("latest");
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+function CommunityPageContent() {
+  const auth = useOptionalAuth();
+  const {
+    discussions,
+    events,
+    statistics,
+    filters,
+    isLoading,
+    isLoadingMore,
+    isLoadingOverview,
+    hasMore,
+    error,
+    overviewError,
+    setCategory,
+    setSearchQuery,
+    setSortBy,
+    loadMore,
+    refresh,
+    refreshOverview,
+    registerForEvent,
+    loadMoreRef,
+  } = useCommunity();
 
-  // Real-time updates
-  const { isConnected, lastEvent } = useCommunityRealtime({
-    onNewDiscussion: (discussion) => {
-      const newDisc = discussion as Discussion;
-      if (!newDisc?.id) return;
-      setDiscussions((prev) => {
-        // Prevent duplicates
-        if (prev.some((d) => d.id === newDisc.id)) return prev;
-        return [newDisc, ...prev];
-      });
+  const [activeView, setActiveView] = useState<FeedView>("trending");
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const userId = auth?.user?.id;
+  const myDiscussions = useMemo(
+    () =>
+      userId
+        ? discussions.filter((discussion) => discussion.authorId === userId)
+        : [],
+    [discussions, userId]
+  );
+  const visibleDiscussions =
+    activeView === "my-posts" ? myDiscussions : discussions;
+
+  const handleViewChange = useCallback(
+    (view: FeedView) => {
+      setActiveView(view);
+      const sort: DiscussionSort = view === "trending" ? "trending" : "latest";
+      setSortBy(sort);
     },
-    onNewReply: (discussionId, reply) => {
-      setDiscussions((prev) =>
-        prev.map((d) =>
-          d.id === discussionId
-            ? { ...d, replyCount: d.replyCount + 1, lastReply: reply as Discussion["lastReply"] }
-            : d
-        )
-      );
-    },
-    onLikeUpdate: (discussionId, likeCount) => {
-      setDiscussions((prev) =>
-        prev.map((d) =>
-          d.id === discussionId ? { ...d, likeCount } : d
-        )
-      );
-    },
-  });
-
-  // Fetch discussions
-  const fetchDiscussions = useCallback(
-    async (page = 1, append = false) => {
-      try {
-        if (page === 1) {
-          setIsLoading(true);
-        } else {
-          setIsLoadingMore(true);
-        }
-        setError(null);
-
-        const params = new URLSearchParams({
-          page: String(page),
-          limit: "10",
-          sort: sortBy,
-        });
-        if (selectedCategory) params.set("category", selectedCategory);
-        if (searchQuery) params.set("q", searchQuery);
-
-        const res = await fetch(`/api/community/discussions?${params}`);
-        if (!res.ok) throw new Error("Failed to fetch discussions");
-
-        const data = await res.json();
-
-        if (append) {
-          setDiscussions((prev) => {
-            // Prevent duplicates
-            const existingIds = new Set(prev.map((d) => d.id));
-            const newDiscussions = data.discussions.filter(
-              (d: Discussion) => !existingIds.has(d.id)
-            );
-            return [...prev, ...newDiscussions];
-          });
-        } else {
-          setDiscussions(data.discussions);
-        }
-
-        setHasMore(data.hasMore);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
-      }
-    },
-    [selectedCategory, searchQuery, sortBy]
+    [setSortBy]
   );
 
-  // Initial fetch
-  useEffect(() => {
-    fetchDiscussions();
-  }, [fetchDiscussions]);
-
-  // Infinite scroll
-  const { resetInfiniteScroll } = useInfiniteScroll({
-    isLoading: isLoadingMore,
-    hasMore,
-    onLoadMore: () => fetchDiscussions(Math.floor(discussions.length / 10) + 1, true),
-    observerRef,
-    loadMoreRef,
-  });
-
-  // Reset infinite scroll when filters change
-  useEffect(() => {
-    resetInfiniteScroll();
-  }, [selectedCategory, searchQuery, sortBy, resetInfiniteScroll]);
-
-  const handleCategoryChange = (category: string | null) => {
-    setSelectedCategory(category);
-  };
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleSortChange = (sort: DiscussionSort) => {
-    setSortBy(sort);
-  };
+  const handleDiscussionCreated = useCallback(
+    (created: Discussion) => {
+      setIsComposerOpen(false);
+      setToastMessage("Your discussion was published.");
+      trackDiscussionCreated(created.id, created.category);
+      refresh();
+    },
+    [refresh]
+  );
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">
-            Community
-          </h1>
-          <p className="mt-2 text-[var(--muted)]">
-            Connect, share, and learn with fellow mentees and mentors
-          </p>
-          {isConnected && (
-            <span className="mt-2 inline-flex items-center gap-1 text-sm text-green-600">
-              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              Live updates enabled
-            </span>
-          )}
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-6">
+          <CommunityHeroBanner
+            onStartDiscussion={() => setIsComposerOpen(true)}
+          />
         </div>
 
-        <CommunityHeroBanner />
+        <CommunityFeedTabs
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          myPostsCount={myDiscussions.length}
+          className="mb-6 overflow-hidden rounded-xl border border-slate-200 shadow-sm"
+        />
 
-        <div className="mt-8 flex flex-col gap-8 lg:flex-row">
-          <main className="flex-1 min-w-0">
-            {error && (
-              <div
-                role="alert"
-                className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800"
-              >
-                {error}
-              </div>
-            )}
-
+        <div
+          role="tabpanel"
+          id={`${activeView}-panel`}
+          aria-labelledby={`${activeView}-tab`}
+          className="grid min-w-0 grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-8"
+        >
+          <main className="min-w-0">
             <CommunityFeed
-              discussions={discussions}
+              discussions={visibleDiscussions}
               isLoading={isLoading}
               isLoadingMore={isLoadingMore}
               hasMore={hasMore}
-              selectedCategory={selectedCategory}
-              searchQuery={searchQuery}
-              sortBy={sortBy}
-              onCategoryChange={handleCategoryChange}
-              onSearchChange={handleSearchChange}
-              onSortChange={handleSortChange}
+              selectedCategory={filters.selectedCategory}
+              searchQuery={filters.searchQuery}
+              sortBy={filters.sortBy}
+              onCategoryChange={setCategory}
+              onSearchChange={setSearchQuery}
+              onSortChange={setSortBy}
+              onLoadMore={loadMore}
+              error={error}
+              onRetry={refresh}
+              onStartDiscussion={() => setIsComposerOpen(true)}
               loadMoreRef={loadMoreRef}
             />
           </main>
 
-          <aside className="w-full lg:w-80 flex-shrink-0">
-            <CommunitySidebar
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-            />
-          </aside>
+          <CommunitySidebar
+            selectedCategory={filters.selectedCategory}
+            onCategoryChange={setCategory}
+            events={events}
+            statistics={statistics}
+            isLoadingStatistics={isLoadingOverview}
+            overviewError={overviewError}
+            onRetryOverview={refreshOverview}
+            isRetryingOverview={isLoadingOverview}
+            onRegisterForEvent={registerForEvent}
+          />
         </div>
       </div>
+
+      <StartDiscussionModal
+        isOpen={isComposerOpen}
+        onClose={() => setIsComposerOpen(false)}
+        onCreated={handleDiscussionCreated}
+        defaultCategory={
+          isCommunityCategoryId(filters.selectedCategory)
+            ? filters.selectedCategory
+            : undefined
+        }
+      />
+
+      {toastMessage ? (
+        <CommunityToast
+          message={toastMessage}
+          onDismiss={() => setToastMessage(null)}
+        />
+      ) : null}
     </div>
+  );
+}
+
+export default function CommunityPage() {
+  return (
+    <CommunityProvider>
+      <CommunityPageContent />
+    </CommunityProvider>
   );
 }
