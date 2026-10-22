@@ -39,6 +39,9 @@ CommunityPage
 │   └── Infinite scroll trigger
 ├── CommunitySidebar
 │   ├── Category list with FollowButton per category #1014
+│   ├── CommunityStatisticsWidget                     #990
+│   ├── UpcomingEvents                                #988, #1243
+│   │   └── Title, host, date, time, registration count, Register CTA
 │   └── Community guidelines
 ├── StartDiscussionModal                            #1001, #1004
 │   └── RichTextEditor
@@ -46,6 +49,25 @@ CommunityPage
 └── NotificationDropdown
     └── Notification list
 ```
+
+## Upcoming Events widget (#988, #1243)
+
+`components/community/UpcomingEvents.tsx` renders the sidebar's event list and is
+fully props-driven so it can be reused outside the community sidebar:
+
+| Prop | Purpose |
+|------|---------|
+| `events` | `CommunityEvent[]` in display order |
+| `heading` | Section heading (defaults to "Upcoming Events") |
+| `onRegister` | Optional async registration handler; analytics still fire without it |
+| `emptyMessage` | Copy shown when nothing is scheduled |
+| `isLoading` | Renders skeleton rows while the overview request is in flight |
+| `className` | Extra layout classes |
+
+Each row shows the title, host, date, time, registration count and a Register
+CTA. Registration is optimistic and failures are surfaced inline. Events at or
+over `capacity` render a disabled "Full" CTA, and long titles/hosts wrap instead
+of overflowing the sidebar column.
 
 ## Discussion creation (#998, #999, #1001, #1004)
 
@@ -73,6 +95,28 @@ the same modal:
 
 The API client attaches the signed-in user's id (`x-user-id`) and display name
 to the request, so the composer does not need to wire up auth itself.
+
+## Discussion search (#1247)
+
+The community feed can be searched by **title**, **content**, **author** and
+**category**. Matching is case-insensitive, partial and server-side, so it
+covers every discussion rather than only the currently loaded page.
+
+1. **Input** — `DiscussionFilters` keeps the typed value in local state and
+   debounces updates to shared state by 300 ms. A clear button resets the
+   query immediately.
+2. **State** — `CommunityProvider` includes `searchQuery` in the feed request
+   and refetches page 1 whenever it changes, so results update dynamically.
+3. **Matching** — `lib/community-search.ts` normalizes the query and matches
+   every term against the discussion's title, content, author name, category
+   id, category display name and tags.
+4. **API** — `GET /api/community/discussions?q=react` returns only matching
+   discussions together with the usual pagination metadata. A blank query is
+   ignored and returns the full feed.
+
+Multi-word queries use AND semantics: `react hooks` matches a discussion whose
+title mentions React and whose content mentions hooks, even when the words are
+not adjacent. Search combines with the category filter and sort options.
 
 ## API Endpoints
 
@@ -116,7 +160,7 @@ All social endpoints scope their state to the viewer, resolved from the
 ### Categories & Events
 
 - `GET /api/community/categories` - List categories with discussion counts
-- `GET /api/community/events/upcoming` - List upcoming community events
+- `GET /api/community/events/upcoming` - Upcoming events in the shared `CommunityEvent` shape (also returned by `/api/community/overview`)
 
 ### Notifications
 
@@ -213,6 +257,7 @@ Local component state is used for:
 ```bash
 npm test -- tests/unit/discussion-card.test.tsx
 npm test -- tests/unit/community-event-card.test.tsx
+npm test -- tests/unit/upcoming-events.test.tsx
 npm test -- tests/unit/community-statistics-widget.test.tsx
 ```
 

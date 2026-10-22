@@ -1,11 +1,17 @@
+import type { Metadata } from "next";
 import HeroSection from "@/components/landing/HeroSection";
 import StatsSection from "@/components/landing/StatsSection";
 import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import CTASection from "@/components/landing/CTASection";
 import WhyChooseUsSection from "@/components/landing/WhyChooseUsSection";
 import LearningPathsSection from "@/components/landing/LearningPathsSection";
 import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
+
+export const metadata: Metadata = {
+  title: "SkillSync | Find a Mentor, Build Your Career",
+  description:
+    "Connect with experienced tech mentors for practical, personalized career guidance and build your next step with confidence.",
+};
 
 /**
  * The landing page.

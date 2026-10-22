@@ -35,16 +35,10 @@ export async function GET(request: NextRequest) {
     filtered = filtered.filter((d) => categories.includes(d.category));
   }
 
-  // Filter by search query (title, content, author, category; case-insensitive) (#992)
+  // Filter by search query (title, content, author, category; case-insensitive,
+  // multi-term) (#992, #1247)
   if (search) {
-    const searchLower = search.trim().toLowerCase();
-    filtered = filtered.filter(
-      (d) =>
-        d.title.toLowerCase().includes(searchLower) ||
-        d.content.toLowerCase().includes(searchLower) ||
-        d.authorName.toLowerCase().includes(searchLower) ||
-        d.category.toLowerCase().includes(searchLower)
-    );
+    filtered = filterDiscussionsBySearch(filtered, search);
   }
 
   // Sort (#994, #1249): the shared comparator keeps the feed deterministic.

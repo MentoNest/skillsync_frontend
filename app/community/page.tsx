@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useOptionalAuth } from "@/components/auth/AuthProvider";
 import CommunityFeedTabs, {
   type FeedView,
@@ -46,9 +46,13 @@ function CommunityPageContent() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const userId = auth?.user?.id;
-  const myDiscussions = userId
-    ? discussions.filter((discussion) => discussion.authorId === userId)
-    : [];
+  const myDiscussions = useMemo(
+    () =>
+      userId
+        ? discussions.filter((discussion) => discussion.authorId === userId)
+        : [],
+    [discussions, userId]
+  );
   const visibleDiscussions =
     activeView === "my-posts" ? myDiscussions : discussions;
 
@@ -119,6 +123,7 @@ function CommunityPageContent() {
             events={events}
             statistics={statistics}
             isLoadingStatistics={isLoadingOverview}
+            isLoadingEvents={isLoadingOverview}
             overviewError={overviewError}
             onRetryOverview={refreshOverview}
             isRetryingOverview={isLoadingOverview}
