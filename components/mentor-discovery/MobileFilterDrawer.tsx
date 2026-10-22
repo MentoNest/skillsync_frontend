@@ -34,11 +34,33 @@ export default function MobileFilterDrawer({
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("bookmarkedMentors");
-    if (stored) {
-      setBookmarkedIds(JSON.parse(stored));
-    }
-  }, []);
+    if (!isOpen) return;
+
+    previousActiveElement.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const previousOverflow = document.body.style.overflow;
+    const drawer = drawerRef.current;
+    const backgroundElements = Array.from(document.body.children).filter(
+      (element): element is HTMLElement =>
+        element instanceof HTMLElement && (!drawer || !element.contains(drawer))
+    );
+    const previousInertStates = backgroundElements.map((element) => [element, element.inert] as const);
+
+    document.body.style.overflow = "hidden";
+    backgroundElements.forEach((element) => {
+      element.inert = true;
+    });
+    drawer?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      previousInertStates.forEach(([element, wasInert]) => {
+        element.inert = wasInert;
+      });
+      previousActiveElement.current?.focus();
+    };
+  }, [isOpen]);
 
   const fetchMentors = useCallback(
     async (pageNumber = 1, append = false) => {
@@ -49,30 +71,26 @@ export default function MobileFilterDrawer({
         setIsLoading(true);
         setError(null);
       }
-
-      try {
-        const response = await mentorApi.getMentors(filters, pageNumber);
-
-        if (append) {
-          setMentors((prev) => {
-            // Prevent duplicate mentors
-            const existingIds = new Set(prev.map((m) => m.id));
-            const newMentors = response.mentors.filter((m) => !existingIds.has(m.id));
-            return [...prev, ...newMentors];
-          });
-        } else {
-          setMentors(response.mentors);
+      if (e.key === "Tab") {
+        const focusableElements = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []).filter(
+          (element) => !element.hasAttribute("disabled") && element.tabIndex >= 0
+        );
+        if (focusableElements.length === 0) {
+          e.preventDefault();
+          drawerRef.current?.focus();
+          return;
         }
-
-        setCurrentPage(pageNumber);
-        setTotalPages(response.totalPages);
-        setHasMore(response.hasMore ?? (pageNumber < response.totalPages));
-      } catch (err) {
-        const message = "Failed to load mentors. Please try again.";
-        if (append) {
-          setLoadMoreError(message);
-        } else {
-          setError(message);
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        const focusIsOutsideDrawer = !drawerRef.current?.contains(document.activeElement);
+        if (e.shiftKey && (document.activeElement === firstElement || focusIsOutsideDrawer)) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && (document.activeElement === lastElement || focusIsOutsideDrawer)) {
+          e.preventDefault();
+          firstElement.focus();
         }
         console.error("Error fetching mentors:", err);
       } finally {
@@ -92,28 +110,39 @@ export default function MobileFilterDrawer({
               showHeader={false}
             />
 
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 mb-3">Sort By</h3>
-              <select
-                value={filters.sortBy || "relevance"}
-                onChange={(e) => updateFilters({ ...filters, sortBy: e.target.value as MentorFilters["sortBy"] }, { replace: true })}
-                className="px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                aria-label="Sort by"
-              >
-                <option value="relevance">Relevance</option>
-                <option value="rating">Highest Rated</option>
-                <option value="sessions">Most Sessions</option>
-                <option value="hourlyRate">Price: Low to High</option>
-              </select>
-              {hasActiveFilters && (
-                <button
-                  onClick={handleClearFilters}
-                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-                >
-                  Clear filters
-                </button>
-              )}
-            </div>
+  const drawerContent = (
+    <div
+      id="mentor-filter-drawer"
+      className="fixed inset-0 z-50 lg:hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="filter-drawer-title"
+    >
+      <div
+        className="fixed inset-0 bg-black/50 transition-opacity"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <div
+        ref={drawerRef}
+        tabIndex={-1}
+        className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-xl transform transition-transform duration-300 ease-in-out"
+        aria-label="Filter options"
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200">
+            <h2 id="filter-drawer-title" className="text-lg font-semibold text-slate-900">
+              Filters
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              aria-label="Close filters"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
