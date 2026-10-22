@@ -1,4 +1,4 @@
-import { Mentor } from "./mentor-types";
+import { Mentor } from "@/types/mentor";
 
 /**
  * Canonical mock mentor dataset.

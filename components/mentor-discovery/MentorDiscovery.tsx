@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo, memo, Suspense } from "react";
-import { Mentor, MentorFilters } from "@/lib/mentor-types";
+import { Mentor, MentorFilters } from "@/types/mentor";
 import MentorCard, { MentorCardSkeleton } from "@/components/mentor-discovery/MentorCard";
 import Link from "next/link";
 import { useUrlFilters } from "@/lib/url-filters";

@@ -1,4 +1,4 @@
-import { Mentor, MentorFilters } from "./mentor-types";
+import { Mentor, MentorFilters } from "@/types/mentor";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 

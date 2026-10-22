@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { MentorFilters } from "@/lib/mentor-types";
+import { MentorFilters } from "@/types/mentor";
 import { createPortal } from "react-dom";
 import SearchInput from "./SearchInput";
 import MentorFilterSidebar from "@/components/mentor-discovery/MentorFilterSidebar";

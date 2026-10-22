@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { ComparisonCriteria, Mentor } from "@/lib/mentor-types";
+import type { ComparisonCriteria, Mentor } from "@/types/mentor";
 import { createPortal } from "react-dom";
 
 const COMPARISON_CRITERIA: ComparisonCriteria[] = [

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Mentor, MentorFilters } from "@/lib/mentor-types";
-import { MICK_MENTORS } from "@/lib/mock-mentors";
+import { Mentor, MentorFilters } from "@/types/mentor";
+import { MOCK_MENTORS } from "@/lib/mock-mentors";
 import { normalizeHourlyRateRange, normalizeSearchTerm, mentorMatchesSearch } from "@/lib/mentor-search";
 
 function applyFilters(mentors: Mentor[], filters: MentorFilters): Mentor[] {
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    const filtered = applyFilters(MICK_MENTORS, filters);
+    const filtered = applyFilters(MOCK_MENTORS, filters);
     const total = filtered.length;
     const totalPages = Math.ceil(total / limit);
     const start = (page - 1) * limit;

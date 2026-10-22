@@ -1,11 +1,11 @@
-import { Mentor } from "@/lib/mentor-types";
+import { Mentor } from "@/types/mentor";
 import Link from "next/link";
 import { mentorProfileHref } from "@/lib/mentor-types";
 import BaseMentorCard from "../landing/MentorCard";
 export { default as MentorCardSkeleton } from "../landing/MentorCardSkeleton";
 export type { MentorCardProps } from "../landing/MentorCard";
 
-interface MentorDiscoveryCardProps {
+export interface MentorDiscoveryCardProps {
   mentor: Mentor;
   isBookmarked?: boolean;
   onToggleBookmark?: () => void;
