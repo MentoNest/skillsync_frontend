@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { filterDiscussionsBySearch } from "@/lib/community-search";
 import { parseCategoryParam } from "@/lib/community-types";
 import {
   createDiscussion,
@@ -31,16 +32,10 @@ export async function GET(request: NextRequest) {
     filtered = filtered.filter((d) => categories.includes(d.category));
   }
 
-  // Filter by search query (title, content, author, category; case-insensitive) (#992)
+  // Filter by search query (title, content, author, category; case-insensitive,
+  // multi-term) (#992, #1247)
   if (search) {
-    const searchLower = search.trim().toLowerCase();
-    filtered = filtered.filter(
-      (d) =>
-        d.title.toLowerCase().includes(searchLower) ||
-        d.content.toLowerCase().includes(searchLower) ||
-        d.authorName.toLowerCase().includes(searchLower) ||
-        d.category.toLowerCase().includes(searchLower)
-    );
+    filtered = filterDiscussionsBySearch(filtered, search);
   }
 
   // Sort (#994): latest | most-liked | most-replies | trending

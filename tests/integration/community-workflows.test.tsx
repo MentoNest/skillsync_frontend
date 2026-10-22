@@ -100,4 +100,33 @@ describe("Community Page Integration", () => {
       );
     });
   });
+
+  it("clears the search and restores the unfiltered feed", async () => {
+    render(<CommunityPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Integration Test Discussion")).toBeInTheDocument();
+    });
+
+    const searchInput = screen.getByLabelText("Search discussions");
+    fireEvent.change(searchInput, { target: { value: "test query" } });
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining("q=test"),
+        expect.anything()
+      );
+    });
+
+    fireEvent.click(screen.getByLabelText("Clear search"));
+
+    expect(searchInput).toHaveValue("");
+
+    await waitFor(() => {
+      const requestedUrls = (global.fetch as jest.Mock).mock.calls.map(
+        ([url]) => String(url)
+      );
+      expect(requestedUrls.at(-1)).not.toContain("q=");
+    });
+  });
 });

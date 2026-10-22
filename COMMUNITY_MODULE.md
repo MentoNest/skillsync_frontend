@@ -74,6 +74,28 @@ the same modal:
 The API client attaches the signed-in user's id (`x-user-id`) and display name
 to the request, so the composer does not need to wire up auth itself.
 
+## Discussion search (#1247)
+
+The community feed can be searched by **title**, **content**, **author** and
+**category**. Matching is case-insensitive, partial and server-side, so it
+covers every discussion rather than only the currently loaded page.
+
+1. **Input** — `DiscussionFilters` keeps the typed value in local state and
+   debounces updates to shared state by 300 ms. A clear button resets the
+   query immediately.
+2. **State** — `CommunityProvider` includes `searchQuery` in the feed request
+   and refetches page 1 whenever it changes, so results update dynamically.
+3. **Matching** — `lib/community-search.ts` normalizes the query and matches
+   every term against the discussion's title, content, author name, category
+   id, category display name and tags.
+4. **API** — `GET /api/community/discussions?q=react` returns only matching
+   discussions together with the usual pagination metadata. A blank query is
+   ignored and returns the full feed.
+
+Multi-word queries use AND semantics: `react hooks` matches a discussion whose
+title mentions React and whose content mentions hooks, even when the words are
+not adjacent. Search combines with the category filter and sort options.
+
 ## API Endpoints
 
 ### Discussions
