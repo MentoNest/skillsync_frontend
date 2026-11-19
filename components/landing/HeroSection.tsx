@@ -28,7 +28,7 @@ export default function HeroSection() {
           {/* Left: copy */}
           <div>
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 mb-6" role="status" aria-live="polite">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 mb-6">
               <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" aria-hidden="true" />
               <span className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">
                 Now live — join 18k+ learners
