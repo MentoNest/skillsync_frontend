@@ -1,4 +1,6 @@
-const BENEFITS = [
+import BenefitCard, { BenefitCardProps } from "./BenefitCard";
+
+const BENEFITS: Omit<BenefitCardProps, "className">[] = [
   {
     title: "Vetted Experts Only",
     description: "Every mentor goes through a rigorous screening process. We verify credentials, experience, and teaching ability so you learn from the best.",
@@ -106,18 +108,8 @@ export default function WhyChooseUsSection() {
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8" role="list" aria-label="Platform benefits">
-          {BENEFITS.map((benefit, index) => (
-            <article
-              key={benefit.title}
-              className="group bg-white rounded-2xl border border-slate-200 p-6 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300"
-              role="listitem"
-            >
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors" aria-hidden="true">
-                {benefit.icon}
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">{benefit.title}</h3>
-              <p className="text-slate-600 leading-relaxed">{benefit.description}</p>
-            </article>
+          {BENEFITS.map((benefit) => (
+            <BenefitCard key={benefit.title} {...benefit} />
           ))}
         </div>
       </div>

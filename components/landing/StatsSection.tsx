@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import StatCard, { StatCardProps } from "./StatCard";
 
 /**
@@ -15,10 +14,7 @@ import StatCard, { StatCardProps } from "./StatCard";
  * `lib/` for one duplication is not worth the indirection. If a fifth section
  * needs them, extract then — see the note in the PR.
  */
-interface PlatformStat extends StatCardProps {
-  /** Accent colour applied to the value text */
-  valueClassName?: string;
-}
+type PlatformStat = StatCardProps;
 
 const PLATFORM_STATS: PlatformStat[] = [
   {
@@ -145,7 +141,9 @@ export default function StatsSection() {
               key={stat.label}
               value={stat.value}
               label={stat.label}
+              description={stat.description}
               icon={stat.icon}
+              iconClassName={stat.iconClassName}
             />
           ))}
         </dl>

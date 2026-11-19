@@ -25,6 +25,7 @@ export default function HomePage() {
       <HeroSection />
       <StatsSection />
       <MentorDiscoverySection />
+      <TestimonialsSection />
       <WhyChooseUsSection />
       <LearningPathsSection />
       <FeaturedMentorHighlight />

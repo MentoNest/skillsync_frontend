@@ -92,6 +92,7 @@ const TESTIMONIALS: TestimonialCardProps[] = [
 export default function TestimonialsSection() {
   return (
     <section
+      id="testimonials"
       className="relative py-20 lg:py-28 bg-white"
       aria-labelledby="testimonials-heading"
     >
