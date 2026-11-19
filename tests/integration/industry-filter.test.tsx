@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import MentorsPage from "@/app/(mentee)/mentee/mentors/page";
 import { mentorApi } from "@/lib/api";
-import { Mentor } from "@/lib/mentor-types";
+import { Mentor } from "@/types/mentor";
 
 // Mock next/navigation
 let mockSearchParams = new URLSearchParams();

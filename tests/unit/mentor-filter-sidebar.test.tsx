@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import MentorFilterSidebar from "@/components/mentor-discovery/MentorFilterSidebar";
-import { MentorFilters } from "@/lib/mentor-types";
+import { MentorFilters } from "@/types/mentor";
 
 function setup(filters: MentorFilters = {}, variant: "list" | "pills" = "list") {
   const onFiltersChange = jest.fn();

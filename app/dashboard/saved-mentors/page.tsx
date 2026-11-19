@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Mentor } from "@/lib/mentor-types";
+import { Mentor } from "@/types/mentor";
 import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
 
 const MOCK_SAVED_MENTORS: Mentor[] = [
@@ -28,7 +28,7 @@ const MOCK_SAVED_MENTORS: Mentor[] = [
     bio: "Turned 3 zero-to-one products into market leaders.",
     skills: ["Product Strategy", "0-to-1 Products", "Stakeholder Management", "Analytics"],
     industry: "Finance",
-    experienceLevel: "executive",
+    experienceLevel: "principal",
     rating: 4.8,
     hourlyRate: 300,
     availability: "available",

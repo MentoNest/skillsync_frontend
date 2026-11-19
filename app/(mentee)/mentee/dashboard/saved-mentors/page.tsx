@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Mentor } from "@/lib/mentor-types";
+import { Mentor } from "@/types/mentor";
 import MentorCard, { MentorCardSkeleton } from "@/components/landing/MentorCard";
 
 const MOCK_SAVED_MENTORS: Mentor[] = [

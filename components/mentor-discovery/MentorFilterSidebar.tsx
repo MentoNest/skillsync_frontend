@@ -1,45 +1,32 @@
 "use client";
 
 import React, { useId } from "react";
-import { MentorFilters } from "@/lib/mentor-types";
+import {
+  isMentorExperienceLevel,
+  MENTOR_EXPERIENCE_LABELS,
+  MENTOR_EXPERIENCE_LEVELS,
+  MENTOR_EXPERTISE_OPTIONS,
+  MentorFilters,
+} from "@/types/mentor";
 import { cn } from "@/lib/utils";
 import IndustryFilter, {
   DEFAULT_INDUSTRIES,
 } from "@/components/mentor-discovery/IndustryFilter";
 import ExperienceLevelFilter from "@/components/mentor-discovery/ExperienceLevelFilter";
 
-export const EXPERTISE_OPTIONS = [
-  "Frontend",
-  "Backend",
-  "Full Stack",
-  "Mobile",
-  "DevOps",
-  "Data Science",
-  "Machine Learning",
-  "Product Management",
-  "UX Design",
-  "QA Engineering",
-];
+/** Expertise categories mentors can be filtered by. */
+export const EXPERTISE_OPTIONS = MENTOR_EXPERTISE_OPTIONS;
 
 /**
  * App-wide experience vocabulary.
  *
  * These are the values stored in `MentorFilters.experience`, persisted to the URL
- * by `useUrlFilters`, and mapped back to display text by `EXPERIENCE_LABELS` on
- * the mentor profile page. They are deliberately *not* the Junior / Mid-Level /
+ * by `useUrlFilters`, and mapped back to display text by
+ * `MENTOR_EXPERIENCE_LABELS`. They are deliberately *not* the Junior / Mid-Level /
  * Senior / Executive set in `EXPERIENCE_LEVELS` — changing them would invalidate
  * every bookmarked filter URL and silently stop matching mentors.
  */
-export const EXPERIENCE_OPTIONS = ["junior", "mid", "senior", "lead", "principal"];
-
-/** Display text for `EXPERIENCE_OPTIONS`, matching the mentor profile page. */
-const EXPERIENCE_LABELS: Record<string, string> = {
-  junior: "Junior",
-  mid: "Mid-level",
-  senior: "Senior",
-  lead: "Lead",
-  principal: "Principal",
-};
+export const EXPERIENCE_OPTIONS = MENTOR_EXPERIENCE_LEVELS;
 
 const RATING_OPTIONS = [4.5, 4.0, 3.5, 3.0];
 
@@ -71,7 +58,7 @@ export interface MentorFilterSidebarProps {
 
 interface CheckboxGroupProps {
   title: string;
-  options: string[];
+  options: readonly string[];
   selected: string[];
   onChange: (selected: string[]) => void;
   variant: MentorFilterSidebarVariant;
@@ -233,9 +220,17 @@ export default function MentorFilterSidebar({
 
       <ExperienceLevelFilter
         selectedLevels={filters.experience || []}
-        onChange={(v) => setFilter("experience", v)}
+        onChange={(levels) =>
+          setFilter(
+            "experience",
+            levels.filter(isMentorExperienceLevel)
+          )
+        }
         variant={variant}
-        options={EXPERIENCE_OPTIONS.map((value) => ({ value, label: EXPERIENCE_LABELS[value] ?? value }))}
+        options={EXPERIENCE_OPTIONS.map((value) => ({
+          value,
+          label: MENTOR_EXPERIENCE_LABELS[value],
+        }))}
       />
 
       {variant === "list" ? (
@@ -337,6 +332,4 @@ function toPositiveNumber(raw: string): number | undefined {
 }
 
 export { MentorFilterSidebar };
-export { default, MentorFilterSidebar } from "@/components/mentor-discovery/MentorFilterSidebar";
-export type { MentorFilterSidebarProps } from "@/components/mentor-discovery/MentorFilterSidebar";
-export { IndustryFilter } from "@/components/mentor-discovery/IndustryFilter";    
+export { IndustryFilter } from "@/components/mentor-discovery/IndustryFilter";

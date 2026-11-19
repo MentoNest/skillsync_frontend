@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { mentorApi, ApiError } from "@/lib/api";
+import { MENTOR_EXPERIENCE_LABELS, MentorAvailability } from "@/types/mentor";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
 import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 
@@ -13,21 +14,13 @@ interface MentorProfilePageProps {
   params: Promise<{ mentorId: string }>;
 }
 
-const EXPERIENCE_LABELS: Record<string, string> = {
-  junior: "Junior",
-  mid: "Mid-level",
-  senior: "Senior",
-  lead: "Lead",
-  principal: "Principal",
-};
-
-const AVAILABILITY_LABELS: Record<string, string> = {
+const AVAILABILITY_LABELS: Record<MentorAvailability, string> = {
   available: "Available now",
   busy: "Limited availability",
   unavailable: "Currently unavailable",
 };
 
-const AVAILABILITY_DOT_CLASSES: Record<string, string> = {
+const AVAILABILITY_DOT_CLASSES: Record<MentorAvailability, string> = {
   available: "bg-emerald-500",
   busy: "bg-amber-500",
   unavailable: "bg-slate-400",
@@ -76,10 +69,8 @@ export default async function MentorProfilePage({
     .join("")
     .toUpperCase();
 
-  const experienceLabel =
-    EXPERIENCE_LABELS[mentor.experienceLevel] ?? mentor.experienceLevel;
-  const availabilityLabel =
-    AVAILABILITY_LABELS[mentor.availability] ?? mentor.availability;
+  const experienceLabel = MENTOR_EXPERIENCE_LABELS[mentor.experienceLevel];
+  const availabilityLabel = AVAILABILITY_LABELS[mentor.availability];
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -156,8 +147,7 @@ export default async function MentorProfilePage({
                   <span className="inline-flex items-center gap-1.5">
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        AVAILABILITY_DOT_CLASSES[mentor.availability] ??
-                        "bg-slate-400"
+                        AVAILABILITY_DOT_CLASSES[mentor.availability]
                       }`}
                       aria-hidden="true"
                     />

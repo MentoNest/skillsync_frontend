@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
+import { MentorAvailability } from "@/types/mentor";
 
-export type MentorAvailability = "available" | "busy" | "unavailable";
+export type { MentorAvailability };
 
 interface AvailabilityConfig {
   label: string;

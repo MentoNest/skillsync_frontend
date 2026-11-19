@@ -10,9 +10,9 @@ interface ExperienceLevelFilterProps {
    * but callers must be able to pass their own set: the discovery sidebar uses a
    * different, app-wide vocabulary (`junior`/`mid`/`senior`/`lead`/`principal`)
    * that is also what `MentorFilters.experience`, the URL filter state and the
-   * mentor profile page's `EXPERIENCE_LABELS` all speak. Hardcoding one list here
-   * is what left this component rendered nowhere while the sidebar grew its own
-   * third copy of the control.
+   * mentor profile page's `MENTOR_EXPERIENCE_LABELS` all speak. Hardcoding one
+   * list here is what left this component rendered nowhere while the sidebar grew
+   * its own third copy of the control.
    */
   options?: readonly { value: string; label: string }[];
   /**

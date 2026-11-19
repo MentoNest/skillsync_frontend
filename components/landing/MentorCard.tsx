@@ -3,8 +3,8 @@
 import React, { useState, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Mentor } from "@/types/mentor";
 import { mentorProfileHref } from "@/lib/mentor-types";
 import MentorRating from "@/components/mentor-discovery/MentorRating";
 import MentorSkillTags from "@/components/mentor-discovery/MentorSkillTags";
@@ -12,30 +12,53 @@ import FeaturedMentorBadge from "@/components/mentor/FeaturedMentorBadge";
 export { default as MentorCardSkeleton } from "./MentorCardSkeleton";
 export { MentorRating };
 
-export interface MentorCardProps {
-  id?: string;
+/**
+ * Props for the shared mentor card.
+ *
+ * Every mentor field the card renders is taken straight from the shared
+ * `Mentor` type, so the card and the mentor model can never disagree about
+ * what a rating, an availability state or a list of skills looks like.
+ */
+export interface MentorCardProps
+  extends Partial<
+    Pick<
+      Mentor,
+      | "id"
+      | "headline"
+      | "bio"
+      | "avatar"
+      | "rating"
+      | "sessions"
+      | "hourlyRate"
+      | "skills"
+      | "availability"
+      | "profileHref"
+      | "featured"
+    >
+  > {
+  /** The mentor's display name. */
   name: string;
+  /** Alias for `headline`, used by landing-page copy. */
   title?: string;
-  headline?: string;
-  bio?: string;
+  /** Alias for `bio`, used by landing-page copy. */
   description?: string;
-  avatar?: string;
+  /** Alias for `avatar`. */
   avatarUrl?: string;
+  /** Pre-computed initials, used when there is no avatar image. */
   avatarInitials?: string;
+  /** Tailwind classes for the initials fallback. */
   avatarColor?: string;
-  rating?: number;
-  sessions?: number;
+  /** Number of ratings behind the score. */
   ratingCount?: number;
-  hourlyRate?: number;
+  /** Pre-formatted price, used when no hourly rate is known. */
   price?: number | string;
-  skills?: string[];
-  availability?: "available" | "busy" | "unavailable";
-  profileHref?: string;
-  /** Platform-curated mentor. Shows the optional Featured badge when true. */
-  featured?: boolean;
+  /** Label for the call-to-action link. */
   ctaText?: string;
+  /** Explicit link for the call-to-action. */
   ctaHref?: string;
+  /** Called when the call-to-action is clicked. */
   onCtaClick?: () => void;
+  /** Replaces the default call-to-action when provided. */
   children?: ReactNode;
   className?: string;
 }

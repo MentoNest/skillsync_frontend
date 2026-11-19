@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { MentorFilters } from "./mentor-types";
+import { MentorFilters } from "@/types/mentor";
 import { normalizeSearchTerm } from "./mentor-search";
 
 const FILTER_PARAMS: (keyof MentorFilters)[] = [
