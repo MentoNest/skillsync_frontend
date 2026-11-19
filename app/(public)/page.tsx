@@ -6,6 +6,7 @@ import CTASection from "@/components/landing/CTASection";
 import WhyChooseUsSection from "@/components/landing/WhyChooseUsSection";
 import LearningPathsSection from "@/components/landing/LearningPathsSection";
 import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
+import Footer from "@/components/landing/Footer";
 
 /**
  * The landing page.
@@ -21,15 +22,18 @@ import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighligh
  */
 export default function HomePage() {
   return (
-    <main>
-      <HeroSection />
-      <StatsSection />
-      <MentorDiscoverySection />
-      <TestimonialsSection />
-      <WhyChooseUsSection />
-      <LearningPathsSection />
-      <FeaturedMentorHighlight />
-      <CTASection />
-    </main>
+    <>
+      <main>
+        <HeroSection />
+        <StatsSection />
+        <MentorDiscoverySection />
+        <TestimonialsSection />
+        <WhyChooseUsSection />
+        <LearningPathsSection />
+        <FeaturedMentorHighlight />
+        <CTASection />
+      </main>
+      <Footer />
+    </>
   );
 }
