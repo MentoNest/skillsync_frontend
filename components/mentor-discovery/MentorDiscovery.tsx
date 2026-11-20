@@ -1,18 +1,57 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MentorFilterSidebar from "./MentorFilterSidebar";
 import MentorResultCard from "./MentorResultCard";
 import {
+  EXPERIENCE_OPTIONS,
+  EXPERTISE_OPTIONS,
+  INDUSTRY_OPTIONS,
   MOCK_MENTORS,
   createEmptyFilters,
   filterMentors,
+  type ExperienceLevel,
   type MentorFilters,
 } from "./mentorData";
 
 export default function MentorDiscovery() {
   const [filters, setFilters] = useState<MentorFilters>(createEmptyFilters);
   const [query, setQuery] = useState("");
+  const [urlReady, setUrlReady] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const expertise = params.getAll("expertise").filter((value) =>
+      EXPERTISE_OPTIONS.includes(value)
+    );
+    const industry = params.getAll("industry").filter((value) =>
+      INDUSTRY_OPTIONS.includes(value)
+    );
+    const requested = params.get("experience") as ExperienceLevel | null;
+    const experience =
+      requested && EXPERIENCE_OPTIONS.includes(requested) ? requested : "";
+
+    setFilters({ expertise, industry, experience });
+    setQuery(params.get("q") ?? "");
+    setUrlReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!urlReady) return;
+
+    const params = new URLSearchParams();
+    filters.expertise.forEach((value) => params.append("expertise", value));
+    filters.industry.forEach((value) => params.append("industry", value));
+    if (filters.experience) params.set("experience", filters.experience);
+    if (query.trim()) params.set("q", query.trim());
+
+    const search = params.toString();
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${search ? `?${search}` : ""}`
+    );
+  }, [filters, query, urlReady]);
 
   const results = useMemo(
     () => filterMentors(MOCK_MENTORS, filters, query),
