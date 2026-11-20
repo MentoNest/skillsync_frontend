@@ -5,7 +5,6 @@ export type ResourceItem = {
   description: string;
   href: string;
   readTime?: string;
-  author?: string;
 };
 
 export const FEATURED_TRACKS: ResourceItem[] = [
@@ -40,7 +39,6 @@ export const FEATURED_ARTICLES: ResourceItem[] = [
     description: "Model data with clarity, integrity, and performance in mind.",
     href: "/resources/articles",
     readTime: "6 min read",
-    author: "Priya Nair",
   },
   {
     id: "personal-brand",
@@ -49,7 +47,6 @@ export const FEATURED_ARTICLES: ResourceItem[] = [
     description: "Showcase your work and grow a reputation that opens doors.",
     href: "/resources/articles",
     readTime: "5 min read",
-    author: "Marcus Lee",
   },
   {
     id: "actionable-feedback",
@@ -58,7 +55,6 @@ export const FEATURED_ARTICLES: ResourceItem[] = [
     description: "Help teammates improve with specific, kind, and useful feedback.",
     href: "/resources/articles",
     readTime: "4 min read",
-    author: "Aisha Rahman",
   },
 ];
 
