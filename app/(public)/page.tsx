@@ -1,12 +1,15 @@
 import HeroSection from "@/components/landing/HeroSection";
 import StatsSection from "@/components/landing/StatsSection";
-import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import CTASection from "@/components/landing/CTASection";
-import WhyChooseUsSection from "@/components/landing/WhyChooseUsSection";
-import LearningPathsSection from "@/components/landing/LearningPathsSection";
-import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
-import Footer from "@/components/landing/Footer";
+import dynamic from "next/dynamic";
+
+// Below-the-fold sections are code-split so the hero renders first (#1358).
+const MentorDiscoverySection = dynamic(() => import("@/components/landing/MentorDiscoverySection"));
+const TestimonialsSection = dynamic(() => import("@/components/landing/TestimonialsSection"));
+const CTASection = dynamic(() => import("@/components/landing/CTASection"));
+const WhyChooseUsSection = dynamic(() => import("@/components/landing/WhyChooseUsSection"));
+const LearningPathsSection = dynamic(() => import("@/components/landing/LearningPathsSection"));
+const FeaturedMentorHighlight = dynamic(() => import("@/components/landing/FeaturedMentorHighlight"));
+const Footer = dynamic(() => import("@/components/landing/Footer"));
 
 /**
  * The landing page.
