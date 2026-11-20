@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ResourceCategoryCard, type ResourceCategory } from "./ResourceCards";
 
-/** Purple gradient hero for /resources (#1371). */
 export function ResourcesHero() {
   return (
     <section aria-labelledby="resources-title" className="bg-gradient-to-r from-purple-700 to-indigo-600 px-4 py-16 text-center text-white">
@@ -44,7 +43,7 @@ const CATEGORIES: ResourceCategory[] = [
 /** Quick Access grid: 4/2/1 columns (#1373). */
 export function QuickAccessGrid({ items = CATEGORIES }: { items?: ResourceCategory[] }) {
   return (
-    <section aria-labelledby="quick-access">
+    <section aria-labelledby="quick-access" className="w-full min-w-0">
       <h2 id="quick-access" className="mb-4 text-xl font-semibold">Quick Access</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((category) => <ResourceCategoryCard key={category.href} {...category} />)}
