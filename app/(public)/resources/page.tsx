@@ -1,3 +1,5 @@
+import FeaturedArticles from "../../../components/resources/FeaturedArticles";
+import ToolsAndTemplates from "../../../components/resources/ToolsAndTemplates";
 import { QuickAccessGrid, ResourceSearchBar, ResourcesHero } from "../../../components/resources/ResourcesSections";
 
 export const metadata = { title: "Learning Resources | SkillSync" };
@@ -11,6 +13,8 @@ export default function ResourcesPage() {
         <ResourceSearchBar />
         <QuickAccessGrid />
       </div>
+      <FeaturedArticles />
+      <ToolsAndTemplates />
     </main>
   );
 }
