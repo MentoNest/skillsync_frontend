@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MentorFilterSidebar from "./MentorFilterSidebar";
 import MentorResultCard from "./MentorResultCard";
+import { trackMentorDiscoveryEvent } from "@/lib/analytics/mentorDiscovery";
 import {
   MOCK_MENTORS,
   createEmptyFilters,
@@ -18,6 +19,23 @@ export default function MentorDiscovery() {
     () => filterMentors(MOCK_MENTORS, filters, query),
     [filters, query]
   );
+
+  useEffect(() => {
+    if (query.trim()) {
+      trackMentorDiscoveryEvent("mentor_search", { query: query.trim() });
+    }
+  }, [query]);
+
+  useEffect(() => {
+    const payload = {
+      expertise: filters.expertise,
+      industry: filters.industry,
+      experience: filters.experience,
+    };
+    if (filters.expertise.length || filters.industry.length || filters.experience) {
+      trackMentorDiscoveryEvent("mentor_filter_used", payload);
+    }
+  }, [filters]);
 
   const resetAll = () => {
     setFilters(createEmptyFilters());
