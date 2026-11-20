@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/mentors", label: "Discover Mentors" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/resources", label: "Resources" },
+  { href: "/community", label: "Community" },
 ];
 
 /** Responsive public navigation bar with active state and mobile menu (#1369). */
