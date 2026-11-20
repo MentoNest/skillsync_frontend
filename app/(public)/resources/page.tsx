@@ -1,16 +1,19 @@
-import { QuickAccessGrid, ResourceSearchBar, ResourcesHero } from "../../../components/resources/ResourcesSections";
+import { Suspense } from "react";
+import Footer from "../../../components/landing/Footer";
+import ResourcesView from "../../../components/resources/ResourcesView";
 
 export const metadata = { title: "Learning Resources | SkillSync" };
 
 /** Public Learning Resources route: /resources (#1370). */
 export default function ResourcesPage() {
   return (
-    <main className="pt-16">
-      <ResourcesHero />
-      <div className="mx-auto max-w-7xl space-y-10 px-4 py-10">
-        <ResourceSearchBar />
-        <QuickAccessGrid />
-      </div>
-    </main>
+    <>
+      <main className="min-w-0 overflow-x-hidden pt-16">
+        <Suspense fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
+          <ResourcesView />
+        </Suspense>
+      </main>
+      <Footer />
+    </>
   );
 }
