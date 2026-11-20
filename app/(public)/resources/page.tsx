@@ -29,6 +29,8 @@ export default function ResourcesPage() {
           <PopularTools />
         </Suspense>
       </div>
+      <FeaturedArticles />
+      <ToolsAndTemplates />
     </main>
   );
 }
