@@ -69,6 +69,8 @@ export default function CommunitySidebar({
                 key={category.id}
                 type="button"
                 onClick={() => onSelectCategory(category.id)}
+                aria-pressed={isSelected}
+                aria-label={`Filter discussions by ${category.name}`}
                 className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isSelected
                     ? "bg-purple-100 text-purple-800 font-semibold"

@@ -69,6 +69,7 @@ There are no frontend API calls for creating a discussion, viewing a discussion 
 
 - Feed tab: `trending`, `latest`, or `my-posts`.
 - One selected category ID at a time; selecting another category replaces the current selection.
+- Category changes immediately refetch the feed and clear the current page back to page 1.
 - Search text, debounced by 250 ms when non-empty.
 - 1-based page number, page size 10, result count, and `hasMore`.
 - Loading and request-error state, with a retry key to reload the current query.
