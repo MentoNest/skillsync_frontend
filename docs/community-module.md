@@ -15,7 +15,7 @@ The Community module gives learners a public place to browse and filter mentorsh
 
 The route is public and is nested under the `(public)` route group. The route group changes the layout hierarchy without changing the URL.
 
-The shared [`Header`](/C:/Users/User/Downloads/skillsync_frontend-main/skillsync_frontend-1/components/landing/Header.tsx) component links to `/community`. [`PublicLayout`](/C:/Users/User/Downloads/skillsync_frontend-main/skillsync_frontend-1/app/(public)/layout.tsx) applies the public header and footer to the route.
+The shared [`Header`](../components/landing/Header.tsx) component links to `/community`. [`PublicLayout`](../app/(public)/layout.tsx) applies the public header and footer to the route.
 
 ## Component hierarchy
 
