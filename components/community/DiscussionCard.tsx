@@ -39,7 +39,7 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
           <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-gray-100 bg-gray-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={discussion.author.avatar}
+              src={discussion.author.avatar || "/images/mentors/sarah-chen.svg"}
               alt={discussion.author.name}
               className="h-full w-full object-cover"
               loading="lazy"

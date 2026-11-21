@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import CommunityHero from "./CommunityHero";
 import CommunityFeedTabs, { CommunityFeedTab } from "./CommunityFeedTabs";
 import CommunitySidebar from "./CommunitySidebar";
 import DiscussionCard from "./DiscussionCard";
 import StartDiscussionButton from "./StartDiscussionButton";
-import { SAMPLE_DISCUSSIONS, DiscussionPost } from "./communityData";
+import { getDiscussions } from "../../lib/community/discussionsApi";
+import type { DiscussionPost } from "./communityData";
+
+const PAGE_SIZE = 10;
 
 /**
  * Responsive Community Page Layout component (#1423).
@@ -18,49 +21,67 @@ export default function CommunityLayout() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [discussions, setDiscussions] = useState<DiscussionPost[]>([]);
+  const [totalDiscussions, setTotalDiscussions] = useState(0);
+  const [page, setPage] = useState(1);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Filter & sort discussions
-  const filteredDiscussions = useMemo(() => {
-    let result = [...SAMPLE_DISCUSSIONS];
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      setIsLoading(true);
+      setError(null);
+      getDiscussions(
+        {
+          page,
+          pageSize: PAGE_SIZE,
+          sort: activeTab,
+          category: selectedCategory,
+          search: searchQuery,
+        },
+        controller.signal
+      )
+        .then((result) => {
+          setDiscussions(result.discussions);
+          setTotalDiscussions(result.total);
+          setHasMore(result.hasMore);
+        })
+        .catch((requestError: unknown) => {
+          if (controller.signal.aborted) return;
+          setError(
+            requestError instanceof Error
+              ? requestError.message
+              : "Unable to load discussions. Please try again."
+          );
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setIsLoading(false);
+        });
+    }, searchQuery ? 250 : 0);
 
-    // Filter by Category
-    if (selectedCategory !== "all") {
-      const catMap: Record<string, string> = {
-        career: "Career & Growth",
-        "code-review": "Code Review",
-        "web3-stellar": "Web3 & Stellar",
-        "system-design": "System Design",
-        general: "General Discussion",
-      };
-      const targetName = catMap[selectedCategory];
-      if (targetName) {
-        result = result.filter((d) => d.category === targetName);
-      }
-    }
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [activeTab, page, reloadKey, searchQuery, selectedCategory]);
 
-    // Filter by Search Query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (d) =>
-          d.title.toLowerCase().includes(q) ||
-          d.excerpt.toLowerCase().includes(q) ||
-          d.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    }
+  const updateTab = (tab: CommunityFeedTab) => {
+    setActiveTab(tab);
+    setPage(1);
+  };
 
-    // Sort by Tab
-    if (activeTab === "trending") {
-      result.sort((a, b) => b.likesCount + b.viewsCount - (a.likesCount + a.viewsCount));
-    } else if (activeTab === "latest") {
-      // Keep natural order or sort
-    } else if (activeTab === "my-posts") {
-      // Simulated empty or subset
-      result = [];
-    }
+  const updateCategory = (category: string) => {
+    setSelectedCategory(category);
+    setPage(1);
+  };
 
-    return result;
-  }, [activeTab, selectedCategory, searchQuery]);
+  const updateSearch = (search: string) => {
+    setSearchQuery(search);
+    setPage(1);
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
@@ -75,8 +96,8 @@ export default function CommunityLayout() {
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <CommunityFeedTabs
               activeTab={activeTab}
-              onTabChange={setActiveTab}
-              discussionsCount={filteredDiscussions.length}
+              onTabChange={updateTab}
+              discussionsCount={totalDiscussions}
             />
 
             {/* Search Input Bar */}
@@ -86,7 +107,7 @@ export default function CommunityLayout() {
                   type="text"
                   placeholder="Search discussions by keyword, topic, or #tag..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => updateSearch(e.target.value)}
                   aria-label="Search discussions"
                   className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 shadow-sm focus:border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-600"
                 />
@@ -116,8 +137,29 @@ export default function CommunityLayout() {
             aria-labelledby={`tab-${activeTab}`}
             className="space-y-4"
           >
-            {filteredDiscussions.length > 0 ? (
-              filteredDiscussions.map((discussion: DiscussionPost) => (
+            {isLoading ? (
+              <div
+                role="status"
+                className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-600"
+              >
+                Loading discussions…
+              </div>
+            ) : error ? (
+              <div
+                role="alert"
+                className="rounded-xl border border-red-200 bg-red-50 p-6 text-center"
+              >
+                <p className="text-sm text-red-800">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => setReloadKey((currentKey) => currentKey + 1)}
+                  className="mt-3 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-red-700 shadow-sm hover:bg-red-100"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : discussions.length > 0 ? (
+              discussions.map((discussion: DiscussionPost) => (
                 <DiscussionCard key={discussion.id} discussion={discussion} />
               ))
             ) : (
@@ -143,13 +185,37 @@ export default function CommunityLayout() {
                   {searchQuery
                     ? `No discussions match "${searchQuery}". Try clearing search filters.`
                     : activeTab === "my-posts"
-                    ? "You haven't posted any discussions yet. Start your first conversation!"
+                    ? "You haven't posted any discussions yet."
                     : "No discussions in this category yet. Be the first to share your thoughts!"}
                 </p>
                 <div className="mt-6">
                   <StartDiscussionButton onClick={() => setIsModalOpen(true)} />
                 </div>
               </div>
+            )}
+            {!isLoading && !error && discussions.length > 0 && (
+              <nav
+                aria-label="Discussion pages"
+                className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3"
+              >
+                <button
+                  type="button"
+                  onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+                  disabled={page === 1}
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-gray-600">Page {page}</span>
+                <button
+                  type="button"
+                  onClick={() => setPage((currentPage) => currentPage + 1)}
+                  disabled={!hasMore}
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </nav>
             )}
           </div>
         </div>
@@ -158,7 +224,7 @@ export default function CommunityLayout() {
         <div className="lg:col-span-1">
           <CommunitySidebar
             selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            onSelectCategory={updateCategory}
           />
         </div>
       </div>
