@@ -33,6 +33,11 @@ function getNumber(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function getId(value: unknown): string | undefined {
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  return undefined;
+}
+
 function getDiscussion(value: unknown): DiscussionPost {
   if (!isObject(value)) {
     throw new Error("The discussions response contains an invalid discussion.");
@@ -65,6 +70,14 @@ function getDiscussion(value: unknown): DiscussionPost {
     )
   );
   const createdAt = getString(value.createdAt ?? value.created_at, "Recently");
+  const authorId = getId(
+    authorValue.id ??
+      authorValue._id ??
+      value.authorId ??
+      value.author_id ??
+      value.userId ??
+      value.user_id
+  );
 
   return {
     id: String(id),
@@ -72,6 +85,7 @@ function getDiscussion(value: unknown): DiscussionPost {
     excerpt: content,
     category,
     author: {
+      id: authorId,
       name: authorName,
       avatar: getString(
         authorValue.avatar,
@@ -144,6 +158,37 @@ function getAccessToken(): string | undefined {
     throw new Error("Your saved session is invalid. Please sign in again.");
   }
   return session.token;
+}
+
+export function getCurrentUserId(): string | undefined {
+  const storedSession = window.localStorage.getItem("skillsync.session");
+  if (!storedSession) return undefined;
+
+  let session: unknown;
+  try {
+    session = JSON.parse(storedSession);
+  } catch {
+    return undefined;
+  }
+  if (!isObject(session) || !isObject(session.user)) return undefined;
+
+  return getId(session.user.id ?? session.user._id);
+}
+
+export async function deleteDiscussion(id: string): Promise<void> {
+  const token = getAccessToken();
+  if (!token) throw new Error("Please sign in to delete a discussion.");
+
+  const baseUrl = API_URL.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/community/discussions/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const body: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = isObject(body) ? getString(body.message) : "";
+    throw new Error(message || `Unable to delete discussion (${response.status}).`);
+  }
 }
 
 export async function getDiscussions(

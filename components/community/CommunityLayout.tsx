@@ -1,15 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
 import CommunityHero from "./CommunityHero";
 import CommunityFeedTabs, { CommunityFeedTab } from "./CommunityFeedTabs";
 import CommunitySidebar from "./CommunitySidebar";
 import DiscussionCard from "./DiscussionCard";
 import StartDiscussionButton from "./StartDiscussionButton";
-import { getDiscussions } from "../../lib/community/discussionsApi";
+import {
+  deleteDiscussion,
+  getCurrentUserId,
+  getDiscussions,
+} from "../../lib/community/discussionsApi";
 import type { DiscussionPost } from "./communityData";
 
 const PAGE_SIZE = 10;
+
+function subscribeToSession(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  return () => window.removeEventListener("storage", onStoreChange);
+}
 
 /**
  * Responsive Community Page Layout component (#1423).
@@ -28,6 +37,16 @@ export default function CommunityLayout() {
   const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const currentUserId = useSyncExternalStore(
+    subscribeToSession,
+    getCurrentUserId,
+    () => undefined
+  );
+  const [deletingDiscussionId, setDeletingDiscussionId] = useState<string>();
+  const [deleteFeedback, setDeleteFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -81,6 +100,33 @@ export default function CommunityLayout() {
   const updateSearch = (search: string) => {
     setSearchQuery(search);
     setPage(1);
+  };
+
+  const handleDelete = async (id: string) => {
+    const discussion = discussions.find((item) => item.id === id);
+    if (!discussion || discussion.author.id !== currentUserId) return;
+    if (!window.confirm(`Delete "${discussion.title}"? This action cannot be undone.`)) return;
+
+    setDeletingDiscussionId(id);
+    setDeleteFeedback(null);
+    try {
+      await deleteDiscussion(id);
+      setDiscussions((currentDiscussions) =>
+        currentDiscussions.filter((item) => item.id !== id)
+      );
+      setTotalDiscussions((currentTotal) => Math.max(0, currentTotal - 1));
+      setDeleteFeedback({ type: "success", message: "Discussion deleted successfully." });
+    } catch (deleteError: unknown) {
+      setDeleteFeedback({
+        type: "error",
+        message:
+          deleteError instanceof Error
+            ? deleteError.message
+            : "Unable to delete discussion. Please try again.",
+      });
+    } finally {
+      setDeletingDiscussionId(undefined);
+    }
   };
 
   return (
@@ -137,6 +183,18 @@ export default function CommunityLayout() {
             aria-labelledby={`tab-${activeTab}`}
             className="space-y-4"
           >
+            {deleteFeedback && (
+              <p
+                role={deleteFeedback.type === "error" ? "alert" : "status"}
+                className={`rounded-lg px-4 py-3 text-sm ${
+                  deleteFeedback.type === "error"
+                    ? "border border-red-200 bg-red-50 text-red-800"
+                    : "border border-green-200 bg-green-50 text-green-800"
+                }`}
+              >
+                {deleteFeedback.message}
+              </p>
+            )}
             {isLoading ? (
               <div
                 role="status"
@@ -160,7 +218,16 @@ export default function CommunityLayout() {
               </div>
             ) : discussions.length > 0 ? (
               discussions.map((discussion: DiscussionPost) => (
-                <DiscussionCard key={discussion.id} discussion={discussion} />
+                <DiscussionCard
+                  key={discussion.id}
+                  discussion={discussion}
+                  onDelete={
+                    currentUserId && discussion.author.id === currentUserId
+                      ? handleDelete
+                      : undefined
+                  }
+                  isDeleting={deletingDiscussionId === discussion.id}
+                />
               ))
             ) : (
               <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">

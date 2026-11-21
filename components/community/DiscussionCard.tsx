@@ -6,13 +6,20 @@ import { DiscussionPost } from "./communityData";
 export interface DiscussionCardProps {
   discussion: DiscussionPost;
   onLike?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  isDeleting?: boolean;
 }
 
 /**
  * Reusable discussion post card component with responsive layout,
  * author details, tag badges, and interaction stats.
  */
-export default function DiscussionCard({ discussion, onLike }: DiscussionCardProps) {
+export default function DiscussionCard({
+  discussion,
+  onLike,
+  onDelete,
+  isDeleting = false,
+}: DiscussionCardProps) {
   const [likes, setLikes] = useState(discussion.likesCount);
   const [hasLiked, setHasLiked] = useState(false);
 
@@ -104,6 +111,16 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
         <span>Posted {discussion.createdAt}</span>
 
         <div className="flex items-center gap-4">
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => onDelete(discussion.id)}
+              disabled={isDeleting}
+              className="rounded px-2 py-1 font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-wait disabled:opacity-60"
+            >
+              {isDeleting ? "Deleting…" : "Delete"}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleLike}
