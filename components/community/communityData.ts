@@ -8,6 +8,7 @@ export interface CommunityCategory {
 }
 
 export interface DiscussionAuthor {
+  id?: string;
   name: string;
   avatar: string;
   role: string;
