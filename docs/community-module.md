@@ -1,152 +1,124 @@
 # Community Module
 
-This document describes the current frontend implementation of the SkillSync Community module and identifies integration points for backend, authentication, and moderation features.
-
-## Purpose
-
-The Community module gives learners a public place to browse and filter mentorship discussions by topic. It is currently a frontend prototype: discussion data is rendered in-page and no requests are made to a backend service.
+This guide describes the current Community frontend, its API integration, and functionality that is still a placeholder. It is intended for contributors working on the SkillSync frontend.
 
 ## Routing
 
-| Route | File | Description |
+| Route | File | Purpose |
 | --- | --- | --- |
-| `/` | `app/(public)/page.tsx` | Public landing page; contains links and community promotion. |
-| `/community` | `app/(public)/community/page.tsx` | Community discussion listing and category filter. |
+| `/community` | `app/(public)/community/page.tsx` | Public discussion feed and category browsing. |
 
-The route is public and is nested under the `(public)` route group. The route group changes the layout hierarchy without changing the URL.
-
-The shared [`Header`](../components/landing/Header.tsx) component links to `/community`. [`PublicLayout`](../app/(public)/layout.tsx) applies the public header and footer to the route.
+The `(public)` segment is a Next.js route group and is not part of the URL. The route entry exports page metadata and renders `CommunityLayout`. `PublicNavbar` defines a link to `/community`; check where it is mounted before changing shared navigation.
 
 ## Component hierarchy
 
 ```text
-app/layout.tsx
-└── app/(public)/layout.tsx
-    ├── components/landing/Header.tsx
-    ├── app/(public)/community/page.tsx
-    │   ├── Category filter section
-    │   ├── Clear-filters control
-    │   └── Discussion list
-    └── components/landing/Footer.tsx
+app/(public)/community/page.tsx
+└── components/community/CommunityLayout.tsx
+    ├── CommunityHero
+    │   └── StartDiscussionButton
+    ├── CommunityFeedTabs
+    ├── search input
+    ├── DiscussionCard (one per API result)
+    ├── loading, error/retry, empty, and pagination states
+    ├── CommunitySidebar
+    │   ├── community statistics
+    │   ├── category filter
+    │   └── upcoming events
+    └── start-discussion mock dialog
 ```
 
-The community page is currently a single client component. It owns both the static discussion data and interactive filtering state. There are no dedicated community components or module directories yet.
+`components/community/communityData.ts` defines the `DiscussionPost`, `CommunityCategory`, event, and statistics types and the static category, event, statistics, and sample-discussion data. The feed currently fetches discussions through `lib/community/discussionsApi.ts`; `SAMPLE_DISCUSSIONS` is not used as a fallback by that request.
 
-## Data and API endpoints
+`components/community/DiscussionCard.tsx` renders each discussion and keeps its like count/liked state locally. Other reusable Community components include `AuthorAvatar`, `CommunityStats`, and `TrendingBadge`; check imports before assuming these are part of the current route render tree.
 
-The page defines local constants for:
+## API integration
 
-- `categories`: available discussion categories.
-- `discussions`: discussion records displayed to users.
+The frontend currently implements one Community API operation:
 
-A discussion currently contains:
+### List discussions
 
-- `id`
-- `title`
-- `excerpt`
-- `author`
-- `initials`
-- `age`
-- `replies`
-- `categories`
+`getDiscussions` sends a `GET` request to:
 
-There are currently no API calls, environment-dependent service URLs, or backend models in this module. Therefore, the following Community operations do not have implemented endpoints:
+```text
+${NEXT_PUBLIC_API_URL}/community/discussions
+```
 
-- Listing discussions.
-- Creating a discussion.
-- Viewing discussion details.
-- Posting or editing replies.
-- Reporting content.
-- Moderating content.
+If `NEXT_PUBLIC_API_URL` is unset, the request uses the relative path `/community/discussions`. The query parameters are:
 
-When backend support is added, page data should be moved to a typed data-access module and fetched through server components or a clearly documented API client. Candidate REST resources could include `/api/community/discussions`, `/api/community/categories`, `/api/community/discussions/:id/replies`, and `/api/community/reports`, but these routes must match the backend contract before implementation.
+| Parameter | Meaning |
+| --- | --- |
+| `page` | Current 1-based page. |
+| `limit` | Page size (10 in the Community layout). |
+| `sort` | `trending` or `latest`; the `my-posts` tab is sent as `latest`. |
+| `category` | Selected category ID; omitted for `all`. |
+| `search` | Trimmed search text; omitted when blank. |
+| `mine` | Set to `true` for the `my-posts` tab. |
 
-## State management
+For `my-posts`, the client reads `skillsync.session` from browser local storage and sends its token as a Bearer authorization header when available. The response adapter accepts a discussion array or common `discussions`, `items`, or `results` envelopes, maps API fields to `DiscussionPost`, and derives total/has-more values from pagination metadata. Non-success responses and invalid payloads become errors displayed with a retry action. Requests are aborted when their query changes or the component unmounts.
 
-The page uses React local state:
+The endpoint path and response shapes above describe the current frontend contract; confirm them with the backend before changing either side. Authentication has separate `/auth/login` and `/auth/register` requests in `lib/auth/authApi.ts`, but no other Community write endpoints are implemented.
 
-- `selectedCategories: string[]` stores the categories selected with the filter buttons.
-- `toggleCategory(category)` adds or removes a category.
-- Clearing filters resets the array to `[]`.
-- `filteredDiscussions` derives the visible discussions from the selected categories. An empty selection means that all discussions are shown. If categories are selected, a discussion is shown when at least one of its categories matches.
+### Not implemented
 
-No global store, URL search parameters, cache, or persistence is used. Reloading the page resets the filter. If the module grows, filter state should be moved into a dedicated hook or component and server-supplied discussions should use an explicit loading, empty, error, and pagination state.
+There are no frontend API calls for creating a discussion, viewing a discussion detail, posting/editing replies, reporting content, or moderation actions. The “Start Discussion” dialog is a mock: its publish button only shows a browser alert and closes the dialog. RSVP controls are also presentational and do not submit an event registration.
+
+## State management and feed behavior
+
+`CommunityLayout` owns the feed state with React local state; there is no Community global store or URL-backed state:
+
+- Feed tab: `trending`, `latest`, or `my-posts`.
+- One selected category ID at a time; selecting another category replaces the current selection.
+- Search text, debounced by 250 ms when non-empty.
+- 1-based page number, page size 10, result count, and `hasMore`.
+- Loading and request-error state, with a retry key to reload the current query.
+- Start-discussion dialog visibility.
+
+Changing the tab, category, or search resets pagination to page 1. The category list, category counts, event cards, and community statistics are currently static frontend data; the discussion feed comes from the API.
 
 ## Permissions
 
-Current behavior is public:
+The `/community` route and browsing controls are public and are not wrapped in `ProtectedRoute`. The `my-posts` tab requests `mine=true` and includes a stored access token if available, but this page does not itself enforce or verify a member role. Authentication state is stored in `skillsync.session`; dashboard role checks in `lib/auth/authApi.ts` do not define Community permissions.
 
-- Any visitor can open `/community`.
-- Any visitor can use the category filter.
-- No login is required.
-- There is no create, edit, delete, reply, or report action implemented.
-
-Authentication routes exist at `/login` and `/register`, but the Community page does not inspect authentication or authorization state. Backend integration must define viewer capabilities, such as whether a signed-in user can create discussions or replies, and should enforce permissions on both the UI and server.
+The mock discussion dialog is not a real create-post capability. Before implementing writes, define the allowed roles and enforce authorization on the backend as well as conditionally presenting the relevant UI. Do not treat client-side visibility or a local-storage token as an authorization boundary.
 
 ## Moderation workflow
 
-A moderation workflow is not implemented in the current frontend. The static prototype does not expose actions or moderation queues.
+Community moderation is not implemented in the frontend: there are no report controls, moderator queue, review actions, or moderation API endpoints. A complete workflow will need backend-defined policies and permissions, reporting, an access-controlled review queue, auditable moderation actions, and appropriate author notifications. Document the agreed backend contract and role behavior when those features are added.
 
-A complete integration should cover:
+## Accessibility and UX
 
-1. A signed-in member submits a post or reply.
-2. The backend validates content and applies the configured publishing policy.
-3. Members or administrators can report policy-violating content.
-4. Moderators review reports and the referenced content in an access-controlled queue.
-5. Moderators approve, edit, hide, or remove content and record the action.
-6. The author receives an appropriate status notification.
+- The route includes a skip-to-content link.
+- Feed tabs expose tab roles, selected state, and panel relationships.
+- Search has an accessible label.
+- Loading and error states use status/alert semantics; failed requests can be retried.
+- The feed presents an empty state and pagination controls.
+- Buttons have accessible names or visible labels; keep keyboard focus visible when changing controls.
 
-The backend must be the authority for role checks, report handling, audit history, and moderation rules. The frontend should hide unauthorized actions and still handle server-rejected operations safely.
-
-## Accessibility and UX behavior
-
-- Filter buttons use `aria-pressed` to expose selection state.
-- The filter section has a labeled heading and the category controls have an accessible group label.
-- The discussion count uses `aria-live="polite"` for updates.
-- The page provides a visible clear-filters action when filters are active.
-- An empty local result state is shown when no discussions match.
-- Tailwind classes provide a responsive layout and dark-mode styles.
-
-## Testing instructions
-
-### Prerequisites
-
-- Node.js and npm are installed.
-- Run `npm install` from the repository root if dependencies are not present.
+## Testing
 
 ### Automated checks
+
+The repository currently has no dedicated test-runner script. Run these checks from the repository root before submitting a Community change:
 
 ```powershell
 npm run lint
 npm run build
 ```
 
-Run these checks before submitting a Community module change. The build also verifies Next.js routing and TypeScript compilation.
+### Manual smoke test
 
-### Manual test
-
-1. Start the application:
-
-   ```powershell
-   npm run dev
-   ```
-
-2. Open `http://localhost:3000/community`.
-3. Confirm the header and footer are displayed.
-4. Confirm all five discussions are visible before a category is selected.
-5. Select a category and confirm only discussions containing that category remain.
-6. Select multiple categories and confirm discussions matching either selected category remain (current OR behavior).
-7. Use **Clear filters** and confirm all discussions return.
-8. Narrow the viewport and confirm the category buttons and discussion cards remain usable.
-9. Toggle the system/browser dark mode and confirm text and controls remain readable.
-
-There is no automated test runner configured in `package.json` currently. If Community tests are added, place focused route/component tests beside the implementation or in a conventional `test` or `tests` directory, and document the new npm test script here.
+1. Start the frontend with `npm run dev` and open `http://localhost:3000/community`.
+2. With the backend configured through `NEXT_PUBLIC_API_URL`, confirm the discussion request loads and renders cards.
+3. Check the loading, empty, and error/retry states (for example, with an empty result or unavailable API).
+4. Change between Trending, Latest, and My Posts; confirm each triggers the expected query. Test My Posts both with and without a saved session.
+5. Select categories, search for text, and move between pages. Confirm query changes reset to page 1 and search requests are debounced.
+6. Confirm the Start Discussion dialog and RSVP controls are understood to be mock/presentational only; they do not create data.
+7. Check keyboard navigation, the skip link, and responsive layout at narrow and wide viewport sizes.
 
 ## Contributor notes
 
-- Keep static prototype data separate from reusable Community components as the module grows.
-- Define and export TypeScript types for discussions, replies, categories, and reports.
-- Use Next.js route segments rather than client-only navigation for Community subroutes.
-- Add loading, empty, error, and retry states before replacing static data with API data.
-- Cover category filtering and selected-state updates with tests.
-- Do not add moderation controls without corresponding backend authorization and audit behavior.
+- Keep API transport and response mapping in `lib/community/discussionsApi.ts`; keep shared Community data types in `components/community/communityData.ts` unless a shared type location is introduced.
+- Update this guide and the backend contract together when endpoint paths, query parameters, or payloads change.
+- Add focused tests for API response mapping, query construction, and feed state as test tooling is introduced.
+- Replace mock write actions only when their backend endpoints, permission rules, and error behavior are defined.

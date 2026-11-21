@@ -1,66 +1,42 @@
-import FeaturedMentorHighlight from "@/components/landing/FeaturedMentorHighlight";
-import MentorDiscoverySection from "@/components/landing/MentorDiscoverySection";
-import ExpertiseFilterSection from "@/components/landing/ExpertiseFilterSection";
-import FeaturedArticlesSection from "@/components/landing/FeaturedArticlesSection";
-import FeaturedLearningTracksSection from "@/components/landing/FeaturedLearningTracksSection";
-import CTASection from "@/components/landing/CTASection";
-import LearningPathSection from "@/components/landing/LearningPathSection";
-import Image from "next/image";
+import HeroSection from "@/components/landing/HeroSection";
+import StatsSection from "@/components/landing/StatsSection";
+import dynamic from "next/dynamic";
 
-export default function Home() {
+// Below-the-fold sections are code-split so the hero renders first (#1358).
+const MentorDiscoverySection = dynamic(() => import("@/components/landing/MentorDiscoverySection"));
+const TestimonialsSection = dynamic(() => import("@/components/landing/TestimonialsSection"));
+const CTASection = dynamic(() => import("@/components/landing/CTASection"));
+const WhyChooseUsSection = dynamic(() => import("@/components/landing/WhyChooseUsSection"));
+const LearningPathsSection = dynamic(() => import("@/components/landing/LearningPathsSection"));
+const FeaturedMentorHighlight = dynamic(() => import("@/components/landing/FeaturedMentorHighlight"));
+const Footer = dynamic(() => import("@/components/landing/Footer"));
+
+/**
+ * The landing page.
+ *
+ * Reading order is the argument the page makes: what the product is (hero), who
+ * it is for (mentor discovery), evidence it works (stats), and what people say
+ * (testimonials) before the ask (CTA). Putting the CTA last rather than after
+ * the hero is the main change from the previous version of this file, and it is
+ * the reason the other two sections have anywhere to sit.
+ *
+ * The `Navbar` is `fixed`, so the hero carries `pt-16` to clear it. Every
+ * section after the hero does not need that, and does not have it.
+ */
+export default function HomePage() {
   return (
-    <main>
-      <section className="bg-white dark:bg-gray-900">
-        <div className="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
-          <div className="mr-auto place-self-center lg:col-span-7 text-center lg:text-left">
-            <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
-              Find Your Perfect Mentor
-            </h1>
-            <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
-              Accelerate your career with personalized mentorship from industry
-              experts.
-            </p>
-            <a
-              href="#"
-              className="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
-            >
-              Get started
-              <svg
-                className="w-5 h-5 ml-2 -mr-1"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-            </a>
-          </div>
-          <div className="hidden lg:mt-0 lg:col-span-5 lg:flex">
-            {/* Fixed aspect ratio reserves space and prevents layout shift */}
-            <div className="relative aspect-[362/724] w-full max-w-[280px]">
-              <Image
-                src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/phone-mockup.png"
-                alt="SkillSync product mockup on a phone"
-                fill
-                priority
-                fetchPriority="high"
-                sizes="(min-width: 1024px) 40vw, 100vw"
-                className="h-auto w-auto object-contain"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-      <MentorDiscoverySection />
-      <ExpertiseFilterSection />
-      <FeaturedLearningTracksSection />
-      <FeaturedArticlesSection />
-      <FeaturedMentorHighlight />
-      <CTASection />
-    </main>
+    <>
+      <main>
+        <HeroSection />
+        <StatsSection />
+        <MentorDiscoverySection />
+        <TestimonialsSection />
+        <WhyChooseUsSection />
+        <LearningPathsSection />
+        <FeaturedMentorHighlight />
+        <CTASection />
+      </main>
+      <Footer />
+    </>
   );
 }

@@ -1,27 +1,49 @@
-import React from "react";
+import Link from "next/link";
 
-const CTASection = () => {
+/**
+ * Final call-to-action section.
+ *
+ * Sits at the end of the page, after the reader has seen the product, the
+ * proof, and the people. A `<section>` with `aria-labelledby`, matching every
+ * other landing section, and both actions are real links (not buttons that
+ * only work with a mouse) so they are reachable by keyboard and screen
+ * readers alike.
+ */
+export default function CTASection() {
   return (
-    <section className="bg-white dark:bg-gray-900">
-      <div className="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
-        <div className="mx-auto max-w-screen-sm text-center">
-          <h2 className="mb-4 text-4xl tracking-tight font-extrabold leading-tight text-gray-900 dark:text-white">
-            Start your journey today
-          </h2>
-          <p className="mb-6 font-light text-gray-500 dark:text-gray-400 md:text-lg">
-            Sign up now and connect with mentors who can help you achieve your
-            goals.
-          </p>
-          <a
-            href="#"
-            className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+    <section
+      id="get-started"
+      className="py-20 lg:py-28 bg-gradient-to-br from-indigo-600 via-indigo-600 to-cyan-600"
+      aria-labelledby="cta-heading"
+    >
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2
+          id="cta-heading"
+          className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight"
+        >
+          Ready to accelerate your growth?
+        </h2>
+        <p className="mt-5 text-lg text-indigo-100 leading-relaxed max-w-2xl mx-auto">
+          Join thousands of learners who found the right mentor to help them
+          reach their next career milestone. Getting started takes less than
+          two minutes.
+        </p>
+
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white text-indigo-700 font-semibold text-base hover:bg-indigo-50 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
           >
-            Sign Up Now
-          </a>
+            Get started for free
+          </Link>
+          <Link
+            href="/mentors"
+            className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/40 text-white font-semibold text-base hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
+          >
+            Discover mentors
+          </Link>
         </div>
       </div>
     </section>
   );
-};
-
-export default CTASection;
+}
