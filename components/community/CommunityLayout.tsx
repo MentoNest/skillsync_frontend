@@ -5,7 +5,7 @@ import CommunityHero from "./CommunityHero";
 import CommunityFeedTabs, { CommunityFeedTab } from "./CommunityFeedTabs";
 import CommunitySidebar from "./CommunitySidebar";
 import DiscussionCard from "./DiscussionCard";
-import StartDiscussionButton from "./StartDiscussionButton";
+import CommunityEmptyState from "./CommunityEmptyState";
 import {
   deleteDiscussion,
   getCurrentUserId,
@@ -230,35 +230,11 @@ export default function CommunityLayout() {
                 />
               ))
             ) : (
-              <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-                <h3 className="mt-2 text-base font-semibold text-gray-900">
-                  No discussions found
-                </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  {searchQuery
-                    ? `No discussions match "${searchQuery}". Try clearing search filters.`
-                    : activeTab === "my-posts"
-                    ? "You haven't posted any discussions yet."
-                    : "No discussions in this category yet. Be the first to share your thoughts!"}
-                </p>
-                <div className="mt-6">
-                  <StartDiscussionButton onClick={() => setIsModalOpen(true)} />
-                </div>
-              </div>
+              <CommunityEmptyState
+                searchQuery={searchQuery}
+                activeTab={activeTab}
+                onStartDiscussion={() => setIsModalOpen(true)}
+              />
             )}
             {!isLoading && !error && discussions.length > 0 && (
               <nav
