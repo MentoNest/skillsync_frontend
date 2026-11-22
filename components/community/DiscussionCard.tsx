@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DiscussionPost } from "./communityData";
 
 export interface DiscussionCardProps {
@@ -8,6 +8,12 @@ export interface DiscussionCardProps {
   onLike?: (id: string) => void;
   onDelete?: (id: string) => void;
   isDeleting?: boolean;
+  /** Persisted like state supplied by the Community interaction store (#1458). */
+  isLiked?: boolean;
+  /** Persisted bookmark state supplied by the Community interaction store (#1459). */
+  isBookmarked?: boolean;
+  onToggleLike?: (id: string) => void;
+  onToggleBookmark?: (id: string) => void;
 }
 
 /**
@@ -19,20 +25,44 @@ export default function DiscussionCard({
   onLike,
   onDelete,
   isDeleting = false,
+  isLiked,
+  isBookmarked,
+  onToggleLike,
+  onToggleBookmark,
 }: DiscussionCardProps) {
   const [likes, setLikes] = useState(discussion.likesCount);
-  const [hasLiked, setHasLiked] = useState(false);
+  const [hasLiked, setHasLiked] = useState(
+    Boolean(isLiked ?? discussion.isLiked ?? false)
+  );
+  const [bookmarked, setBookmarked] = useState(
+    Boolean(isBookmarked ?? discussion.isBookmarked ?? false)
+  );
+
+  // Keep the optimistic UI in sync when the persisted store changes (e.g. from
+  // another tab or after a rollback).
+  useEffect(() => {
+    setHasLiked(Boolean(isLiked ?? discussion.isLiked ?? false));
+    setLikes(discussion.likesCount);
+  }, [isLiked, discussion.isLiked, discussion.likesCount]);
+
+  useEffect(() => {
+    setBookmarked(Boolean(isBookmarked ?? discussion.isBookmarked ?? false));
+  }, [isBookmarked, discussion.isBookmarked]);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (hasLiked) {
-      setLikes((prev) => prev - 1);
-      setHasLiked(false);
-    } else {
-      setLikes((prev) => prev + 1);
-      setHasLiked(true);
-      onLike?.(discussion.id);
-    }
+    const nextLiked = !hasLiked;
+    setHasLiked(nextLiked);
+    setLikes((previous) => previous + (nextLiked ? 1 : -1));
+    if (onToggleLike) onToggleLike(discussion.id);
+    else if (nextLiked) onLike?.(discussion.id);
+  };
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextBookmarked = !bookmarked;
+    setBookmarked(nextBookmarked);
+    onToggleBookmark?.(discussion.id);
   };
 
   return (
@@ -125,6 +155,7 @@ export default function DiscussionCard({
             type="button"
             onClick={handleLike}
             aria-label={`${hasLiked ? "Unlike" : "Like"} discussion. Currently ${likes} likes.`}
+            aria-pressed={hasLiked}
             className={`inline-flex items-center gap-1 rounded px-2 py-1 transition-colors ${
               hasLiked
                 ? "text-rose-600 font-semibold"
@@ -147,6 +178,35 @@ export default function DiscussionCard({
               />
             </svg>
             <span>{likes}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleBookmark}
+            aria-label={`${bookmarked ? "Remove bookmark from" : "Save"} discussion`}
+            aria-pressed={bookmarked}
+            className={`inline-flex items-center gap-1 rounded px-2 py-1 transition-colors ${
+              bookmarked
+                ? "text-purple-700 font-semibold"
+                : "text-gray-500 hover:text-purple-700"
+            }`}
+          >
+            <svg
+              className={`h-4 w-4 ${bookmarked ? "fill-current" : ""}`}
+              fill={bookmarked ? "currentColor" : "none"}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 3a2 2 0 00-2 2v16l7-4 7 4V5a2 2 0 00-2-2H5z"
+              />
+            </svg>
+            <span>{bookmarked ? "Saved" : "Save"}</span>
           </button>
 
           <span
