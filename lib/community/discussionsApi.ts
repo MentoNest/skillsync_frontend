@@ -1,4 +1,5 @@
 import type { DiscussionPost } from "../../components/community/communityData";
+import { COMMUNITY_CATEGORIES } from "../../components/community/communityData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
@@ -20,6 +21,38 @@ export interface DiscussionPage {
 
 type JsonObject = Record<string, unknown>;
 
+function normalizeCategory(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+export function matchesCategory(
+  discussionCategory: string,
+  selectedCategoryId: string
+): boolean {
+  if (selectedCategoryId === "all") return true;
+
+  const selectedCategory = COMMUNITY_CATEGORIES.find(
+    (category) =>
+      category.id === selectedCategoryId || category.slug === selectedCategoryId
+  );
+  if (!selectedCategory) return true;
+
+  const target = normalizeCategory(selectedCategory.name);
+  const targetSlug = normalizeCategory(selectedCategory.slug);
+  const discussion = normalizeCategory(discussionCategory);
+
+  return (
+    discussion === target ||
+    discussion === targetSlug ||
+    discussion.includes(target) ||
+    target.includes(discussion)
+  );
+}
+
 function isObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -31,6 +64,11 @@ function getString(value: unknown, fallback = ""): string {
 function getNumber(value: unknown): number {
   const parsed = typeof value === "number" ? value : Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getId(value: unknown): string | undefined {
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  return undefined;
 }
 
 function getDiscussion(value: unknown): DiscussionPost {
@@ -53,7 +91,14 @@ function getDiscussion(value: unknown): DiscussionPost {
     : typeof rawTags === "string"
       ? rawTags.split(",").map((tag) => tag.trim()).filter(Boolean)
       : [];
-  const category = getString(categoryValue.name, getString(value.category, "General Discussion"));
+  const category = getString(
+    categoryValue.name ??
+      categoryValue.title ??
+      categoryValue.label ??
+      categoryValue.slug ??
+      categoryValue.id,
+    getString(value.category, "General Discussion")
+  );
   const authorName = getString(
     authorValue.name,
     getString(
@@ -65,6 +110,14 @@ function getDiscussion(value: unknown): DiscussionPost {
     )
   );
   const createdAt = getString(value.createdAt ?? value.created_at, "Recently");
+  const authorId = getId(
+    authorValue.id ??
+      authorValue._id ??
+      value.authorId ??
+      value.author_id ??
+      value.userId ??
+      value.user_id
+  );
 
   return {
     id: String(id),
@@ -72,6 +125,7 @@ function getDiscussion(value: unknown): DiscussionPost {
     excerpt: content,
     category,
     author: {
+      id: authorId,
       name: authorName,
       avatar: getString(
         authorValue.avatar,
@@ -89,6 +143,10 @@ function getDiscussion(value: unknown): DiscussionPost {
     viewsCount: getNumber(value.viewsCount ?? value.views_count),
     isPinned: Boolean(value.isPinned ?? value.is_pinned),
     tags,
+    isLiked: Boolean(value.isLiked ?? value.likedByMe ?? value.liked_by_me),
+    isBookmarked: Boolean(
+      value.isBookmarked ?? value.bookmarkedByMe ?? value.bookmarked_by_me
+    ),
   };
 }
 
@@ -146,6 +204,37 @@ function getAccessToken(): string | undefined {
   return session.token;
 }
 
+export function getCurrentUserId(): string | undefined {
+  const storedSession = window.localStorage.getItem("skillsync.session");
+  if (!storedSession) return undefined;
+
+  let session: unknown;
+  try {
+    session = JSON.parse(storedSession);
+  } catch {
+    return undefined;
+  }
+  if (!isObject(session) || !isObject(session.user)) return undefined;
+
+  return getId(session.user.id ?? session.user._id);
+}
+
+export async function deleteDiscussion(id: string): Promise<void> {
+  const token = getAccessToken();
+  if (!token) throw new Error("Please sign in to delete a discussion.");
+
+  const baseUrl = API_URL.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/community/discussions/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const body: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = isObject(body) ? getString(body.message) : "";
+    throw new Error(message || `Unable to delete discussion (${response.status}).`);
+  }
+}
+
 export async function getDiscussions(
   query: DiscussionQuery,
   signal?: AbortSignal
@@ -155,7 +244,12 @@ export async function getDiscussions(
     limit: String(query.pageSize),
     sort: query.sort === "my-posts" ? "latest" : query.sort,
   });
-  if (query.category !== "all") params.set("category", query.category);
+  if (query.category !== "all") {
+    const category = COMMUNITY_CATEGORIES.find(
+      (item) => item.id === query.category || item.slug === query.category
+    );
+    params.set("category", category?.slug ?? query.category);
+  }
   if (query.search.trim()) params.set("search", query.search.trim());
 
   const headers = new Headers();
@@ -178,7 +272,13 @@ export async function getDiscussions(
   if (body === null) throw new Error("The discussions response was not valid JSON.");
 
   const { items, metadata } = getPayload(body);
-  const discussions = items.map(getDiscussion);
+  const mappedDiscussions = items.map(getDiscussion);
+  const discussions =
+    query.category === "all"
+      ? mappedDiscussions
+      : mappedDiscussions.filter((discussion) =>
+          matchesCategory(discussion.category, query.category)
+        );
   const totalValue = metadata.total ?? metadata.totalItems ?? metadata.count;
   const total = totalValue === undefined ? discussions.length : getNumber(totalValue);
   const totalPages = getNumber(metadata.totalPages);
@@ -192,4 +292,76 @@ export async function getDiscussions(
           : discussions.length === query.pageSize;
 
   return { discussions, total, hasMore };
+}
+
+/** Shared transport for the Community write endpoints (#1458, #1459, #1461). */
+async function writeRequest(
+  path: string,
+  method: "POST" | "DELETE"
+): Promise<void> {
+  const token = getAccessToken();
+  // Interactions stay usable as local-only state when there is no session.
+  if (!token) return;
+
+  const baseUrl = API_URL.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}${path}`, {
+    method,
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => null);
+    const message = isObject(body) ? getString(body.message) : "";
+    throw new Error(
+      message || `Unable to update community interaction (${response.status}).`
+    );
+  }
+}
+
+/** Persist a like/unlike. Optimistic callers roll back if this rejects. */
+export async function setDiscussionLike(
+  id: string,
+  liked: boolean
+): Promise<void> {
+  const path = `/community/discussions/${encodeURIComponent(id)}/like`;
+  await writeRequest(path, liked ? "POST" : "DELETE");
+}
+
+/** Persist a discussion bookmark. */
+export async function setDiscussionBookmark(
+  id: string,
+  bookmarked: boolean
+): Promise<void> {
+  const path = `/community/discussions/${encodeURIComponent(id)}/bookmark`;
+  await writeRequest(path, bookmarked ? "POST" : "DELETE");
+}
+
+/** Persist a category follow. */
+export async function setCategoryFollow(
+  categoryId: string,
+  followed: boolean
+): Promise<void> {
+  const path = `/community/categories/${encodeURIComponent(categoryId)}/follow`;
+  await writeRequest(path, followed ? "POST" : "DELETE");
+}
+
+/** Load the current user's saved discussions from the API, when available. */
+export async function getSavedDiscussions(): Promise<DiscussionPost[]> {
+  const token = getAccessToken();
+  if (!token) return [];
+
+  const baseUrl = API_URL.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/community/discussions/saved`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const body: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = isObject(body) ? getString(body.message) : "";
+    throw new Error(
+      message || `Unable to load saved discussions (${response.status}).`
+    );
+  }
+  if (body === null) return [];
+
+  const { items } = getPayload(body);
+  return items.map(getDiscussion);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useSyncExternalStore, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DiscussionPost } from "./communityData";
 import {
   isAuthorFollowed,
@@ -12,36 +12,63 @@ import {
 export interface DiscussionCardProps {
   discussion: DiscussionPost;
   onLike?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  isDeleting?: boolean;
+  /** Persisted like state supplied by the Community interaction store (#1458). */
+  isLiked?: boolean;
+  /** Persisted bookmark state supplied by the Community interaction store (#1459). */
+  isBookmarked?: boolean;
+  onToggleLike?: (id: string) => void;
+  onToggleBookmark?: (id: string) => void;
 }
 
 /**
  * Reusable discussion post card component with responsive layout,
  * author details, tag badges, and interaction stats.
  */
-export default function DiscussionCard({ discussion, onLike }: DiscussionCardProps) {
+export default function DiscussionCard({
+  discussion,
+  onLike,
+  onDelete,
+  isDeleting = false,
+  isLiked,
+  isBookmarked,
+  onToggleLike,
+  onToggleBookmark,
+}: DiscussionCardProps) {
   const [likes, setLikes] = useState(discussion.likesCount);
-  const [hasLiked, setHasLiked] = useState(false);
-  const isFollowing = useSyncExternalStore(
-    subscribeToCommunityStorage,
-    () => isAuthorFollowed(discussion.author.name),
-    () => false
+  const [hasLiked, setHasLiked] = useState(
+    Boolean(isLiked ?? discussion.isLiked ?? false)
   );
-  const [reportOpen, setReportOpen] = useState(false);
-  const [reportReason, setReportReason] = useState("Spam");
-  const [reportDetails, setReportDetails] = useState("");
-  const [reportMessage, setReportMessage] = useState("");
-  const [shareMessage, setShareMessage] = useState("");
+  const [bookmarked, setBookmarked] = useState(
+    Boolean(isBookmarked ?? discussion.isBookmarked ?? false)
+  );
+
+  // Keep the optimistic UI in sync when the persisted store changes (e.g. from
+  // another tab or after a rollback).
+  useEffect(() => {
+    setHasLiked(Boolean(isLiked ?? discussion.isLiked ?? false));
+    setLikes(discussion.likesCount);
+  }, [isLiked, discussion.isLiked, discussion.likesCount]);
+
+  useEffect(() => {
+    setBookmarked(Boolean(isBookmarked ?? discussion.isBookmarked ?? false));
+  }, [isBookmarked, discussion.isBookmarked]);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (hasLiked) {
-      setLikes((prev) => prev - 1);
-      setHasLiked(false);
-    } else {
-      setLikes((prev) => prev + 1);
-      setHasLiked(true);
-      onLike?.(discussion.id);
-    }
+    const nextLiked = !hasLiked;
+    setHasLiked(nextLiked);
+    setLikes((previous) => previous + (nextLiked ? 1 : -1));
+    if (onToggleLike) onToggleLike(discussion.id);
+    else if (nextLiked) onLike?.(discussion.id);
+  };
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextBookmarked = !bookmarked;
+    setBookmarked(nextBookmarked);
+    onToggleBookmark?.(discussion.id);
   };
 
   const handleFollow = () => {
@@ -174,16 +201,21 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
         <span>Posted {discussion.createdAt}</span>
 
         <div className="flex items-center gap-4">
-          <button type="button" onClick={handleShare} className="rounded px-2 py-1 hover:text-purple-700">
-            Share
-          </button>
-          <button type="button" onClick={() => setReportOpen(true)} className="rounded px-2 py-1 hover:text-red-700">
-            Report
-          </button>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => onDelete(discussion.id)}
+              disabled={isDeleting}
+              className="rounded px-2 py-1 font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-wait disabled:opacity-60"
+            >
+              {isDeleting ? "Deleting…" : "Delete"}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleLike}
             aria-label={`${hasLiked ? "Unlike" : "Like"} discussion. Currently ${likes} likes.`}
+            aria-pressed={hasLiked}
             className={`inline-flex items-center gap-1 rounded px-2 py-1 transition-colors ${
               hasLiked
                 ? "text-rose-600 font-semibold"
@@ -206,6 +238,35 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
               />
             </svg>
             <span>{likes}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleBookmark}
+            aria-label={`${bookmarked ? "Remove bookmark from" : "Save"} discussion`}
+            aria-pressed={bookmarked}
+            className={`inline-flex items-center gap-1 rounded px-2 py-1 transition-colors ${
+              bookmarked
+                ? "text-purple-700 font-semibold"
+                : "text-gray-500 hover:text-purple-700"
+            }`}
+          >
+            <svg
+              className={`h-4 w-4 ${bookmarked ? "fill-current" : ""}`}
+              fill={bookmarked ? "currentColor" : "none"}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 3a2 2 0 00-2 2v16l7-4 7 4V5a2 2 0 00-2-2H5z"
+              />
+            </svg>
+            <span>{bookmarked ? "Saved" : "Save"}</span>
           </button>
 
           <span

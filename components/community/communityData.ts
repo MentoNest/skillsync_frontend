@@ -8,6 +8,7 @@ export interface CommunityCategory {
 }
 
 export interface DiscussionAuthor {
+  id?: string;
   name: string;
   avatar: string;
   role: string;
@@ -26,6 +27,10 @@ export interface DiscussionPost {
   viewsCount: number;
   isPinned?: boolean;
   tags: string[];
+  /** Whether the signed-in user has liked this discussion (#1458). */
+  isLiked?: boolean;
+  /** Whether the signed-in user has bookmarked this discussion (#1459). */
+  isBookmarked?: boolean;
 }
 
 export interface CommunityEvent {
