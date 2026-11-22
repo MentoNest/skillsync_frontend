@@ -20,7 +20,7 @@ app/(public)/community/page.tsx
     ├── CommunityFeedTabs
     ├── search input
     ├── DiscussionCard (one per API result)
-    ├── loading, error/retry, empty, and pagination states
+    ├── loading, error/retry, empty, and infinite-scroll states
     ├── CommunitySidebar
     │   ├── community statistics
     │   ├── category filter
@@ -72,9 +72,11 @@ There are no frontend API calls for creating a discussion, viewing a discussion 
 - Search text, debounced by 250 ms when non-empty.
 - 1-based page number, page size 10, result count, and `hasMore`.
 - Loading and request-error state, with a retry key to reload the current query.
+- Infinite-scroll loading that appends subsequent API pages and deduplicates discussion IDs. A visible “Load more discussions” button also supports manual loading and browsers without `IntersectionObserver`.
+- Near-real-time updates by re-fetching page 1 every 30 seconds, and when the page becomes visible or the browser comes back online. New/updated first-page discussions are merged to the front without dropping already-loaded older pages. Polling pauses while the page is hidden and reports request failures while retrying on the next refresh.
 - Start-discussion dialog visibility.
 
-Changing the tab, category, or search resets pagination to page 1. The category list, category counts, event cards, and community statistics are currently static frontend data; the discussion feed comes from the API.
+Changing the tab, category, or search resets the feed to page 1. The category list, category counts, event cards, and community statistics are currently static frontend data; the discussion feed comes from the API. The backend currently documents no push/stream endpoint, so live updates use periodic HTTP polling rather than a WebSocket or Server-Sent Events connection.
 
 ## Permissions
 
@@ -92,7 +94,7 @@ Community moderation is not implemented in the frontend: there are no report con
 - Feed tabs expose tab roles, selected state, and panel relationships.
 - Search has an accessible label.
 - Loading and error states use status/alert semantics; failed requests can be retried.
-- The feed presents an empty state and pagination controls.
+- The feed presents an empty state and infinite-scroll/manual load-more controls.
 - Buttons have accessible names or visible labels; keep keyboard focus visible when changing controls.
 
 ## Testing
@@ -112,9 +114,10 @@ npm run build
 2. With the backend configured through `NEXT_PUBLIC_API_URL`, confirm the discussion request loads and renders cards.
 3. Check the loading, empty, and error/retry states (for example, with an empty result or unavailable API).
 4. Change between Trending, Latest, and My Posts; confirm each triggers the expected query. Test My Posts both with and without a saved session.
-5. Select categories, search for text, and move between pages. Confirm query changes reset to page 1 and search requests are debounced.
-6. Confirm the Start Discussion dialog and RSVP controls are understood to be mock/presentational only; they do not create data.
-7. Check keyboard navigation, the skip link, and responsive layout at narrow and wide viewport sizes.
+5. Select categories and search for text. Confirm query changes reset to page 1, search requests are debounced, scrolling appends unique results, and the manual load-more control retries failed page requests.
+6. Confirm the feed refreshes its first page on the 30-second interval and on returning to the visible/online state without dropping older loaded discussions.
+7. Confirm the Start Discussion dialog and RSVP controls are understood to be mock/presentational only; they do not create data.
+8. Check keyboard navigation, the skip link, and responsive layout at narrow and wide viewport sizes.
 
 ## Contributor notes
 
