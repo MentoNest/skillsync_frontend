@@ -1,16 +1,20 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   COMMUNITY_CATEGORIES,
   COMMUNITY_STATS,
   UPCOMING_COMMUNITY_EVENTS,
-  CommunityCategory,
 } from "./communityData";
+import { useBookmarkedDiscussions } from "../../lib/community/useCommunityInteractions";
 
 export interface CommunitySidebarProps {
   selectedCategory: string;
   onSelectCategory: (categoryId: string) => void;
+  /** Categories the user follows (#1461). */
+  followedCategoryIds?: string[];
+  onToggleFollowCategory?: (categoryId: string) => void;
 }
 
 /**
@@ -20,7 +24,11 @@ export interface CommunitySidebarProps {
 export default function CommunitySidebar({
   selectedCategory,
   onSelectCategory,
+  followedCategoryIds = [],
+  onToggleFollowCategory,
 }: CommunitySidebarProps) {
+  const followed = new Set(followedCategoryIds);
+  const savedCount = useBookmarkedDiscussions().length;
   return (
     <aside aria-label="Community Sidebar" className="space-y-6">
       {/* 1. Community Stats Card */}
@@ -62,33 +70,72 @@ export default function CommunitySidebar({
           Topics & Categories
         </h2>
         <nav aria-label="Filter by Topic" className="mt-3 space-y-1">
-          {COMMUNITY_CATEGORIES.map((category: CommunityCategory) => {
+          {COMMUNITY_CATEGORIES.map((category) => {
             const isSelected = selectedCategory === category.id;
+            const isFollowed = followed.has(category.id);
             return (
-              <button
+              <div
                 key={category.id}
-                type="button"
-                onClick={() => onSelectCategory(category.id)}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  isSelected
-                    ? "bg-purple-100 text-purple-800 font-semibold"
-                    : "text-gray-700 hover:bg-gray-100"
+                className={`flex items-center rounded-lg transition-colors ${
+                  isSelected ? "bg-purple-100" : "hover:bg-gray-100"
                 }`}
               >
-                <span>{category.name}</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs ${
-                    isSelected
-                      ? "bg-purple-200 text-purple-900"
-                      : "bg-gray-100 text-gray-500"
+                <button
+                  type="button"
+                  onClick={() => onSelectCategory(category.id)}
+                  aria-pressed={isSelected}
+                  className={`flex flex-1 items-center justify-between px-3 py-2 text-left text-sm font-medium ${
+                    isSelected ? "text-purple-800 font-semibold" : "text-gray-700"
                   }`}
                 >
-                  {category.postCount}
-                </span>
-              </button>
+                  <span className="flex items-center gap-2">
+                    {category.name}
+                    {isFollowed && (
+                      <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+                        Following
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${
+                      isSelected
+                        ? "bg-purple-200 text-purple-900"
+                        : "bg-gray-100 text-gray-500"
+                    }`}
+                  >
+                    {category.postCount}
+                  </span>
+                </button>
+                {category.id !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => onToggleFollowCategory?.(category.id)}
+                    aria-label={`${isFollowed ? "Unfollow" : "Follow"} ${category.name}`}
+                    aria-pressed={isFollowed}
+                    className={`mr-2 rounded-full px-2 py-1 text-xs font-semibold transition-colors ${
+                      isFollowed
+                        ? "bg-emerald-600 text-white"
+                        : "border border-purple-200 text-purple-700 hover:bg-purple-50"
+                    }`}
+                  >
+                    {isFollowed ? "Following" : "Follow"}
+                  </button>
+                )}
+              </div>
             );
           })}
         </nav>
+        <div className="mt-3 border-t border-gray-100 pt-3">
+          <Link
+            href="/community/saved"
+            className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-purple-700 hover:bg-purple-50"
+          >
+            <span>Saved discussions</span>
+            <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs">
+              {savedCount}
+            </span>
+          </Link>
+        </div>
       </div>
 
       {/* 3. Upcoming Community Events */}
