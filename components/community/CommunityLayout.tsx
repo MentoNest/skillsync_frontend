@@ -174,6 +174,13 @@ export default function CommunityLayout() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       {/* Hero Banner (#1424) */}
       <CommunityHero onStartDiscussion={() => setIsModalOpen(true)} />
+      {canModerate && (
+        <div className="flex justify-end">
+          <Link href="/community/moderation" className="text-sm font-semibold text-purple-700 hover:text-purple-900">
+            Open moderation dashboard
+          </Link>
+        </div>
+      )}
 
       {/* Main 2-Column Responsive Layout (#1423) */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
