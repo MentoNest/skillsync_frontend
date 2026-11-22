@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useSyncExternalStore, useState } from "react";
 import { DiscussionPost } from "./communityData";
+import {
+  isAuthorFollowed,
+  subscribeToCommunityStorage,
+  toggleFollowAuthor,
+  submitDiscussionReport,
+} from "../../lib/community/communityInteractions";
 
 export interface DiscussionCardProps {
   discussion: DiscussionPost;
@@ -15,6 +21,16 @@ export interface DiscussionCardProps {
 export default function DiscussionCard({ discussion, onLike }: DiscussionCardProps) {
   const [likes, setLikes] = useState(discussion.likesCount);
   const [hasLiked, setHasLiked] = useState(false);
+  const isFollowing = useSyncExternalStore(
+    subscribeToCommunityStorage,
+    () => isAuthorFollowed(discussion.author.name),
+    () => false
+  );
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("Spam");
+  const [reportDetails, setReportDetails] = useState("");
+  const [reportMessage, setReportMessage] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -28,8 +44,54 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
     }
   };
 
+  const handleFollow = () => {
+    try {
+      toggleFollowAuthor(discussion.author.name);
+    } catch (error) {
+      setShareMessage(error instanceof Error ? error.message : "Unable to update follow status.");
+    }
+  };
+
+  const handleShare = async () => {
+    const url = new URL(window.location.href);
+    url.hash = `discussion-${discussion.id}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: discussion.title, text: discussion.excerpt, url: url.toString() });
+        setShareMessage("Discussion shared.");
+        return;
+      }
+      await navigator.clipboard.writeText(url.toString());
+      setShareMessage("Discussion link copied.");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      setShareMessage(error instanceof Error ? error.message : "Unable to share this discussion.");
+    }
+  };
+
+  const handleReport = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      submitDiscussionReport({
+        discussionId: discussion.id,
+        discussionTitle: discussion.title,
+        discussionExcerpt: discussion.excerpt,
+        authorName: discussion.author.name,
+        reason: reportReason,
+        details: reportDetails.trim(),
+      });
+      setReportMessage("Report submitted for moderator review.");
+      setReportOpen(false);
+      setReportDetails("");
+    } catch (error) {
+      setReportMessage(error instanceof Error ? error.message : "Unable to submit the report.");
+    }
+  };
+
   return (
     <article
+      id={`discussion-${discussion.id}`}
       aria-labelledby={`disc-title-${discussion.id}`}
       className="group relative rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-purple-300 hover:shadow-md"
     >
@@ -58,6 +120,14 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
             </div>
             <p className="text-xs text-gray-500">{discussion.author.role}</p>
           </div>
+          <button
+            type="button"
+            onClick={handleFollow}
+            aria-pressed={isFollowing}
+            className="rounded-full border border-purple-200 px-3 py-1 text-xs font-semibold text-purple-700 hover:bg-purple-50"
+          >
+            {isFollowing ? "Following" : "Follow"}
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -104,6 +174,12 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
         <span>Posted {discussion.createdAt}</span>
 
         <div className="flex items-center gap-4">
+          <button type="button" onClick={handleShare} className="rounded px-2 py-1 hover:text-purple-700">
+            Share
+          </button>
+          <button type="button" onClick={() => setReportOpen(true)} className="rounded px-2 py-1 hover:text-red-700">
+            Report
+          </button>
           <button
             type="button"
             onClick={handleLike}
@@ -183,6 +259,32 @@ export default function DiscussionCard({ discussion, onLike }: DiscussionCardPro
           </span>
         </div>
       </div>
+      {(shareMessage || reportMessage) && (
+        <p role="status" className="mt-2 text-xs text-gray-600">{reportMessage || shareMessage}</p>
+      )}
+      {reportOpen && (
+        <div role="dialog" aria-modal="true" aria-labelledby={`report-title-${discussion.id}`} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <form onSubmit={handleReport} className="w-full max-w-md space-y-4 rounded-xl bg-white p-6 shadow-xl">
+            <h3 id={`report-title-${discussion.id}`} className="text-lg font-bold text-gray-900">Report discussion</h3>
+            <label className="block text-sm font-medium text-gray-700">
+              Reason
+              <select value={reportReason} onChange={(event) => setReportReason(event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 p-2">
+                {["Spam", "Harassment", "Offensive content", "Misinformation", "Other"].map((reason) => (
+                  <option key={reason}>{reason}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm font-medium text-gray-700">
+              Details (optional)
+              <textarea value={reportDetails} onChange={(event) => setReportDetails(event.target.value)} rows={3} className="mt-1 w-full rounded-lg border border-gray-300 p-2" />
+            </label>
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setReportOpen(false)} className="rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cancel</button>
+              <button type="submit" className="rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white hover:bg-red-800">Submit report</button>
+            </div>
+          </form>
+        </div>
+      )}
     </article>
   );
 }

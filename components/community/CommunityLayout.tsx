@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import CommunityHero from "./CommunityHero";
 import CommunityFeedTabs, { CommunityFeedTab } from "./CommunityFeedTabs";
 import CommunitySidebar from "./CommunitySidebar";
 import DiscussionCard from "./DiscussionCard";
 import StartDiscussionButton from "./StartDiscussionButton";
 import { getDiscussions } from "../../lib/community/discussionsApi";
+import { hasAdminSession, subscribeToCommunityStorage } from "../../lib/community/communityInteractions";
 import type { DiscussionPost } from "./communityData";
 
 const PAGE_SIZE = 10;
@@ -28,6 +30,11 @@ export default function CommunityLayout() {
   const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const canModerate = useSyncExternalStore(
+    subscribeToCommunityStorage,
+    hasAdminSession,
+    () => false
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -87,6 +94,13 @@ export default function CommunityLayout() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       {/* Hero Banner (#1424) */}
       <CommunityHero onStartDiscussion={() => setIsModalOpen(true)} />
+      {canModerate && (
+        <div className="flex justify-end">
+          <Link href="/community/moderation" className="text-sm font-semibold text-purple-700 hover:text-purple-900">
+            Open moderation dashboard
+          </Link>
+        </div>
+      )}
 
       {/* Main 2-Column Responsive Layout (#1423) */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
