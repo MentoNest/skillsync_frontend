@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useSyncExternalStore } from "react";
+import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import CommunityHero from "./CommunityHero";
 import CommunityFeedTabs, { CommunityFeedTab } from "./CommunityFeedTabs";
 import CommunitySidebar from "./CommunitySidebar";
@@ -24,10 +24,25 @@ import {
 import type { DiscussionPost } from "./communityData";
 
 const PAGE_SIZE = 10;
+const LIVE_UPDATE_INTERVAL = 30_000;
 
 function subscribeToSession(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
   return () => window.removeEventListener("storage", onStoreChange);
+}
+
+function mergeDiscussions(
+  current: DiscussionPost[],
+  incoming: DiscussionPost[],
+  prependIncoming: boolean
+): DiscussionPost[] {
+  const merged = prependIncoming ? [...incoming, ...current] : [...current, ...incoming];
+  const seen = new Set<string>();
+  return merged.filter((discussion) => {
+    if (seen.has(discussion.id)) return false;
+    seen.add(discussion.id);
+    return true;
+  });
 }
 
 /**
@@ -46,7 +61,12 @@ export default function CommunityLayout() {
   const [reloadKey, setReloadKey] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [liveUpdateError, setLiveUpdateError] = useState<string | null>(null);
+  const loadMoreRef = useRef<HTMLButtonElement>(null);
+  const isLoadingMoreRef = useRef(false);
   const currentUserId = useSyncExternalStore(
     subscribeToSession,
     getCurrentUserId,
@@ -67,8 +87,17 @@ export default function CommunityLayout() {
   useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => {
-      setIsLoading(true);
-      setError(null);
+      const isFirstPage = page === 1;
+      if (isFirstPage) {
+        setIsLoading(true);
+        setIsLoadingMore(false);
+        setError(null);
+        setLoadMoreError(null);
+        isLoadingMoreRef.current = false;
+      } else {
+        setIsLoadingMore(true);
+        setLoadMoreError(null);
+      }
       getDiscussions(
         {
           page,
@@ -80,20 +109,29 @@ export default function CommunityLayout() {
         controller.signal
       )
         .then((result) => {
-          setDiscussions(result.discussions);
+          setDiscussions((currentDiscussions) =>
+            isFirstPage
+              ? result.discussions
+              : mergeDiscussions(currentDiscussions, result.discussions, false)
+          );
           setTotalDiscussions(result.total);
           setHasMore(result.hasMore);
         })
         .catch((requestError: unknown) => {
           if (controller.signal.aborted) return;
-          setError(
-            requestError instanceof Error
-              ? requestError.message
-              : "Unable to load discussions. Please try again."
-          );
+          const message = requestError instanceof Error
+            ? requestError.message
+            : "Unable to load discussions. Please try again.";
+          if (isFirstPage) setError(message);
+          else setLoadMoreError(message);
         })
         .finally(() => {
-          if (!controller.signal.aborted) setIsLoading(false);
+          if (controller.signal.aborted) return;
+          if (isFirstPage) setIsLoading(false);
+          else {
+            setIsLoadingMore(false);
+            isLoadingMoreRef.current = false;
+          }
         });
     }, searchQuery ? 250 : 0);
 
@@ -102,6 +140,86 @@ export default function CommunityLayout() {
       controller.abort();
     };
   }, [activeTab, page, reloadKey, searchQuery, selectedCategory]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let refreshInFlight = false;
+
+    const refreshLatestDiscussions = async () => {
+      if (
+        controller.signal.aborted ||
+        document.visibilityState === "hidden" ||
+        refreshInFlight
+      ) {
+        return;
+      }
+      refreshInFlight = true;
+      try {
+        const result = await getDiscussions(
+          {
+            page: 1,
+            pageSize: PAGE_SIZE,
+            sort: activeTab,
+            category: selectedCategory,
+            search: searchQuery,
+          },
+          controller.signal
+        );
+        if (controller.signal.aborted) return;
+        setDiscussions((currentDiscussions) =>
+          mergeDiscussions(currentDiscussions, result.discussions, true)
+        );
+        setTotalDiscussions(result.total);
+        setHasMore(result.hasMore);
+        setLiveUpdateError(null);
+      } catch (requestError: unknown) {
+        if (controller.signal.aborted) return;
+        setLiveUpdateError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Unable to refresh community updates."
+        );
+      } finally {
+        refreshInFlight = false;
+      }
+    };
+
+    const intervalId = window.setInterval(refreshLatestDiscussions, LIVE_UPDATE_INTERVAL);
+    document.addEventListener("visibilitychange", refreshLatestDiscussions);
+    window.addEventListener("online", refreshLatestDiscussions);
+
+    return () => {
+      controller.abort();
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", refreshLatestDiscussions);
+      window.removeEventListener("online", refreshLatestDiscussions);
+    };
+  }, [activeTab, searchQuery, selectedCategory]);
+
+  useEffect(() => {
+    const button = loadMoreRef.current;
+    if (
+      !button ||
+      !hasMore ||
+      isLoading ||
+      isLoadingMore ||
+      loadMoreError ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || isLoadingMoreRef.current) return;
+        isLoadingMoreRef.current = true;
+        setPage((currentPage) => currentPage + 1);
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(button);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, isLoadingMore, loadMoreError, discussions.length]);
 
   const updateTab = (tab: CommunityFeedTab) => {
     setActiveTab(tab);
@@ -222,6 +340,17 @@ export default function CommunityLayout() {
                 </svg>
               </div>
             </div>
+            <p
+              role="status"
+              aria-live="polite"
+              className={`px-4 py-2 text-xs ${
+                liveUpdateError ? "bg-amber-50 text-amber-800" : "bg-white text-gray-500"
+              }`}
+            >
+              {liveUpdateError
+                ? `Live updates paused: ${liveUpdateError}. Retrying automatically.`
+                : "Live updates are on. New activity is checked every 30 seconds."}
+            </p>
           </div>
 
           {/* Discussion Posts List */}
@@ -293,29 +422,35 @@ export default function CommunityLayout() {
                 onStartDiscussion={() => setIsModalOpen(true)}
               />
             )}
-            {!isLoading && !error && discussions.length > 0 && (
-              <nav
-                aria-label="Discussion pages"
-                className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3"
-              >
+            {!isLoading && !error && discussions.length > 0 && hasMore && (
+              <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center">
+                {loadMoreError && (
+                  <p role="alert" className="mb-3 text-sm text-red-700">
+                    {loadMoreError}
+                  </p>
+                )}
                 <button
+                  ref={loadMoreRef}
                   type="button"
-                  onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
-                  disabled={page === 1}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={() => {
+                    if (isLoadingMoreRef.current || isLoadingMore) return;
+                    if (loadMoreError) {
+                      setReloadKey((currentKey) => currentKey + 1);
+                      return;
+                    }
+                    isLoadingMoreRef.current = true;
+                    setPage((currentPage) => currentPage + 1);
+                  }}
+                  disabled={isLoadingMore}
+                  className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-wait disabled:opacity-60"
                 >
-                  Previous
+                  {isLoadingMore
+                    ? "Loading more discussions…"
+                    : loadMoreError
+                      ? "Try loading more"
+                      : "Load more discussions"}
                 </button>
-                <span className="text-sm text-gray-600">Page {page}</span>
-                <button
-                  type="button"
-                  onClick={() => setPage((currentPage) => currentPage + 1)}
-                  disabled={!hasMore}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </nav>
+              </div>
             )}
           </div>
         </div>
