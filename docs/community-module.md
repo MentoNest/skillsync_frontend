@@ -7,6 +7,7 @@ This guide describes the current Community frontend, its API integration, and fu
 | Route | File | Purpose |
 | --- | --- | --- |
 | `/community` | `app/(public)/community/page.tsx` | Public discussion feed and category browsing. |
+| `/community/saved` | `app/(public)/community/saved/page.tsx` | Bookmarked discussions, with remove action and empty state (#1460). |
 
 The `(public)` segment is a Next.js route group and is not part of the URL. The route entry exports page metadata and renders `CommunityLayout`. `PublicNavbar` defines a link to `/community`; check where it is mounted before changing shared navigation.
 
@@ -115,6 +116,17 @@ npm run build
 5. Select categories, search for text, and move between pages. Confirm query changes reset to page 1 and search requests are debounced.
 6. Confirm the Start Discussion dialog and RSVP controls are understood to be mock/presentational only; they do not create data.
 7. Check keyboard navigation, the skip link, and responsive layout at narrow and wide viewport sizes.
+
+## Likes, bookmarks and followed categories
+
+Community interactions are implemented across four areas:
+
+- **Likes (#1458):** `DiscussionCard` toggles optimistically with an accessible `aria-pressed` control. `lib/community/communityActions.ts` writes local state first, then calls `POST`/`DELETE /community/discussions/:id/like`; a failed request rolls the toggle back. The API response may also carry `isLiked`/`likedByMe`, which is mapped into `DiscussionPost`.
+- **Bookmarks (#1459):** The same pattern persists to `/community/discussions/:id/bookmark`. Bookmarked post snapshots are stored locally so `/community/saved` can render immediately.
+- **Saved page (#1460):** `components/community/SavedDiscussions.tsx` reads the persisted snapshots, optionally refreshes them from `GET /community/discussions/saved`, supports removal, and shows an empty state with a link back to the feed.
+- **Followed categories (#1461):** `CommunitySidebar` renders a Follow/Following control per category and a "Following" badge. State is persisted to local storage and best-effort synced with `POST`/`DELETE /community/categories/:id/follow`.
+
+State lives in `lib/community/communityStorage.ts`, namespaced by the user id from `skillsync.session`, and is exposed through `useSyncExternalStore` hooks in `lib/community/useCommunityInteractions.ts`. A `skillsync:community-change` event plus the `storage` event keep every mounted component (and other tabs) in sync. When no session exists, interactions remain local-only.
 
 ## Contributor notes
 
