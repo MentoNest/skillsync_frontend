@@ -103,6 +103,10 @@ function getDiscussion(value: unknown): DiscussionPost {
     viewsCount: getNumber(value.viewsCount ?? value.views_count),
     isPinned: Boolean(value.isPinned ?? value.is_pinned),
     tags,
+    isLiked: Boolean(value.isLiked ?? value.likedByMe ?? value.liked_by_me),
+    isBookmarked: Boolean(
+      value.isBookmarked ?? value.bookmarkedByMe ?? value.bookmarked_by_me
+    ),
   };
 }
 
@@ -237,4 +241,76 @@ export async function getDiscussions(
           : discussions.length === query.pageSize;
 
   return { discussions, total, hasMore };
+}
+
+/** Shared transport for the Community write endpoints (#1458, #1459, #1461). */
+async function writeRequest(
+  path: string,
+  method: "POST" | "DELETE"
+): Promise<void> {
+  const token = getAccessToken();
+  // Interactions stay usable as local-only state when there is no session.
+  if (!token) return;
+
+  const baseUrl = API_URL.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}${path}`, {
+    method,
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => null);
+    const message = isObject(body) ? getString(body.message) : "";
+    throw new Error(
+      message || `Unable to update community interaction (${response.status}).`
+    );
+  }
+}
+
+/** Persist a like/unlike. Optimistic callers roll back if this rejects. */
+export async function setDiscussionLike(
+  id: string,
+  liked: boolean
+): Promise<void> {
+  const path = `/community/discussions/${encodeURIComponent(id)}/like`;
+  await writeRequest(path, liked ? "POST" : "DELETE");
+}
+
+/** Persist a discussion bookmark. */
+export async function setDiscussionBookmark(
+  id: string,
+  bookmarked: boolean
+): Promise<void> {
+  const path = `/community/discussions/${encodeURIComponent(id)}/bookmark`;
+  await writeRequest(path, bookmarked ? "POST" : "DELETE");
+}
+
+/** Persist a category follow. */
+export async function setCategoryFollow(
+  categoryId: string,
+  followed: boolean
+): Promise<void> {
+  const path = `/community/categories/${encodeURIComponent(categoryId)}/follow`;
+  await writeRequest(path, followed ? "POST" : "DELETE");
+}
+
+/** Load the current user's saved discussions from the API, when available. */
+export async function getSavedDiscussions(): Promise<DiscussionPost[]> {
+  const token = getAccessToken();
+  if (!token) return [];
+
+  const baseUrl = API_URL.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/community/discussions/saved`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const body: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = isObject(body) ? getString(body.message) : "";
+    throw new Error(
+      message || `Unable to load saved discussions (${response.status}).`
+    );
+  }
+  if (body === null) return [];
+
+  const { items } = getPayload(body);
+  return items.map(getDiscussion);
 }
