@@ -38,3 +38,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Community discussion details
+
+The discussion details page provides a dedicated view of a community discussion and its complete conversation.
+
+- **Route:** `/community/discussions/[discussionId]`
+- **Post details:** Show the full post and its author.
+- **Conversation:** Show the discussion's comments.
+- **Related content:** Show related discussions.
+- **Not found:** Handle unknown discussion IDs with a not-found state.
