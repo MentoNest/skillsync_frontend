@@ -1,4 +1,5 @@
 import type { DiscussionPost } from "../../components/community/communityData";
+import { COMMUNITY_CATEGORIES } from "../../components/community/communityData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
@@ -19,6 +20,38 @@ export interface DiscussionPage {
 }
 
 type JsonObject = Record<string, unknown>;
+
+function normalizeCategory(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+export function matchesCategory(
+  discussionCategory: string,
+  selectedCategoryId: string
+): boolean {
+  if (selectedCategoryId === "all") return true;
+
+  const selectedCategory = COMMUNITY_CATEGORIES.find(
+    (category) =>
+      category.id === selectedCategoryId || category.slug === selectedCategoryId
+  );
+  if (!selectedCategory) return true;
+
+  const target = normalizeCategory(selectedCategory.name);
+  const targetSlug = normalizeCategory(selectedCategory.slug);
+  const discussion = normalizeCategory(discussionCategory);
+
+  return (
+    discussion === target ||
+    discussion === targetSlug ||
+    discussion.includes(target) ||
+    target.includes(discussion)
+  );
+}
 
 function isObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -58,7 +91,14 @@ function getDiscussion(value: unknown): DiscussionPost {
     : typeof rawTags === "string"
       ? rawTags.split(",").map((tag) => tag.trim()).filter(Boolean)
       : [];
-  const category = getString(categoryValue.name, getString(value.category, "General Discussion"));
+  const category = getString(
+    categoryValue.name ??
+      categoryValue.title ??
+      categoryValue.label ??
+      categoryValue.slug ??
+      categoryValue.id,
+    getString(value.category, "General Discussion")
+  );
   const authorName = getString(
     authorValue.name,
     getString(
@@ -204,7 +244,12 @@ export async function getDiscussions(
     limit: String(query.pageSize),
     sort: query.sort === "my-posts" ? "latest" : query.sort,
   });
-  if (query.category !== "all") params.set("category", query.category);
+  if (query.category !== "all") {
+    const category = COMMUNITY_CATEGORIES.find(
+      (item) => item.id === query.category || item.slug === query.category
+    );
+    params.set("category", category?.slug ?? query.category);
+  }
   if (query.search.trim()) params.set("search", query.search.trim());
 
   const headers = new Headers();
@@ -227,7 +272,13 @@ export async function getDiscussions(
   if (body === null) throw new Error("The discussions response was not valid JSON.");
 
   const { items, metadata } = getPayload(body);
-  const discussions = items.map(getDiscussion);
+  const mappedDiscussions = items.map(getDiscussion);
+  const discussions =
+    query.category === "all"
+      ? mappedDiscussions
+      : mappedDiscussions.filter((discussion) =>
+          matchesCategory(discussion.category, query.category)
+        );
   const totalValue = metadata.total ?? metadata.totalItems ?? metadata.count;
   const total = totalValue === undefined ? discussions.length : getNumber(totalValue);
   const totalPages = getNumber(metadata.totalPages);
