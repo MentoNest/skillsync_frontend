@@ -11,6 +11,16 @@ import {
   getCurrentUserId,
   getDiscussions,
 } from "../../lib/community/discussionsApi";
+import {
+  bookmarkDiscussionWithPersistence,
+  followCategoryWithPersistence,
+  likeDiscussionWithPersistence,
+} from "../../lib/community/communityActions";
+import {
+  useBookmarkedDiscussions,
+  useFollowedCategoryIds,
+  useLikedDiscussionIds,
+} from "../../lib/community/useCommunityInteractions";
 import type { DiscussionPost } from "./communityData";
 
 const PAGE_SIZE = 10;
@@ -47,6 +57,12 @@ export default function CommunityLayout() {
     type: "success" | "error";
     message: string;
   } | null>(null);
+  const [interactionError, setInteractionError] = useState<string | null>(null);
+
+  const likedIds = useLikedDiscussionIds();
+  const bookmarkedDiscussions = useBookmarkedDiscussions();
+  const followedCategoryIds = useFollowedCategoryIds();
+  const bookmarkedIds = bookmarkedDiscussions.map((post) => post.id);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -100,6 +116,31 @@ export default function CommunityLayout() {
   const updateSearch = (search: string) => {
     setSearchQuery(search);
     setPage(1);
+  };
+
+  const handleToggleLike = (id: string) => {
+    setInteractionError(null);
+    likeDiscussionWithPersistence(id).catch(() =>
+      setInteractionError("Could not save your like. Please try again.")
+    );
+  };
+
+  const handleToggleBookmark = (id: string) => {
+    const post =
+      discussions.find((item) => item.id === id) ??
+      bookmarkedDiscussions.find((item) => item.id === id);
+    if (!post) return;
+    setInteractionError(null);
+    bookmarkDiscussionWithPersistence(post).catch(() =>
+      setInteractionError("Could not save your bookmark. Please try again.")
+    );
+  };
+
+  const handleToggleFollow = (categoryId: string) => {
+    setInteractionError(null);
+    followCategoryWithPersistence(categoryId).catch(() =>
+      setInteractionError("Could not save your follow. Please try again.")
+    );
   };
 
   const handleDelete = async (id: string) => {
@@ -183,6 +224,11 @@ export default function CommunityLayout() {
             aria-labelledby={`tab-${activeTab}`}
             className="space-y-4"
           >
+            {interactionError && (
+              <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                {interactionError}
+              </p>
+            )}
             {deleteFeedback && (
               <p
                 role={deleteFeedback.type === "error" ? "alert" : "status"}
@@ -221,6 +267,10 @@ export default function CommunityLayout() {
                 <DiscussionCard
                   key={discussion.id}
                   discussion={discussion}
+                  isLiked={likedIds.includes(discussion.id)}
+                  isBookmarked={bookmarkedIds.includes(discussion.id)}
+                  onToggleLike={handleToggleLike}
+                  onToggleBookmark={handleToggleBookmark}
                   onDelete={
                     currentUserId && discussion.author.id === currentUserId
                       ? handleDelete
@@ -292,6 +342,8 @@ export default function CommunityLayout() {
           <CommunitySidebar
             selectedCategory={selectedCategory}
             onSelectCategory={updateCategory}
+            followedCategoryIds={followedCategoryIds}
+            onToggleFollowCategory={handleToggleFollow}
           />
         </div>
       </div>
