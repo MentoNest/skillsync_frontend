@@ -26,6 +26,8 @@ export interface DiscussionPost {
   commentsCount: number;
   viewsCount: number;
   isPinned?: boolean;
+  /** Whether replies to this discussion are disabled. */
+  isLocked?: boolean;
   tags: string[];
   /** Whether the signed-in user has liked this discussion (#1458). */
   isLiked?: boolean;

@@ -1,16 +1,21 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import CommunityHero from "./CommunityHero";
 import CommunityFeedTabs, { CommunityFeedTab } from "./CommunityFeedTabs";
 import CommunitySidebar from "./CommunitySidebar";
 import DiscussionCard from "./DiscussionCard";
 import CommunityEmptyState from "./CommunityEmptyState";
+import CommunityNotifications from "./CommunityNotifications";
 import {
   deleteDiscussion,
   getCurrentUserId,
   getDiscussions,
+  setDiscussionLocked,
+  setDiscussionPinned,
 } from "../../lib/community/discussionsApi";
+import { hasAdminSession, subscribeToCommunityStorage } from "../../lib/community/communityInteractions";
 import {
   bookmarkDiscussionWithPersistence,
   followCategoryWithPersistence,
@@ -78,6 +83,12 @@ export default function CommunityLayout() {
     message: string;
   } | null>(null);
   const [interactionError, setInteractionError] = useState<string | null>(null);
+  const [updatingModerationId, setUpdatingModerationId] = useState<string>();
+  const canModerate = useSyncExternalStore(
+    subscribeToCommunityStorage,
+    hasAdminSession,
+    () => false
+  );
 
   const likedIds = useLikedDiscussionIds();
   const bookmarkedDiscussions = useBookmarkedDiscussions();
@@ -261,6 +272,56 @@ export default function CommunityLayout() {
     );
   };
 
+  const handleTogglePin = async (id: string) => {
+    const discussion = discussions.find((item) => item.id === id);
+    if (!discussion || !canModerate) return;
+    const pinned = !discussion.isPinned;
+    setUpdatingModerationId(id);
+    setDiscussions((current) =>
+      current.map((item) => item.id === id ? { ...item, isPinned: pinned } : item)
+    );
+    try {
+      await setDiscussionPinned(id, pinned);
+      setInteractionError(null);
+    } catch (moderationError) {
+      setDiscussions((current) =>
+        current.map((item) => item.id === id ? { ...item, isPinned: !pinned } : item)
+      );
+      setInteractionError(
+        moderationError instanceof Error
+          ? moderationError.message
+          : "Could not update the pinned discussion."
+      );
+    } finally {
+      setUpdatingModerationId(undefined);
+    }
+  };
+
+  const handleToggleLock = async (id: string) => {
+    const discussion = discussions.find((item) => item.id === id);
+    if (!discussion || !canModerate) return;
+    const locked = !discussion.isLocked;
+    setUpdatingModerationId(id);
+    setDiscussions((current) =>
+      current.map((item) => item.id === id ? { ...item, isLocked: locked } : item)
+    );
+    try {
+      await setDiscussionLocked(id, locked);
+      setInteractionError(null);
+    } catch (moderationError) {
+      setDiscussions((current) =>
+        current.map((item) => item.id === id ? { ...item, isLocked: !locked } : item)
+      );
+      setInteractionError(
+        moderationError instanceof Error
+          ? moderationError.message
+          : "Could not update the locked discussion."
+      );
+    } finally {
+      setUpdatingModerationId(undefined);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     const discussion = discussions.find((item) => item.id === id);
     if (!discussion || discussion.author.id !== currentUserId) return;
@@ -291,6 +352,9 @@ export default function CommunityLayout() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       {/* Hero Banner (#1424) */}
+      <div className="flex justify-end">
+        <CommunityNotifications />
+      </div>
       <CommunityHero onStartDiscussion={() => setIsModalOpen(true)} />
       {canModerate && (
         <div className="flex justify-end">
@@ -407,6 +471,10 @@ export default function CommunityLayout() {
                   isBookmarked={bookmarkedIds.includes(discussion.id)}
                   onToggleLike={handleToggleLike}
                   onToggleBookmark={handleToggleBookmark}
+                  canModerate={canModerate}
+                  onTogglePin={handleTogglePin}
+                  onToggleLock={handleToggleLock}
+                  isUpdatingModeration={updatingModerationId === discussion.id}
                   onDelete={
                     currentUserId && discussion.author.id === currentUserId
                       ? handleDelete

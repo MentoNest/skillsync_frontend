@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import { DiscussionPost } from "./communityData";
 import {
   isAuthorFollowed,
@@ -8,6 +8,7 @@ import {
   toggleFollowAuthor,
   submitDiscussionReport,
 } from "../../lib/community/communityInteractions";
+import PinLockDiscussion from "./PinLockDiscussion";
 
 export interface DiscussionCardProps {
   discussion: DiscussionPost;
@@ -20,6 +21,10 @@ export interface DiscussionCardProps {
   isBookmarked?: boolean;
   onToggleLike?: (id: string) => void;
   onToggleBookmark?: (id: string) => void;
+  canModerate?: boolean;
+  onTogglePin?: (id: string) => void;
+  onToggleLock?: (id: string) => void;
+  isUpdatingModeration?: boolean;
 }
 
 /**
@@ -35,6 +40,10 @@ export default function DiscussionCard({
   isBookmarked,
   onToggleLike,
   onToggleBookmark,
+  canModerate = false,
+  onTogglePin,
+  onToggleLock,
+  isUpdatingModeration = false,
 }: DiscussionCardProps) {
   const [likes, setLikes] = useState(discussion.likesCount);
   const [hasLiked, setHasLiked] = useState(
@@ -43,17 +52,15 @@ export default function DiscussionCard({
   const [bookmarked, setBookmarked] = useState(
     Boolean(isBookmarked ?? discussion.isBookmarked ?? false)
   );
-
-  // Keep the optimistic UI in sync when the persisted store changes (e.g. from
-  // another tab or after a rollback).
-  useEffect(() => {
-    setHasLiked(Boolean(isLiked ?? discussion.isLiked ?? false));
-    setLikes(discussion.likesCount);
-  }, [isLiked, discussion.isLiked, discussion.likesCount]);
-
-  useEffect(() => {
-    setBookmarked(Boolean(isBookmarked ?? discussion.isBookmarked ?? false));
-  }, [isBookmarked, discussion.isBookmarked]);
+  const [reportMessage, setReportMessage] = useState("");
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("Spam");
+  const [reportDetails, setReportDetails] = useState("");
+  const isFollowing = useSyncExternalStore(
+    subscribeToCommunityStorage,
+    () => isAuthorFollowed(discussion.author.name),
+    () => false
+  );
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -76,24 +83,6 @@ export default function DiscussionCard({
       toggleFollowAuthor(discussion.author.name);
     } catch (error) {
       setShareMessage(error instanceof Error ? error.message : "Unable to update follow status.");
-    }
-  };
-
-  const handleShare = async () => {
-    const url = new URL(window.location.href);
-    url.hash = `discussion-${discussion.id}`;
-
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: discussion.title, text: discussion.excerpt, url: url.toString() });
-        setShareMessage("Discussion shared.");
-        return;
-      }
-      await navigator.clipboard.writeText(url.toString());
-      setShareMessage("Discussion link copied.");
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      setShareMessage(error instanceof Error ? error.message : "Unable to share this discussion.");
     }
   };
 
@@ -161,6 +150,11 @@ export default function DiscussionCard({
           {discussion.isPinned && (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-xs font-medium text-amber-800">
               📌 Pinned
+            </span>
+          )}
+          {discussion.isLocked && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-xs font-medium text-red-800">
+              🔒 Locked
             </span>
           )}
           <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
@@ -320,8 +314,18 @@ export default function DiscussionCard({
           </span>
         </div>
       </div>
-      {(shareMessage || reportMessage) && (
-        <p role="status" className="mt-2 text-xs text-gray-600">{reportMessage || shareMessage}</p>
+      {canModerate && (
+        <PinLockDiscussion
+          discussionId={discussion.id}
+          isPinned={discussion.isPinned}
+          isLocked={discussion.isLocked}
+          onTogglePin={onTogglePin}
+          onToggleLock={onToggleLock}
+          disabled={isUpdatingModeration}
+        />
+      )}
+      {reportMessage && (
+        <p role="status" className="mt-2 text-xs text-gray-600">{reportMessage}</p>
       )}
       {reportOpen && (
         <div role="dialog" aria-modal="true" aria-labelledby={`report-title-${discussion.id}`} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

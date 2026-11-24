@@ -142,6 +142,7 @@ function getDiscussion(value: unknown): DiscussionPost {
     commentsCount: getNumber(value.commentsCount ?? value.comments_count),
     viewsCount: getNumber(value.viewsCount ?? value.views_count),
     isPinned: Boolean(value.isPinned ?? value.is_pinned),
+    isLocked: Boolean(value.isLocked ?? value.is_locked ?? value.locked),
     tags,
     isLiked: Boolean(value.isLiked ?? value.likedByMe ?? value.liked_by_me),
     isBookmarked: Boolean(
@@ -343,6 +344,28 @@ export async function setCategoryFollow(
   const path = `/community/categories/${encodeURIComponent(categoryId)}/follow`;
   await writeRequest(path, followed ? "POST" : "DELETE");
 }
+
+/** Pin or unpin a discussion. */
+export async function setDiscussionPinned(
+  id: string,
+  pinned: boolean
+): Promise<void> {
+  const path = `/community/discussions/${encodeURIComponent(id)}/pin`;
+  await writeRequest(path, pinned ? "POST" : "DELETE");
+}
+
+export const pinDiscussion = setDiscussionPinned;
+
+/** Lock or unlock discussion replies. */
+export async function setDiscussionLocked(
+  id: string,
+  locked: boolean
+): Promise<void> {
+  const path = `/community/discussions/${encodeURIComponent(id)}/lock`;
+  await writeRequest(path, locked ? "POST" : "DELETE");
+}
+
+export const lockDiscussion = setDiscussionLocked;
 
 /** Load the current user's saved discussions from the API, when available. */
 export async function getSavedDiscussions(): Promise<DiscussionPost[]> {
